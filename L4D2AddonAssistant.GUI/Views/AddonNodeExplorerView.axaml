@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="using:L4D2AddonAssistant.Views"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             xmlns:r="using:L4D2AddonAssistant.Resources"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="L4D2AddonAssistant.Views.AddonNodeExplorerView"
+             x:DataType="vm:AddonNodeExplorerViewModel">
+  <Design.DataContext>
+    <vm:AddonNodeExplorerViewModelDesign/>
+  </Design.DataContext>
+  
+  <Grid
+    RowDefinitions="Auto, *"
+    ColumnDefinitions="*, 4, 300">
+    <Grid
+      RowDefinitions="Auto"
+      ColumnDefinitions="Auto, Auto, *"
+      Grid.Row="0"
+      Grid.Column="0" 
+      Margin="5">
+      <Grid.Styles>
+        <Style Selector="Button">
+          <Setter Property="Background" Value="Transparent"/>
+          <Style Selector="^:disabled ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+          </Style>
+        </Style>
+
+        <Style Selector="Button.Regular > PathIcon">
+          <Setter Property="Width" Value="25"/>
+          <Setter Property="Height" Value="25"/>
+        </Style>
+      </Grid.Styles>
+       
+      <Button
+        Command="{Binding GotoParentCommand}"
+        Classes="Regular"
+        Grid.Row="0" Grid.Column="0">
+        <PathIcon Data="{StaticResource icon_arrow_up}"/>
+      </Button>
+
+      <Button
+        Command="{Binding GotoRootCommand}"
+        Classes="Regular"
+        Grid.Row="0" Grid.Column="1">
+        <PathIcon Data="{StaticResource icon_home}"/>
+      </Button>
+
+      <ScrollViewer Grid.Row="0" Grid.Column="2">
+        <v:AddonNodeNavBarView/>
+      </ScrollViewer>
+    </Grid>
+
+    <!--Container View-->
+    <Border
+      Grid.Row="1"
+      Grid.Column="0"
+      BorderThickness="2"
+      BorderBrush="Gray">
+      <v:AddonNodeContainerView
+        DataContext="{Binding ContainerViewModel}">
+      </v:AddonNodeContainerView>
+      <Border.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="{x:Static r:Texts.New}">
+            <MenuItem Header="{x:Static r:Texts.Group}" Command="{Binding NewGroupCommand}"/>
+          </MenuItem>
+          
+          <Separator/>
+          
+          <MenuItem Header="{x:Static r:Texts.Enable}" Command="{Binding EnableCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.Disable}" Command="{Binding DisableCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.EnableRecursively}" Command="{Binding EnableRecursivelyCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.DisableRecursively}" Command="{Binding DisableRecursivelyCommand}"/>
+          
+          <Separator/>
+          
+          <MenuItem Header="{x:Static r:Texts.Move}" Command="{Binding MoveCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.MoveHere}" Command="{Binding MoveHereCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.CancelMove}" Command="{Binding CancelMoveCommand}"/>
+          
+          <Separator/>
+          
+          <MenuItem Header="{x:Static r:Texts.Delete}" Command="{Binding DeleteCommand}" CommandParameter="{x:False}"/>
+          <MenuItem Header="{x:Static r:Texts.DeleteAndRetainFile}" Command="{Binding DeleteCommand}" CommandParameter="{x:True}"/>
+          
+        </ContextMenu>
+      </Border.ContextMenu>
+    </Border>
+
+    <GridSplitter
+      Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+      ResizeDirection="Columns"/>
+    
+    <!--AddonNodeView Panel-->
+    <Border
+      Grid.Row="0"
+      Grid.Column="2"
+      Grid.RowSpan="2"
+      BorderThickness="2"
+      BorderBrush="Gray">
+      <Panel>
+        <StackPanel
+          Orientation="Vertical"
+          Margin="5, 100, 5, 5"
+          IsVisible="{Binding IsMultipleSelection, FallbackValue=False}">
+          <TextBlock
+            Text="{Binding SelectionCount, StringFormat={x:Static r:Texts.MultipleItemsSelected}}"
+            Margin="5"
+            TextAlignment="Center"/>
+          <TextBlock
+            Text="{Binding SelectionNames}"
+            Margin="5"
+            TextAlignment="Center"
+            TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <Panel
+          IsVisible="{Binding IsSingleSelection, FallbackValue=False}"
+          Margin="10">
+          <v:AddonNodeView DataContext="{Binding SingleSelection, TargetNullValue={x:Null}}"/>
+        </Panel>
+      </Panel>
+    </Border>
+    
+  </Grid>
+</UserControl>

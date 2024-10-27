@@ -1,0 +1,83 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
+using L4D2AddonAssistant.ViewModels;
+using L4D2AddonAssistant.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
+
+namespace L4D2AddonAssistant
+{
+    public partial class App : Application
+    {
+        public const string DocumentDirectoryName = "L4D2AddonAssistant";
+
+        private string _documentDirectoryPath;
+
+        public event Action? ShutdownRequested = null;
+
+        public App()
+        {
+            _documentDirectoryPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DocumentDirectoryName);
+            Directory.CreateDirectory(_documentDirectoryPath);
+
+            Services = new ServiceCollection()
+                .AddSingleton(this)
+                .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<MainWindow>(services => new MainWindow() { DataContext = services.GetRequiredService<MainWindowViewModel>()})
+                .AddSingleton<AppSettings>()
+                .AddSingleton<CommonInteractions>()
+                .AddSingleton<IMessageBoxService, MessageBoxService>()
+                .BuildServiceProvider();
+        }
+
+        //public static new App Current => (App?)Application.Current ?? throw new InvalidOperationException("The App.Current is null.");
+
+        public IServiceProvider Services { get; }
+
+        public string DocumentDirectoryPath => _documentDirectoryPath;
+
+        public override void Initialize()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.ShutdownRequested += (sender, args) =>
+                {
+                    ShutdownRequested?.Invoke();
+                };
+
+                var mainWindow = Services.GetRequiredService<MainWindow>();
+
+                var commonInteractions = Services.GetRequiredService<CommonInteractions>();
+                commonInteractions.ChooseDirectory.RegisterHandler(async (context) =>
+                {
+                    string? output = null;
+                    var storage = mainWindow.StorageProvider;
+                    var options = new FolderPickerOpenOptions() { AllowMultiple = false };
+                    var folders = await storage.OpenFolderPickerAsync(options);
+                    if (folders.Count == 1)
+                    {
+                        var folder = folders[0];
+                        var path = folder.Path;
+                        if (path.IsFile)
+                        {
+                            output = path.LocalPath;
+                        }
+                    }
+                    context.SetOutput(output);
+                });
+
+                desktop.MainWindow = mainWindow;
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
+    }
+}

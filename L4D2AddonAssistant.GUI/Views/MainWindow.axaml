@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="using:L4D2AddonAssistant.Views"
+        xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="L4D2AddonAssistant.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="L4D2 Addon Assistant">
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="{x:Static r:Texts.File}">
+        <MenuItem Header="{x:Static r:Texts.Open}" Command="{Binding OpenDirectoryCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.Save}" Command="{Binding SaveCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}"/>
+      </MenuItem>
+    </Menu>
+    
+    <v:AddonNodeExplorerView DataContext="{Binding AddonNodeExplorerViewModel}"/>
+  </DockPanel>
+</Window>

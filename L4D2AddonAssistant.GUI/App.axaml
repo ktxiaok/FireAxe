@@ -1,0 +1,67 @@
+<Application
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="L4D2AddonAssistant.App"
+  xmlns:local="using:L4D2AddonAssistant"
+  xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
+  RequestedThemeVariant="Default">
+  <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
+  
+  <Application.Styles>
+    <FluentTheme/>
+    
+    <Style Selector="PathIcon">
+      <Setter Property="Foreground" Value="{DynamicResource brush_foreground}"/>
+    </Style>
+    
+    <Style Selector="Button:disabled > PathIcon">
+      <Setter Property="Foreground" Value="Gray"/>
+    </Style>
+    
+    <Style Selector="ComboBox.EnumComboBox">
+      <Setter Property="ItemTemplate">
+        <Setter.Value>
+          <DataTemplate>
+            <TextBlock Text="{ReflectionBinding Converter={x:Static conv:EnumDescriptionConverter.Instance}}"/>
+          </DataTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style Selector="TextBlock.Heading1">
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="FontSize" Value="20"/>
+    </Style>
+
+    <Style Selector="TextBlock.PropertyName">
+      <Setter Property="HorizontalAlignment" Value="Left"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0, 5, 5, 5"/>
+    </Style>
+
+    <Style Selector="TextBlock.PropertyValue">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="5, 5, 0, 5"/>
+    </Style>
+
+    <Style Selector="ComboBox.PropertyValue">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="Margin" Value="5, 5, 0, 5"/>
+    </Style>
+  </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Assets/CommonResources.axaml"/>
+        <ResourceInclude Source="/Views/EditableTextBlock.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  
+</Application>

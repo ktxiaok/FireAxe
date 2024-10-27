@@ -1,0 +1,58 @@
+<v:AddonNodeSimpleView xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             xmlns:v="using:L4D2AddonAssistant.Views"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             x:Class="L4D2AddonAssistant.Views.AddonNodeTileView"
+             x:DataType="vm:AddonNodeSimpleViewModel">
+  <Design.DataContext>
+    <vm:AddonNodeSimpleViewModelDesign/>
+  </Design.DataContext>
+  <Panel
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+    <StackPanel
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+      <Panel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Margin="10">
+        <PathIcon
+          Width="{Binding #image.Width}"
+          Height="{Binding $self.Width}"
+          Data="{StaticResource icon_folder}"
+          IsVisible="{Binding ShouldShowFolderIcon}"/>
+        <PathIcon
+          Width="{Binding #image.Width}"
+          Height="{Binding $self.Width}"
+          Data="{StaticResource icon_question}"
+          IsVisible="{Binding ShouldShowUnknownImage}"/>
+        <Image
+          x:Name="image"
+          Width="{StaticResource size_addon_tile}"
+          Height="{Binding $self.Width}"
+          Stretch="Uniform"
+          Source="{Binding Image}"
+          IsVisible="{Binding ShouldShowImage}"/>
+      </Panel>
+      <Panel Height="20">
+        <TextBlock
+          Text="{Binding AddonNode.Name}"
+          FontSize="12"
+          MaxWidth="{Binding #image.Width}"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          TextWrapping="Wrap"
+          MaxLines="1"
+          TextTrimming="CharacterEllipsis"/>
+      </Panel>
+    </StackPanel>
+    <v:AddonNodeEnableButton
+      HorizontalAlignment="Right"
+      VerticalAlignment="Top">
+    </v:AddonNodeEnableButton>
+  </Panel>
+</v:AddonNodeSimpleView>

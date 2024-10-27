@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:L4D2AddonAssistant"
+             xmlns:r="using:L4D2AddonAssistant.Resources"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
+             xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="450"
+             x:Class="L4D2AddonAssistant.AddonGroupSectionView"
+             x:DataType="vm:AddonGroupViewModel">
+  <Design.DataContext>
+    <vm:AddonGroupViewModelDesign/>
+  </Design.DataContext>
+  
+  <Grid
+    RowDefinitions="Auto, Auto"
+    ColumnDefinitions="*, *">
+    <TextBlock
+      Classes="Heading1"
+      Margin="0, 5, 0, 5"
+      Grid.Row="0"
+      Grid.ColumnSpan="2"
+      Text="{x:Static r:Texts.Group}"/>
+    <TextBlock
+      Classes="PropertyName"
+      Grid.Row="1"
+      Grid.Column="0"
+      Text="{x:Static r:Texts.EnableStrategy}"/>
+    <ComboBox
+      Classes="EnumComboBox PropertyValue"
+      Grid.Row="1"
+      Grid.Column="1"
+      ItemsSource="{Binding Source={me:EnumValues {x:Type local:AddonGroupEnableStrategy}}}"
+      SelectedItem="{Binding AddonNode.EnableStrategy}"/>
+  </Grid>
+</UserControl>
