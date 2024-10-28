@@ -14,7 +14,6 @@
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">
         <MenuItem Header="{x:Static r:Texts.Open}" Command="{Binding OpenDirectoryCommand}"/>
-        <MenuItem Header="{x:Static r:Texts.Save}" Command="{Binding SaveCommand}"/>
         <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}"/>
       </MenuItem>
     </Menu>

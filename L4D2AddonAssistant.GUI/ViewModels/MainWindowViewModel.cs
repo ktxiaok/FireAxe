@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 
 namespace L4D2AddonAssistant.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase, ISaveable
     {
         private AppSettings _settings;
         private CommonInteractions _commonInteractions;
@@ -16,7 +16,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
-        public MainWindowViewModel(App app, AppSettings settings, CommonInteractions commonInteractions)
+        public MainWindowViewModel(AppSettings settings, CommonInteractions commonInteractions)
         {
             ArgumentNullException.ThrowIfNull(settings);
             ArgumentNullException.ThrowIfNull(commonInteractions);
@@ -24,8 +24,6 @@ namespace L4D2AddonAssistant.ViewModels
             _commonInteractions = commonInteractions;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
-
-            app.ShutdownRequested += OnShutdown;
 
             OpenDirectoryCommand = ReactiveCommand.CreateFromObservable(() =>
             {
@@ -38,7 +36,6 @@ namespace L4D2AddonAssistant.ViewModels
                     return Unit.Default;
                 });
             });
-            SaveCommand = ReactiveCommand.Create(Save, _addonRootNotNull);
             ImportCommand = ReactiveCommand.Create(Import, _addonRootNotNull);
 
             // Try to open the LastOpenDirectory.
@@ -52,7 +49,26 @@ namespace L4D2AddonAssistant.ViewModels
                 else
                 {
                     _settings.LastOpenDirectory = null;
-                    _settings.WriteFile();
+                    _settings.Save();
+                }
+            }
+        }
+
+        public bool RequestSave
+        {
+            get
+            {
+                if (_addonRoot == null)
+                {
+                    return false;
+                }
+                return _addonRoot.RequestSave;
+            }
+            set
+            {
+                if (_addonRoot != null)
+                {
+                    _addonRoot.RequestSave = value;
                 }
             }
         }
@@ -82,8 +98,6 @@ namespace L4D2AddonAssistant.ViewModels
         }
 
         public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
-        
-        public ReactiveCommand<Unit, Unit> SaveCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ImportCommand { get; }
 
@@ -99,14 +113,14 @@ namespace L4D2AddonAssistant.ViewModels
             AddonRoot = addonRoot;
 
             _settings.LastOpenDirectory = dirPath;
-            _settings.WriteFile();
+            _settings.Save();
         }
 
         public void Save()
         {
             if (_addonRoot != null)
             {
-                _addonRoot.SaveFile();
+                _addonRoot.Save();
             }
         }
 
@@ -116,11 +130,6 @@ namespace L4D2AddonAssistant.ViewModels
             {
                 _addonRoot.Import();
             }
-        }
-
-        private void OnShutdown()
-        {
-            Save();
         }
     }
 }

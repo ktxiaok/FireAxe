@@ -7,7 +7,7 @@ using System.IO;
 namespace L4D2AddonAssistant
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class AppSettings : ReactiveObject
+    public class AppSettings : ObservableObject, ISaveable
     {
         public const string SettingsFileName = "Settings.json";
 
@@ -21,17 +21,25 @@ namespace L4D2AddonAssistant
 
             _settingsFilePath = Path.Join(app.DocumentDirectoryPath, SettingsFileName);
 
-            ReadFile();
+            LoadFile();
         }
+
+        public bool RequestSave { get; set; } = true;
 
         [JsonProperty]
         public string? LastOpenDirectory
         {
             get => _lastOpenDirectory;
-            set => this.RaiseAndSetIfChanged(ref _lastOpenDirectory, value);
+            set 
+            {
+                if (NotifyAndSetIfChanged(ref _lastOpenDirectory, value))
+                {
+                    RequestSave = true;
+                }
+            }
         }
 
-        public void ReadFile()
+        public void LoadFile()
         {
             try
             {
@@ -46,7 +54,7 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public void WriteFile()
+        public void Save()
         {
             try
             {

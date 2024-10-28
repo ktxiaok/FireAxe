@@ -3,12 +3,12 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Collections.Specialized;
 using ValveKeyValue;
 
 namespace L4D2AddonAssistant
 {
-    public class AddonRoot : IAddonNodeContainer, IAddonNodeContainerInternal
+    public class AddonRoot : IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
     {
         public const string SaveFileName = ".addonroot";
 
@@ -30,8 +30,10 @@ namespace L4D2AddonAssistant
         
         public AddonRoot()
         {
-            
+            ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
         }
+
+        public bool RequestSave { get; set; } = true;
 
         public ReadOnlyObservableCollection<AddonNode> Nodes => _containerService.Nodes;
 
@@ -42,6 +44,7 @@ namespace L4D2AddonAssistant
             {
                 _directoryPath = new(value);
                 _directoryPath.Create();
+                RequestSave = true;
             }
         }
 
@@ -266,7 +269,7 @@ namespace L4D2AddonAssistant
             LoadSave(save);
         }
 
-        public void SaveFile()
+        public void Save()
         {
             SaveFile(DirectoryPath, CreateSave());
         }
@@ -339,6 +342,11 @@ namespace L4D2AddonAssistant
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            RequestSave = true;
         }
     }
 }

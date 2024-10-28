@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 
 namespace L4D2AddonAssistant
@@ -132,7 +133,7 @@ namespace L4D2AddonAssistant
 
         public AddonGroup(AddonRoot root, AddonGroup? group = null) : base(root, group)
         {
-
+            ((INotifyCollectionChanged)Children).CollectionChanged += OnCollectionChanged;
         }
 
         public override Type SaveType => typeof(AddonGroupSave);
@@ -151,6 +152,7 @@ namespace L4D2AddonAssistant
                 _enableStrategy = value;
                 NotifyChanged();
                 AutoCheck();
+                Root.RequestSave = true;
             }
         }
 
@@ -270,6 +272,11 @@ namespace L4D2AddonAssistant
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            Root.RequestSave = true;
         }
     }
 

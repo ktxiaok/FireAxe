@@ -30,6 +30,7 @@ namespace L4D2AddonAssistant
                 .AddSingleton<AppSettings>()
                 .AddSingleton<CommonInteractions>()
                 .AddSingleton<IMessageBoxService, MessageBoxService>()
+                .AddSingleton<SaveManager>()
                 .BuildServiceProvider();
         }
 
@@ -75,6 +76,11 @@ namespace L4D2AddonAssistant
                 });
 
                 desktop.MainWindow = mainWindow;
+
+                var saveManager = Services.GetRequiredService<SaveManager>();
+                saveManager.Register(Services.GetRequiredService<MainWindowViewModel>());
+                saveManager.Register(Services.GetRequiredService<AppSettings>());
+                saveManager.Run();
             }
 
             base.OnFrameworkInitializationCompleted();

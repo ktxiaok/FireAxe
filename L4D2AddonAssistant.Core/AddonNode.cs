@@ -64,6 +64,7 @@ namespace L4D2AddonAssistant
                     Group.NotifyChildEnableOrDisable(this);
                 }
                 AutoCheck();
+                Root.RequestSave = true;
             }
         }
 
@@ -72,7 +73,13 @@ namespace L4D2AddonAssistant
         public AddonGroup? Group
         {
             get => _group;
-            private set => NotifyAndSetIfChanged(ref _group, value);
+            private set
+            {
+                if (NotifyAndSetIfChanged(ref _group, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
         }
 
         public IAddonNodeContainer Parent => ((IAddonNodeContainer?)Group) ?? Root; 
@@ -153,6 +160,7 @@ namespace L4D2AddonAssistant
                 parentInternal.ChangeNameUnchecked(_name, value, this);
                 _name = value;
                 NotifyChanged();
+                Root.RequestSave = true;
             }
         }
 

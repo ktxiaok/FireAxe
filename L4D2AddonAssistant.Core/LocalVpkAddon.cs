@@ -4,6 +4,8 @@ namespace L4D2AddonAssistant
 {
     public class LocalVpkAddon : VpkAddon
     {
+        private Guid _vpkGuid = Guid.Empty;
+
         public LocalVpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
 
@@ -15,7 +17,17 @@ namespace L4D2AddonAssistant
 
         public override Type SaveType => typeof(LocalVpkAddonSave);
 
-        public Guid VpkGuid { get; set; } = Guid.Empty;
+        public Guid VpkGuid
+        {
+            get => _vpkGuid;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _vpkGuid, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
+        }
 
         protected override void OnCreateSave(AddonNodeSave save)
         {
