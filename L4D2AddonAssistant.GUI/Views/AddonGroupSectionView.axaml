@@ -8,7 +8,7 @@
              xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
              xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="450"
-             x:Class="L4D2AddonAssistant.AddonGroupSectionView"
+             x:Class="L4D2AddonAssistant.Views.AddonGroupSectionView"
              x:DataType="vm:AddonGroupViewModel">
   <Design.DataContext>
     <vm:AddonGroupViewModelDesign/>

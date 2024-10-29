@@ -5,7 +5,7 @@
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
              xmlns:r="using:L4D2AddonAssistant.Resources"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
-             x:Class="L4D2AddonAssistant.VpkAddonSectionView"
+             x:Class="L4D2AddonAssistant.Views.VpkAddonSectionView"
              x:DataType="vm:VpkAddonViewModel">
   <Grid
     RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"

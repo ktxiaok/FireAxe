@@ -6,7 +6,7 @@ using L4D2AddonAssistant.ViewModels;
 using ReactiveUI;
 using System.Reactive.Disposables;
 
-namespace L4D2AddonAssistant;
+namespace L4D2AddonAssistant.Views;
 
 public partial class VpkAddonSectionView : ReactiveUserControl<VpkAddonViewModel>
 {
