@@ -12,6 +12,7 @@ namespace L4D2AddonAssistant
         public const string SettingsFileName = "Settings.json";
 
         private string? _lastOpenDirectory = null;
+        private string? _language = null;
 
         private string _settingsFilePath;
 
@@ -22,6 +23,7 @@ namespace L4D2AddonAssistant
             _settingsFilePath = Path.Join(app.DocumentDirectoryPath, SettingsFileName);
 
             LoadFile();
+            LanguageManager.CurrentLanguage = Language;
         }
 
         public bool RequestSave { get; set; } = true;
@@ -33,6 +35,19 @@ namespace L4D2AddonAssistant
             set 
             {
                 if (NotifyAndSetIfChanged(ref _lastOpenDirectory, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public string? Language
+        {
+            get => _language;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _language, value))
                 {
                     RequestSave = true;
                 }
