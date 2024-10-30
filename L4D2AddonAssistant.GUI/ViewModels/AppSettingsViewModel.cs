@@ -11,16 +11,12 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private AppSettings _settings;
 
-        private CommonInteractions _commonInteractions;
-
         private IEnumerable<string?> _languageItemsSource;
 
-        public AppSettingsViewModel(AppSettings settings, CommonInteractions commonInteractions)
+        public AppSettingsViewModel(AppSettings settings)
         {
             ArgumentNullException.ThrowIfNull(settings);
-            ArgumentNullException.ThrowIfNull(commonInteractions);
             _settings = settings;
-            _commonInteractions = commonInteractions;
 
             _languageItemsSource = [null, .. LanguageManager.SupportedLanguages];
 
@@ -31,7 +27,7 @@ namespace L4D2AddonAssistant.ViewModels
 
             SelectGamePathCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                var path = await _commonInteractions.ChooseDirectory.Handle(Unit.Default);
+                var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
                 if (path != null)
                 {
                     _settings.GamePath = path;
@@ -46,5 +42,7 @@ namespace L4D2AddonAssistant.ViewModels
         public IEnumerable<string?> LanguageItemsSource => _languageItemsSource;
 
         public ReactiveCommand<Unit, Unit> SelectGamePathCommand { get; }
+
+        public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
     }
 }

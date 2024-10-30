@@ -29,8 +29,6 @@ namespace L4D2AddonAssistant
                 .AddSingleton<MainWindow>(services => new MainWindow() { DataContext = services.GetRequiredService<MainWindowViewModel>()})
                 .AddSingleton<AppSettings>()
                 .AddSingleton<AppSettingsViewModel>()
-                .AddSingleton<CommonInteractions>()
-                .AddSingleton<IMessageBoxService, MessageBoxService>()
                 .AddSingleton<SaveManager>()
                 .AddSingleton<IAppWindowManager, AppWindowManager>()
                 .BuildServiceProvider();
@@ -59,25 +57,6 @@ namespace L4D2AddonAssistant
                 };
 
                 var mainWindow = Services.GetRequiredService<MainWindow>();
-
-                var commonInteractions = Services.GetRequiredService<CommonInteractions>();
-                commonInteractions.ChooseDirectory.RegisterHandler(async (context) =>
-                {
-                    string? output = null;
-                    var storage = mainWindow.StorageProvider;
-                    var options = new FolderPickerOpenOptions() { AllowMultiple = false };
-                    var folders = await storage.OpenFolderPickerAsync(options);
-                    if (folders.Count == 1)
-                    {
-                        var folder = folders[0];
-                        var path = folder.Path;
-                        if (path.IsFile)
-                        {
-                            output = path.LocalPath;
-                        }
-                    }
-                    context.SetOutput(output);
-                });
 
                 desktop.MainWindow = mainWindow;
 

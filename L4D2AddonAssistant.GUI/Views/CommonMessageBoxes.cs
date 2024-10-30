@@ -6,11 +6,32 @@ using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Models;
 using MsBox.Avalonia.Enums;
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 
 namespace L4D2AddonAssistant.Views
 {
     public static class CommonMessageBoxes
     {
+        public static async Task<string?> ChooseDirectory(Window ownerWindow)
+        {
+            ArgumentNullException.ThrowIfNull(ownerWindow);
+
+            var storage = ownerWindow.StorageProvider;
+            var options = new FolderPickerOpenOptions() { AllowMultiple = false };
+            var folders = await storage.OpenFolderPickerAsync(options);
+            if (folders.Count == 1)
+            {
+                var folder = folders[0];
+                var path = folder.Path;
+                if (path.IsFile)
+                {
+                    return path.LocalPath;
+                }
+            }
+
+            return null;
+        }
+
         public static async Task<bool> Confirm(Window ownerWindow, string message, string title)
         {
             ArgumentNullException.ThrowIfNull(ownerWindow);

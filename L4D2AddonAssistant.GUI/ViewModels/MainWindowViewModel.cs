@@ -2,14 +2,14 @@
 using System;
 using System.IO;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace L4D2AddonAssistant.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase, ISaveable
+    public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable
     {
         private AppSettings _settings;
-        private CommonInteractions _commonInteractions;
         private IAppWindowManager _windowManager;
 
         private AddonRoot? _addonRoot = null;
@@ -17,27 +17,22 @@ namespace L4D2AddonAssistant.ViewModels
 
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
-        public MainWindowViewModel(AppSettings settings, CommonInteractions commonInteractions, IAppWindowManager windowManager)
+        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager)
         {
             ArgumentNullException.ThrowIfNull(settings);
-            ArgumentNullException.ThrowIfNull(commonInteractions);
             ArgumentNullException.ThrowIfNull(windowManager);
             _settings = settings;
-            _commonInteractions = commonInteractions;
             _windowManager = windowManager;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
-            OpenDirectoryCommand = ReactiveCommand.CreateFromObservable(() =>
+            OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                return _commonInteractions.ChooseDirectory.Handle(Unit.Default).Select((path) =>
+                var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
+                if (path != null)
                 {
-                    if (path != null)
-                    {
-                        OpenDirectory(path);
-                    }
-                    return Unit.Default;
-                });
+                    OpenDirectory(path);
+                }
             });
             ImportCommand = ReactiveCommand.Create(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
@@ -56,7 +51,14 @@ namespace L4D2AddonAssistant.ViewModels
                     _settings.Save();
                 }
             }
+
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
+
+            });
         }
+
+        public ViewModelActivator Activator { get; } = new();
 
         public bool RequestSave
         {
@@ -106,6 +108,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> ImportCommand { get; }
 
         public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
+
+        public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 
         public void OpenDirectory(string dirPath)
         {
