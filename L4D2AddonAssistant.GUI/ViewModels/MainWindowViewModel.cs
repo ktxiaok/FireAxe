@@ -10,18 +10,21 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private AppSettings _settings;
         private CommonInteractions _commonInteractions;
+        private IAppWindowManager _windowManager;
 
         private AddonRoot? _addonRoot = null;
         private IObservable<bool> _addonRootNotNull;
 
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
-        public MainWindowViewModel(AppSettings settings, CommonInteractions commonInteractions)
+        public MainWindowViewModel(AppSettings settings, CommonInteractions commonInteractions, IAppWindowManager windowManager)
         {
             ArgumentNullException.ThrowIfNull(settings);
             ArgumentNullException.ThrowIfNull(commonInteractions);
+            ArgumentNullException.ThrowIfNull(windowManager);
             _settings = settings;
             _commonInteractions = commonInteractions;
+            _windowManager = windowManager;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
@@ -37,6 +40,7 @@ namespace L4D2AddonAssistant.ViewModels
                 });
             });
             ImportCommand = ReactiveCommand.Create(Import, _addonRootNotNull);
+            OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
 
             // Try to open the LastOpenDirectory.
             var lastOpenDir = _settings.LastOpenDirectory;
@@ -100,6 +104,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ImportCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
         public void OpenDirectory(string dirPath)
         {

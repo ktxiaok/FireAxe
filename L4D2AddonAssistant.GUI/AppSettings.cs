@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using ReactiveUI;
 using Serilog;
 using System;
 using System.IO;
@@ -13,6 +12,7 @@ namespace L4D2AddonAssistant
 
         private string? _lastOpenDirectory = null;
         private string? _language = null;
+        private string _gamePath = "";
 
         private string _settingsFilePath;
 
@@ -34,10 +34,20 @@ namespace L4D2AddonAssistant
             get => _lastOpenDirectory;
             set 
             {
-                if (NotifyAndSetIfChanged(ref _lastOpenDirectory, value))
+                if (value == _lastOpenDirectory)
                 {
-                    RequestSave = true;
+                    return;
                 }
+                if (value != null)
+                {
+                    if (!FileUtils.IsValidPath(value) || !Path.IsPathRooted(value))
+                    {
+                        throw new ArgumentException("The path is invalid.");
+                    }
+                }
+                _lastOpenDirectory = value;
+                NotifyChanged();
+                RequestSave = true;
             }
         }
 
@@ -51,6 +61,30 @@ namespace L4D2AddonAssistant
                 {
                     RequestSave = true;
                 }
+            }
+        }
+
+        [JsonProperty]
+        public string GamePath
+        {
+            get => _gamePath;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+                if (value == _gamePath)
+                {
+                    return;
+                }
+                if (value.Length > 0)
+                {
+                    if (!FileUtils.IsValidPath(value) || !Path.IsPathRooted(value))
+                    {
+                        throw new ArgumentException("The path is invalid.");
+                    }
+                }
+                _gamePath = value;
+                NotifyChanged();
+                RequestSave = true;
             }
         }
 

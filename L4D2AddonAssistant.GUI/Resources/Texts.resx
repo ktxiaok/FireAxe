@@ -135,6 +135,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
   </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
@@ -180,6 +183,9 @@
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>
+  <data name="GamePath" xml:space="preserve">
+    <value>Game Path</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
@@ -191,6 +197,9 @@
   </data>
   <data name="ItemNameExists" xml:space="preserve">
     <value>The name of the item already exists.</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Move</value>
@@ -218,6 +227,12 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
   </data>
   <data name="Skip" xml:space="preserve">
     <value>Skip</value>

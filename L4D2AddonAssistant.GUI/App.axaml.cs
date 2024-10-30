@@ -28,9 +28,11 @@ namespace L4D2AddonAssistant
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<MainWindow>(services => new MainWindow() { DataContext = services.GetRequiredService<MainWindowViewModel>()})
                 .AddSingleton<AppSettings>()
+                .AddSingleton<AppSettingsViewModel>()
                 .AddSingleton<CommonInteractions>()
                 .AddSingleton<IMessageBoxService, MessageBoxService>()
                 .AddSingleton<SaveManager>()
+                .AddSingleton<IAppWindowManager, AppWindowManager>()
                 .BuildServiceProvider();
         }
 
@@ -49,6 +51,8 @@ namespace L4D2AddonAssistant
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                Services.GetRequiredService<AppSettings>();
+
                 desktop.ShutdownRequested += (sender, args) =>
                 {
                     ShutdownRequested?.Invoke();

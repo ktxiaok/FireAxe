@@ -25,5 +25,21 @@ namespace L4D2AddonAssistant
 
             return File.Exists(path) || Directory.Exists(path);
         }
+
+        public static bool IsValidPath(string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+
+            try
+            {
+                Path.GetFullPath(path);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

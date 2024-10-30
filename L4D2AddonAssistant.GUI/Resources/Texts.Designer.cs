@@ -115,6 +115,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Default 的本地化字符串。
+        /// </summary>
+        public static string Default {
+            get {
+                return ResourceManager.GetString("Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Delete 的本地化字符串。
         /// </summary>
         public static string Delete {
@@ -250,6 +259,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Game Path 的本地化字符串。
+        /// </summary>
+        public static string GamePath {
+            get {
+                return ResourceManager.GetString("GamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Group 的本地化字符串。
         /// </summary>
         public static string Group {
@@ -282,6 +300,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string ItemNameExists {
             get {
                 return ResourceManager.GetString("ItemNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Language 的本地化字符串。
+        /// </summary>
+        public static string Language {
+            get {
+                return ResourceManager.GetString("Language", resourceCulture);
             }
         }
         
@@ -363,6 +390,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Select 的本地化字符串。
+        /// </summary>
+        public static string Select {
+            get {
+                return ResourceManager.GetString("Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Settings 的本地化字符串。
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
         
