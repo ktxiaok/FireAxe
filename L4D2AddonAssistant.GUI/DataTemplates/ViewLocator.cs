@@ -3,7 +3,7 @@ using Avalonia.Controls.Templates;
 using L4D2AddonAssistant.ViewModels;
 using System;
 
-namespace L4D2AddonAssistant
+namespace L4D2AddonAssistant.DataTemplates
 {
     public class ViewLocator : IDataTemplate
     {

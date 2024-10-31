@@ -286,6 +286,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Invalid input. 的本地化字符串。
+        /// </summary>
+        public static string InvalidInputMessage {
+            get {
+                return ResourceManager.GetString("InvalidInputMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The target group is the subgroup of the source group. 的本地化字符串。
         /// </summary>
         public static string InvalidMoveMessage {
