@@ -192,6 +192,12 @@
   <data name="Import" xml:space="preserve">
     <value>Import</value>
   </data>
+  <data name="ImportErrorMessage" xml:space="preserve">
+    <value>Failed to import.</value>
+  </data>
+  <data name="ImportSuccessMessage" xml:space="preserve">
+    <value>Imported successfully.</value>
+  </data>
   <data name="InvalidInputMessage" xml:space="preserve">
     <value>Invalid input.</value>
   </data>
@@ -242,6 +248,9 @@
   </data>
   <data name="SkipAll" xml:space="preserve">
     <value>Skip All</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>Title:</value>

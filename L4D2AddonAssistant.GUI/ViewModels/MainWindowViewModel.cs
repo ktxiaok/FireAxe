@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -34,7 +35,7 @@ namespace L4D2AddonAssistant.ViewModels
                     OpenDirectory(path);
                 }
             });
-            ImportCommand = ReactiveCommand.Create(Import, _addonRootNotNull);
+            ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
 
             // Try to open the LastOpenDirectory.
@@ -111,6 +112,10 @@ namespace L4D2AddonAssistant.ViewModels
 
         public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 
+        public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
+
+        public Interaction<Exception, Unit> ShowImportErrorInteraction { get; } = new();
+
         public void OpenDirectory(string dirPath)
         {
             ArgumentNullException.ThrowIfNull(dirPath);
@@ -134,11 +139,19 @@ namespace L4D2AddonAssistant.ViewModels
             }
         }
 
-        public void Import()
+        public async Task Import()
         {
             if (_addonRoot != null)
             {
-                _addonRoot.Import();
+                try
+                {
+                    _addonRoot.Import();
+                    await ShowImportSuccessInteraction.Handle(Unit.Default);
+                }
+                catch (Exception ex)
+                {
+                    await ShowImportErrorInteraction.Handle(ex);
+                }
             }
         }
     }

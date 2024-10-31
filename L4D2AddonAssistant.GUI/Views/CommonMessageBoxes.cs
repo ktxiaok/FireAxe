@@ -61,7 +61,7 @@ namespace L4D2AddonAssistant.Views
             }
         }
 
-        public static async Task<ErrorOperationReply> GetErrorOperationReplyAsync(Window ownerWindow, string message, string? title = null)
+        public static async Task<ErrorOperationReply> GetErrorOperationReply(Window ownerWindow, string message, string? title = null)
         {
             ArgumentNullException.ThrowIfNull(ownerWindow);
             ArgumentNullException.ThrowIfNull(message);
@@ -101,11 +101,20 @@ namespace L4D2AddonAssistant.Views
             }
         }
 
-        public static Task ShowExceptionAsync(Window ownerWindow, Exception ex)
+        public static Task ShowException(Window ownerWindow, Exception ex, string? message = null)
         {
             ArgumentNullException.ThrowIfNull(ownerWindow);
             ArgumentNullException.ThrowIfNull(ex);
 
+            string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
+            if (message == null)
+            {
+                message = exceptionMessage;
+            }
+            else
+            {
+                message = message + '\n' + exceptionMessage;
+            }
             return MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
             {
                 ButtonDefinitions =
@@ -113,8 +122,26 @@ namespace L4D2AddonAssistant.Views
                     new ButtonDefinition{ Name = Texts.Ok, IsDefault = true }
                 ],
                 ContentTitle = Texts.Error,
-                ContentMessage = Texts.ExceptionOccurMessage + '\n' + ex.ToString(),
+                ContentMessage = message,
                 Icon = Icon.Error,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            }).ShowWindowDialogAsync(ownerWindow);
+        }
+
+        public static Task ShowInfo(Window ownerWindow, string message, string title)
+        {
+            ArgumentNullException.ThrowIfNull(ownerWindow);
+            ArgumentNullException.ThrowIfNull(message);
+            ArgumentNullException.ThrowIfNull(title);
+
+            return MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
+            {
+                ButtonDefinitions =
+                [
+                    new ButtonDefinition { Name = Texts.Ok, IsDefault = true }
+                ],
+                ContentTitle = title,
+                ContentMessage = message,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
             }).ShowWindowDialogAsync(ownerWindow);
         }

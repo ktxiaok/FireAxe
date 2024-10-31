@@ -71,7 +71,7 @@ namespace L4D2AddonAssistant.Views
 
             viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
             {
-                await CommonMessageBoxes.ShowExceptionAsync(FindWindow(), context.Input);
+                await CommonMessageBoxes.ShowException(FindWindow(), context.Input);
                 context.SetOutput(Unit.Default);
             }).DisposeWith(disposables);
 
@@ -90,22 +90,25 @@ namespace L4D2AddonAssistant.Views
             viewModel.ReportInvalidMoveInteraction.RegisterHandler(async (context) =>
             {
                 string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.InvalidMoveMessage;
-                var reply = await CommonMessageBoxes.GetErrorOperationReplyAsync(FindWindow(), message);
+                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
                 context.SetOutput(reply);
             }).DisposeWith(disposables);
 
             viewModel.ReportNameExistsForMoveInteraction.RegisterHandler(async (context) =>
             {
                 string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.ItemNameExists;
-                var reply = await CommonMessageBoxes.GetErrorOperationReplyAsync(FindWindow(), message);
+                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
                 context.SetOutput(reply);
             }).DisposeWith(disposables);
 
             viewModel.ReportExceptionForMoveInteraction.RegisterHandler(async (context) =>
             {
                 var input = context.Input;
-                string message = string.Format(Texts.CantMoveItemWithName, input.Item1) + '\n' + input.Item2.ToString();
-                var reply = await CommonMessageBoxes.GetErrorOperationReplyAsync(FindWindow(), message);
+                string name = input.Item1;
+                Exception ex = input.Item2;
+                string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
+                string message = string.Format(Texts.CantMoveItemWithName, name) + '\n' + exceptionMessage;
+                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
                 context.SetOutput(reply);
             }).DisposeWith(disposables);
 

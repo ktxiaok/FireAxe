@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using HarfBuzzSharp;
-using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
+﻿using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +8,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using L4D2AddonAssistant.Resources;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -314,11 +310,17 @@ namespace L4D2AddonAssistant.ViewModels
                     }
                     catch (AddonNameExistsException)
                     {
-                        reply = await ReportNameExistsForMoveInteraction.Handle(node.FullName);
+                        if (!skipAll)
+                        {
+                            reply = await ReportNameExistsForMoveInteraction.Handle(node.FullName);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        reply = await ReportExceptionForMoveInteraction.Handle((node.FullName, ex));
+                        if (!skipAll)
+                        {
+                            reply = await ReportExceptionForMoveInteraction.Handle((node.FullName, ex));
+                        }
                     }
                 }
 

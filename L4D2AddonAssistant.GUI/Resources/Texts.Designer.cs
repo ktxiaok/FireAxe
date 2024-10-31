@@ -286,6 +286,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Failed to import. 的本地化字符串。
+        /// </summary>
+        public static string ImportErrorMessage {
+            get {
+                return ResourceManager.GetString("ImportErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Imported successfully. 的本地化字符串。
+        /// </summary>
+        public static string ImportSuccessMessage {
+            get {
+                return ResourceManager.GetString("ImportSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Invalid input. 的本地化字符串。
         /// </summary>
         public static string InvalidInputMessage {
@@ -435,6 +453,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string SkipAll {
             get {
                 return ResourceManager.GetString("SkipAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Success 的本地化字符串。
+        /// </summary>
+        public static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
             }
         }
         
