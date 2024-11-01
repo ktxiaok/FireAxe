@@ -37,6 +37,7 @@ namespace L4D2AddonAssistant.ViewModels
             });
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
+            PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
 
             // Try to open the LastOpenDirectory.
             var lastOpenDir = _settings.LastOpenDirectory;
@@ -110,11 +111,19 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> PushCommand { get; } 
+
         public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 
         public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
 
         public Interaction<Exception, Unit> ShowImportErrorInteraction { get; } = new();
+
+        public Interaction<Unit, Unit> ShowPushSuccessInteraction { get; } = new();
+
+        public Interaction<Exception, Unit> ShowPushErrorInteraction { get; } = new();
+
+        public Interaction<string, Unit> ShowInvalidGamePathInteraction { get; } = new();
 
         public void OpenDirectory(string dirPath)
         {
@@ -152,6 +161,29 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     await ShowImportErrorInteraction.Handle(ex);
                 }
+            }
+        }
+
+        public async Task Push()
+        {
+            if (_addonRoot != null)
+            {
+                var gamePath = _settings.GamePath;
+                if (!GamePathUtils.CheckValidity(gamePath))
+                {
+                    await ShowInvalidGamePathInteraction.Handle(gamePath);
+                    return;
+                }
+                try
+                {
+                    _addonRoot.Push(gamePath);
+                }
+                catch (Exception ex)
+                {
+                    await ShowPushErrorInteraction.Handle(ex);
+                    return;
+                }
+                await ShowPushSuccessInteraction.Handle(Unit.Default);
             }
         }
     }

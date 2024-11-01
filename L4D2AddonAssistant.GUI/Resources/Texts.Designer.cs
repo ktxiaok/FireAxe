@@ -304,6 +304,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The game path &quot;{0}&quot; is invalid. 的本地化字符串。
+        /// </summary>
+        public static string InvalidGamePathMessage {
+            get {
+                return ResourceManager.GetString("InvalidGamePathMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Invalid input. 的本地化字符串。
         /// </summary>
         public static string InvalidInputMessage {
@@ -399,6 +408,42 @@ namespace L4D2AddonAssistant.Resources {
         public static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Operations 的本地化字符串。
+        /// </summary>
+        public static string Operations {
+            get {
+                return ResourceManager.GetString("Operations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Push 的本地化字符串。
+        /// </summary>
+        public static string Push {
+            get {
+                return ResourceManager.GetString("Push", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Push failed. 的本地化字符串。
+        /// </summary>
+        public static string PushErrorMessage {
+            get {
+                return ResourceManager.GetString("PushErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Push succeeded. 的本地化字符串。
+        /// </summary>
+        public static string PushSuccessMessage {
+            get {
+                return ResourceManager.GetString("PushSuccessMessage", resourceCulture);
             }
         }
         

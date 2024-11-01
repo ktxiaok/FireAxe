@@ -9,12 +9,17 @@ namespace L4D2AddonAssistant
         {
             ArgumentNullException.ThrowIfNull(gamePath);
 
+            if (!FileUtils.IsValidPath(gamePath) || !Path.IsPathRooted(gamePath))
+            {
+                return false;
+            }
+
             string appidPath = Path.Join(gamePath, "steam_appid.txt");
             try
             {
                 if (File.Exists(appidPath))
                 {
-                    return File.ReadAllText(appidPath).Trim() == "550";
+                    return File.ReadAllText(appidPath).Trim(' ', '\n', '\0') == "550";
                 }
             }
             catch (Exception ex)

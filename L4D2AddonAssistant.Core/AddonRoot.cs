@@ -117,7 +117,7 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public void Sync(string gamePath)
+        public void Push(string gamePath)
         {
             ArgumentNullException.ThrowIfNull(gamePath);
 
@@ -233,8 +233,12 @@ namespace L4D2AddonAssistant
             }
 
             // Update addonlist.txt.
+            if (!File.Exists(addonListPath))
+            {
+                File.Create(addonListPath);
+            }
             addonList = new KVObject("AddonList", addonEntries.Select(pair => new KVObject(pair.Key, pair.Value)));
-            using (var stream = File.OpenWrite(addonListPath))
+            using (var stream = File.Open(addonListPath, FileMode.Truncate))
             {
                 kv.Serialize(stream, addonList);
             }
@@ -242,9 +246,9 @@ namespace L4D2AddonAssistant
             bool TryParseLocalVpkFileName(string nameNoExt, out Guid guid)
             {
                 guid = Guid.Empty;
-                if (nameNoExt.Length == (5 + 32) && nameNoExt.StartsWith("local"))
+                if (nameNoExt.Length == (6 + 32) && nameNoExt.StartsWith("local_"))
                 {
-                    string guidStr = nameNoExt.Substring(5);
+                    string guidStr = nameNoExt.Substring(6);
                     if (Guid.TryParse(guidStr, out guid))
                     {
                         return true;
@@ -255,7 +259,7 @@ namespace L4D2AddonAssistant
 
             string BuildLocalVpkFileName(Guid guid)
             {
-                return "local" + guid.ToString("N") + ".vpk";
+                return "local_" + guid.ToString("N") + ".vpk";
             }
         }
 

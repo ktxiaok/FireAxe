@@ -198,6 +198,9 @@
   <data name="ImportSuccessMessage" xml:space="preserve">
     <value>Imported successfully.</value>
   </data>
+  <data name="InvalidGamePathMessage" xml:space="preserve">
+    <value>The game path "{0}" is invalid.</value>
+  </data>
   <data name="InvalidInputMessage" xml:space="preserve">
     <value>Invalid input.</value>
   </data>
@@ -230,6 +233,18 @@
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
+  </data>
+  <data name="Operations" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="PushErrorMessage" xml:space="preserve">
+    <value>Push failed.</value>
+  </data>
+  <data name="PushSuccessMessage" xml:space="preserve">
+    <value>Push succeeded.</value>
   </data>
   <data name="RetainFileMessage" xml:space="preserve">
     <value>If you do this, files will be retained.</value>

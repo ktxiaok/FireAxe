@@ -125,7 +125,12 @@ public class EditableTextBlock : TemplatedControl
     {
         if (_textBox != null)
         {
+            var oldValue = Value;
             Value = _textBox.Text!;
+            if (_hasError)
+            {
+                Value = oldValue;
+            }
         }
         if (!_hasError)
         {

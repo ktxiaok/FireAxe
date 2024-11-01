@@ -18,6 +18,9 @@
         <Separator/>
         <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>
       </MenuItem>
+      <MenuItem Header="{x:Static r:Texts.Operations}">
+        <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}"/>
+      </MenuItem>
     </Menu>
     
     <v:AddonNodeExplorerView DataContext="{Binding AddonNodeExplorerViewModel}"/>

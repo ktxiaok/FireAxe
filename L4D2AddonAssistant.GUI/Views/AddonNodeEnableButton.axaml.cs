@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
@@ -14,6 +15,9 @@ namespace L4D2AddonAssistant.Views
         public AddonNodeEnableButton()
         {
             InitializeComponent();
+
+            DoubleTapped += AddonNodeEnableButton_DoubleTapped;
+
             var app = Application.Current!;
             var iconEnabled = (Geometry?)app.FindResource("icon_enabled");
             var iconEnabledSuppressed = (Geometry?)app.FindResource("icon_enabled_suppressed");
@@ -48,6 +52,11 @@ namespace L4D2AddonAssistant.Views
                 })
                 .DisposeWith(disposables);
             });
+        }
+
+        private void AddonNodeEnableButton_DoubleTapped(object? sender, TappedEventArgs e)
+        {
+            e.Handled = true;
         }
     }
 }

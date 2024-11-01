@@ -41,23 +41,40 @@ namespace L4D2AddonAssistant.Views
             {
                 return;
             }
-            _viewModelConnection = new();
+            var disposables = new CompositeDisposable();
+            _viewModelConnection = disposables;
 
             viewModel.ChooseDirectoryInteraction.RegisterHandler(async (context) =>
             {
                 context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
-            }).DisposeWith(_viewModelConnection);
+            }).DisposeWith(disposables);
 
             viewModel.ShowImportSuccessInteraction.RegisterHandler(async (context) =>
             {
                 await CommonMessageBoxes.ShowInfo(this, Texts.ImportSuccessMessage, Texts.Success);
                 context.SetOutput(Unit.Default);
-            }).DisposeWith(_viewModelConnection);
+            }).DisposeWith(disposables);
             viewModel.ShowImportErrorInteraction.RegisterHandler(async (context) =>
             {
                 await CommonMessageBoxes.ShowException(this, context.Input, Texts.ImportErrorMessage);
                 context.SetOutput(Unit.Default);
-            }).DisposeWith(_viewModelConnection);
+            }).DisposeWith(disposables);
+
+            viewModel.ShowPushSuccessInteraction.RegisterHandler(async (context) =>
+            {
+                await CommonMessageBoxes.ShowInfo(this, Texts.PushSuccessMessage, Texts.Success);
+                context.SetOutput(Unit.Default);
+            }).DisposeWith(disposables);
+            viewModel.ShowPushErrorInteraction.RegisterHandler(async (context) =>
+            {
+                await CommonMessageBoxes.ShowException(this, context.Input, Texts.PushErrorMessage);
+                context.SetOutput(Unit.Default);
+            }).DisposeWith(disposables);
+            viewModel.ShowInvalidGamePathInteraction.RegisterHandler(async (context) =>
+            {
+                await CommonMessageBoxes.ShowInfo(this, string.Format(Texts.InvalidGamePathMessage, context.Input), Texts.Error);
+                context.SetOutput(Unit.Default);
+            }).DisposeWith(disposables);
         }
 
         private void DisconnectViewModel()
