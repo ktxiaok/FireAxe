@@ -39,6 +39,14 @@ namespace L4D2AddonAssistant.ViewModels
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
 
+            _settings.WhenAnyValue(x => x.GamePath).Subscribe((gamePath) =>
+            {
+                if (_addonRoot != null)
+                {
+                    _addonRoot.GamePath = gamePath;
+                }
+            });
+
             // Try to open the LastOpenDirectory.
             var lastOpenDir = _settings.LastOpenDirectory;
             if (lastOpenDir != null)
@@ -86,6 +94,10 @@ namespace L4D2AddonAssistant.ViewModels
             get => _addonRoot;
             set
             {
+                if (value == _addonRoot)
+                {
+                    return;
+                }
                 _addonRoot = value;
                 if (_addonRoot == null)
                 {
@@ -93,6 +105,7 @@ namespace L4D2AddonAssistant.ViewModels
                 }
                 else
                 {
+                    _addonRoot.GamePath = _settings.GamePath;
                     AddonNodeExplorerViewModel = new(_addonRoot);
                 }
                 this.RaisePropertyChanged();
@@ -168,15 +181,14 @@ namespace L4D2AddonAssistant.ViewModels
         {
             if (_addonRoot != null)
             {
-                var gamePath = _settings.GamePath;
-                if (!GamePathUtils.CheckValidity(gamePath))
-                {
-                    await ShowInvalidGamePathInteraction.Handle(gamePath);
-                    return;
-                }
                 try
                 {
-                    _addonRoot.Push(gamePath);
+                    _addonRoot.Push();
+                }
+                catch (InvalidGamePathException)
+                {
+                    await ShowInvalidGamePathInteraction.Handle(_addonRoot.GamePath);
+                    return;
                 }
                 catch (Exception ex)
                 {

@@ -26,6 +26,8 @@ namespace L4D2AddonAssistant
 
         private DirectoryInfo? _directoryPath = null;
 
+        private string _gamePath = "";
+
         private List<VpkAddon> _vpkAddons = new();
         
         public AddonRoot()
@@ -45,6 +47,17 @@ namespace L4D2AddonAssistant
                 _directoryPath = new(value);
                 _directoryPath.Create();
                 RequestSave = true;
+            }
+        }
+
+        public string GamePath
+        {
+            get => _gamePath;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+
+                _gamePath = value;
             }
         }
 
@@ -117,9 +130,9 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public void Push(string gamePath)
+        public void Push()
         {
-            ArgumentNullException.ThrowIfNull(gamePath);
+            var gamePath = EnsureValidGamePath();
 
             string addonsPath = GamePathUtils.GetAddonsPath(gamePath);
 
@@ -351,6 +364,15 @@ namespace L4D2AddonAssistant
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             RequestSave = true;
+        }
+
+        private string EnsureValidGamePath()
+        {
+            if (!GamePathUtils.CheckValidity(_gamePath))
+            {
+                throw new InvalidGamePathException();
+            }
+            return _gamePath;
         }
     }
 }
