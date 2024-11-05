@@ -2,13 +2,12 @@
 using SteamDatabase.ValvePak;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace L4D2AddonAssistant
 {
     public abstract class VpkAddon : AddonNode
     {
-        private WeakReference<byte[]> _image = new(null!);
-
         private WeakReference<VpkAddonInfo> _addonInfo = new(null!);
 
         public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
@@ -16,59 +15,41 @@ namespace L4D2AddonAssistant
             root.RegisterVpkAddon(this);
         }
 
-        public abstract string? VpkFilePath
+        public abstract string? FullVpkFilePath
         {
             get;
-        }
-
-        public string? FullVpkFilePath
-        {
-            get
-            {
-                var path = VpkFilePath;
-                if (path == null)
-                {
-                    return null;
-                }
-                return Path.Join(Root.DirectoryPath, path);
-            }
         }
 
         public override Type SaveType => typeof(VpkAddonSave);
 
         public override bool RequireFile => true;
 
-        public override byte[]? RetrieveImage()
+        protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
         {
-            _image.TryGetTarget(out var image);
-            if (image == null)
+            string? vpkPath = FullVpkFilePath;
+            if (vpkPath == null)
             {
-                if (TryCreatePackage(out var pak))
+                return Task.FromResult<byte[]?>(null);
+            }
+            return Task.Run(() =>
+            {
+                if (TryCreatePackage(vpkPath, out var pak))
                 {
                     using (pak)
                     {
-                        image = VpkUtils.GetAddonImage(pak);
-                        if (image != null)
-                        {
-                            _image.SetTarget(image);
-                        }
+                        cancellationToken.ThrowIfCancellationRequested();
+                        return VpkUtils.GetAddonImage(pak);
                     }
                 }
-            }
-            return image;
-        }
-
-        public override void InvalidateImage()
-        {
-            _image.SetTarget(null!);
+                return null;
+            });
         }
 
         public VpkAddonInfo? RetrieveInfo()
         {
-            _addonInfo.TryGetTarget(out var addonInfo);
-            if (addonInfo == null)
+            if (!_addonInfo.TryGetTarget(out var addonInfo))
             {
-                if (TryCreatePackage(out var pak))
+                if (TryCreatePackage(FullVpkFilePath, out var pak))
                 {
                     using (pak)
                     {
@@ -88,10 +69,27 @@ namespace L4D2AddonAssistant
             _addonInfo.SetTarget(null!);
         }
 
-        private bool TryCreatePackage([NotNullWhen(true)] out Package? pak)
+        protected override void OnCreateSave(AddonNodeSave save)
+        {
+            base.OnCreateSave(save);
+            var save1 = (VpkAddonSave)save;
+        }
+
+        protected override void OnLoadSave(AddonNodeSave save)
+        {
+            base.OnLoadSave(save);
+            var save1 = (VpkAddonSave)save;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Root.UnregisterVpkAddon(this);
+        }
+
+        private static bool TryCreatePackage(string? path, [NotNullWhen(true)] out Package? pak)
         {
             pak = null;
-            var path = FullVpkFilePath;
             if (path == null)
             {
                 return false;
@@ -112,24 +110,6 @@ namespace L4D2AddonAssistant
                 }
                 return false;
             }
-        }
-
-        protected override void OnCreateSave(AddonNodeSave save)
-        {
-            base.OnCreateSave(save);
-            var save1 = (VpkAddonSave)save;
-        }
-
-        protected override void OnLoadSave(AddonNodeSave save)
-        {
-            base.OnLoadSave(save);
-            var save1 = (VpkAddonSave)save;
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            Root.UnregisterVpkAddon(this);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace L4D2AddonAssistant
 
         }
 
-        public override string? VpkFilePath => FilePath;
+        public override string? FullVpkFilePath => FullFilePath;
 
         public override string FileExtension => ".vpk";
 

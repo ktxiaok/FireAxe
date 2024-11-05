@@ -20,6 +20,9 @@ namespace L4D2AddonAssistant
 
         private List<AddonProblem>? _problems = null;
 
+        private WeakReference<byte[]?>? _image = null;
+        private object _imageLock = new();
+
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
             OnInitSelf();
@@ -122,6 +125,25 @@ namespace L4D2AddonAssistant
             }
         }
 
+        public byte[]? ImageCache
+        {
+            get
+            {
+                lock (_imageLock)
+                {
+                    if (_image == null)
+                    {
+                        return null;
+                    }
+                    if (_image.TryGetTarget(out var target))
+                    {
+                        return target;
+                    }
+                }
+                return null;
+            }
+        }
+
         public string Name
         {
             get => _name;
@@ -181,14 +203,31 @@ namespace L4D2AddonAssistant
 
         internal virtual bool HasChildren_Internal => false;
 
-        public virtual byte[]? RetrieveImage()
+        public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
         {
-            return null;
+            var task = DoGetImageAsync(cancellationToken);
+            var image = new WeakReference<byte[]?>(null);
+            var imageLock = _imageLock;
+            lock (imageLock)
+            {
+                _image = image;
+            }
+            // set cache
+            Task.Run(() =>
+            {
+                var result = task.Result;
+                lock (imageLock)
+                {
+                    image.SetTarget(result);
+                }
+            });
+
+            return task;
         }
 
-        public virtual void InvalidateImage()
+        protected virtual Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
         {
-
+            return Task.FromResult<byte[]?>(null);
         }
 
         public bool CanMoveTo(AddonGroup? group)

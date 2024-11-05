@@ -1,9 +1,12 @@
 ﻿using Avalonia.Media.Imaging;
 using ReactiveUI;
+using System;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -20,6 +23,8 @@ namespace L4D2AddonAssistant.ViewModels
         private readonly bool _shouldShowFolderIcon;
         private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
         private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
+
+        private CancellationTokenSource? _cancellationTokenSource = null;
 
         public AddonNodeSimpleViewModel(AddonNode addonNode)
         {
@@ -81,6 +86,8 @@ namespace L4D2AddonAssistant.ViewModels
                     _shouldShowImage = null;
 
                     Image = null;
+
+                    CancelTasks();
                 })
                 .DisposeWith(disposables);
             });
@@ -118,13 +125,49 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 
-        public virtual void Refresh()
+        public virtual async void Refresh(bool hard = false)
         {
-            _addonNode.InvalidateImage();
-            var imageData = _addonNode.RetrieveImage();
+            CancelTasks();
+            _cancellationTokenSource = new();
+            var cancellationToken = _cancellationTokenSource.Token;
+
+            byte[]? imageData = null;
+            Task<byte[]?>? getImageTask = null;
+            
+            if (!hard)
+            {
+                imageData = _addonNode.ImageCache;
+            }
+            if (imageData == null)
+            {
+                getImageTask = _addonNode.GetImageAsync(cancellationToken);
+            }
+
+            if (getImageTask != null)
+            {
+                try
+                {
+                    imageData = await getImageTask;
+                }
+                catch (OperationCanceledException)
+                {
+
+                }
+            }
+
             if (imageData != null)
             {
                 Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+            }
+        }
+
+        private void CancelTasks()
+        {
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
             }
         }
     }
