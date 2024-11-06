@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L4D2AddonAssistant.GUI", "L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L4D2AddonAssistant.Core", "L4D2AddonAssistant.Core\L4D2AddonAssistant.Core.csproj", "{6619B1C8-CC2B-4A28-9B73-1E9F6A768289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_test", "_test\_test.csproj", "{1AD80497-452D-462F-A534-D1A4F4EF1DD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_test", "_test\_test.csproj", "{1AD80497-452D-462F-A534-D1A4F4EF1DD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
