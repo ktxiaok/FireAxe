@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -8,22 +9,30 @@ using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable
+    public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
     {
+        private bool _disposed = false;
+
         private AppSettings _settings;
         private IAppWindowManager _windowManager;
+        private IDownloadService _downloadService;
+        private HttpClient _httpClient;
 
         private AddonRoot? _addonRoot = null;
         private IObservable<bool> _addonRootNotNull;
 
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
-        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager)
+        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient)
         {
             ArgumentNullException.ThrowIfNull(settings);
             ArgumentNullException.ThrowIfNull(windowManager);
+            ArgumentNullException.ThrowIfNull(downloadService);
+            ArgumentNullException.ThrowIfNull(httpClient);
             _settings = settings;
             _windowManager = windowManager;
+            _downloadService = downloadService;
+            _httpClient = httpClient;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
@@ -92,12 +101,13 @@ namespace L4D2AddonAssistant.ViewModels
         public AddonRoot? AddonRoot
         {
             get => _addonRoot;
-            set
+            private set
             {
                 if (value == _addonRoot)
                 {
                     return;
                 }
+                _addonRoot?.Dispose();
                 _addonRoot = value;
                 if (_addonRoot == null)
                 {
@@ -105,7 +115,11 @@ namespace L4D2AddonAssistant.ViewModels
                 }
                 else
                 {
+                    _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+                    _addonRoot.DownloadService = _downloadService;
+                    _addonRoot.HttpClient = _httpClient;
                     _addonRoot.GamePath = _settings.GamePath;
+                    _addonRoot.LoadFile();
                     AddonNodeExplorerViewModel = new(_addonRoot);
                 }
                 this.RaisePropertyChanged();
@@ -144,7 +158,6 @@ namespace L4D2AddonAssistant.ViewModels
 
             var addonRoot = new AddonRoot();
             addonRoot.DirectoryPath = dirPath;
-            addonRoot.LoadFile();
             // TEST
             //DesignHelper.AddTestAddonNodes(addonRoot);
             AddonRoot = addonRoot;
@@ -196,6 +209,15 @@ namespace L4D2AddonAssistant.ViewModels
                     return;
                 }
                 await ShowPushSuccessInteraction.Handle(Unit.Default);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _addonRoot?.Dispose();
+                _disposed = true;
             }
         }
     }

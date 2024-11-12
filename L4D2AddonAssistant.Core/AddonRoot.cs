@@ -4,11 +4,12 @@ using Serilog;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using ValveKeyValue;
 
 namespace L4D2AddonAssistant
 {
-    public class AddonRoot : IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
+    public class AddonRoot : IDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
     {
         public const string SaveFileName = ".addonroot";
 
@@ -22,6 +23,14 @@ namespace L4D2AddonAssistant
             }
         };
 
+        private bool _disposed = false;
+
+        private TaskScheduler? _taskScheduler = null;
+
+        private IDownloadService? _downloadService = null;
+
+        private HttpClient? _httpClient = null;
+
         private AddonNodeContainerService _containerService = new();
 
         private DirectoryInfo? _directoryPath = null;
@@ -33,6 +42,57 @@ namespace L4D2AddonAssistant
         public AddonRoot()
         {
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
+        }
+
+        [AllowNull]
+        public TaskScheduler TaskScheduler
+        {
+            get
+            {
+                if (_taskScheduler == null)
+                {
+                    throw new InvalidOperationException("TaskScheduler not set");
+                }
+                return _taskScheduler;
+            }
+            set
+            {
+                _taskScheduler = value;
+            }
+        }
+
+        [AllowNull]
+        public IDownloadService DownloadService
+        {
+            get
+            {
+                if (_downloadService == null)
+                {
+                    throw new InvalidOperationException("DownloadService not set");
+                }
+                return _downloadService;
+            }
+            set
+            {
+                _downloadService = value;
+            }
+        }
+
+        [AllowNull]
+        public HttpClient HttpClient
+        {
+            get
+            {
+                if (_httpClient == null)
+                {
+                    throw new InvalidOperationException("HttpClient not set");
+                }
+                return _httpClient;
+            }
+            set
+            {
+                _httpClient = value;
+            }
         }
 
         public bool RequestSave { get; set; } = true;
@@ -328,6 +388,18 @@ namespace L4D2AddonAssistant
             foreach (var nodeSave in save.Nodes)
             {
                 AddonNode.LoadSave(nodeSave, this);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                foreach (var node in Nodes)
+                {
+                    node.Destroy();
+                }
+                _disposed = true;
             }
         }
         

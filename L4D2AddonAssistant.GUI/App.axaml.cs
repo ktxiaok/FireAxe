@@ -7,6 +7,7 @@ using L4D2AddonAssistant.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using System.Net.Http;
 
 namespace L4D2AddonAssistant
 {
@@ -33,6 +34,8 @@ namespace L4D2AddonAssistant
                 .AddSingleton<AppSettingsViewModel>()
                 .AddSingleton<SaveManager>()
                 .AddSingleton<IAppWindowManager, AppWindowManager>()
+                .AddSingleton<IDownloadService, DownloadService>()
+                .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
         }
 
