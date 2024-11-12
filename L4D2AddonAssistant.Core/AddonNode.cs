@@ -20,8 +20,8 @@ namespace L4D2AddonAssistant
 
         private List<AddonProblem>? _problems = null;
 
-        private WeakReference<byte[]?>? _image = null;
-        private object _imageLock = new();
+        private WeakReference<byte[]?> _image = new(null);
+        private Task<byte[]?>? _getImageTask = null;
 
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
@@ -129,16 +129,9 @@ namespace L4D2AddonAssistant
         {
             get
             {
-                lock (_imageLock)
+                if (_image.TryGetTarget(out var target))
                 {
-                    if (_image == null)
-                    {
-                        return null;
-                    }
-                    if (_image.TryGetTarget(out var target))
-                    {
-                        return target;
-                    }
+                    return target;
                 }
                 return null;
             }
@@ -205,24 +198,20 @@ namespace L4D2AddonAssistant
 
         public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
         {
-            var task = DoGetImageAsync(cancellationToken);
-            var image = new WeakReference<byte[]?>(null);
-            var imageLock = _imageLock;
-            lock (imageLock)
+            if (_getImageTask != null)
             {
-                _image = image;
+                return _getImageTask;
             }
-            // set cache
-            Task.Run(() =>
+            _getImageTask = DoGetImageAsync(cancellationToken);
+            _getImageTask.ContinueWith((task) =>
             {
-                var result = task.Result;
-                lock (imageLock)
+                if (task.IsCompletedSuccessfully)
                 {
-                    image.SetTarget(result);
+                    _image.SetTarget(task.Result);
                 }
-            });
-
-            return task;
+                _getImageTask = null;
+            }, cancellationToken, TaskContinuationOptions.None, Root.TaskScheduler);
+            return _getImageTask;
         }
 
         protected virtual Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)

@@ -42,7 +42,7 @@ namespace L4D2AddonAssistant
                     }
                 }
                 return null;
-            });
+            }, cancellationToken);
         }
 
         public VpkAddonInfo? RetrieveInfo()
