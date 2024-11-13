@@ -36,8 +36,6 @@ namespace L4D2AddonAssistant
         private DirectoryInfo? _directoryPath = null;
 
         private string _gamePath = "";
-
-        private List<VpkAddon> _vpkAddons = new();
         
         public AddonRoot()
         {
@@ -395,10 +393,12 @@ namespace L4D2AddonAssistant
         {
             if (!_disposed)
             {
+                var tasks = new List<Task>();
                 foreach (var node in Nodes)
                 {
-                    node.Destroy();
+                    tasks.Add(node.DestroyAsync(false));
                 }
+                Task.WhenAll(tasks).Wait();
                 _disposed = true;
             }
         }
@@ -411,16 +411,6 @@ namespace L4D2AddonAssistant
         internal void RemoveNode(AddonNode node)
         {
             _containerService.Remove(node);
-        }
-
-        internal void RegisterVpkAddon(VpkAddon addon)
-        {
-            _vpkAddons.Add(addon);
-        }
-
-        internal void UnregisterVpkAddon(VpkAddon addon)
-        {
-            _vpkAddons.Remove(addon);
         }
 
         void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name)

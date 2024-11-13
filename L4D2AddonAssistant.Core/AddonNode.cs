@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -303,27 +304,17 @@ namespace L4D2AddonAssistant
             UpdateEnabledInHierarchy();
         }
 
-        public void DeleteFile()
+        public Task DestroyAsync(bool deleteFile)
         {
-            if (RequireFile)
+            string? pathToDelete = null;
+            if (deleteFile && RequireFile)
             {
-                string path = FullFilePath;
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-                else if (Directory.Exists(path))
-                {
-                    Directory.Delete(path, true);
-                }
+                pathToDelete = FullFilePath;
             }
-        }
-
-        public void Destroy()
-        {
+            var tasks = new List<Task>();
             foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
             {
-                node.OnDestroy();
+                tasks.Add(node.OnDestroyAsync());
             }
             if (Group == null)
             {
@@ -333,6 +324,22 @@ namespace L4D2AddonAssistant
             {
                 Group.RemoveChild(this);
             }
+            var resultTask = Task.WhenAll(tasks);
+            if (pathToDelete != null)
+            {
+                resultTask = resultTask.ContinueWith((task) =>
+                {
+                    try
+                    {
+                        FileUtils.Delete(pathToDelete);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception occurred during deleting file: {FilePath}", pathToDelete);
+                    }
+                });
+            }
+            return resultTask;
         }
 
         public void Check()
@@ -472,10 +479,11 @@ namespace L4D2AddonAssistant
             }
         }
 
-        protected virtual void OnDestroy()
+        protected virtual Task OnDestroyAsync()
         {
             _isValid = false;
             NotifyChanged(nameof(IsValid));
+            return Task.CompletedTask;
         }
 
         protected virtual void OnCheck(Action<AddonProblem> submiter)

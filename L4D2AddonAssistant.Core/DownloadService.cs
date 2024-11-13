@@ -335,31 +335,30 @@ namespace L4D2AddonAssistant
                 if (_download != null)
                 {
                     var download = _download;
-                    Task.Run(() =>
+                   
+                    try
                     {
-                        try
-                        {
-                            download.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            LogException(ex);
-                        }
-                        try
-                        {
-                            download.Package.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            LogException(ex);
-                        }
+                        download.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException(ex);
+                    }
+                    try
+                    {
+                        download.Package.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException(ex);
+                    }
 
-                        void LogException(Exception ex)
-                        {
-                            Log.Error(ex, "Exception occurred during the task of DownloadItem.Dispose.");
-                        }
-                    });
                     _download = null;
+                }
+
+                void LogException(Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during DownloadItem.DisposeDownload.");
                 }
             }
         }

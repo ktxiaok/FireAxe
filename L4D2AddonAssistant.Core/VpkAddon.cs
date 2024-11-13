@@ -2,7 +2,6 @@
 using SteamDatabase.ValvePak;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace L4D2AddonAssistant
 {
@@ -12,7 +11,7 @@ namespace L4D2AddonAssistant
 
         public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
-            root.RegisterVpkAddon(this);
+            
         }
 
         public abstract string? FullVpkFilePath
@@ -79,12 +78,6 @@ namespace L4D2AddonAssistant
         {
             base.OnLoadSave(save);
             var save1 = (VpkAddonSave)save;
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            Root.UnregisterVpkAddon(this);
         }
 
         private static bool TryCreatePackage(string? path, [NotNullWhen(true)] out Package? pak)

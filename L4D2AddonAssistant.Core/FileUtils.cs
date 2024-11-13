@@ -4,6 +4,20 @@ namespace L4D2AddonAssistant
 {
     public static class FileUtils
     {
+        public static void Delete(string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            else if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
         public static void Move(string sourcePath, string targetPath)
         {
             ArgumentNullException.ThrowIfNull(sourcePath);

@@ -255,18 +255,8 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     continue;
                 }
-                if (!retainFile)
-                {
-                    try
-                    {
-                        node.DeleteFile();
-                    }
-                    catch (Exception ex)
-                    {
-                        await ReportExceptionInteraction.Handle(ex);
-                    }
-                }
-                node.Destroy();
+                // TODO
+                node.DestroyAsync(!retainFile);
             }
         }
 
