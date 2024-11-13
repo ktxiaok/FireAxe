@@ -21,8 +21,7 @@ namespace L4D2AddonAssistant
 
         private List<AddonProblem>? _problems = null;
 
-        private WeakReference<byte[]?> _image = new(null);
-        private Task<byte[]?>? _getImageTask = null;
+        private WeakReference<byte[]?>? _image = null;
 
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
@@ -130,6 +129,10 @@ namespace L4D2AddonAssistant
         {
             get
             {
+                if (_image == null)
+                {
+                    return null;
+                }
                 if (_image.TryGetTarget(out var target))
                 {
                     return target;
@@ -199,20 +202,17 @@ namespace L4D2AddonAssistant
 
         public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
         {
-            if (_getImageTask != null)
-            {
-                return _getImageTask;
-            }
-            _getImageTask = DoGetImageAsync(cancellationToken);
-            _getImageTask.ContinueWith((task) =>
+            var image = new WeakReference<byte[]?>(null);
+            _image = image;
+            var task = DoGetImageAsync(cancellationToken);
+            task.ContinueWith((task) =>
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    _image.SetTarget(task.Result);
+                    image.SetTarget(task.Result);
                 }
-                _getImageTask = null;
             }, cancellationToken, TaskContinuationOptions.None, Root.TaskScheduler);
-            return _getImageTask;
+            return task;
         }
 
         protected virtual Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
