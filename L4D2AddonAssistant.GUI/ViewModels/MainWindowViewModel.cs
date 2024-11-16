@@ -55,6 +55,13 @@ namespace L4D2AddonAssistant.ViewModels
                     _addonRoot.GamePath = gamePath;
                 }
             });
+            _settings.WhenAnyValue(x => x.IsAutoUpdateWorkshopItem).Subscribe((isAutoUpdateWorkshopItem) =>
+            {
+                if (_addonRoot != null)
+                {
+                    _addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
+                }
+            });
 
             // Try to open the LastOpenDirectory.
             var lastOpenDir = _settings.LastOpenDirectory;
@@ -119,6 +126,7 @@ namespace L4D2AddonAssistant.ViewModels
                     _addonRoot.DownloadService = _downloadService;
                     _addonRoot.HttpClient = _httpClient;
                     _addonRoot.GamePath = _settings.GamePath;
+                    _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
                     AddonNodeExplorerViewModel = new(_addonRoot);
                 }

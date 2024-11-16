@@ -13,6 +13,7 @@ namespace L4D2AddonAssistant
         private string? _lastOpenDirectory = null;
         private string? _language = null;
         private string _gamePath = "";
+        private bool _isAutoUpdateWorkshopItem = true;
 
         private string _settingsFilePath;
 
@@ -85,6 +86,19 @@ namespace L4D2AddonAssistant
                 _gamePath = value;
                 NotifyChanged();
                 RequestSave = true;
+            }
+        }
+
+        [JsonProperty]
+        public bool IsAutoUpdateWorkshopItem
+        {
+            get => _isAutoUpdateWorkshopItem;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _isAutoUpdateWorkshopItem, value))
+                {
+                    RequestSave = true;
+                }
             }
         }
 

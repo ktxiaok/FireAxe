@@ -16,6 +16,8 @@ namespace L4D2AddonAssistant
 
         private ulong? _publishedFileId = null;
 
+        private AutoUpdateStrategy _autoUpdateStrategy = AutoUpdateStrategy.Default;
+
         private WeakReference<PublishedFileDetails?>? _publishedFileDetails = null;
 
         private string? _vpkPath = null;
@@ -54,6 +56,20 @@ namespace L4D2AddonAssistant
                 }
             }
         }
+
+        public AutoUpdateStrategy AutoUpdateStrategy
+        {
+            get => _autoUpdateStrategy;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _autoUpdateStrategy, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
+        }
+
+        public bool IsAutoUpdate => Root.ShouldUpdateWorkshopItem(AutoUpdateStrategy);
 
         public PublishedFileDetails? PublishedFileDetailsCache
         {
@@ -145,6 +161,7 @@ namespace L4D2AddonAssistant
             {
                 getDetailsTask = GetPublishedFileDetailsAsync(cancellationToken);
             }
+            bool requestUpdate = IsAutoUpdate;
             string? vpkPathFromMetaInfo = null;
             var problems = new List<AddonProblem>();
             var downloadService = Root.DownloadService;
@@ -193,7 +210,15 @@ namespace L4D2AddonAssistant
                     }
                     else
                     {
-                        if (metaInfo.PublishedFileId != publishedFileId || metaInfo.TimeUpdated != details.TimeUpdated)
+                        if (metaInfo.PublishedFileId != publishedFileId)
+                        {
+                            needDownload = true;
+                        }
+                        if (requestUpdate && metaInfo.TimeUpdated != details.TimeUpdated)
+                        {
+                            needDownload = true;
+                        }
+                        if (!File.Exists(Path.Join(dirPath, metaInfo.CurrentFile)))
                         {
                             needDownload = true;
                         }

@@ -121,6 +121,8 @@ namespace L4D2AddonAssistant
 
         public bool IsAutoCheck { get; set; } = true;
 
+        public bool IsAutoUpdateWorkshopItem { get; set; } = true;
+
         IAddonNodeContainer? IAddonNodeContainer.Parent => null;
 
         AddonRoot IAddonNodeContainer.Root => this;
@@ -400,6 +402,18 @@ namespace L4D2AddonAssistant
                     tasks.Add(node.DestroyAsync(false));
                 }
                 await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+        }
+
+        public bool ShouldUpdateWorkshopItem(AutoUpdateStrategy strategy)
+        {
+            if (strategy == AutoUpdateStrategy.Default)
+            {
+                return IsAutoUpdateWorkshopItem;
+            }
+            else
+            {
+                return strategy == AutoUpdateStrategy.Enabled;
             }
         }
         
