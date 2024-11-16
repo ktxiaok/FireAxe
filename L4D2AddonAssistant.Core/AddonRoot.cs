@@ -9,7 +9,7 @@ using ValveKeyValue;
 
 namespace L4D2AddonAssistant
 {
-    public class AddonRoot : IDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
+    public class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
     {
         public const string SaveFileName = ".addonroot";
 
@@ -389,17 +389,17 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             if (!_disposed)
             {
+                _disposed = true;
                 var tasks = new List<Task>();
                 foreach (var node in Nodes)
                 {
                     tasks.Add(node.DestroyAsync(false));
                 }
-                Task.WhenAll(tasks).Wait();
-                _disposed = true;
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
         }
         

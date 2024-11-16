@@ -13,6 +13,8 @@ namespace L4D2AddonAssistant
 
         private bool _allowEnabledInHierarchy = true;
 
+        private int _blockMove = 0;
+
         private string _name = "";
 
         private AddonGroup? _group = null;
@@ -20,6 +22,7 @@ namespace L4D2AddonAssistant
         private AddonRoot _root;
 
         private List<AddonProblem>? _problems = null;
+        private bool _isBusyChecking = false;
 
         private WeakReference<byte[]?>? _image = null;
 
@@ -91,7 +94,7 @@ namespace L4D2AddonAssistant
 
         public virtual bool RequireFile => false;
 
-        public bool IsAutoCheck => Root?.IsAutoCheck ?? true; 
+        public bool IsAutoCheck => Root.IsAutoCheck; 
 
         bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
 
@@ -155,6 +158,8 @@ namespace L4D2AddonAssistant
                 {
                     return;
                 }
+
+                ThrowIfMoveDenied();
 
                 var parentInternal = (IAddonNodeContainerInternal)Parent;
                 parentInternal.ThrowIfNodeNameInvalid(value);
@@ -260,6 +265,8 @@ namespace L4D2AddonAssistant
                 return;
             }
 
+            ThrowIfMoveDenied();
+
             var containerInternal = group == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)group;
             containerInternal.ThrowIfNodeNameInvalid(Name);
 
@@ -344,27 +351,15 @@ namespace L4D2AddonAssistant
 
         public void Check()
         {
-            if (_problems != null)
+            if (_isBusyChecking)
             {
-                _problems.Clear();
-            }
-            OnCheck(AddProblem);
-            if (_problems != null)
-            {
-                if (_problems.Count == 0)
-                {
-                    _problems = null;
-                }
+                return;
             }
 
-            void AddProblem(AddonProblem problem)
-            {
-                if (_problems == null)
-                {
-                    _problems = new(2);
-                }
-                _problems.Add(problem);
-            }
+            _isBusyChecking = true;
+            _problems?.Clear();
+            OnCheck();
+            _isBusyChecking = false;
         }
 
         private class CreateSaveStackFrame
@@ -479,6 +474,31 @@ namespace L4D2AddonAssistant
             }
         }
 
+        protected void AddProblem(AddonProblem problem)
+        {
+            ArgumentNullException.ThrowIfNull(problem);
+
+            if (_problems == null)
+            {
+                _problems = new(2);
+            }
+            _problems.Add(problem);
+        }
+
+        protected IDisposable BlockMove()
+        {
+            _blockMove++;
+            bool disposed = false;
+            return DisposableUtils.Create(() =>
+            {
+                if (!disposed)
+                {
+                    _blockMove--;
+                    disposed = true;
+                }
+            });
+        }
+
         protected virtual Task OnDestroyAsync()
         {
             _isValid = false;
@@ -486,7 +506,7 @@ namespace L4D2AddonAssistant
             return Task.CompletedTask;
         }
 
-        protected virtual void OnCheck(Action<AddonProblem> submiter)
+        protected virtual void OnCheck()
         {
 
         }
@@ -547,6 +567,17 @@ namespace L4D2AddonAssistant
                 else
                 {
                     current.NotifyChanged(nameof(IsEnabledInHierarchy));
+                }
+            }
+        }
+
+        private void ThrowIfMoveDenied()
+        {
+            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
+            {
+                if (node._blockMove > 0)
+                {
+                    throw new AddonNodeMoveDeniedException(node);
                 }
             }
         }

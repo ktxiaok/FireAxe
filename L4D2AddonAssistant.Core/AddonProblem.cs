@@ -12,6 +12,9 @@ namespace L4D2AddonAssistant
 
         public AddonNode Source { get; }
 
-        public abstract bool TrySolve();
+        public virtual bool TrySolve()
+        {
+            return false;
+        }
     }
 }

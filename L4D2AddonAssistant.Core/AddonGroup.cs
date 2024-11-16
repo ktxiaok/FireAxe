@@ -169,12 +169,12 @@ namespace L4D2AddonAssistant
             return _containerService.GetUniqueName(name);
         }
 
-        protected override void OnCheck(Action<AddonProblem> submiter)
+        protected override void OnCheck()
         {
-            base.OnCheck(submiter);
+            base.OnCheck();
             if (EnableStrategyProblem.TryCreate(this, out var problem))
             {
-                submiter(problem);
+                AddProblem(problem);
             }
         }
 

@@ -107,7 +107,7 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     return;
                 }
-                _addonRoot?.Dispose();
+                _addonRoot?.DisposeAsync();
                 _addonRoot = value;
                 if (_addonRoot == null)
                 {
@@ -216,8 +216,8 @@ namespace L4D2AddonAssistant.ViewModels
         {
             if (!_disposed)
             {
-                _addonRoot?.Dispose();
                 _disposed = true;
+                _addonRoot?.DisposeAsync();
             }
         }
     }

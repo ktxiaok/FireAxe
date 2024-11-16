@@ -70,6 +70,7 @@ namespace L4D2AddonAssistant
 
                 Task.Run(() =>
                 {
+                    bool downloadCreated = false;   
                     try
                     {
                         DownloadPackage? downloadPackage = null;
@@ -100,22 +101,25 @@ namespace L4D2AddonAssistant
                         }
                         lock (_downloadLock)
                         {
-                            if (_status != DownloadStatus.Preparing)
+                            if (_status == DownloadStatus.Preparing)
                             {
-                                downloadPackage?.Dispose();
-                                return;
-                            }
-                            _download = new(config);
-                            _download.DownloadStarted += OnDownloadStarted;
-                            _download.DownloadProgressChanged += OnDownloadProgressChanged;
-                            _download.DownloadFileCompleted += OnDownloadFileCompleted;
-                            if (downloadPackage == null)
-                            {
-                                _download.DownloadFileTaskAsync(url, downloadingFilePath);
+                                _download = new(config);
+                                _download.DownloadStarted += OnDownloadStarted;
+                                _download.DownloadProgressChanged += OnDownloadProgressChanged;
+                                _download.DownloadFileCompleted += OnDownloadFileCompleted;
+                                if (downloadPackage == null)
+                                {
+                                    _download.DownloadFileTaskAsync(url, downloadingFilePath);
+                                }
+                                else
+                                {
+                                    _download.DownloadFileTaskAsync(downloadPackage);
+                                }
+                                downloadCreated = true;
                             }
                             else
                             {
-                                _download.DownloadFileTaskAsync(downloadPackage);
+                                downloadPackage?.Dispose();
                             }
                         }
                     }
@@ -126,108 +130,13 @@ namespace L4D2AddonAssistant
                             _exception = ex;
                             _status = DownloadStatus.Failed;
                         }
+                    }
+
+                    if (!downloadCreated)
+                    {
+                        OnDownloadCompleted();
                     }
                 });
-            }
-
-            private void OnDownloadFileCompleted(object? sender, System.ComponentModel.AsyncCompletedEventArgs e)
-            {
-                if (e.Cancelled)
-                {
-                    lock (_downloadLock)
-                    {
-                        _status = DownloadStatus.Cancelled;
-                    }
-                }
-                else if (e.Error != null)
-                {
-                    lock (_downloadLock)
-                    {
-                        _exception = e.Error;
-                        _status = DownloadStatus.Failed;
-                    }
-                }
-                else
-                {
-                    string downloadingPath = _filePath + DownloadingFileExtension;
-                    string downloadInfoPath = _filePath + DownloadInfoFileExtension;
-                    try
-                    {
-                        if (File.Exists(_filePath))
-                        {
-                            File.Delete(_filePath);
-                        }
-                        File.Move(downloadingPath, _filePath);
-                        try
-                        {
-                            if (File.Exists(downloadInfoPath))
-                            {
-                                File.Delete(downloadInfoPath);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex, "Exception occurred during deleting .downloadinfo file: {FilePath}", downloadInfoPath);
-                        }
-                        lock (_downloadLock)
-                        {
-                            _status = DownloadStatus.Succeeded;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        lock (_downloadLock)
-                        {
-                            _exception = ex;
-                            _status = DownloadStatus.Failed;
-                        }
-                    }
-                }
-
-                lock (_downloadLock)
-                {
-                    DisposeDownload();
-                }
-            }
-
-            private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
-            {
-                bool needSave = false;
-                lock (_downloadedBytesLock)
-                {
-                    _downloadedBytes = e.ReceivedBytesSize;
-                    _speed = e.BytesPerSecondSpeed;
-                    long currentTime = Environment.TickCount64;
-                    if (currentTime - _lastSaveTimeMs > SaveDownloadProgressIntervalMs)
-                    {
-                        needSave = true;
-                        _lastSaveTimeMs = currentTime;
-                    }
-                }
-                if (needSave)
-                {
-                    string savePath = _filePath + DownloadInfoFileExtension;
-                    try
-                    {
-                        File.WriteAllText(savePath, JsonConvert.SerializeObject(_download!.Package, s_downloadInfoJsonSettings));
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Exception occurred during writing .downloadinfo file: {FilePath}", savePath);
-                    }
-                }
-            }
-
-            private void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
-            {
-                lock (_totalBytesLock)
-                {
-                    _totalBytes = e.TotalBytesToReceive;
-                }
-                lock (_downloadLock)
-                {
-                    _status = DownloadStatus.Running;
-                }
             }
 
             public string Url => _url;
@@ -317,43 +226,182 @@ namespace L4D2AddonAssistant
                 }
             }
 
-            public void Dispose()
+            public void Cancel()
             {
                 lock (_downloadLock)
                 {
-                    DisposeDownload();
+                    if (_status == DownloadStatus.Preparing || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
+                    {
+                        _download?.CancelAsync();
+                        _status = DownloadStatus.Cancelled;
+                    }
+                }
+            }
+
+            public void Wait()
+            {
+                lock (_downloadLock)
+                {
+                    if (_status.IsCompleted())
+                    {
+                        return;
+                    }
+                    Monitor.Wait(_downloadLock);
+                }
+            }
+
+            public void Dispose()
+            {
+                Downloader.DownloadService? downloadToDispose = null;
+                lock (_downloadLock)
+                {
+                    downloadToDispose = _download;
+                    _download = null;
 
                     if (_status == DownloadStatus.Preparing || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
                     {
                         _status = DownloadStatus.Cancelled;
                     }
                 }
+                if (downloadToDispose != null)
+                {
+                    DisposeDownload(downloadToDispose);
+                }
             }
 
-            private void DisposeDownload()
+            private void OnDownloadFileCompleted(object? sender, System.ComponentModel.AsyncCompletedEventArgs e)
             {
-                if (_download != null)
+                if (e.Cancelled)
                 {
-                    var download = _download;
-                   
+                    lock (_downloadLock)
+                    {
+                        _status = DownloadStatus.Cancelled;
+                    }
+                }
+                else if (e.Error != null)
+                {
+                    lock (_downloadLock)
+                    {
+                        _exception = e.Error;
+                        _status = DownloadStatus.Failed;
+                    }
+                }
+                else
+                {
+                    string downloadingPath = _filePath + DownloadingFileExtension;
+                    string downloadInfoPath = _filePath + DownloadInfoFileExtension;
                     try
                     {
-                        download.Dispose();
+                        if (File.Exists(_filePath))
+                        {
+                            File.Delete(_filePath);
+                        }
+                        File.Move(downloadingPath, _filePath);
+                        try
+                        {
+                            if (File.Exists(downloadInfoPath))
+                            {
+                                File.Delete(downloadInfoPath);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during deleting .downloadinfo file: {FilePath}", downloadInfoPath);
+                        }
+                        lock (_downloadLock)
+                        {
+                            _status = DownloadStatus.Succeeded;
+                        }
                     }
                     catch (Exception ex)
                     {
-                        LogException(ex);
+                        lock (_downloadLock)
+                        {
+                            _exception = ex;
+                            _status = DownloadStatus.Failed;
+                        }
                     }
-                    try
-                    {
-                        download.Package.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        LogException(ex);
-                    }
+                }
 
+                Downloader.DownloadService? downloadToDispose = null;
+                lock (_downloadLock)
+                {
+                    downloadToDispose = _download;
                     _download = null;
+                }
+                if (downloadToDispose != null)
+                {
+                    DisposeDownload(downloadToDispose);
+                }
+
+                OnDownloadCompleted();
+            }
+
+            private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
+            {
+                bool needSave = false;
+                lock (_downloadedBytesLock)
+                {
+                    _downloadedBytes = e.ReceivedBytesSize;
+                    _speed = e.BytesPerSecondSpeed;
+                    long currentTime = Environment.TickCount64;
+                    if (currentTime - _lastSaveTimeMs > SaveDownloadProgressIntervalMs)
+                    {
+                        needSave = true;
+                        _lastSaveTimeMs = currentTime;
+                    }
+                }
+                if (needSave)
+                {
+                    string savePath = _filePath + DownloadInfoFileExtension;
+                    try
+                    {
+                        File.WriteAllText(savePath, JsonConvert.SerializeObject(_download!.Package, s_downloadInfoJsonSettings));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception occurred during writing .downloadinfo file: {FilePath}", savePath);
+                    }
+                }
+            }
+
+            private void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
+            {
+                lock (_totalBytesLock)
+                {
+                    _totalBytes = e.TotalBytesToReceive;
+                }
+                lock (_downloadLock)
+                {
+                    _status = DownloadStatus.Running;
+                }
+            }
+
+            private void OnDownloadCompleted()
+            {
+                lock (_downloadLock)
+                {
+                    Monitor.PulseAll(_downloadLock);
+                }
+            }
+
+            private static void DisposeDownload(Downloader.DownloadService download)
+            {  
+                try
+                {
+                    download.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    LogException(ex);
+                }
+                try
+                {
+                    download.Package.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    LogException(ex);
                 }
 
                 void LogException(Exception ex)

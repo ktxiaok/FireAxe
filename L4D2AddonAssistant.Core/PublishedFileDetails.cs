@@ -6,36 +6,36 @@ namespace L4D2AddonAssistant
     public class PublishedFileDetails
     {
         [JsonProperty("file_url")]
-        public string FileUrl { get; set; } = "";
+        public required string FileUrl { get; init; }
 
         [JsonProperty("preview_url")]
-        public string PreviewUrl { get; set; } = "";
+        public required string PreviewUrl { get; init; }
 
         [JsonProperty("title")]
-        public string Title { get; set; } = "";
+        public required string Title { get; init; }
 
         [JsonProperty("description")]
-        public string Description { get; set; } = "";
+        public required string Description { get; init; }
 
         [JsonProperty("time_created")]
-        public ulong TimeCreated { get; set; } = 0;
+        public required ulong TimeCreated { get; init; }
 
         [JsonProperty("time_updated")]
-        public ulong TimeUpdated { get; set; } = 0;
+        public required ulong TimeUpdated { get; init; }
 
         [JsonProperty("subscriptions")]
-        public uint Subscriptions { get; set; } = 0;
+        public required uint Subscriptions { get; init; }
 
         [JsonProperty("favorited")]
-        public uint Favorited { get; set; } = 0;
+        public required uint Favorited { get; init; }
 
         [JsonProperty("lifetime_subscriptions")]
-        public uint LifetimeSubscriptions { get; set; } = 0;
+        public required uint LifetimeSubscriptions { get; init; }
 
         [JsonProperty("lifetime_favorited")]
-        public uint LifetimeFavorited { get; set; } = 0;
+        public required uint LifetimeFavorited { get; init; }
 
         [JsonProperty("views")]
-        public uint Views { get; set; } = 0;
+        public required uint Views { get; init; }
     }
 }
