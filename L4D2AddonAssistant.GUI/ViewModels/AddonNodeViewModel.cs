@@ -19,6 +19,10 @@ namespace L4D2AddonAssistant.ViewModels
             {
                 return new LocalVpkAddonViewModel(localVpkAddon);
             }
+            else if (addonNode is WorkshopVpkAddon workshopVpkAddon)
+            {
+                return new WorkshopVpkAddonViewModel(workshopVpkAddon);
+            }
             else
             {
                 return new AddonNodeViewModel(addonNode);

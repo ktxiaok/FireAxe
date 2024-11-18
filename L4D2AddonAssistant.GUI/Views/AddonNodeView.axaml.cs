@@ -21,19 +21,25 @@ namespace L4D2AddonAssistant.Views
                     {
                         if (viewModel is AddonGroupViewModel addonGroupViewModel)
                         {
-                            var sectionView = new AddonGroupSectionView()
+                            sectionViewPanel.Children.Add(new AddonGroupSectionView()
                             {
                                 ViewModel = addonGroupViewModel
-                            };
-                            sectionViewPanel.Children.Add(sectionView);
+                            });
                         }
-                        if (viewModel is VpkAddonViewModel vpkAddonViewModel)
+                        else if (viewModel is VpkAddonViewModel vpkAddonViewModel)
                         {
-                            var sectionView = new VpkAddonSectionView()
+                            sectionViewPanel.Children.Add(new VpkAddonSectionView()
                             {
                                 ViewModel = vpkAddonViewModel
-                            };
-                            sectionViewPanel.Children.Add(sectionView);
+                            });
+                            
+                            if (viewModel is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
+                            {
+                                sectionViewPanel.Children.Add(new WorkshopVpkAddonSectionView()
+                                {
+                                    ViewModel = workshopVpkAddonViewModel
+                                });
+                            }
                         }
                     }
                 })

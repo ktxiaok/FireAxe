@@ -220,6 +220,16 @@ namespace L4D2AddonAssistant
             return task;
         }
 
+        public Task<byte[]?> GetImageAllowCacheAsync(CancellationToken cancellationToken)
+        {
+            var cache = ImageCache;
+            if (cache != null)
+            {
+                return Task.FromResult<byte[]?>(cache);
+            }
+            return GetImageAsync(cancellationToken);
+        }
+
         protected virtual Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult<byte[]?>(null);
@@ -360,6 +370,11 @@ namespace L4D2AddonAssistant
             _problems?.Clear();
             OnCheck();
             _isBusyChecking = false;
+        }
+
+        public virtual void ClearCaches()
+        {
+            _image = null;
         }
 
         private class CreateSaveStackFrame

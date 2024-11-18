@@ -7,5 +7,7 @@ namespace L4D2AddonAssistant
         public override Type TargetType => typeof(WorkshopVpkAddon);
 
         public ulong? PublishedFileId { get; set; }
+
+        public AutoUpdateStrategy AutoUpdateStrategy { get; set; }
     }
 }

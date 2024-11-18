@@ -27,15 +27,11 @@ namespace L4D2AddonAssistant.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _info, value);
         }
 
-        public override void Refresh(bool hard)
+        public override void Refresh()
         {
             base.Refresh();
 
             var addon = AddonNode;
-            if (hard) 
-            { 
-                addon.InvalidateInfo(); 
-            }
             Info = addon.RetrieveInfo();
         }
     }

@@ -11,7 +11,7 @@
     RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
     ColumnDefinitions="Auto, *">
     <TextBlock
-      Text="VPK"
+      Text="{x:Static r:Texts.VpkInfo}"
       Classes="Heading1"
       Grid.Row="0"
       Grid.Column="0"

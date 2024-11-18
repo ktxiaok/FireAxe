@@ -123,6 +123,9 @@
   <data name="AuthorColon" xml:space="preserve">
     <value>Author:</value>
   </data>
+  <data name="AutoUpdateStrategy" xml:space="preserve">
+    <value>Auto Update Strategy</value>
+  </data>
   <data name="CancelMove" xml:space="preserve">
     <value>Cancel Move</value>
   </data>
@@ -153,6 +156,9 @@
   <data name="DisableRecursively" xml:space="preserve">
     <value>Disable Recursively (including all subitems)</value>
   </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
   </data>
@@ -173,6 +179,15 @@
   </data>
   <data name="Enum_AddonGroupEnableStrategy_SingleRandom" xml:space="preserve">
     <value>Random Single</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
+    <value>Enabled</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
@@ -207,6 +222,9 @@
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>The target group is the subgroup of the source group.</value>
   </data>
+  <data name="ItemId" xml:space="preserve">
+    <value>Item ID</value>
+  </data>
   <data name="ItemNameExists" xml:space="preserve">
     <value>The name of the item already exists.</value>
   </data>
@@ -227,6 +245,9 @@
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
+  </data>
+  <data name="Null" xml:space="preserve">
+    <value>Null</value>
   </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
@@ -273,8 +294,20 @@
   <data name="UnnamedGroup" xml:space="preserve">
     <value>Unnamed Group</value>
   </data>
+  <data name="UnnamedWorkshopAddon" xml:space="preserve">
+    <value>Unnamed Workshop Addon</value>
+  </data>
   <data name="VersionColon" xml:space="preserve">
     <value>Version:</value>
+  </data>
+  <data name="VpkInfo" xml:space="preserve">
+    <value>VPK Information</value>
+  </data>
+  <data name="Workshop" xml:space="preserve">
+    <value>Workshop</value>
+  </data>
+  <data name="WorkshopAddon" xml:space="preserve">
+    <value>Workshop Addon</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

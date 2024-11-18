@@ -79,6 +79,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Auto Update Strategy 的本地化字符串。
+        /// </summary>
+        public static string AutoUpdateStrategy {
+            get {
+                return ResourceManager.GetString("AutoUpdateStrategy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Cancel Move 的本地化字符串。
         /// </summary>
         public static string CancelMove {
@@ -169,6 +178,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Download 的本地化字符串。
+        /// </summary>
+        public static string Download {
+            get {
+                return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Enable 的本地化字符串。
         /// </summary>
         public static string Enable {
@@ -228,6 +246,33 @@ namespace L4D2AddonAssistant.Resources {
         public static string Enum_AddonGroupEnableStrategy_SingleRandom {
             get {
                 return ResourceManager.GetString("Enum_AddonGroupEnableStrategy_SingleRandom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Default 的本地化字符串。
+        /// </summary>
+        public static string Enum_AutoUpdateStrategy_Default {
+            get {
+                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Disabled 的本地化字符串。
+        /// </summary>
+        public static string Enum_AutoUpdateStrategy_Disabled {
+            get {
+                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enabled 的本地化字符串。
+        /// </summary>
+        public static string Enum_AutoUpdateStrategy_Enabled {
+            get {
+                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Enabled", resourceCulture);
             }
         }
         
@@ -331,6 +376,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Item ID 的本地化字符串。
+        /// </summary>
+        public static string ItemId {
+            get {
+                return ResourceManager.GetString("ItemId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The name of the item already exists. 的本地化字符串。
         /// </summary>
         public static string ItemNameExists {
@@ -390,6 +444,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string No {
             get {
                 return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Null 的本地化字符串。
+        /// </summary>
+        public static string Null {
+            get {
+                return ResourceManager.GetString("Null", resourceCulture);
             }
         }
         
@@ -529,11 +592,47 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Unnamed Workshop Addon 的本地化字符串。
+        /// </summary>
+        public static string UnnamedWorkshopAddon {
+            get {
+                return ResourceManager.GetString("UnnamedWorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Version: 的本地化字符串。
         /// </summary>
         public static string VersionColon {
             get {
                 return ResourceManager.GetString("VersionColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 VPK Information 的本地化字符串。
+        /// </summary>
+        public static string VpkInfo {
+            get {
+                return ResourceManager.GetString("VpkInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Workshop 的本地化字符串。
+        /// </summary>
+        public static string Workshop {
+            get {
+                return ResourceManager.GetString("Workshop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Workshop Addon 的本地化字符串。
+        /// </summary>
+        public static string WorkshopAddon {
+            get {
+                return ResourceManager.GetString("WorkshopAddon", resourceCulture);
             }
         }
         

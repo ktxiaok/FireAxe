@@ -17,30 +17,47 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <StackPanel Name="PART_DisplayView" Orientation="Horizontal">
-            <TextBlock Name="PART_TextBlock" VerticalAlignment="Center"/>
+          <Grid 
+            Name="PART_DisplayView"
+            RowDefinitions="Auto"
+            ColumnDefinitions="*, Auto">
+            <TextBlock 
+              Name="PART_TextBlock"
+              Grid.Column="0"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"/>
             <Button
               Name="PART_EditButton"
+              Grid.Column="1"
               Margin="3"
               Width="{Binding $self.Height}">
               <PathIcon Data="{StaticResource icon_edit}"/>
             </Button>
-          </StackPanel>
-          <StackPanel Name="PART_EditView" Orientation="Horizontal">
-            <TextBox Name="PART_TextBox" VerticalAlignment="Center"/>
+          </Grid>
+          <Grid 
+            Name="PART_EditView"
+            RowDefinitions="Auto"
+            ColumnDefinitions="*, Auto, Auto">
+            <TextBox 
+              Name="PART_TextBox"
+              Grid.Column="0"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"/>
             <Button
               Name="PART_SubmitButton"
+              Grid.Column="1"
               Margin="3"
               Width="{Binding $self.Height}">
               <PathIcon Data="{StaticResource icon_checkmark}"/>
             </Button>
             <Button
               Name="PART_CancelButton"
+              Grid.Column="2"
               Margin="3"
               Width="{Binding $self.Height}">
               <PathIcon Data="{StaticResource icon_dismiss}"/>
             </Button>
-          </StackPanel>
+          </Grid>
         </Panel>
       </ControlTemplate>
     </Setter>

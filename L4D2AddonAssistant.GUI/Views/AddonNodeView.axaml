@@ -16,6 +16,7 @@
   </UserControl.DataTemplates>
   <StackPanel
     Orientation="Vertical">
+    <!--image-->
     <Border
       Margin="5"
       BoxShadow="{StaticResource boxshadow_regular}">
@@ -39,19 +40,27 @@
           Height="150"/>
       </Panel>
     </Border>
+
+    <!--name-->
     <v:EditableTextBlock
       Value="{Binding AddonNode.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>
         <Style Selector="TextBlock">
-          <Setter Property="MaxWidth" Value="200"/>
           <Setter Property="FontSize" Value="20"/>
           <Setter Property="FontWeight" Value="Bold"/>
+          <Setter Property="TextWrapping" Value="Wrap"/>
+          <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox">
           <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
       </v:EditableTextBlock.Styles>
     </v:EditableTextBlock>
+    
+    
     <v:AddonNodeEnableButton/>
+    
     <StackPanel
       Name="sectionViewPanel"
       Orientation="Vertical"

@@ -16,7 +16,7 @@
   
   <Grid
     RowDefinitions="Auto, Auto"
-    ColumnDefinitions="*, *">
+    ColumnDefinitions="Auto, *">
     <TextBlock
       Classes="Heading1"
       Margin="0, 5, 0, 5"

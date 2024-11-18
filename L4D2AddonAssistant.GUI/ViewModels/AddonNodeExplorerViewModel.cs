@@ -109,6 +109,7 @@ namespace L4D2AddonAssistant.ViewModels
                 .Select((movingNodes) => movingNodes != null));
 
             NewGroupCommand = ReactiveCommand.Create(NewGroup);
+            NewWorkshopAddonCommand = ReactiveCommand.Create(NewWorkshopAddon);
 
             DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, hasSelection);
 
@@ -218,6 +219,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> NewGroupCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> NewWorkshopAddonCommand { get; }
+
         public ReactiveCommand<bool, Unit> DeleteCommand { get; }
 
 
@@ -240,6 +243,13 @@ namespace L4D2AddonAssistant.ViewModels
             group.Name = group.Parent.GetUniqueNodeName(Texts.UnnamedGroup);
             Directory.CreateDirectory(group.FullFilePath);
             SetSelection?.Invoke([group]);
+        }
+
+        public void NewWorkshopAddon()
+        {
+            var addon = new WorkshopVpkAddon(_root, CurrentGroup);
+            addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
+            SetSelection?.Invoke([addon]);
         }
 
         public async Task Delete(bool retainFile)

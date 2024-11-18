@@ -49,7 +49,9 @@
         <PathIcon Data="{StaticResource icon_home}"/>
       </Button>
 
-      <ScrollViewer Grid.Row="0" Grid.Column="2">
+      <ScrollViewer 
+        Grid.Row="0" Grid.Column="2"
+        HorizontalScrollBarVisibility="Auto">
         <v:AddonNodeNavBarView/>
       </ScrollViewer>
     </Grid>
@@ -67,6 +69,7 @@
         <ContextMenu>
           <MenuItem Header="{x:Static r:Texts.New}">
             <MenuItem Header="{x:Static r:Texts.Group}" Command="{Binding NewGroupCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>
           </MenuItem>
           
           <Separator/>
@@ -102,28 +105,30 @@
       Grid.RowSpan="2"
       BorderThickness="2"
       BorderBrush="Gray">
-      <Panel>
-        <StackPanel
-          Orientation="Vertical"
-          Margin="5, 100, 5, 5"
-          IsVisible="{Binding IsMultipleSelection, FallbackValue=False}">
-          <TextBlock
-            Text="{Binding SelectionCount, StringFormat={x:Static r:Texts.MultipleItemsSelected}}"
-            Margin="5"
-            TextAlignment="Center"/>
-          <TextBlock
-            Text="{Binding SelectionNames}"
-            Margin="5"
-            TextAlignment="Center"
-            TextWrapping="Wrap"/>
-        </StackPanel>
+      <ScrollViewer>
+        <Panel>
+          <StackPanel
+            Orientation="Vertical"
+            Margin="5, 100, 5, 5"
+            IsVisible="{Binding IsMultipleSelection, FallbackValue=False}">
+            <TextBlock
+              Text="{Binding SelectionCount, StringFormat={x:Static r:Texts.MultipleItemsSelected}}"
+              Margin="5"
+              TextAlignment="Center"/>
+            <TextBlock
+              Text="{Binding SelectionNames}"
+              Margin="5"
+              TextAlignment="Center"
+              TextWrapping="Wrap"/>
+          </StackPanel>
 
-        <Panel
-          IsVisible="{Binding IsSingleSelection, FallbackValue=False}"
-          Margin="10">
-          <v:AddonNodeView DataContext="{Binding SingleSelection, TargetNullValue={x:Null}}"/>
+          <Panel
+            IsVisible="{Binding IsSingleSelection, FallbackValue=False}"
+            Margin="10">
+            <v:AddonNodeView DataContext="{Binding SingleSelection, TargetNullValue={x:Null}}"/>
+          </Panel>
         </Panel>
-      </Panel>
+      </ScrollViewer>
     </Border>
     
   </Grid>

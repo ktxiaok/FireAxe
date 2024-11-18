@@ -1,12 +1,20 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant
 {
-    public static class DesignHelper
+    internal static class DesignHelper
     {
-        public static AddonNode CreateTestAddonNode()
+        public static AddonRoot CreateEmptyAddonRoot()
         {
             var root = new AddonRoot();
+            root.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            return root;
+        }
+
+        public static AddonNode CreateTestAddonNode()
+        {
+            var root = CreateEmptyAddonRoot();
             var node = new AddonNode(root);
             node.Name = "test_node";
             return node;
@@ -14,7 +22,7 @@ namespace L4D2AddonAssistant
 
         public static AddonGroup CreateTestAddonGroup()
         {
-            var root = new AddonRoot();
+            var root = CreateEmptyAddonRoot();
             var group = new AddonGroup(root);
             group.Name = "test_group";
             return group;
@@ -22,7 +30,7 @@ namespace L4D2AddonAssistant
 
         public static AddonRoot CreateTestAddonRoot()
         {
-            var addonRoot = new AddonRoot();
+            var addonRoot = CreateEmptyAddonRoot();
             AddTestAddonNodes(addonRoot);
             return addonRoot;
         }

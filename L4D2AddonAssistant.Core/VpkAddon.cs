@@ -7,7 +7,7 @@ namespace L4D2AddonAssistant
 {
     public abstract class VpkAddon : AddonNode
     {
-        private WeakReference<VpkAddonInfo> _addonInfo = new(null!);
+        private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
         public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
@@ -63,9 +63,11 @@ namespace L4D2AddonAssistant
             return addonInfo;
         }
 
-        public void InvalidateInfo()
+        public override void ClearCaches()
         {
-            _addonInfo.SetTarget(null!);
+            base.ClearCaches();
+
+            _addonInfo.SetTarget(null);
         }
 
         protected override void OnCreateSave(AddonNodeSave save)

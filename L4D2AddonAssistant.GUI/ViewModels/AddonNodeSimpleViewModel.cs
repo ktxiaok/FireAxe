@@ -17,6 +17,7 @@ namespace L4D2AddonAssistant.ViewModels
         private readonly AddonNode _addonNode;
 
         private Bitmap? _image = null;
+        private byte[]? _rawImage = null;
 
         private ObservableAsPropertyHelper<AddonNodeEnableState>? _enableState = null;
 
@@ -125,36 +126,23 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 
-        public virtual async void Refresh(bool hard = false)
+        public virtual async void Refresh()
         {
             CancelTasks();
             _cancellationTokenSource = new();
             var cancellationToken = _cancellationTokenSource.Token;
 
+            var addon = AddonNode;
+
+            addon.Check();
+
             byte[]? imageData = null;
-            Task<byte[]?>? getImageTask = null;
-            
-            if (!hard)
+            try
             {
-                imageData = _addonNode.ImageCache;
+                imageData = await addon.GetImageAllowCacheAsync(cancellationToken);
             }
-            if (imageData == null)
-            {
-                getImageTask = _addonNode.GetImageAsync(cancellationToken);
-            }
-
-            if (getImageTask != null)
-            {
-                try
-                {
-                    imageData = await getImageTask;
-                }
-                catch (OperationCanceledException)
-                {
-
-                }
-            }
-
+            catch (OperationCanceledException) { }
+            _rawImage = imageData;
             if (imageData != null)
             {
                 Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);

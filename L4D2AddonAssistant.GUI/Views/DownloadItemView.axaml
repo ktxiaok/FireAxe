@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
+             x:Class="L4D2AddonAssistant.Views.DownloadItemView"
+             x:DataType="vm:DownloadItemViewModel">
+  <Grid
+    RowDefinitions="Auto"
+    ColumnDefinitions="*, Auto">
+    <!-- progress bar and status-->
+    <StackPanel
+      Grid.Column="0"
+      Orientation="Vertical" 
+      VerticalAlignment="Center" 
+      Margin="5" 
+      Width="{Binding #progressBar.Width}">
+      <TextBlock
+        Text="{Binding FileName}"
+        Margin="5"
+        TextAlignment="Left"
+        TextWrapping="WrapWithOverflow"
+        MaxLines="2"/>
+      <Grid
+        RowDefinitions="Auto"
+        ColumnDefinitions="*, *, *"
+        Margin="5">
+        <TextBlock
+          Grid.Column="0"
+          TextAlignment="Left">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{}{0}/{1}">
+              <Binding Path="DownloadedBytesReadable"/>
+              <Binding Path="TotalBytesReadable"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+        <TextBlock
+          Grid.Column="1"
+          TextAlignment="Center"
+          Text="{Binding EtaReadable}"/>
+        <TextBlock
+          Grid.Column="2"
+          TextAlignment="Right"
+          Text="{Binding DownloadSpeedReadable}"/>
+      </Grid>
+      <ProgressBar
+        Name="progressBar"
+        Minimum="0"
+        Maximum="{Binding TotalBytes}"
+        Value="{Binding DownloadedBytes}"
+        ShowProgressText="True"/>
+    </StackPanel>
+    
+    <!-- buttons -->
+    <Grid
+      Grid.Column="1"
+      RowDefinitions="Auto"
+      ColumnDefinitions="*, *"
+      VerticalAlignment="Center" 
+      Margin="5">
+      <Grid.Styles>
+        <Style Selector="Button, Button:disabled">
+          <Setter Property="Background" Value="Transparent"/>
+        </Style>
+      </Grid.Styles>
+      
+      <Button
+        Grid.Column="0"
+        Command="{Binding ResumeCommand}"
+        IsVisible="{Binding IsPaused}">
+        <PathIcon Data="{StaticResource icon_play}"/>
+      </Button>
+      <Button
+        Grid.Column="0"
+        Command="{Binding PauseCommand}"
+        IsVisible="{Binding IsRunning}">
+        <PathIcon Data="{StaticResource icon_pause}"/>
+      </Button>
+      <Button
+        Grid.Column="1"
+        Command="{Binding CancelCommand}"
+        IsVisible="{Binding !IsCompleted}">
+        <PathIcon Data="{StaticResource icon_dismiss}"/>
+      </Button>
+    </Grid>
+  </Grid>
+</UserControl>

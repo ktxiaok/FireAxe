@@ -323,16 +323,16 @@ namespace L4D2AddonAssistant
                     }
                 }
 
-                Downloader.DownloadService? downloadToDispose = null;
-                lock (_downloadLock)
-                {
-                    downloadToDispose = _download;
-                    _download = null;
-                }
-                if (downloadToDispose != null)
-                {
-                    DisposeDownload(downloadToDispose);
-                }
+                //Downloader.DownloadService? downloadToDispose = null;
+                //lock (_downloadLock)
+                //{
+                //    downloadToDispose = _download;
+                //    _download = null;
+                //}
+                //if (downloadToDispose != null)
+                //{
+                //    DisposeDownload(downloadToDispose);
+                //}
 
                 OnDownloadCompleted();
             }

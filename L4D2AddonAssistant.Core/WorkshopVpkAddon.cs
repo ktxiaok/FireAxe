@@ -51,6 +51,7 @@ namespace L4D2AddonAssistant
                 if (NotifyAndSetIfChanged(ref _publishedFileId, value))
                 {
                     _download?.Cancel();
+                    ClearCaches();
                     AutoCheck();
                     Root.RequestSave = true;
                 }
@@ -134,6 +135,14 @@ namespace L4D2AddonAssistant
             });
         }
 
+        public override void ClearCaches()
+        {
+            base.ClearCaches();
+
+            _publishedFileDetails = null;
+            NotifyChanged(nameof(PublishedFileDetailsCache));
+        }
+
         protected override void OnCheck()
         {
             base.OnCheck();
@@ -162,27 +171,15 @@ namespace L4D2AddonAssistant
                 getDetailsTask = GetPublishedFileDetailsAsync(cancellationToken);
             }
             bool requestUpdate = IsAutoUpdate;
-            string? vpkPathFromMetaInfo = null;
+            string? resultVpkPath = null;
             var problems = new List<AddonProblem>();
             var downloadService = Root.DownloadService;
             var addonRootTaskScheduler = Root.TaskScheduler;
             var addonRootTaskFactory = new TaskFactory(addonRootTaskScheduler);
             IDisposable blockMove = BlockMove();
-            _checkTask = Task.Run(() =>
+            try
             {
-                if (getDetailsTask != null)
-                {
-                    var result = getDetailsTask.Result;
-                    if (result.IsSucceeded)
-                    {
-                        details = result.Content;
-                    }
-                    else
-                    {
-                        var problem = new GetPublishedFileDetailsProblem(this, result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId);
-                        problems.Add(problem);
-                    }
-                }
+                Directory.CreateDirectory(dirPath);
 
                 string metaInfoPath = Path.Join(dirPath, MetaInfoFileName);
 
@@ -199,117 +196,146 @@ namespace L4D2AddonAssistant
                         Log.Error(ex, "Exception occurred during reading meta info file: {FilePath}", metaInfoPath);
                     }
                 }
-
-                if (details != null)
-                {
-                    bool needDownload = false;
-
-                    if (metaInfo == null)
-                    {
-                        needDownload = true;
-                    }
-                    else
-                    {
-                        if (metaInfo.PublishedFileId != publishedFileId)
-                        {
-                            needDownload = true;
-                        }
-                        if (requestUpdate && metaInfo.TimeUpdated != details.TimeUpdated)
-                        {
-                            needDownload = true;
-                        }
-                        if (!File.Exists(Path.Join(dirPath, metaInfo.CurrentFile)))
-                        {
-                            needDownload = true;
-                        }
-                    }
-
-                    if (needDownload)
-                    {
-                        // Delete the old meta info file.
-                        if (File.Exists(metaInfoPath))
-                        {
-                            File.Delete(metaInfoPath);
-                        }
-
-                        string downloadFileName = $"{details.Title}-{details.TimeUpdated}.vpk";
-                        downloadFileName = FileUtils.SanitizeFileName(downloadFileName);
-                        if (downloadFileName == "")
-                        {
-                            downloadFileName = "UNNAMED.vpk";
-                        }
-                        downloadFileName = FileUtils.GetUniqueFileName(downloadFileName, dirPath);
-                        string downloadFilePath = Path.Join(dirPath, downloadFileName);
-                        string url = details.FileUrl;
-
-                        using (var download = downloadService.Download(url, downloadFilePath))
-                        {
-                            addonRootTaskFactory.StartNew(() => DownloadItem = download).Wait();
-                            download.Wait();
-                            addonRootTaskFactory.StartNew(() => DownloadItem = null).Wait();
-                            var status = download.Status;
-                            if (status == DownloadStatus.Succeeded)
-                            {
-                                metaInfo = new WorkshopVpkMetaInfo()
-                                {
-                                    PublishedFileId = publishedFileId,
-                                    TimeUpdated = details.TimeUpdated,
-                                    CurrentFile = downloadFileName
-                                };
-                                File.WriteAllText(metaInfoPath, JsonConvert.SerializeObject(metaInfo, s_metaInfoJsonSettings));
-                            }
-                            else if (status == DownloadStatus.Failed)
-                            {
-                                var problem = new DownloadFailedProblem(this)
-                                {
-                                    Url = url,
-                                    FilePath = downloadFilePath,
-                                    Exception = download.Exception
-                                };
-                                problems.Add(problem);
-                            }
-                        }
-                    }
-                }
-
                 if (metaInfo != null)
                 {
-                    vpkPathFromMetaInfo = Path.Join(dirPath, metaInfo.CurrentFile);
-                }
-            });
-
-            _checkTask.ContinueWith((task) =>
-            {
-                _checkTask = null;
-                blockMove.Dispose();
-                foreach (var problem in problems)
-                {
-                    AddProblem(problem);
-                }
-                _vpkPath = vpkPathFromMetaInfo;
-
-                if (task.Exception != null)
-                {
-                    var exceptions = task.Exception.Flatten().InnerExceptions;
-                    foreach (var ex in exceptions)
+                    var vpkPathPreview = Path.Join(dirPath, metaInfo.CurrentFile);
+                    if (File.Exists(vpkPathPreview))
                     {
-                        if (ex is OperationCanceledException)
+                        _vpkPath = vpkPathPreview;
+                    }
+                }
+
+                _checkTask = Task.Run(() =>
+                {
+                    if (getDetailsTask != null)
+                    {
+                        var result = getDetailsTask.Result;
+                        if (result.IsSucceeded)
                         {
-                            continue;
+                            details = result.Content;
                         }
-                        Log.Error(ex, "Exception occurred during the check task of WorkshopVpkAddon.");
+                        else
+                        {
+                            var problem = new GetPublishedFileDetailsProblem(this, result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId);
+                            problems.Add(problem);
+                        }
                     }
-                }
 
-                if (_checkTaskPending)
-                {
-                    _checkTaskPending = false;
-                    if (_publishedFileId.HasValue)
+                    if (details != null)
                     {
-                        CreateCheckTask(_publishedFileId.Value);
+                        bool needDownload = false;
+
+                        if (metaInfo == null)
+                        {
+                            needDownload = true;
+                        }
+                        else
+                        {
+                            if (metaInfo.PublishedFileId != publishedFileId)
+                            {
+                                needDownload = true;
+                            }
+                            if (requestUpdate && metaInfo.TimeUpdated != details.TimeUpdated)
+                            {
+                                needDownload = true;
+                            }
+                            if (!File.Exists(Path.Join(dirPath, metaInfo.CurrentFile)))
+                            {
+                                needDownload = true;
+                            }
+                        }
+
+                        if (needDownload)
+                        {
+                            // Delete the old meta info file.
+                            if (File.Exists(metaInfoPath))
+                            {
+                                File.Delete(metaInfoPath);
+                            }
+
+                            string downloadFileName = $"{details.Title}-{details.TimeUpdated}.vpk";
+                            downloadFileName = FileUtils.SanitizeFileName(downloadFileName);
+                            if (downloadFileName == "")
+                            {
+                                downloadFileName = "UNNAMED.vpk";
+                            }
+                            downloadFileName = FileUtils.GetUniqueFileName(downloadFileName, dirPath);
+                            string downloadFilePath = Path.Join(dirPath, downloadFileName);
+                            string url = details.FileUrl;
+
+                            using (var download = downloadService.Download(url, downloadFilePath))
+                            {
+                                addonRootTaskFactory.StartNew(() => DownloadItem = download).Wait();
+                                download.Wait();
+                                addonRootTaskFactory.StartNew(() => DownloadItem = null).Wait();
+                                var status = download.Status;
+                                if (status == DownloadStatus.Succeeded)
+                                {
+                                    metaInfo = new WorkshopVpkMetaInfo()
+                                    {
+                                        PublishedFileId = publishedFileId,
+                                        TimeUpdated = details.TimeUpdated,
+                                        CurrentFile = downloadFileName
+                                    };
+                                    File.WriteAllText(metaInfoPath, JsonConvert.SerializeObject(metaInfo, s_metaInfoJsonSettings));
+                                }
+                                else if (status == DownloadStatus.Failed)
+                                {
+                                    var problem = new DownloadFailedProblem(this)
+                                    {
+                                        Url = url,
+                                        FilePath = downloadFilePath,
+                                        Exception = download.Exception
+                                    };
+                                    problems.Add(problem);
+                                }
+                            }
+                        }
                     }
-                }
-            }, addonRootTaskScheduler);
+
+                    if (metaInfo != null)
+                    {
+                        resultVpkPath = Path.Join(dirPath, metaInfo.CurrentFile);
+                    }
+                });
+
+                _checkTask.ContinueWith((task) =>
+                {
+                    _checkTask = null;
+                    blockMove.Dispose();
+                    foreach (var problem in problems)
+                    {
+                        AddProblem(problem);
+                    }
+                    _vpkPath = resultVpkPath;
+
+                    if (task.Exception != null)
+                    {
+                        var exceptions = task.Exception.Flatten().InnerExceptions;
+                        foreach (var ex in exceptions)
+                        {
+                            if (ex is OperationCanceledException)
+                            {
+                                continue;
+                            }
+                            Log.Error(ex, "Exception occurred during the check task of WorkshopVpkAddon.");
+                        }
+                    }
+
+                    if (_checkTaskPending)
+                    {
+                        _checkTaskPending = false;
+                        if (_publishedFileId.HasValue)
+                        {
+                            CreateCheckTask(_publishedFileId.Value);
+                        }
+                    }
+                }, addonRootTaskScheduler);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during WorkshopVpkAddon.CreateCheckTask.");
+            }
         }
 
         protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
@@ -317,6 +343,10 @@ namespace L4D2AddonAssistant
             var httpClient = Root.HttpClient;
             return GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ContinueWith<byte[]?>((task) =>
             {
+                if (task.IsCanceled)
+                {
+                    throw new TaskCanceledException();
+                }
                 var result = task.Result;
                 if (result != null)
                 {
@@ -333,6 +363,10 @@ namespace L4D2AddonAssistant
                 return null;
             }).ContinueWith<Task<byte[]?>>((task) =>
             {
+                if (task.IsCanceled)
+                {
+                    throw new TaskCanceledException();
+                }
                 var result = task.Result;
                 if (result == null)
                 {
@@ -342,7 +376,22 @@ namespace L4D2AddonAssistant
                 {
                     return Task.FromResult<byte[]?>(result);
                 }
-            }, Root.TaskScheduler).ContinueWith((task) => task.Result.Result);
+            }, Root.TaskScheduler).ContinueWith((task) => 
+            {
+                if (task.IsCanceled)
+                {
+                    throw new TaskCanceledException();
+                }
+                var task2 = task.Result;
+                try
+                {
+                    return task2.Result;
+                }
+                catch (AggregateException ex)
+                {
+                    throw ex.InnerExceptions[0];
+                }
+            });
         }
 
         protected override Task OnDestroyAsync()
@@ -370,6 +419,7 @@ namespace L4D2AddonAssistant
             base.OnCreateSave(save);
             var save1 = (WorkshopVpkAddonSave)save;
             save1.PublishedFileId = PublishedFileId;
+            save1.AutoUpdateStrategy = AutoUpdateStrategy; 
         }
 
         protected override void OnLoadSave(AddonNodeSave save)
@@ -380,6 +430,7 @@ namespace L4D2AddonAssistant
             {
                 PublishedFileId = save1.PublishedFileId;
             }
+            AutoUpdateStrategy = save1.AutoUpdateStrategy;
         }
 
         private Task<GetPublishedFileDetailsResult> DoGetPublishedFileDetailsAsync(CancellationToken cancellationToken)
