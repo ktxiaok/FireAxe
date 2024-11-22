@@ -9,7 +9,7 @@ namespace L4D2AddonAssistant
     {
         public const string MetaInfoFileName = ".workshop";
 
-        private static readonly JsonSerializerSettings s_metaInfoJsonSettings = new()
+        internal static readonly JsonSerializerSettings s_metaInfoJsonSettings = new()
         {
             Formatting = Formatting.Indented,
         };

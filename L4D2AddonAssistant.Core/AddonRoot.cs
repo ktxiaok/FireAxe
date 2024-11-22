@@ -154,12 +154,37 @@ namespace L4D2AddonAssistant
             }
         }
 
+        private class WorkshopVpkImportItem : ImportItem
+        {
+            public string Name;
+            public AddonGroup? Group;
+            public ulong PublishedFileId;
+
+            public WorkshopVpkImportItem(string name, AddonGroup? group, ulong publishedFileId)
+            {
+                Name = name;
+                Group = group;
+                PublishedFileId = publishedFileId;
+            }
+
+            public override void Create(AddonRoot root)
+            {
+                new WorkshopVpkAddon(root, Group)
+                {
+                    Name = Name,
+                    PublishedFileId = PublishedFileId
+                };
+            }
+        }
+
         public void Import(AddonGroup? group = null)
         {
             var fileFinder = group == null ? new AddonNodeFileFinder(this) : new AddonNodeFileFinder(group);
             var imports = new List<ImportItem>();
-            while (fileFinder.MoveNext())
+            bool skipDir = false;
+            while (fileFinder.MoveNext(skipDir))
             {
+                skipDir = false;
                 if (fileFinder.CurrentNodeExists)
                 {
                     continue;
@@ -167,9 +192,36 @@ namespace L4D2AddonAssistant
 
                 var filePath = fileFinder.CurrentFilePath;
                 var fileExtension = Path.GetExtension(filePath);
-                if (fileExtension == ".vpk")
+                if (fileFinder.IsCurrentDirectory)
                 {
-                    imports.Add(new LocalVpkImportItem(Path.GetFileNameWithoutExtension(filePath), fileFinder.GetOrCreateCurrentGroup()));
+                    if (fileExtension == ".workshop")
+                    {
+                        string metaInfoFilePath = Path.Join(filePath, WorkshopVpkAddon.MetaInfoFileName);
+                        WorkshopVpkMetaInfo? metaInfo = null;
+                        try
+                        {
+                            if (File.Exists(metaInfoFilePath))
+                            {
+                                metaInfo = JsonConvert.DeserializeObject<WorkshopVpkMetaInfo>(File.ReadAllText(metaInfoFilePath), WorkshopVpkAddon.s_metaInfoJsonSettings);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during reading workshop meta info file: {FilePath}", metaInfoFilePath);
+                        }
+                        if (metaInfo != null)
+                        {
+                            skipDir = true;
+                            imports.Add(new WorkshopVpkImportItem(Path.GetFileNameWithoutExtension(filePath), fileFinder.GetOrCreateCurrentGroup(), metaInfo.PublishedFileId));
+                        }
+                    }
+                }
+                else
+                {
+                    if (fileExtension == ".vpk")
+                    {
+                        imports.Add(new LocalVpkImportItem(Path.GetFileNameWithoutExtension(filePath), fileFinder.GetOrCreateCurrentGroup()));
+                    }
                 }
             }
             foreach (var import in imports)
@@ -178,40 +230,38 @@ namespace L4D2AddonAssistant
             }
         }
 
-        private class LocalVpkFile
-        {
-            public string FileName;
-            public Guid Guid;
-
-            public LocalVpkFile(string fileName, Guid guid)
-            {
-                FileName = fileName;
-                Guid = guid;
-            }
-        }
-
         public void Push()
         {
             var gamePath = EnsureValidGamePath();
-
             string addonsPath = GamePathUtils.GetAddonsPath(gamePath);
 
-            // Delete old vpk files.
-            var remainingLocalVpkFiles = new List<LocalVpkFile>();
+            // Delete old link files.
+            var remainingFilePaths = new List<string>();
             {
-                var filesToDelete = new List<(string FilePath, object File)>();
+                var filePathsToDelete = new List<string>();
                 foreach (string filePath in Directory.EnumerateFiles(addonsPath))
                 {
+                    if ((File.GetAttributes(filePath) & FileAttributes.ReparsePoint) == 0)
+                    {
+                        continue;
+                    }
+
                     if (filePath.EndsWith(".vpk"))
                     {
                         string fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
-                        if (TryParseLocalVpkFileName(fileNameNoExt, out Guid guid))
+
+                        if (TryParseLocalVpkFileNameNoExt(fileNameNoExt, out _))
                         {
-                            filesToDelete.Add((filePath, new LocalVpkFile(fileNameNoExt + ".vpk", guid)));
+                            filePathsToDelete.Add(filePath);
+                        }
+
+                        if (TryParseWorkshopVpkFileNameNoExt(fileNameNoExt, out _))
+                        {
+                            filePathsToDelete.Add(filePath);
                         }
                     }
                 }
-                foreach ((string filePath, object file) in filesToDelete)
+                foreach (string filePath in filePathsToDelete)
                 {
                     try
                     {
@@ -223,10 +273,7 @@ namespace L4D2AddonAssistant
                     }
                     if (File.Exists(filePath))
                     {
-                        if (file is LocalVpkFile localVpkFile)
-                        {
-                            remainingLocalVpkFiles.Add(localVpkFile);
-                        }
+                        remainingFilePaths.Add(filePath);
                     }
                 }
             }
@@ -260,7 +307,12 @@ namespace L4D2AddonAssistant
                     if (name.EndsWith(".vpk"))
                     {
                         string nameNoExt = name.Substring(0, name.Length - 4);
-                        if (TryParseLocalVpkFileName(nameNoExt, out _))
+
+                        if (TryParseLocalVpkFileNameNoExt(nameNoExt, out _))
+                        {
+                            continue;
+                        }
+                        if (TryParseWorkshopVpkFileNameNoExt(nameNoExt, out _))
                         {
                             continue;
                         }
@@ -270,9 +322,10 @@ namespace L4D2AddonAssistant
             }
 
             // Add remaining files to entries.
-            foreach (var file in remainingLocalVpkFiles)
+            foreach (string filePath in remainingFilePaths)
             {
-                addonEntries[file.FileName] = "0";
+                string fileName = Path.GetFileName(filePath);
+                addonEntries[fileName] = "0";
             }
 
             // Add enabled addons to entries.
@@ -287,19 +340,30 @@ namespace L4D2AddonAssistant
                 {
                     string? vpkPath = vpkAddon.FullVpkFilePath;
                     string? linkFileName = null;
-                    if (vpkPath == null)
+
+                    if (vpkPath == null || !File.Exists(vpkPath))
                     {
                         continue;
                     }
+
                     if (vpkAddon is LocalVpkAddon localVpkAddon)
                     {
                         localVpkAddon.ValidateVpkGuid();
                         linkFileName = BuildLocalVpkFileName(localVpkAddon.VpkGuid);
                     }
+                    else if (vpkAddon is WorkshopVpkAddon workshopVpkAddon)
+                    {
+                        if (workshopVpkAddon.PublishedFileId.HasValue)
+                        {
+                            linkFileName = BuildWorkshopVpkFileName(workshopVpkAddon.PublishedFileId.Value);
+                        }
+                    }
+
                     if (linkFileName == null)
                     {
                         continue;
                     }
+
                     File.CreateSymbolicLink(Path.Join(addonsPath, linkFileName), vpkPath);
                     addonEntries[linkFileName] = "1";
                 }
@@ -316,13 +380,32 @@ namespace L4D2AddonAssistant
                 kv.Serialize(stream, addonList);
             }
 
-            bool TryParseLocalVpkFileName(string nameNoExt, out Guid guid)
+            bool TryParseLocalVpkFileNameNoExt(string nameNoExt, out Guid guid)
             {
+                const int PrefixLength = 6;
+                const int GuidLength = 32;
+
                 guid = Guid.Empty;
-                if (nameNoExt.Length == (6 + 32) && nameNoExt.StartsWith("local_"))
+                if (nameNoExt.Length == (PrefixLength + GuidLength) && nameNoExt.StartsWith("local_"))
                 {
-                    string guidStr = nameNoExt.Substring(6);
+                    string guidStr = nameNoExt.Substring(PrefixLength);
                     if (Guid.TryParse(guidStr, out guid))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            bool TryParseWorkshopVpkFileNameNoExt(string nameNoExt, out ulong publishedFileId)
+            {
+                const int PrefixLength = 9;
+
+                publishedFileId = 0;
+                if (nameNoExt.Length > PrefixLength && nameNoExt.StartsWith("workshop_"))
+                {
+                    string idStr = nameNoExt.Substring(PrefixLength);
+                    if (ulong.TryParse(idStr, out publishedFileId))
                     {
                         return true;
                     }
@@ -332,7 +415,12 @@ namespace L4D2AddonAssistant
 
             string BuildLocalVpkFileName(Guid guid)
             {
-                return "local_" + guid.ToString("N") + ".vpk";
+                return $"local_{guid:N}.vpk";
+            }
+
+            string BuildWorkshopVpkFileName(ulong publishedFileId)
+            {
+                return $"workshop_{publishedFileId}.vpk";
             }
         }
 
