@@ -1,5 +1,6 @@
 ﻿using Downloader;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
@@ -17,28 +18,28 @@ namespace L4D2AddonAssistant
         private static readonly JsonSerializerSettings s_downloadInfoJsonSettings = new()
         {
             Formatting = Formatting.Indented,
-            ContractResolver = DownloadInfoContractResolver.Instance
+            //ContractResolver = DownloadInfoContractResolver.Instance
         };
 
-        private class DownloadInfoContractResolver : DefaultContractResolver
-        {
-            public static readonly DownloadInfoContractResolver Instance = new();
+        //private class DownloadInfoContractResolver : DefaultContractResolver
+        //{
+        //    public static readonly DownloadInfoContractResolver Instance = new();
 
-            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-            {
-                var property = base.CreateProperty(member, memberSerialization);
+        //    protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        //    {
+        //        var property = base.CreateProperty(member, memberSerialization);
 
-                if (property.DeclaringType == typeof(DownloadPackage))
-                {
-                    if (property.PropertyName == nameof(DownloadPackage.Storage))
-                    {
-                        property.Ignored = true;
-                    }
-                }
+        //        if (property.DeclaringType == typeof(DownloadPackage))
+        //        {
+        //            if (property.PropertyName == nameof(DownloadPackage.Storage))
+        //            {
+        //                property.Ignored = true;
+        //            }
+        //        }
 
-                return property;
-            }
-        }
+        //        return property;
+        //    }
+        //}
 
         private class DownloadItem : IDownloadItem
         {
@@ -80,7 +81,13 @@ namespace L4D2AddonAssistant
                         {
                             try
                             {
-                                downloadPackage = JsonConvert.DeserializeObject<DownloadPackage>(File.ReadAllText(downloadInfoFilePath));
+                                var downloadPackageJObj = JObject.Parse(File.ReadAllText(downloadInfoFilePath));
+                                downloadPackageJObj["FileName"] = downloadingFilePath;
+                                if (downloadPackageJObj.TryGetValue("Storage", out var storageToken))
+                                {
+                                    storageToken["Path"] = downloadingFilePath;
+                                }
+                                downloadPackage = downloadPackageJObj.ToObject<DownloadPackage>();
                             }
                             catch (Exception ex)
                             {
@@ -94,10 +101,10 @@ namespace L4D2AddonAssistant
                                     downloadPackage = null;
                                 }
                             }
-                            if (downloadPackage != null)
-                            {
-                                downloadPackage.FileName = downloadingFilePath;
-                            }
+                            //if (downloadPackage != null)
+                            //{
+                            //    downloadPackage.FileName = downloadingFilePath;
+                            //}
                         }
                         lock (_downloadLock)
                         {
