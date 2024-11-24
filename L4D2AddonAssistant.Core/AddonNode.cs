@@ -9,6 +9,8 @@ namespace L4D2AddonAssistant
     {
         private bool _isValid = true;
 
+        private CancellationTokenSource _destructionCancellationTokenSource = new();
+
         private bool _isEnabled = false;
 
         private bool _allowEnabledInHierarchy = true;
@@ -24,7 +26,8 @@ namespace L4D2AddonAssistant
         private List<AddonProblem>? _problems = null;
         private bool _isBusyChecking = false;
 
-        private WeakReference<byte[]?>? _image = null;
+        private WeakReference<byte[]?> _image = new(null);
+        private Task<byte[]?>? _getImageTask = null;
 
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
@@ -132,10 +135,6 @@ namespace L4D2AddonAssistant
         {
             get
             {
-                if (_image == null)
-                {
-                    return null;
-                }
                 if (_image.TryGetTarget(out var target))
                 {
                     return target;
@@ -201,23 +200,29 @@ namespace L4D2AddonAssistant
 
         public virtual string FileExtension => "";
 
+        internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
+
         internal virtual ReadOnlyObservableCollection<AddonNode> Children_Internal => throw new NotSupportedException();
 
         internal virtual bool HasChildren_Internal => false;
 
         public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
         {
-            var image = new WeakReference<byte[]?>(null);
-            _image = image;
-            var task = DoGetImageAsync(cancellationToken);
-            task.ContinueWith((task) =>
+            var task = _getImageTask;
+            if (task == null)
             {
-                if (task.IsCompletedSuccessfully)
+                task = DoGetImageAsync(DestructionCancellationToken);
+                _getImageTask = task;
+                _getImageTask.ContinueWith((task) =>
                 {
-                    image.SetTarget(task.Result);
-                }
-            }, cancellationToken, TaskContinuationOptions.None, Root.TaskScheduler);
-            return task;
+                    _getImageTask = null;
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        _image.SetTarget(task.Result);
+                    }
+                }, Root.TaskScheduler);
+            }
+            return task.WaitAsync(cancellationToken);
         }
 
         public Task<byte[]?> GetImageAllowCacheAsync(CancellationToken cancellationToken)
@@ -374,7 +379,7 @@ namespace L4D2AddonAssistant
 
         public virtual void ClearCaches()
         {
-            _image = null;
+            _image.SetTarget(null);
         }
 
         private class CreateSaveStackFrame
@@ -518,7 +523,16 @@ namespace L4D2AddonAssistant
         {
             _isValid = false;
             NotifyChanged(nameof(IsValid));
-            return Task.CompletedTask;
+
+            var task = Task.CompletedTask;
+            _destructionCancellationTokenSource.Cancel();
+            _destructionCancellationTokenSource.Dispose();
+            if (_getImageTask != null)
+            {
+                task = Task.WhenAll(task, _getImageTask);
+            }
+
+            return task;
         }
 
         protected virtual void OnCheck()

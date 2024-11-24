@@ -18,11 +18,10 @@ namespace L4D2AddonAssistant
 
         private AutoUpdateStrategy _autoUpdateStrategy = AutoUpdateStrategy.Default;
 
-        private WeakReference<PublishedFileDetails?>? _publishedFileDetails = null;
+        private WeakReference<PublishedFileDetails?> _publishedFileDetails = new(null);
+        private Task<GetPublishedFileDetailsResult>? _getPublishedFileDetailsTask = null;
 
         private string? _vpkPath = null;
-
-        private CancellationTokenSource _cancellationTokenSource = new();
 
         private Task? _checkTask = null;
         private bool _checkTaskPending = false;
@@ -76,10 +75,6 @@ namespace L4D2AddonAssistant
         {
             get
             {
-                if (_publishedFileDetails == null)
-                {
-                    return null;
-                }
                 if (_publishedFileDetails.TryGetTarget(out var target))
                 {
                     return target;
@@ -96,25 +91,22 @@ namespace L4D2AddonAssistant
 
         public Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(CancellationToken cancellationToken)
         {
-            var details = new WeakReference<PublishedFileDetails?>(null);
-            _publishedFileDetails = details;
-            var task = DoGetPublishedFileDetailsAsync(cancellationToken);
-            task.ContinueWith((task) =>
+            var task = _getPublishedFileDetailsTask;
+            if (task == null)
             {
-                if (task.IsCompletedSuccessfully)
+                task = DoGetPublishedFileDetailsAsync(DestructionCancellationToken);
+                _getPublishedFileDetailsTask = task;
+                _getPublishedFileDetailsTask.ContinueWith((task) =>
                 {
+                    _getPublishedFileDetailsTask = null;
                     var result = task.Result;
                     if (result.IsSucceeded)
                     {
-                        details.SetTarget(result.Content);
-                        if (details == _publishedFileDetails)
-                        {
-                            NotifyChanged(nameof(PublishedFileDetailsCache));
-                        }
+                        _publishedFileDetails.SetTarget(result.Content);
                     }
-                }
-            }, cancellationToken, TaskContinuationOptions.None, Root.TaskScheduler);
-            return task;
+                }, Root.TaskScheduler);
+            }
+            return task.WaitAsync(cancellationToken);
         }
 
         public Task<PublishedFileDetails?> GetPublishedFileDetailsAllowCacheAsync(CancellationToken cancellationToken)
@@ -139,8 +131,7 @@ namespace L4D2AddonAssistant
         {
             base.ClearCaches();
 
-            _publishedFileDetails = null;
-            NotifyChanged(nameof(PublishedFileDetailsCache));
+            _publishedFileDetails.SetTarget(null);
         }
 
         protected override void OnCheck()
@@ -163,7 +154,7 @@ namespace L4D2AddonAssistant
         private void CreateCheckTask(ulong publishedFileId)
         {
             string dirPath = FullFilePath;
-            var cancellationToken = _cancellationTokenSource.Token;
+            var cancellationToken = DestructionCancellationToken;
             var details = PublishedFileDetailsCache;
             Task<GetPublishedFileDetailsResult>? getDetailsTask = null;
             if (details == null)
@@ -397,20 +388,27 @@ namespace L4D2AddonAssistant
         protected override Task OnDestroyAsync()
         {
             var baseTask = base.OnDestroyAsync();
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
+
             var tasks = new List<Task>();
             tasks.Add(baseTask);
+
             if (_checkTask != null)
             {
                 tasks.Add(_checkTask);
             }
             _checkTaskPending = false;
+
+            if (_getPublishedFileDetailsTask != null)
+            {
+                tasks.Add(_getPublishedFileDetailsTask);
+            }
+
             var download = _download;
             tasks.Add(Task.Run(() =>
             {
                 download?.Dispose();
             }));
+
             return Task.WhenAll(tasks);
         }
 
