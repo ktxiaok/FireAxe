@@ -22,7 +22,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         private IEnumerable<AddonNode>? _movingNodes = null;
 
-        private IReadOnlyList<AddonNodeSimpleViewModel>? _selection = null;
+        private IReadOnlyList<AddonNodeListItemViewModel>? _selection = null;
         private readonly ObservableAsPropertyHelper<int> _selectionCount;
         private readonly ObservableAsPropertyHelper<bool> _isSingleSelection;
         private readonly ObservableAsPropertyHelper<bool> _isMultipleSelection;
@@ -163,7 +163,7 @@ namespace L4D2AddonAssistant.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _movingNodes, value);
         }
 
-        public IReadOnlyList<AddonNodeSimpleViewModel>? Selection
+        public IReadOnlyList<AddonNodeListItemViewModel>? Selection
         {
             get => _selection;
             set

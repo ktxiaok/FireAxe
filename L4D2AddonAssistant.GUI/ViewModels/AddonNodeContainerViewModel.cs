@@ -12,11 +12,10 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private ReadOnlyObservableCollection<AddonNode>? _nodes = null;
         private IDisposable? _nodesSubscription = null;
-        private ReadOnlyObservableCollection<AddonNodeSimpleViewModel>? _nodeViewModels = null;
+        private ReadOnlyObservableCollection<AddonNodeListItemViewModel>? _nodeViewModels = null;
 
         public AddonNodeContainerViewModel()
         {
-            Activator = new();
             this.WhenActivated((CompositeDisposable disposables) =>
             {
                 this.WhenAnyValue(x => x.Nodes)
@@ -26,7 +25,7 @@ namespace L4D2AddonAssistant.ViewModels
                     if (nodes != null)
                     {
                         _nodesSubscription = nodes.ToObservableChangeSet()
-                        .Select(node => new AddonNodeSimpleViewModel(node))
+                        .Select(node => new AddonNodeListItemViewModel(node, this))
                         .Bind(out var nodeViewModels)
                         .Subscribe();
                         NodeViewModels = nodeViewModels;
@@ -42,7 +41,7 @@ namespace L4D2AddonAssistant.ViewModels
             });
         }
 
-        public ViewModelActivator Activator { get; }
+        public ViewModelActivator Activator { get; } = new();
 
         public ReadOnlyObservableCollection<AddonNode>? Nodes
         {
@@ -50,7 +49,7 @@ namespace L4D2AddonAssistant.ViewModels
             set => this.RaiseAndSetIfChanged(ref _nodes, value);
         }
 
-        public ReadOnlyObservableCollection<AddonNodeSimpleViewModel>? NodeViewModels
+        public ReadOnlyObservableCollection<AddonNodeListItemViewModel>? NodeViewModels
         {
             get => _nodeViewModels;
             private set => this.RaiseAndSetIfChanged(ref _nodeViewModels, value);

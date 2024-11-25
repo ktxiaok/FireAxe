@@ -8,18 +8,18 @@ using System.Reactive.Disposables;
 
 namespace L4D2AddonAssistant.Views
 {
-    public class AddonNodeSimpleView : ReactiveUserControl<AddonNodeSimpleViewModel>
+    public class AddonNodeListItemView : ReactiveUserControl<AddonNodeSimpleViewModel>
     {
-        public AddonNodeSimpleView()
+        public AddonNodeListItemView()
         {
-            DoubleTapped += AddonNodeSimpleView_DoubleTapped;
+            DoubleTapped += AddonNodeListItemView_DoubleTapped;
             this.WhenActivated((CompositeDisposable disposables) =>
             {
 
             });
         }
 
-        private void AddonNodeSimpleView_DoubleTapped(object? sender, TappedEventArgs e)
+        private void AddonNodeListItemView_DoubleTapped(object? sender, TappedEventArgs e)
         {
             e.Source = this;
         }

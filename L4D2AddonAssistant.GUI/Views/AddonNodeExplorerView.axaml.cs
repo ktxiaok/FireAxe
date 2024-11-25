@@ -1,11 +1,9 @@
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.ReactiveUI;
 using L4D2AddonAssistant.Resources;
 using L4D2AddonAssistant.ViewModels;
-using MsBox.Avalonia;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -167,7 +165,7 @@ namespace L4D2AddonAssistant.Views
             var viewModel = ViewModel;
             if (viewModel != null)
             {
-                if (e.Source is AddonNodeSimpleView nodeView)
+                if (e.Source is AddonNodeListItemView nodeView)
                 {
                     var nodeViewModel = nodeView.ViewModel;
                     if (nodeViewModel != null)
@@ -191,7 +189,7 @@ namespace L4D2AddonAssistant.Views
                 if (e.Source is ListBox listBox)
                 {
                     viewModel.Selection = listBox.Selection.SelectedItems
-                        .Select(item => item as AddonNodeSimpleViewModel)
+                        .Select(item => item as AddonNodeListItemViewModel)
                         .Where(x => x != null)
                         .ToArray()!;
                 }
