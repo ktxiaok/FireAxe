@@ -484,6 +484,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Preparing... 的本地化字符串。
+        /// </summary>
+        public static string PreparingMessage {
+            get {
+                return ResourceManager.GetString("PreparingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Push 的本地化字符串。
         /// </summary>
         public static string Push {

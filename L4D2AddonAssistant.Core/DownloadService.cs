@@ -108,7 +108,7 @@ namespace L4D2AddonAssistant
                         }
                         lock (_downloadLock)
                         {
-                            if (_status == DownloadStatus.Preparing)
+                            if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused)
                             {
                                 _download = new(config);
                                 _download.DownloadStarted += OnDownloadStarted;
@@ -218,6 +218,10 @@ namespace L4D2AddonAssistant
                         _download!.Pause();
                         _status = DownloadStatus.Paused;
                     }
+                    else if (_status == DownloadStatus.Preparing)
+                    {
+                        _status = DownloadStatus.PreparingAndPaused;
+                    }
                 }
             }
 
@@ -230,6 +234,10 @@ namespace L4D2AddonAssistant
                         _download!.Resume();
                         _status = DownloadStatus.Running;
                     }
+                    else if (_status == DownloadStatus.PreparingAndPaused)
+                    {
+                        _status = DownloadStatus.Preparing;
+                    }
                 }
             }
 
@@ -237,7 +245,7 @@ namespace L4D2AddonAssistant
             {
                 lock (_downloadLock)
                 {
-                    if (_status == DownloadStatus.Preparing || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
+                    if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
                     {
                         _download?.CancelAsync();
                         _status = DownloadStatus.Cancelled;
@@ -265,7 +273,7 @@ namespace L4D2AddonAssistant
                     downloadToDispose = _download;
                     _download = null;
 
-                    if (_status == DownloadStatus.Preparing || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
+                    if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
                     {
                         _status = DownloadStatus.Cancelled;
                     }
@@ -380,7 +388,15 @@ namespace L4D2AddonAssistant
                 }
                 lock (_downloadLock)
                 {
-                    _status = DownloadStatus.Running;
+                    if (_status == DownloadStatus.Preparing)
+                    {
+                        _status = DownloadStatus.Running;
+                    }
+                    else if (_status == DownloadStatus.PreparingAndPaused)
+                    {
+                        _download?.Pause();
+                        _status = DownloadStatus.Paused;
+                    }
                 }
             }
 

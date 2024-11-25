@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             xmlns:r="using:L4D2AddonAssistant.Resources"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
              x:Class="L4D2AddonAssistant.Views.DownloadItemView"
              x:DataType="vm:DownloadItemViewModel">
@@ -47,10 +48,15 @@
       </Grid>
       <ProgressBar
         Name="progressBar"
+        IsVisible="{Binding IsProgressAvailable}"
         Minimum="0"
         Maximum="{Binding TotalBytes}"
         Value="{Binding DownloadedBytes}"
         ShowProgressText="True"/>
+      <TextBlock
+        Text="{x:Static r:Texts.PreparingMessage}"
+        IsVisible="{Binding IsPreparing}"
+        TextAlignment="Left"/>
     </StackPanel>
     
     <!-- buttons -->
@@ -69,13 +75,13 @@
       <Button
         Grid.Column="0"
         Command="{Binding ResumeCommand}"
-        IsVisible="{Binding IsPaused}">
+        IsVisible="{Binding IsResumeable}">
         <PathIcon Data="{StaticResource icon_play}"/>
       </Button>
       <Button
         Grid.Column="0"
         Command="{Binding PauseCommand}"
-        IsVisible="{Binding IsRunning}">
+        IsVisible="{Binding IsPauseable}">
         <PathIcon Data="{StaticResource icon_pause}"/>
       </Button>
       <Button

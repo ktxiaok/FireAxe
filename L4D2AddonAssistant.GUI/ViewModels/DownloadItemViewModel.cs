@@ -28,6 +28,7 @@ namespace L4D2AddonAssistant.ViewModels
         private string _etaReadable = UnknownEtaString;
 
         private bool _preparing = true;
+        private bool _preparingAndPaused = false;
         private bool _running = false;
         private bool _paused = false;
         private bool _completed = false;
@@ -47,6 +48,13 @@ namespace L4D2AddonAssistant.ViewModels
                 Log.Error(ex, "Exception occurred during getting the file name of the path: {FilePath}", _download.FilePath);
             }
 
+            this.WhenAnyValue(x => x.IsRunning,  x => x.IsPaused)
+                .Subscribe((_) => this.RaisePropertyChanged(nameof(IsProgressAvailable)));
+            this.WhenAnyValue(x => x.IsPreparing, x => x.IsPreparingAndPaused,  x => x.IsRunning)
+                .Subscribe((_) => this.RaisePropertyChanged(nameof(IsPauseable)));
+            this.WhenAnyValue(x => x.IsPreparingAndPaused,  x => x.IsPaused)
+                .Subscribe((_) => this.RaisePropertyChanged(nameof(IsResumeable)));
+
             CancelCommand = ReactiveCommand.Create(() => { _download.Cancel(); Refresh(); });
             ResumeCommand = ReactiveCommand.Create(() => { _download.Resume(); Refresh(); });
             PauseCommand = ReactiveCommand.Create(() => { _download.Pause(); Refresh(); });
@@ -59,6 +67,8 @@ namespace L4D2AddonAssistant.ViewModels
                     return true;
                 }, RefreshInterval).DisposeWith(disposables);
             });
+
+            Refresh();
         }
 
         public ViewModelActivator Activator { get; } = new();
@@ -184,6 +194,12 @@ namespace L4D2AddonAssistant.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _preparing, value);
         }
 
+        public bool IsPreparingAndPaused
+        {
+            get => _preparingAndPaused;
+            private set => this.RaiseAndSetIfChanged(ref _preparingAndPaused, value);
+        }
+
         public bool IsRunning
         {
             get => _running;
@@ -206,6 +222,12 @@ namespace L4D2AddonAssistant.ViewModels
             }
         }
 
+        public bool IsProgressAvailable => IsRunning || IsPaused;
+
+        public bool IsPauseable => (IsPreparing && !IsPreparingAndPaused) || IsRunning;
+
+        public bool IsResumeable => IsPreparingAndPaused || IsPaused; 
+
         public void Refresh()
         {
             if (IsCompleted)
@@ -217,9 +239,18 @@ namespace L4D2AddonAssistant.ViewModels
 
             if (IsPreparing)
             {
-                if (status != DownloadStatus.Preparing)
+                if (status == DownloadStatus.Preparing)
+                {
+                    IsPreparingAndPaused = false;
+                }
+                else if (status == DownloadStatus.PreparingAndPaused)
+                {
+                    IsPreparingAndPaused = true;
+                }
+                else
                 {
                     IsPreparing = false;
+                    IsPreparingAndPaused = false;
                     TotalBytes = _download.TotalBytes;
                 }
             }

@@ -258,6 +258,9 @@
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
   </data>
+  <data name="PreparingMessage" xml:space="preserve">
+    <value>Preparing...</value>
+  </data>
   <data name="Push" xml:space="preserve">
     <value>Push</value>
   </data>

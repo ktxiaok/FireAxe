@@ -5,6 +5,7 @@ namespace L4D2AddonAssistant
     public enum DownloadStatus
     {
         Preparing,
+        PreparingAndPaused,
         Running,
         Paused,
         Succeeded,
