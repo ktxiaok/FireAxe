@@ -60,10 +60,9 @@
     
     
     <v:AddonNodeEnableButton/>
-    
+
     <StackPanel
-      Name="sectionViewPanel"
-      Orientation="Vertical"
-      HorizontalAlignment="Stretch"/>
+      Name="sectionViewContainerControl"
+      Orientation="Vertical"/>
   </StackPanel>
 </UserControl>

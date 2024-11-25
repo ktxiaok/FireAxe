@@ -16,26 +16,26 @@ namespace L4D2AddonAssistant.Views
                 this.WhenAnyValue(x => x.ViewModel)
                 .Subscribe(viewModel =>
                 {
-                    sectionViewPanel.Children.Clear();
+                    ClearSectionViews();
                     if (viewModel != null)
                     {
                         if (viewModel is AddonGroupViewModel addonGroupViewModel)
                         {
-                            sectionViewPanel.Children.Add(new AddonGroupSectionView()
+                            AddSectionView(new AddonGroupSectionView()
                             {
                                 ViewModel = addonGroupViewModel
                             });
                         }
                         else if (viewModel is VpkAddonViewModel vpkAddonViewModel)
                         {
-                            sectionViewPanel.Children.Add(new VpkAddonSectionView()
+                            AddSectionView(new VpkAddonSectionView()
                             {
                                 ViewModel = vpkAddonViewModel
                             });
                             
                             if (viewModel is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
                             {
-                                sectionViewPanel.Children.Add(new WorkshopVpkAddonSectionView()
+                                AddSectionView(new WorkshopVpkAddonSectionView()
                                 {
                                     ViewModel = workshopVpkAddonViewModel
                                 });
@@ -45,7 +45,18 @@ namespace L4D2AddonAssistant.Views
                 })
                 .DisposeWith(disposables);
             });
+
             InitializeComponent();
+        }
+
+        private void ClearSectionViews()
+        {
+            sectionViewContainerControl.Children.Clear();
+        }
+
+        private void AddSectionView(Control control)
+        {
+            sectionViewContainerControl.Children.Add(new AddonNodeSectionViewDecorator(control));
         }
     }
 }

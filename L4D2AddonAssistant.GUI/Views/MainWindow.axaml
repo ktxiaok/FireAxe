@@ -9,7 +9,9 @@
         x:Class="L4D2AddonAssistant.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="L4D2 Addon Assistant">
+        Title="{Binding TitleExtraInfo, StringFormat=L4D2 Addon Assistant{0}}"
+        WindowStartupLocation="CenterScreen"
+        Width="1400" Height="900">
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">

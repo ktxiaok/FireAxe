@@ -38,15 +38,16 @@
           Source="{Binding Image}"
           IsVisible="{Binding ShouldShowImage}"/>
       </Panel>
-      <Panel Height="20">
+      <Panel Height="30">
         <TextBlock
           Text="{Binding AddonNode.Name}"
           FontSize="12"
           MaxWidth="{Binding #image.Width}"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
+          TextAlignment="Center"
           TextWrapping="Wrap"
-          MaxLines="1"
+          MaxLines="2"
           TextTrimming="CharacterEllipsis"/>
       </Panel>
     </StackPanel>

@@ -23,6 +23,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
+        private readonly ObservableAsPropertyHelper<string> _titleExtraInfo;
+
         public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient)
         {
             ArgumentNullException.ThrowIfNull(settings);
@@ -35,6 +37,17 @@ namespace L4D2AddonAssistant.ViewModels
             _httpClient = httpClient;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
+
+            _titleExtraInfo = this.WhenAnyValue(x => x.AddonRoot)
+                .Select((addonRoot) =>
+                {
+                    if (addonRoot == null)
+                    {
+                        return "";
+                    }
+                    return " - " + addonRoot.DirectoryPath;
+                })
+                .ToProperty(this, nameof(TitleExtraInfo));
 
             OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -139,6 +152,8 @@ namespace L4D2AddonAssistant.ViewModels
             get => _addonNodeExplorerViewModel;
             private set => this.RaiseAndSetIfChanged(ref _addonNodeExplorerViewModel, value);
         }
+
+        public string TitleExtraInfo => _titleExtraInfo.Value;
 
         public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
 

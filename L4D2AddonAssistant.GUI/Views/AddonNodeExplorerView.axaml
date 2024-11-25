@@ -14,7 +14,7 @@
   
   <Grid
     RowDefinitions="Auto, *"
-    ColumnDefinitions="*, 4, 300">
+    ColumnDefinitions="*, 4, 400">
     <Grid
       RowDefinitions="Auto"
       ColumnDefinitions="Auto, Auto, *"
