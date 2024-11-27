@@ -250,6 +250,42 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Grid View 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeListItemViewKind_Grid {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeListItemViewKind_Grid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Large Tile View 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeListItemViewKind_LargeTile {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeListItemViewKind_LargeTile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tile View 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeListItemViewKind_MediumTile {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeListItemViewKind_MediumTile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Small Tile View 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeListItemViewKind_SmallTile {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeListItemViewKind_SmallTile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Default 的本地化字符串。
         /// </summary>
         public static string Enum_AutoUpdateStrategy_Default {
@@ -457,7 +493,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Ok 的本地化字符串。
+        ///   查找类似 OK 的本地化字符串。
         /// </summary>
         public static string Ok {
             get {

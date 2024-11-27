@@ -180,6 +180,18 @@
   <data name="Enum_AddonGroupEnableStrategy_SingleRandom" xml:space="preserve">
     <value>Random Single</value>
   </data>
+  <data name="Enum_AddonNodeListItemViewKind_Grid" xml:space="preserve">
+    <value>Grid View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_LargeTile" xml:space="preserve">
+    <value>Large Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_MediumTile" xml:space="preserve">
+    <value>Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
+    <value>Small Tile View</value>
+  </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>Default</value>
   </data>
@@ -250,7 +262,7 @@
     <value>Null</value>
   </data>
   <data name="Ok" xml:space="preserve">
-    <value>Ok</value>
+    <value>OK</value>
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>

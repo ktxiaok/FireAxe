@@ -4,7 +4,7 @@ namespace L4D2AddonAssistant.ViewModels
 {
     public enum AddonNodeListItemViewKind : byte
     {
-        List,
+        Grid,
         MediumTile,
         SmallTile,
         LargeTile,

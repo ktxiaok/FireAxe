@@ -32,8 +32,6 @@
     </Style>
 
     <Style Selector="Border.NodeBorder">
-      <Setter Property="HorizontalAlignment" Value="Center"/>
-      <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="Padding" Value="5"/>
       <Setter Property="BorderThickness" Value="3"/>
       <Setter Property="BoxShadow" Value="{StaticResource boxshadow_regular}"/>
@@ -42,8 +40,11 @@
   
   <ScrollViewer>
     <Panel>
-      <ListBox ItemsSource="{Binding NodeViewModels}"
-               SelectionMode="Multiple">
+      <!--tile view-->
+      <ListBox
+        IsVisible="{Binding IsTileView}"
+        ItemsSource="{Binding NodeViewModels}"
+        SelectionMode="Multiple">
         <ListBox.ItemTemplate>
           <DataTemplate>
             <Border Classes="NodeBorder">
@@ -54,6 +55,25 @@
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <WrapPanel/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+      </ListBox>
+
+      <!--grid view-->
+      <ListBox
+        IsVisible="{Binding IsGridView}"
+        ItemsSource="{Binding NodeViewModels}"
+        SelectionMode="Multiple">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Border Classes="NodeBorder">
+              <v:AddonNodeGridRowView/>
+            </Border>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"/>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
       </ListBox>

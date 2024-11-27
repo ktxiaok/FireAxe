@@ -32,7 +32,7 @@
           IsVisible="{Binding ShouldShowUnknownImage}"/>
         <Image
           x:Name="image"
-          Width="{StaticResource size_addon_tile}"
+          Width="{Binding ContainerViewModel.TileViewSize, FallbackValue=200}"
           Height="{Binding $self.Width}"
           Stretch="Uniform"
           Source="{Binding Image}"

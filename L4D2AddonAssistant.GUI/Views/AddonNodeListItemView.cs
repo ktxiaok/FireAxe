@@ -12,16 +12,10 @@ namespace L4D2AddonAssistant.Views
     {
         public AddonNodeListItemView()
         {
-            DoubleTapped += AddonNodeListItemView_DoubleTapped;
             this.WhenActivated((CompositeDisposable disposables) =>
             {
 
             });
-        }
-
-        private void AddonNodeListItemView_DoubleTapped(object? sender, TappedEventArgs e)
-        {
-            e.Source = this;
         }
     }
 }

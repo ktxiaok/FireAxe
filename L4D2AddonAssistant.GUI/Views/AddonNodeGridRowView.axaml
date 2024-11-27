@@ -1,0 +1,40 @@
+<v:AddonNodeListItemView xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="using:L4D2AddonAssistant.Views"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
+             x:DataType="vm:AddonNodeListItemViewModel"
+             x:Class="L4D2AddonAssistant.Views.AddonNodeGridRowView">
+  <Design.DataContext>
+    <vm:AddonNodeListItemViewModelDesign/>
+  </Design.DataContext>
+  <Grid
+    RowDefinitions="Auto" ColumnDefinitions="30, *, 30">
+    <Panel
+      Grid.Column="0"
+      Margin="5, 0, 5, 0">
+      <PathIcon
+        Data="{StaticResource icon_folder}"
+        IsVisible="{Binding ShouldShowFolderIcon}"/>
+      <PathIcon
+        Data="{StaticResource icon_question}"
+        IsVisible="{Binding ShouldShowUnknownImage}"/>
+      <Image
+        Source="{Binding Image}"
+        IsVisible="{Binding ShouldShowImage}"/>
+    </Panel>
+    <TextBlock
+      Grid.Column="1"
+      Text="{Binding AddonNode.Name}"
+      VerticalAlignment="Center"
+      TextTrimming="CharacterEllipsis"/>
+    <Panel
+      Grid.Column="2"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+      <v:AddonNodeEnableButton/>
+    </Panel>
+  </Grid>
+</v:AddonNodeListItemView>

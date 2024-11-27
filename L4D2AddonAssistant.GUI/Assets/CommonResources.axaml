@@ -41,6 +41,6 @@
   
   <BoxShadows x:Key="boxshadow_regular">0 0 5 2 #222</BoxShadows>
   <sys:Double x:Key="size_addon_tile">100</sys:Double>
-  <sys:Double x:Key="size_addon_tile_small">50</sys:Double>
+  <sys:Double x:Key="size_addon_tile_small">75</sys:Double>
   <sys:Double x:Key="size_addon_tile_large">150</sys:Double>
 </ResourceDictionary>

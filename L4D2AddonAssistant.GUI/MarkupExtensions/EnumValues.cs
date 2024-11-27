@@ -1,5 +1,6 @@
 ﻿using Avalonia.Markup.Xaml;
 using System;
+using System.Linq;
 
 namespace L4D2AddonAssistant.MarkupExtensions
 {
@@ -20,7 +21,7 @@ namespace L4D2AddonAssistant.MarkupExtensions
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            return Enum.GetValues(_enumType);
+            return Enum.GetValues(_enumType).Cast<object>().Distinct();
         }
     }
 }

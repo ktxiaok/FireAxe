@@ -5,6 +5,7 @@
              xmlns:v="using:L4D2AddonAssistant.Views"
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
              xmlns:r="using:L4D2AddonAssistant.Resources"
+             xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="L4D2AddonAssistant.Views.AddonNodeExplorerView"
              x:DataType="vm:AddonNodeExplorerViewModel">
@@ -13,7 +14,7 @@
   </Design.DataContext>
   
   <Grid
-    RowDefinitions="Auto, *"
+    RowDefinitions="Auto, Auto, *"
     ColumnDefinitions="*, 4, 400">
     <Grid
       RowDefinitions="Auto"
@@ -56,9 +57,20 @@
       </ScrollViewer>
     </Grid>
 
+    <DockPanel
+      Grid.Row="1" Grid.Column="0">
+      <ComboBox
+        DockPanel.Dock="Right"
+        Classes="EnumComboBox"
+        ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeListItemViewKind}}}"
+        SelectedItem="{Binding ContainerViewModel.ListItemViewKind}"
+        Margin="5"/>
+      <Panel DockPanel.Dock="Left"/>
+    </DockPanel>
+
     <!--Container View-->
     <Border
-      Grid.Row="1"
+      Grid.Row="2"
       Grid.Column="0"
       BorderThickness="2"
       BorderBrush="Gray">
@@ -95,14 +107,14 @@
     </Border>
 
     <GridSplitter
-      Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+      Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
       ResizeDirection="Columns"/>
     
     <!--AddonNodeView Panel-->
     <Border
       Grid.Row="0"
       Grid.Column="2"
-      Grid.RowSpan="2"
+      Grid.RowSpan="3"
       BorderThickness="2"
       BorderBrush="Gray">
       <ScrollViewer>

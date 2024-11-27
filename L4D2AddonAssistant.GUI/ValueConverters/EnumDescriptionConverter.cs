@@ -3,6 +3,7 @@ using Avalonia.Data.Converters;
 using L4D2AddonAssistant.Resources;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 namespace L4D2AddonAssistant.ValueConverters
@@ -24,19 +25,22 @@ namespace L4D2AddonAssistant.ValueConverters
             {
                 return null;
             }
-            var name = Enum.GetName(type, value);
-            if (name == null)
+
+            var targetNames = Enum.GetNames(type).Where((name) => Enum.Parse(type, name).Equals(value));
+            string className = type.Name;
+            string? resultText = null;
+            foreach (string name in targetNames)
             {
-                return null;
+                string key = $"Enum_{className}_{name}";
+                resultText = Texts.ResourceManager.GetString(key, Texts.Culture);
+                if (resultText != null)
+                {
+                    break;
+                }
             }
-            var className = type.Name;
-            var key = "Enum_" + className + "_" + name;
-            var propertyInfo = typeof(Texts).GetProperty(key, BindingFlags.Static | BindingFlags.Public);
-            if (propertyInfo == null)
-            {
-                return $"[property not found: {key}]";
-            }
-            return propertyInfo.GetValue(null);
+            resultText ??= $"[missing text: Enum_{className}_{string.Join('|', targetNames)}]";
+
+            return resultText;
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

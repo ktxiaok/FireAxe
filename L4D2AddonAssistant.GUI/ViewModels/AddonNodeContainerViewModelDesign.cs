@@ -12,7 +12,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         public AddonNodeContainerViewModelDesign()
         {
-            _root = new();
+            _root = DesignHelper.CreateEmptyAddonRoot();
             DesignHelper.AddTestAddonNodes(_root);
             Nodes = _root.Nodes;
         }

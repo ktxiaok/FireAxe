@@ -165,15 +165,13 @@ namespace L4D2AddonAssistant.Views
             var viewModel = ViewModel;
             if (viewModel != null)
             {
-                if (e.Source is AddonNodeListItemView nodeView)
+                if (e.Source is Control sourceControl)
                 {
-                    var nodeViewModel = nodeView.ViewModel;
-                    if (nodeViewModel != null)
+                    if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
                     {
-                        var node = nodeViewModel.AddonNode;
-                        if (node is AddonGroup group)
+                        if (listItemViewModel.AddonNode is AddonGroup addonGroup)
                         {
-                            viewModel.GotoGroup(group);
+                            viewModel.GotoGroup(addonGroup);
                             e.Handled = true;
                         }
                     }
