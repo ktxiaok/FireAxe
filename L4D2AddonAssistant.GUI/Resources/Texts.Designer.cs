@@ -340,6 +340,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 File Size:  的本地化字符串。
+        /// </summary>
+        public static string FileSizeColon {
+            get {
+                return ResourceManager.GetString("FileSizeColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Game Path 的本地化字符串。
         /// </summary>
         public static string GamePath {

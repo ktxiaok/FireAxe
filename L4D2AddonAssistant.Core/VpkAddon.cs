@@ -23,6 +23,29 @@ namespace L4D2AddonAssistant
 
         public override bool RequireFile => true;
 
+        protected override long? GetFileSize()
+        {
+            var path = FullVpkFilePath;
+            if (path == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return new FileInfo(path).Length;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during VpkAddon.GetFileSize.");
+            }
+
+            return null;
+        }
+
         protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
         {
             string? vpkPath = FullVpkFilePath;

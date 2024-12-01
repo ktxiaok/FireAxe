@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using ReactiveUI;
+using Serilog;
 using System;
 using System.IO;
 using System.Reactive;
@@ -24,6 +25,8 @@ namespace L4D2AddonAssistant.ViewModels
         private readonly bool _shouldShowFolderIcon;
         private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
         private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
+
+        private ObservableAsPropertyHelper<string?>? _fileSizeReadable = null;
 
         private CancellationTokenSource? _cancellationTokenSource = null;
 
@@ -73,6 +76,10 @@ namespace L4D2AddonAssistant.ViewModels
                     .Select(image => image != null))
                     .ToProperty(this, nameof(ShouldShowImage));
 
+                _fileSizeReadable = this.WhenAnyValue(x => x.AddonNode.FileSize)
+                .Select((fileSize) => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)
+                .ToProperty(this, nameof(FileSizeReadable));
+
                 Refresh();
 
                 Disposable.Create(() =>
@@ -85,6 +92,9 @@ namespace L4D2AddonAssistant.ViewModels
 
                     _shouldShowImage.Dispose();
                     _shouldShowImage = null;
+
+                    _fileSizeReadable.Dispose();
+                    _fileSizeReadable = null;
 
                     Image = null;
 
@@ -124,6 +134,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
 
+        public string? FileSizeReadable => _fileSizeReadable?.Value;
+
         public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 
         public virtual async void Refresh()
@@ -145,7 +157,14 @@ namespace L4D2AddonAssistant.ViewModels
             _rawImage = imageData;
             if (imageData != null)
             {
-                Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+                try
+                {
+                    Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.Refresh.");
+                }
             }
         }
 

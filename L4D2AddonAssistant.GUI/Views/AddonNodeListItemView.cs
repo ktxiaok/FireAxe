@@ -8,7 +8,7 @@ using System.Reactive.Disposables;
 
 namespace L4D2AddonAssistant.Views
 {
-    public class AddonNodeListItemView : ReactiveUserControl<AddonNodeSimpleViewModel>
+    public class AddonNodeListItemView : ReactiveUserControl<AddonNodeListItemViewModel>
     {
         public AddonNodeListItemView()
         {

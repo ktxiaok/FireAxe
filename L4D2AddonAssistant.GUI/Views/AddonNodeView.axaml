@@ -5,6 +5,7 @@
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
              xmlns:v="using:L4D2AddonAssistant.Views"
              xmlns:dt="using:L4D2AddonAssistant.DataTemplates"
+             xmlns:r="using:L4D2AddonAssistant.Resources"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
              x:Class="L4D2AddonAssistant.Views.AddonNodeView"
              x:DataType="vm:AddonNodeViewModel">
@@ -57,10 +58,21 @@
         </Style>
       </v:EditableTextBlock.Styles>
     </v:EditableTextBlock>
-    
-    
+
+    <!--enable button-->
     <v:AddonNodeEnableButton/>
 
+    <!--file size-->
+    <StackPanel
+      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}}"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Margin="5">
+      <TextBlock Text="{x:Static r:Texts.FileSizeColon}"/>
+      <TextBlock Text="{Binding FileSizeReadable}"/>
+    </StackPanel>
+
+    <!--section views-->
     <StackPanel
       Name="sectionViewContainerControl"
       Orientation="Vertical"/>

@@ -29,6 +29,8 @@ namespace L4D2AddonAssistant
         private WeakReference<byte[]?> _image = new(null);
         private Task<byte[]?>? _getImageTask = null;
 
+        private long? _fileSize = null;
+
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
             OnInitSelf();
@@ -199,6 +201,12 @@ namespace L4D2AddonAssistant
         public string FullFilePath => GetFullFilePath(FilePath);
 
         public virtual string FileExtension => "";
+
+        public long? FileSize
+        {
+            get => _fileSize;
+            private set => NotifyAndSetIfChanged(ref _fileSize, value);
+        }
 
         internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
 
@@ -537,7 +545,26 @@ namespace L4D2AddonAssistant
 
         protected virtual void OnCheck()
         {
+            FileSize = GetFileSize();
+        }
 
+        protected virtual long? GetFileSize()
+        {
+            string path = FullFilePath;
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return new FileInfo(path).Length;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during AddonNode.GetFileSize.");
+            }
+
+            return null;
         }
 
         protected virtual void OnCreateSave(AddonNodeSave save)

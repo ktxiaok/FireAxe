@@ -210,6 +210,9 @@
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>
+  <data name="FileSizeColon" xml:space="preserve">
+    <value>File Size: </value>
+  </data>
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
