@@ -8,6 +8,9 @@ using System.Reactive;
 using System.Reactive.Linq;
 using L4D2AddonAssistant.Resources;
 using System.Threading.Tasks;
+using System.Reactive.Disposables;
+using DynamicData.Binding;
+using DynamicData;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -17,7 +20,14 @@ namespace L4D2AddonAssistant.ViewModels
 
         private AddonNodeContainerViewModel _containerViewModel;
 
-        private bool _hasOverridingNodes = false;
+        private ReadOnlyObservableCollection<AddonNode>? _nodes = null;
+        private IDisposable? _nodesSubscription = null;
+        private ReadOnlyObservableCollection<AddonNode>? _overridingNodes = null;
+
+        private AddonNodeSortMethod _sortMethod = AddonNodeSortMethod.Default;
+        private bool _isAscendingOrder = true;
+        private readonly IObservable<IComparer<AddonNode>> _observableComparer;
+
         private AddonGroup? _currentGroup = null;
 
         private IEnumerable<AddonNode>? _movingNodes = null;
@@ -38,6 +48,9 @@ namespace L4D2AddonAssistant.ViewModels
             _root = root;
             _containerViewModel = new();
             Activator = new();
+
+            _observableComparer = this.WhenAnyValue(x => x.SortMethod, x => x.IsAscendingOrder)
+                .Select(((AddonNodeSortMethod SortMethod, bool IsAscendingOrder) args) => new AddonNodeComparer(args.SortMethod, args.IsAscendingOrder));
 
             _selectionCount = this.WhenAnyValue(x => x.Selection)
                 .Select(selection => selection?.Count ?? 0)
@@ -142,7 +155,33 @@ namespace L4D2AddonAssistant.ViewModels
                     }
                 });
 
-            ResetNodes();
+            this.WhenAnyValue(x => x.Nodes)
+                .Subscribe((nodes) => _containerViewModel.Nodes = nodes);
+
+            this.WhenActivated((CompositeDisposable disposables) =>
+            {
+                this.WhenAnyValue(x => x.CurrentGroup, x => x.OverridingNodes, x => x.SortMethod)
+                .Subscribe((args) =>
+                {
+                    var currentGroup = args.Item1;
+                    var overridingNodes = args.Item2;
+                    
+                    var rawNodes = overridingNodes ?? (currentGroup?.Children ?? _root.Nodes);
+                    DisposeNodesSubscription();
+                    _nodesSubscription = rawNodes.ToObservableChangeSet()
+                    .Sort(_observableComparer)
+                    .Bind(out ReadOnlyObservableCollection<AddonNode> nodes)
+                    .Subscribe();
+                    Nodes = nodes;
+                })
+                .DisposeWith(disposables);
+
+                Disposable.Create(() =>
+                {
+                    DisposeNodesSubscription();
+                })
+                .DisposeWith(disposables);
+            });
         }
 
         public event Action<IEnumerable<AddonNode>>? SetSelection = null;
@@ -155,6 +194,30 @@ namespace L4D2AddonAssistant.ViewModels
         {
             get => _currentGroup;
             private set => this.RaiseAndSetIfChanged(ref _currentGroup, value);
+        }
+
+        public ReadOnlyObservableCollection<AddonNode>? Nodes
+        {
+            get => _nodes;
+            private set => this.RaiseAndSetIfChanged(ref _nodes, value);
+        }
+
+        public ReadOnlyObservableCollection<AddonNode>? OverridingNodes
+        {
+            get => _overridingNodes;
+            private set => this.RaiseAndSetIfChanged(ref _overridingNodes, value);
+        }
+
+        public AddonNodeSortMethod SortMethod
+        {
+            get => _sortMethod;
+            set => this.RaiseAndSetIfChanged(ref _sortMethod, value);
+        }
+
+        public bool IsAscendingOrder
+        {
+            get => _isAscendingOrder;
+            set => this.RaiseAndSetIfChanged(ref _isAscendingOrder, value);
         }
 
         public IEnumerable<AddonNode>? MovingNodes
@@ -383,10 +446,6 @@ namespace L4D2AddonAssistant.ViewModels
                 }
             }
             CurrentGroup = group;
-            if (!_hasOverridingNodes)
-            {
-                ResetNodes();
-            }
         }
 
         public void GotoParent()
@@ -398,16 +457,19 @@ namespace L4D2AddonAssistant.ViewModels
             GotoGroup(_currentGroup.Group);
         }
 
-        public void ResetNodes()
+        public void ToggleOrderDirection()
         {
-            _containerViewModel.Nodes = _currentGroup?.Children ?? _root.Nodes;
-            _hasOverridingNodes = false;
+            IsAscendingOrder = !IsAscendingOrder;
         }
 
-        public void SetOverridingNodes(ReadOnlyObservableCollection<AddonNode> nodes)
+        private void DisposeNodesSubscription()
         {
-            _containerViewModel.Nodes = nodes;
-            _hasOverridingNodes = true;
+            if (_nodesSubscription != null)
+            {
+                _nodesSubscription.Dispose();
+                _nodesSubscription = null;
+                _nodes = null;
+            }
         }
     }
 }

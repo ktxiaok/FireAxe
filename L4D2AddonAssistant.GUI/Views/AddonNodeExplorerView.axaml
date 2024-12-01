@@ -65,6 +65,27 @@
         ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeListItemViewKind}}}"
         SelectedItem="{Binding ContainerViewModel.ListItemViewKind}"
         Margin="5"/>
+      <StackPanel
+        DockPanel.Dock="Right"
+        Orientation="Horizontal"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
+        <Panel>
+          <Button
+          Command="{Binding ToggleOrderDirection}"
+          Content="{x:Static r:Texts.Ascending}"
+          IsVisible="{Binding IsAscendingOrder}"/>
+          <Button
+            Command="{Binding ToggleOrderDirection}"
+            Content="{x:Static r:Texts.Descending}"
+            IsVisible="{Binding !IsAscendingOrder}"/>
+        </Panel>
+        <ComboBox
+          Classes="EnumComboBox"
+          ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeSortMethod}}}"
+          SelectedItem="{Binding SortMethod}"
+          Margin="5"/>
+      </StackPanel>
       <Panel DockPanel.Dock="Left"/>
     </DockPanel>
 

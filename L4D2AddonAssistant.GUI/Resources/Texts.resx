@@ -120,6 +120,9 @@
   <data name="Abort" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="Ascending" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
   <data name="AuthorColon" xml:space="preserve">
     <value>Author:</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="DeleteAndRetainFile" xml:space="preserve">
     <value>Delete And Retain Files</value>
+  </data>
+  <data name="Descending" xml:space="preserve">
+    <value>Descending</value>
   </data>
   <data name="DescriptionColon" xml:space="preserve">
     <value>Description:</value>
@@ -191,6 +197,18 @@
   </data>
   <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
     <value>Small Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
+    <value>Default Order</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
+    <value>Sort By State</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
+    <value>Sort By File Size</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
+    <value>Sort By Name</value>
   </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>Default</value>

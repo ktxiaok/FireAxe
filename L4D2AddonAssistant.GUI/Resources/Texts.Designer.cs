@@ -70,6 +70,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Ascending 的本地化字符串。
+        /// </summary>
+        public static string Ascending {
+            get {
+                return ResourceManager.GetString("Ascending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Author: 的本地化字符串。
         /// </summary>
         public static string AuthorColon {
@@ -147,6 +156,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string DeleteAndRetainFile {
             get {
                 return ResourceManager.GetString("DeleteAndRetainFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Descending 的本地化字符串。
+        /// </summary>
+        public static string Descending {
+            get {
+                return ResourceManager.GetString("Descending", resourceCulture);
             }
         }
         
@@ -282,6 +300,42 @@ namespace L4D2AddonAssistant.Resources {
         public static string Enum_AddonNodeListItemViewKind_SmallTile {
             get {
                 return ResourceManager.GetString("Enum_AddonNodeListItemViewKind_SmallTile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Default Order 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_Default {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sort By State 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_EnableState {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_EnableState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sort By File Size 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_FileSize {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_FileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sort By Name 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_Name {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_Name", resourceCulture);
             }
         }
         
