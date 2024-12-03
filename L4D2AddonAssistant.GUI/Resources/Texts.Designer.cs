@@ -403,6 +403,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Flatten 的本地化字符串。
+        /// </summary>
+        public static string Flatten {
+            get {
+                return ResourceManager.GetString("Flatten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Game Path 的本地化字符串。
         /// </summary>
         public static string GamePath {
@@ -417,6 +426,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Group {
             get {
                 return ResourceManager.GetString("Group", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Ignore Case 的本地化字符串。
+        /// </summary>
+        public static string IgnoreCase {
+            get {
+                return ResourceManager.GetString("IgnoreCase", resourceCulture);
             }
         }
         
@@ -444,6 +462,33 @@ namespace L4D2AddonAssistant.Resources {
         public static string ImportSuccessMessage {
             get {
                 return ResourceManager.GetString("ImportSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Include Name 的本地化字符串。
+        /// </summary>
+        public static string IncludeName {
+            get {
+                return ResourceManager.GetString("IncludeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Include VPK Description 的本地化字符串。
+        /// </summary>
+        public static string IncludeVpkDescription {
+            get {
+                return ResourceManager.GetString("IncludeVpkDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Include Workshop Description 的本地化字符串。
+        /// </summary>
+        public static string IncludeWorkshopDescription {
+            get {
+                return ResourceManager.GetString("IncludeWorkshopDescription", resourceCulture);
             }
         }
         
@@ -637,6 +682,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Search 的本地化字符串。
+        /// </summary>
+        public static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Searching... 的本地化字符串。
+        /// </summary>
+        public static string SearchingMessage {
+            get {
+                return ResourceManager.GetString("SearchingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Select 的本地化字符串。
         /// </summary>
         public static string Select {
@@ -705,6 +768,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string UnnamedWorkshopAddon {
             get {
                 return ResourceManager.GetString("UnnamedWorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use Regex 的本地化字符串。
+        /// </summary>
+        public static string UseRegex {
+            get {
+                return ResourceManager.GetString("UseRegex", resourceCulture);
             }
         }
         

@@ -11,18 +11,33 @@ using System.Threading.Tasks;
 using System.Reactive.Disposables;
 using DynamicData.Binding;
 using DynamicData;
+using System.Threading;
+using Avalonia.Threading;
 
 namespace L4D2AddonAssistant.ViewModels
 {
     public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     {
+        private readonly static TimeSpan SearchTextThrottleTime = TimeSpan.FromSeconds(0.5);
+
         private readonly AddonRoot _root;
 
         private AddonNodeContainerViewModel _containerViewModel;
 
         private ReadOnlyObservableCollection<AddonNode>? _nodes = null;
         private IDisposable? _nodesSubscription = null;
-        private ReadOnlyObservableCollection<AddonNode>? _overridingNodes = null;
+
+        private string _searchText = "";
+        private readonly ObservableAsPropertyHelper<bool> _isSearchTextClearable;
+        private ReadOnlyObservableCollection<AddonNode>? _searchResultNodes = null;
+        private CancellationTokenSource? _searchCts = null;
+        private object? _currentSearchId = null;
+        private bool _isSearching = false;
+
+        private bool _searchIgnoreCase = true;
+        private bool _isSearchFlatten = false;
+        private bool _isSearchRegex = false;
+        private AddonNodeSearchOptions _searchOptions = null!;
 
         private AddonNodeSortMethod _sortMethod = AddonNodeSortMethod.Default;
         private bool _isAscendingOrder = true;
@@ -49,8 +64,17 @@ namespace L4D2AddonAssistant.ViewModels
             _containerViewModel = new();
             Activator = new();
 
+            this.WhenAnyValue(x => x.SearchIgnoreCase,
+                x => x.IsSearchFlatten,
+                x => x.IsSearchRegex)
+                .Subscribe(_ => UpdateSearchOptions());
+
             _observableComparer = this.WhenAnyValue(x => x.SortMethod, x => x.IsAscendingOrder)
                 .Select(((AddonNodeSortMethod SortMethod, bool IsAscendingOrder) args) => new AddonNodeComparer(args.SortMethod, args.IsAscendingOrder));
+
+            _isSearchTextClearable = this.WhenAnyValue(x => x.SearchText)
+                .Select(searchText => searchText.Length > 0)
+                .ToProperty(this, nameof(IsSearchTextClearable));
 
             _selectionCount = this.WhenAnyValue(x => x.Selection)
                 .Select(selection => selection?.Count ?? 0)
@@ -158,15 +182,21 @@ namespace L4D2AddonAssistant.ViewModels
             this.WhenAnyValue(x => x.Nodes)
                 .Subscribe((nodes) => _containerViewModel.Nodes = nodes);
 
+            this.WhenAnyValue(x => x.SearchText)
+                .Throttle(SearchTextThrottleTime)
+                .Subscribe(_ => RefreshSearch());
+            this.WhenAnyValue(x => x.CurrentGroup, x => x.SearchOptions)
+                .Subscribe(_ => RefreshSearch());
+
             this.WhenActivated((CompositeDisposable disposables) =>
             {
-                this.WhenAnyValue(x => x.CurrentGroup, x => x.OverridingNodes, x => x.SortMethod)
+                this.WhenAnyValue(x => x.CurrentGroup, x => x.SearchResultNodes, x => x.SortMethod)
                 .Subscribe((args) =>
                 {
                     var currentGroup = args.Item1;
-                    var overridingNodes = args.Item2;
+                    var searchResultNodes = args.Item2;
                     
-                    var rawNodes = overridingNodes ?? (currentGroup?.Children ?? _root.Nodes);
+                    var rawNodes = searchResultNodes ?? (currentGroup?.Children ?? _root.Nodes);
                     DisposeNodesSubscription();
                     _nodesSubscription = rawNodes.ToObservableChangeSet()
                     .Sort(_observableComparer)
@@ -202,10 +232,48 @@ namespace L4D2AddonAssistant.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _nodes, value);
         }
 
-        public ReadOnlyObservableCollection<AddonNode>? OverridingNodes
+        public string SearchText
         {
-            get => _overridingNodes;
-            private set => this.RaiseAndSetIfChanged(ref _overridingNodes, value);
+            get => _searchText;
+            set => this.RaiseAndSetIfChanged(ref _searchText, value);
+        }
+
+        public bool IsSearchTextClearable => _isSearchTextClearable.Value;
+
+        public ReadOnlyObservableCollection<AddonNode>? SearchResultNodes
+        {
+            get => _searchResultNodes;
+            private set => this.RaiseAndSetIfChanged(ref _searchResultNodes, value);
+        }
+
+        public bool IsSearching
+        {
+            get => _isSearching;
+            private set => this.RaiseAndSetIfChanged(ref _isSearching, value);
+        }
+
+        public bool SearchIgnoreCase
+        {
+            get => _searchIgnoreCase;
+            set => this.RaiseAndSetIfChanged(ref _searchIgnoreCase, value);
+        }
+
+        public bool IsSearchFlatten
+        {
+            get => _isSearchFlatten;
+            set => this.RaiseAndSetIfChanged(ref _isSearchFlatten, value);
+        }
+
+        public bool IsSearchRegex
+        {
+            get => _isSearchRegex;
+            set => this.RaiseAndSetIfChanged(ref _isSearchRegex, value);
+        }
+
+        public AddonNodeSearchOptions SearchOptions
+        {
+            get => _searchOptions;
+            private set => this.RaiseAndSetIfChanged(ref _searchOptions, value);
         }
 
         public AddonNodeSortMethod SortMethod
@@ -462,6 +530,11 @@ namespace L4D2AddonAssistant.ViewModels
             IsAscendingOrder = !IsAscendingOrder;
         }
 
+        public void ClearSearchText()
+        {
+            SearchText = "";
+        }
+
         private void DisposeNodesSubscription()
         {
             if (_nodesSubscription != null)
@@ -470,6 +543,69 @@ namespace L4D2AddonAssistant.ViewModels
                 _nodesSubscription = null;
                 _nodes = null;
             }
+        }
+
+        private void RefreshSearch()
+        {
+            CancelSearch();
+            var searchText = SearchText;
+            if (searchText.Length == 0)
+            {
+                SearchResultNodes = null;
+            }
+            else
+            {
+                StartSearch();
+            }
+        }
+
+        private async void StartSearch()
+        {
+            _searchCts = new();
+            var searchId = new object();
+            _currentSearchId = searchId;
+            IsSearching = true;
+            IEnumerable<AddonNode> addonNodes = CurrentGroup?.Children ?? Root.Nodes;
+            var resultNodes = new ObservableCollection<AddonNode>();
+            SearchResultNodes = new ReadOnlyObservableCollection<AddonNode>(resultNodes);
+            Action<AddonNode> consumer = (addonNode) => Dispatcher.UIThread.Post(() => resultNodes.Add(addonNode));
+            try
+            {
+                await AddonNodeSearchUtils.SearchAsync(addonNodes, SearchText, SearchOptions, consumer, _searchCts.Token);
+            }
+            catch (OperationCanceledException) { }
+            if (_currentSearchId == searchId)
+            {
+                if (_searchCts != null)
+                {
+                    _searchCts.Dispose();
+                    _searchCts = null;
+                }
+                _currentSearchId = null;
+                IsSearching = false;
+            }
+        }
+
+        private void CancelSearch()
+        {
+            if (_searchCts != null)
+            {
+                _searchCts.Cancel();
+                _searchCts.Dispose();
+                _searchCts = null;
+                _currentSearchId = null;
+                IsSearching = false;
+            }
+        }
+
+        private void UpdateSearchOptions()
+        {
+            SearchOptions = new AddonNodeSearchOptions()
+            {
+                IgnoreCase = SearchIgnoreCase,
+                IsFlatten = IsSearchFlatten,
+                IsRegex = IsSearchRegex
+            };
         }
     }
 }

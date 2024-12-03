@@ -231,11 +231,17 @@
   <data name="FileSizeColon" xml:space="preserve">
     <value>File Size: </value>
   </data>
+  <data name="Flatten" xml:space="preserve">
+    <value>Flatten</value>
+  </data>
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
+  </data>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>Ignore Case</value>
   </data>
   <data name="Import" xml:space="preserve">
     <value>Import</value>
@@ -245,6 +251,15 @@
   </data>
   <data name="ImportSuccessMessage" xml:space="preserve">
     <value>Imported successfully.</value>
+  </data>
+  <data name="IncludeName" xml:space="preserve">
+    <value>Include Name</value>
+  </data>
+  <data name="IncludeVpkDescription" xml:space="preserve">
+    <value>Include VPK Description</value>
+  </data>
+  <data name="IncludeWorkshopDescription" xml:space="preserve">
+    <value>Include Workshop Description</value>
   </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>The game path "{0}" is invalid.</value>
@@ -309,6 +324,12 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SearchingMessage" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
   <data name="Select" xml:space="preserve">
     <value>Select</value>
   </data>
@@ -332,6 +353,9 @@
   </data>
   <data name="UnnamedWorkshopAddon" xml:space="preserve">
     <value>Unnamed Workshop Addon</value>
+  </data>
+  <data name="UseRegex" xml:space="preserve">
+    <value>Use Regex</value>
   </data>
   <data name="VersionColon" xml:space="preserve">
     <value>Version:</value>

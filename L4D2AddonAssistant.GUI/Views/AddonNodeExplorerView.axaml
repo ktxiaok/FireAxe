@@ -6,7 +6,7 @@
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
              xmlns:r="using:L4D2AddonAssistant.Resources"
              xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
              x:Class="L4D2AddonAssistant.Views.AddonNodeExplorerView"
              x:DataType="vm:AddonNodeExplorerViewModel">
   <Design.DataContext>
@@ -57,14 +57,23 @@
       </ScrollViewer>
     </Grid>
 
+    <!--search, sort, view kind-->
     <DockPanel
       Grid.Row="1" Grid.Column="0">
+      <DockPanel.Styles>
+        <Style Selector="PathIcon">
+          <Setter Property="Width" Value="20"/>
+          <Setter Property="Height" Value="20"/>
+        </Style>
+      </DockPanel.Styles>
+      <!--view kind-->
       <ComboBox
         DockPanel.Dock="Right"
         Classes="EnumComboBox"
         ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeListItemViewKind}}}"
         SelectedItem="{Binding ContainerViewModel.ListItemViewKind}"
         Margin="5"/>
+      <!--sort-->
       <StackPanel
         DockPanel.Dock="Right"
         Orientation="Horizontal"
@@ -86,7 +95,78 @@
           SelectedItem="{Binding SortMethod}"
           Margin="5"/>
       </StackPanel>
-      <Panel DockPanel.Dock="Left"/>
+      <!--search-->
+      <StackPanel
+        DockPanel.Dock="Left"
+        Orientation="Horizontal"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center">
+        <TextBox
+          Text="{Binding SearchText}"
+          Watermark="{x:Static r:Texts.Search}"
+          VerticalAlignment="Center"
+          Margin="5"
+          MinWidth="150"
+          MaxWidth="300"/>
+        <PathIcon
+          Data="{StaticResource icon_search}"
+          IsVisible="{Binding !IsSearchTextClearable}"
+          VerticalAlignment="Center"
+          Margin="5"/>
+        <Button
+          Command="{Binding ClearSearchText}"
+          IsVisible="{Binding IsSearchTextClearable}"
+          Background="Transparent"
+          VerticalAlignment="Center"
+          Margin="5">
+          <PathIcon Data="{StaticResource icon_dismiss}"/>
+        </Button>
+        <Button
+          Background="Transparent"
+          VerticalAlignment="Center"
+          Margin="5">
+          <PathIcon Data="{StaticResource icon_more}"/>
+          <Button.Flyout>
+            <Flyout>
+              <Grid
+                RowDefinitions="Auto, Auto, Auto"
+                ColumnDefinitions="Auto, 20, Auto">
+                <Grid.Styles>
+                  <Style Selector="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                  </Style>
+                </Grid.Styles>
+                
+                <TextBlock
+                  Grid.Row="0" Grid.Column="0"
+                  Text="{x:Static r:Texts.IgnoreCase}"/>
+                <CheckBox
+                  Grid.Row="0" Grid.Column="2"
+                  IsChecked="{Binding SearchIgnoreCase}"/>
+                
+                <TextBlock
+                  Grid.Row="1" Grid.Column="0"
+                  Text="{x:Static r:Texts.Flatten}"/>
+                <CheckBox
+                  Grid.Row="1" Grid.Column="2"
+                  IsChecked="{Binding IsSearchFlatten}"/>
+                
+                <TextBlock
+                  Grid.Row="2" Grid.Column="0"
+                  Text="{x:Static r:Texts.UseRegex}"/>
+                <CheckBox
+                  Grid.Row="2" Grid.Column="2"
+                  IsChecked="{Binding IsSearchRegex}"/>
+              </Grid>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+        <TextBlock
+          IsVisible="{Binding IsSearching}"
+          Text="{x:Static r:Texts.SearchingMessage}"
+          VerticalAlignment="Center"
+          Margin="5"/>
+      </StackPanel>
     </DockPanel>
 
     <!--Container View-->
