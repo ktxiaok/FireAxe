@@ -26,7 +26,8 @@
       Classes="PropertyName"/>
     <v:EditableTextBlock
       Grid.Row="1" Grid.Column="1"
-      Value="{Binding ItemId}"/>
+      Value="{Binding ItemId}"
+      Display="{Binding DisplayItemId}"/>
 
     <!--auto update strategy-->
     <TextBlock

@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -8,6 +7,7 @@ using Avalonia.Interactivity;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace L4D2AddonAssistant.Views;
 
@@ -29,7 +29,11 @@ public class EditableTextBlock : TemplatedControl
     public const string TemplatePartName_EditView = "PART_EditView";
 
     public static readonly StyledProperty<string> ValueProperty = 
-        AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Value), defaultValue: "", defaultBindingMode: BindingMode.TwoWay, coerce: CoerceValue,enableDataValidation: true);
+        AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Value), defaultValue: "", defaultBindingMode: BindingMode.TwoWay, coerce: CoerceValue, enableDataValidation: true);
+    public static readonly StyledProperty<string?> DisplayProperty =
+        AvaloniaProperty.Register<EditableTextBlock, string?>(nameof(Display), defaultValue: null);
+    public static readonly StyledProperty<string> WatermarkProperty =
+        AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Watermark), defaultValue: "", coerce: CoerceWatermark);
 
     private TextBlock? _textBlock = null;
     private Button? _editButton = null;
@@ -59,6 +63,18 @@ public class EditableTextBlock : TemplatedControl
         set => SetValue(ValueProperty, value);
     }
 
+    public string? Display
+    {
+        get => GetValue(DisplayProperty);
+        set => SetValue(DisplayProperty, value);
+    }
+
+    public string Watermark
+    {
+        get => GetValue(WatermarkProperty);
+        set => SetValue(WatermarkProperty, value);
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -75,7 +91,20 @@ public class EditableTextBlock : TemplatedControl
         var displayView = nameScope.Get<Control>(TemplatePartName_DisplayView);
         var editView = nameScope.Get<Control>(TemplatePartName_EditView);
 
-        textBlock.Bind(TextBlock.TextProperty, this.GetObservable(ValueProperty)).DisposeWith(_partDisposables);
+        textBlock.Bind(TextBlock.TextProperty,
+            this.WhenAnyValue(x => x.Value, x => x.Display)
+            .Select(_ =>
+            {
+                var display = Display;
+                if (display != null)
+                {
+                    return display;
+                }
+                return Value;
+            }))
+            .DisposeWith(_partDisposables);
+        textBox.Bind(TextBox.WatermarkProperty, this.WhenAnyValue(x => x.Watermark))
+            .DisposeWith(_partDisposables);
         editButton.Click += EditButton_Click;
         submitButton.Click += SubmitButton_Click;
         cancelButton.Click += CancelButton_Click;
@@ -114,9 +143,9 @@ public class EditableTextBlock : TemplatedControl
     private void EditButton_Click(object? sender, RoutedEventArgs e)
     {
         _isEditing = true;
-        if (_textBlock != null && _textBox != null)
+        if (_textBox != null)
         {
-            _textBox.Text = _textBlock.Text;
+            _textBox.Text = Value;
         }
         UpdateVisibility();
     }
@@ -171,6 +200,7 @@ public class EditableTextBlock : TemplatedControl
             if (_textBox != null)
             {
                 _textBox.Text = "";
+                DataValidationErrors.SetError(_textBox, null);
             }
         }
     }
@@ -181,6 +211,12 @@ public class EditableTextBlock : TemplatedControl
         {
             return "";
         }
+        return value;
+    }
+
+    private static string CoerceWatermark(AvaloniaObject sender, string? value)
+    {
+        value ??= "";
         return value;
     }
 }

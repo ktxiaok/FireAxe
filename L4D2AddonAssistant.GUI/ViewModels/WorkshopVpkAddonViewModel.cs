@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -9,8 +10,21 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private DownloadItemViewModel? _downloadItemViewModel = null;
 
+        private readonly ObservableAsPropertyHelper<string> _displayItemId;
+
         public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
         {
+            _displayItemId = this.WhenAnyValue(x => x.ItemId)
+                .Select(itemId =>
+                {
+                    if (itemId.Length == 0)
+                    {
+                        return Texts.Null;
+                    }
+                    return itemId;
+                })
+                .ToProperty(this, nameof(DisplayItemId));
+
             this.WhenActivated((CompositeDisposable disposables) =>
             {
                 addon.WhenAnyValue(x => x.PublishedFileId)
@@ -37,7 +51,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         public string ItemId
         {
-            get => AddonNode.PublishedFileId?.ToString() ?? Texts.Null;
+            get => AddonNode.PublishedFileId?.ToString() ?? "";
             set
             {
                 if (ulong.TryParse(value, out ulong id))
@@ -51,6 +65,8 @@ namespace L4D2AddonAssistant.ViewModels
                 }
             }
         }
+
+        public string DisplayItemId => _displayItemId.Value;
 
         public DownloadItemViewModel? DownloadItemViewModel
         {
