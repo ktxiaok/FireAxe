@@ -127,6 +127,7 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     return;
                 }
+                // TODO
                 _addonRoot?.DisposeAsync();
                 _addonRoot = value;
                 if (_addonRoot == null)
@@ -135,12 +136,17 @@ namespace L4D2AddonAssistant.ViewModels
                 }
                 else
                 {
+                    using var blockAutoCheck = _addonRoot.BlockAutoCheck();
                     _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                     _addonRoot.DownloadService = _downloadService;
                     _addonRoot.HttpClient = _httpClient;
                     _addonRoot.GamePath = _settings.GamePath;
                     _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
+                    foreach (var addonNode in _addonRoot.GetAllNodes())
+                    {
+                        addonNode.Check();
+                    }
                     AddonNodeExplorerViewModel = new(_addonRoot);
                 }
                 this.RaisePropertyChanged();

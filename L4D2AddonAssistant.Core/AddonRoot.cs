@@ -36,6 +36,8 @@ namespace L4D2AddonAssistant
         private DirectoryInfo? _directoryPath = null;
 
         private string _gamePath = "";
+
+        private int _blockAutoCheck = 0;
         
         public AddonRoot()
         {
@@ -119,7 +121,7 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public bool IsAutoCheck { get; set; } = true;
+        public bool IsAutoCheck => _blockAutoCheck == 0;
 
         public bool IsAutoUpdateWorkshopItem { get; set; } = true;
 
@@ -503,6 +505,20 @@ namespace L4D2AddonAssistant
             {
                 return strategy == AutoUpdateStrategy.Enabled;
             }
+        }
+
+        public IDisposable BlockAutoCheck()
+        {
+            _blockAutoCheck++;
+            bool disposed = false;
+            return DisposableUtils.Create(() =>
+            {
+                if (!disposed)
+                {
+                    disposed = true;
+                    _blockAutoCheck--;
+                }
+            });
         }
         
         internal void AddNode(AddonNode node)

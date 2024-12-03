@@ -118,10 +118,13 @@ namespace L4D2AddonAssistant
             }
             return GetPublishedFileDetailsAsync(cancellationToken).ContinueWith((task) =>
             {
-                var result = task.Result;
-                if (result.IsSucceeded)
+                if (task.IsCompletedSuccessfully)
                 {
-                    return result.Content;
+                    var result = task.Result;
+                    if (result.IsSucceeded)
+                    {
+                        return result.Content;
+                    }
                 }
                 return null;
             });
