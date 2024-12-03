@@ -15,6 +15,8 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private const int ImageWidthToDecode = 200;
 
+        private bool _isActive = false;
+
         private readonly AddonNode _addonNode;
 
         private Bitmap? _image = null;
@@ -43,6 +45,8 @@ namespace L4D2AddonAssistant.ViewModels
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
+                _isActive = true;
+
                 _enableState = _addonNode.WhenAnyValue(x => x.IsEnabled, x => x.IsEnabledInHierarchy)
                 .Select(((bool isEnabled, bool isEnabledInHierarchy) enableState) =>
                 {
@@ -84,6 +88,8 @@ namespace L4D2AddonAssistant.ViewModels
 
                 Disposable.Create(() =>
                 {
+                    _isActive = false;
+
                     _enableState.Dispose();
                     _enableState = null;
 
@@ -138,7 +144,15 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 
-        public virtual async void Refresh()
+        public void Refresh()
+        {
+            if (_isActive)
+            {
+                OnRefresh();
+            }
+        }
+
+        protected virtual async void OnRefresh()
         {
             CancelTasks();
             _cancellationTokenSource = new();

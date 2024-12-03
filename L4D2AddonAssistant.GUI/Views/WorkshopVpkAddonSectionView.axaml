@@ -11,7 +11,7 @@
              x:Class="L4D2AddonAssistant.Views.WorkshopVpkAddonSectionView"
              x:DataType="vm:WorkshopVpkAddonViewModel">
   <Grid
-    RowDefinitions="Auto, Auto, Auto, Auto"
+    RowDefinitions="Auto, Auto, Auto, Auto, Auto"
     ColumnDefinitions="Auto, *">
     <!--title-->
     <TextBlock
@@ -50,5 +50,80 @@
         Text="{x:Static r:Texts.Download}"/>
       <v:DownloadItemView DataContext="{Binding DownloadItemViewModel}"/>
     </StackPanel>
+
+    <!--published file details-->
+    <Grid
+      Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+      ColumnDefinitions="Auto, *">
+      <TextBlock
+        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="Heading1"
+        Text="{x:Static r:Texts.PublishedFileDetails}"
+        Margin="0, 5, 0, 5"/>
+      
+      <TextBlock
+        Grid.Row="1" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.TitleColon}"/>
+      <TextBlock
+        Grid.Row="1" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Title}"/>
+      
+      <TextBlock
+        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.DescriptionColon}"/>
+      <TextBlock
+        Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+        Text="{Binding PublishedFileDetails.Description}"
+        TextWrapping="Wrap"/>
+      
+      <TextBlock
+        Grid.Row="4" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.ViewsColon}"/>
+      <TextBlock
+        Grid.Row="4" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Views}"/>
+      
+      <TextBlock
+        Grid.Row="5" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.SubscriptionsColon}"/>
+      <TextBlock
+        Grid.Row="5" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Subscriptions}"/>
+      
+      <TextBlock
+        Grid.Row="6" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.FavoritesColon}"/>
+      <TextBlock
+        Grid.Row="6" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Favorited}"/>
+      
+      <TextBlock
+        Grid.Row="7" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.LifetimeSubscriptionsColon}"/>
+      <TextBlock
+        Grid.Row="7" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.LifetimeSubscriptions}"/>
+      
+      <TextBlock
+        Grid.Row="8" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.LifetimeFavoritesColon}"/>
+      <TextBlock
+        Grid.Row="8" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.LifetimeFavorited}"/>
+    </Grid>
   </Grid>
 </UserControl>

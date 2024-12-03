@@ -225,6 +225,9 @@
   <data name="ExceptionOccurMessage" xml:space="preserve">
     <value>Exception occurred during the operation!</value>
   </data>
+  <data name="FavoritesColon" xml:space="preserve">
+    <value>Favorites: </value>
+  </data>
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>
@@ -279,6 +282,12 @@
   <data name="Language" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="LifetimeFavoritesColon" xml:space="preserve">
+    <value>Lifetime Favorites: </value>
+  </data>
+  <data name="LifetimeSubscriptionsColon" xml:space="preserve">
+    <value>Lifetime Subscriptions: </value>
+  </data>
   <data name="Move" xml:space="preserve">
     <value>Move</value>
   </data>
@@ -308,6 +317,9 @@
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
+  </data>
+  <data name="PublishedFileDetails" xml:space="preserve">
+    <value>Published File Details</value>
   </data>
   <data name="Push" xml:space="preserve">
     <value>Push</value>
@@ -342,6 +354,9 @@
   <data name="SkipAll" xml:space="preserve">
     <value>Skip All</value>
   </data>
+  <data name="SubscriptionsColon" xml:space="preserve">
+    <value>Subscriptions: </value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
   </data>
@@ -359,6 +374,9 @@
   </data>
   <data name="VersionColon" xml:space="preserve">
     <value>Version:</value>
+  </data>
+  <data name="ViewsColon" xml:space="preserve">
+    <value>Views: </value>
   </data>
   <data name="VpkInfo" xml:space="preserve">
     <value>VPK Information</value>

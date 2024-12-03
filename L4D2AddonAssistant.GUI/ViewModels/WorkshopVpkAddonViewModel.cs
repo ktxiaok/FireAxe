@@ -3,6 +3,7 @@ using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 
 namespace L4D2AddonAssistant.ViewModels
 {
@@ -10,7 +11,11 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private DownloadItemViewModel? _downloadItemViewModel = null;
 
+        private PublishedFileDetails? _publishedFileDetails = null;
+
         private readonly ObservableAsPropertyHelper<string> _displayItemId;
+
+        private CancellationTokenSource? _cts = null;
 
         public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
         {
@@ -44,6 +49,11 @@ namespace L4D2AddonAssistant.ViewModels
                     }
                 })
                 .DisposeWith(disposables);
+
+                Disposable.Create(() =>
+                {
+                    CancelTasks();
+                }).DisposeWith(disposables);
             });
         }
 
@@ -72,6 +82,43 @@ namespace L4D2AddonAssistant.ViewModels
         {
             get => _downloadItemViewModel;
             private set => this.RaiseAndSetIfChanged(ref _downloadItemViewModel, value);
+        }
+
+        public PublishedFileDetails? PublishedFileDetails
+        {
+            get => _publishedFileDetails;
+            private set => this.RaiseAndSetIfChanged(ref _publishedFileDetails, value);
+        }
+
+        protected override async void OnRefresh()
+        {
+            base.OnRefresh();
+
+            var addon = AddonNode;
+            PublishedFileDetails? publishedFileDetails = null;
+            CancelTasks();
+            _cts = new();
+
+            try
+            {
+                publishedFileDetails = await addon.GetPublishedFileDetailsAllowCacheAsync(_cts.Token);
+            }
+            catch (OperationCanceledException) { }
+            
+            if (publishedFileDetails != null)
+            {
+                PublishedFileDetails = publishedFileDetails;
+            }
+        }
+
+        private void CancelTasks()
+        {
+            if (_cts != null)
+            {
+                _cts.Cancel();
+                _cts.Dispose();
+                _cts = null;
+            }
         }
     }
 }

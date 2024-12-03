@@ -385,6 +385,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Favorites:  的本地化字符串。
+        /// </summary>
+        public static string FavoritesColon {
+            get {
+                return ResourceManager.GetString("FavoritesColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 File 的本地化字符串。
         /// </summary>
         public static string File {
@@ -547,6 +556,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Lifetime Favorites:  的本地化字符串。
+        /// </summary>
+        public static string LifetimeFavoritesColon {
+            get {
+                return ResourceManager.GetString("LifetimeFavoritesColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Lifetime Subscriptions:  的本地化字符串。
+        /// </summary>
+        public static string LifetimeSubscriptionsColon {
+            get {
+                return ResourceManager.GetString("LifetimeSubscriptionsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Move 的本地化字符串。
         /// </summary>
         public static string Move {
@@ -633,6 +660,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string PreparingMessage {
             get {
                 return ResourceManager.GetString("PreparingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Published File Details 的本地化字符串。
+        /// </summary>
+        public static string PublishedFileDetails {
+            get {
+                return ResourceManager.GetString("PublishedFileDetails", resourceCulture);
             }
         }
         
@@ -736,6 +772,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Subscriptions:  的本地化字符串。
+        /// </summary>
+        public static string SubscriptionsColon {
+            get {
+                return ResourceManager.GetString("SubscriptionsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Success 的本地化字符串。
         /// </summary>
         public static string Success {
@@ -786,6 +831,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string VersionColon {
             get {
                 return ResourceManager.GetString("VersionColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Views:  的本地化字符串。
+        /// </summary>
+        public static string ViewsColon {
+            get {
+                return ResourceManager.GetString("ViewsColon", resourceCulture);
             }
         }
         
