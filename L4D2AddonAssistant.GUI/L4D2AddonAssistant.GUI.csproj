@@ -32,10 +32,13 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.4" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.1.6.13" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\L4D2AddonAssistant.Core\L4D2AddonAssistant.Core.csproj" />
+    <ProjectReference Include="..\L4D2AddonAssistant.CrashReporter\L4D2AddonAssistant.CrashReporter.csproj" />
   </ItemGroup>
 
   <ItemGroup>

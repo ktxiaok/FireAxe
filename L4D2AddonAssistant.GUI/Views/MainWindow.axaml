@@ -22,6 +22,9 @@
       </MenuItem>
       <MenuItem Header="{x:Static r:Texts.Operations}">
         <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}"/>
+        <MenuItem Header="Crash?">
+          <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
+        </MenuItem>
       </MenuItem>
     </Menu>
     

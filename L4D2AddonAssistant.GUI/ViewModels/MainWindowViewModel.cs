@@ -241,6 +241,11 @@ namespace L4D2AddonAssistant.ViewModels
             }
         }
 
+        public void DummyCrash()
+        {
+            throw new Exception("dummy crash");
+        }
+
         public void Dispose()
         {
             if (!_disposed)
