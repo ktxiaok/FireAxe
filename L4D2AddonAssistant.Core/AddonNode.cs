@@ -23,7 +23,8 @@ namespace L4D2AddonAssistant
 
         private AddonRoot _root;
 
-        private List<AddonProblem>? _problems = null;
+        private readonly ObservableCollection<AddonProblem> _problems = new();
+        private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
         private bool _isBusyChecking = false;
 
         private WeakReference<byte[]?> _image = new(null);
@@ -42,6 +43,8 @@ namespace L4D2AddonAssistant
             }
 
             _root = root;
+            _problemsReadOnly = new(_problems);
+
             if (group == null)
             {
                 root.AddNode(this);
@@ -121,17 +124,7 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public IReadOnlyCollection<AddonProblem> Problems
-        {
-            get
-            {
-                if (_problems == null)
-                {
-                    return ReadOnlyCollection<AddonProblem>.Empty;
-                }
-                return _problems;
-            }
-        }
+        public ReadOnlyObservableCollection<AddonProblem> Problems => _problemsReadOnly;
 
         public byte[]? ImageCache
         {
@@ -380,8 +373,9 @@ namespace L4D2AddonAssistant
             }
 
             _isBusyChecking = true;
-            _problems?.Clear();
+            _problems.Clear();
             OnCheck();
+            OnPostCheck();
             _isBusyChecking = false;
         }
 
@@ -506,11 +500,12 @@ namespace L4D2AddonAssistant
         {
             ArgumentNullException.ThrowIfNull(problem);
 
-            if (_problems == null)
-            {
-                _problems = new(2);
-            }
             _problems.Add(problem);
+        }
+
+        internal void RemoveProblem(AddonProblem problem)
+        {
+            _problems.Remove(problem);
         }
 
         protected IDisposable BlockMove()
@@ -544,6 +539,11 @@ namespace L4D2AddonAssistant
         }
 
         protected virtual void OnCheck()
+        {
+            
+        }
+
+        protected virtual void OnPostCheck()
         {
             FileSize = GetFileSize();
         }

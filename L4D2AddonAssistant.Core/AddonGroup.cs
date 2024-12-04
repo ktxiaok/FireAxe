@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace L4D2AddonAssistant
 {
@@ -16,7 +17,7 @@ namespace L4D2AddonAssistant
 
             public new AddonGroup Source => (AddonGroup)base.Source;
 
-            public override bool TrySolve()
+            protected override bool OnAutoSolve()
             {
                 var group = Source;
                 switch (group.EnableStrategy)
@@ -54,6 +55,7 @@ namespace L4D2AddonAssistant
                 return problem != null;
             }
 
+            // returns true when there's a problem
             private static bool Check(AddonGroup group)
             {
                 switch (group.EnableStrategy)
@@ -61,39 +63,14 @@ namespace L4D2AddonAssistant
                     case AddonGroupEnableStrategy.Single:
                     case AddonGroupEnableStrategy.SingleRandom:
                         {
-                            bool enabled = group.IsEnabled;
                             int enabledCount = 0;
                             foreach (var child in group.Children)
                             {
                                 if (child.IsEnabled)
                                 {
-                                    ++enabledCount;
+                                    enabledCount++;
                                 }
-                                if (enabled)
-                                {
-                                    if (enabledCount > 1)
-                                    {
-                                        return true;
-                                    }
-                                }
-                                else
-                                {
-                                    if (enabledCount > 0)
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
-                            if (enabled)
-                            {
-                                if (enabledCount != 1)
-                                {
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                if (enabledCount != 0)
+                                if (enabledCount > 1)
                                 {
                                     return true;
                                 }
@@ -134,6 +111,7 @@ namespace L4D2AddonAssistant
         public AddonGroup(AddonRoot root, AddonGroup? group = null) : base(root, group)
         {
             ((INotifyCollectionChanged)Children).CollectionChanged += OnCollectionChanged;
+            PropertyChanged += AddonGroup_PropertyChanged;
         }
 
         public override Type SaveType => typeof(AddonGroupSave);
@@ -272,6 +250,29 @@ namespace L4D2AddonAssistant
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        private void AddonGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsEnabled))
+            {
+                OnIsEnabledChanged();
+            }
+        }
+
+        private void OnIsEnabledChanged()
+        {
+            if (_enableStrategy == AddonGroupEnableStrategy.All)
+            {
+                bool oldValueOfIsBusyHandlingChildEnableOrDisable = _isBusyHandlingChildEnableOrDisable;
+                _isBusyHandlingChildEnableOrDisable = true;
+                bool enabled = IsEnabled;
+                foreach (var child in Children)
+                {
+                    child.IsEnabled = enabled;
+                }
+                _isBusyHandlingChildEnableOrDisable = oldValueOfIsBusyHandlingChildEnableOrDisable;
+            }
         }
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

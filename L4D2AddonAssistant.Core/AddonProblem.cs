@@ -4,7 +4,7 @@ namespace L4D2AddonAssistant
 {
     public abstract class AddonProblem
     {
-        protected AddonProblem(AddonNode source)
+        public AddonProblem(AddonNode source)
         {
             ArgumentNullException.ThrowIfNull(source);
             Source = source;
@@ -12,7 +12,22 @@ namespace L4D2AddonAssistant
 
         public AddonNode Source { get; }
 
-        public virtual bool TrySolve()
+        public virtual bool CanAutoSolve => false;
+
+        public bool TryAutoSolve()
+        {
+            if (OnAutoSolve())
+            {
+                Source.RemoveProblem(this);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        protected virtual bool OnAutoSolve()
         {
             return false;
         }
