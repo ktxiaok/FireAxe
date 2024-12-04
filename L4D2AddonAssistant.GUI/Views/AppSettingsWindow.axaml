@@ -5,22 +5,35 @@
         xmlns:r="using:L4D2AddonAssistant.Resources"
         xmlns:vm="using:L4D2AddonAssistant.ViewModels"
         xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="250"
+        xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
+        xmlns:dt="using:L4D2AddonAssistant.DataTemplates"
+        xmlns:local="using:L4D2AddonAssistant"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
         x:Class="L4D2AddonAssistant.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
         Width="600"
         Height="200"
         WindowStartupLocation="CenterScreen">
+  <Window.DataTemplates>
+    <dt:ExceptionExplainer Scene="Input"/>
+  </Window.DataTemplates>
   <ScrollViewer>
     <Grid
-      RowDefinitions="Auto, Auto"
+      RowDefinitions="Auto, Auto, Auto"
       ColumnDefinitions="Auto, *"
       Margin="10">
-      <TextBlock
+      <!--language-->
+      <StackPanel
         Grid.Row="0" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.Language}"/>
+        Orientation="Horizontal">
+        <TextBlock
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.Language}"/>
+        <TextBlock
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.NeedRestartHint}"/>
+      </StackPanel>
       <ComboBox
         Grid.Row="0" Grid.Column="1"
         HorizontalAlignment="Right"
@@ -33,6 +46,7 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
 
+      <!--game path-->
       <TextBlock
         Grid.Row="1" Grid.Column="0"
         Classes="PropertyName"
@@ -42,7 +56,7 @@
         Orientation="Horizontal"
         HorizontalAlignment="Right">
         <TextBox
-          Text="{Binding Settings.GamePath, UpdateSourceTrigger=LostFocus}"
+          Text="{Binding Settings.GamePath}"
           Width="250" 
           Margin="5"/>
         <Button
@@ -50,6 +64,16 @@
           Content="{x:Static r:Texts.Select}"
           Margin="5"/>
       </StackPanel>
+
+      <!--workshop item auto update-->
+      <TextBlock
+        Grid.Row="2" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
+      <CheckBox
+        Grid.Row="2" Grid.Column="1"
+        Classes="PropertyValue"
+        IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
     </Grid>
   </ScrollViewer>
   

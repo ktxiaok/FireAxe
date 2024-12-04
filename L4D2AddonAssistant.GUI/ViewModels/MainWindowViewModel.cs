@@ -60,6 +60,8 @@ namespace L4D2AddonAssistant.ViewModels
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
+            CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
+            ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
 
             _settings.WhenAnyValue(x => x.GamePath).Subscribe((gamePath) =>
             {
@@ -169,6 +171,10 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
+        public ReactiveCommand<Unit, Unit> CheckCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> ClearCachesCommand { get; } 
+
         public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 
         public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
@@ -238,6 +244,28 @@ namespace L4D2AddonAssistant.ViewModels
                     return;
                 }
                 await ShowPushSuccessInteraction.Handle(Unit.Default);
+            }
+        }
+
+        public void Check()
+        {
+            if (_addonRoot != null)
+            {
+                foreach (var addonNode in _addonRoot.GetAllNodes())
+                {
+                    addonNode.Check();
+                }
+            }
+        }
+
+        public void ClearCaches()
+        {
+            if (_addonRoot != null)
+            {
+                foreach (var addonNode in _addonRoot.GetAllNodes())
+                {
+                    addonNode.ClearCaches();
+                }
             }
         }
 

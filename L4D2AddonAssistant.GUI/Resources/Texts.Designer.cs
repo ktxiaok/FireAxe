@@ -115,6 +115,42 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Check 的本地化字符串。
+        /// </summary>
+        public static string Check {
+            get {
+                return ResourceManager.GetString("Check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Check all addons to keep their status up to date. 的本地化字符串。
+        /// </summary>
+        public static string CheckAllTip {
+            get {
+                return ResourceManager.GetString("CheckAllTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clear caches of all addons. 的本地化字符串。
+        /// </summary>
+        public static string ClearAllCachesTip {
+            get {
+                return ResourceManager.GetString("ClearAllCachesTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Clear Caches 的本地化字符串。
+        /// </summary>
+        public static string ClearCaches {
+            get {
+                return ResourceManager.GetString("ClearCaches", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Confirm Delete 的本地化字符串。
         /// </summary>
         public static string ConfirmDelete {
@@ -475,6 +511,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Import existing files to addon items. 的本地化字符串。
+        /// </summary>
+        public static string ImportTip {
+            get {
+                return ResourceManager.GetString("ImportTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Include Name 的本地化字符串。
         /// </summary>
         public static string IncludeName {
@@ -601,6 +646,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似  (Need Restart) 的本地化字符串。
+        /// </summary>
+        public static string NeedRestartHint {
+            get {
+                return ResourceManager.GetString("NeedRestartHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 New 的本地化字符串。
         /// </summary>
         public static string New {
@@ -642,6 +696,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open a directory where the addons are stored.  的本地化字符串。
+        /// </summary>
+        public static string OpenDirectoryTip {
+            get {
+                return ResourceManager.GetString("OpenDirectoryTip", resourceCulture);
             }
         }
         
@@ -696,6 +759,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string PushSuccessMessage {
             get {
                 return ResourceManager.GetString("PushSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Push enablement states of all addons to the game. 的本地化字符串。
+        /// </summary>
+        public static string PushTip {
+            get {
+                return ResourceManager.GetString("PushTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Refresh 的本地化字符串。
+        /// </summary>
+        public static string Refresh {
+            get {
+                return ResourceManager.GetString("Refresh", resourceCulture);
             }
         }
         
@@ -867,6 +948,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string WorkshopAddon {
             get {
                 return ResourceManager.GetString("WorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Workshop Item Auto Update 的本地化字符串。
+        /// </summary>
+        public static string WorkshopItemAutoUpdate {
+            get {
+                return ResourceManager.GetString("WorkshopItemAutoUpdate", resourceCulture);
             }
         }
         

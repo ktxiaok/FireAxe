@@ -152,6 +152,19 @@ namespace L4D2AddonAssistant.ViewModels
             }
         }
 
+        public void ClearCaches()
+        {
+            AddonNode.ClearCaches();
+            OnClearCaches();
+            Refresh();
+        }
+
+        public void Check()
+        {
+            AddonNode.Check();
+            Refresh();
+        }
+
         protected virtual async void OnRefresh()
         {
             CancelTasks();
@@ -159,8 +172,6 @@ namespace L4D2AddonAssistant.ViewModels
             var cancellationToken = _cancellationTokenSource.Token;
 
             var addon = AddonNode;
-
-            addon.Check();
 
             byte[]? imageData = null;
             try
@@ -180,6 +191,11 @@ namespace L4D2AddonAssistant.ViewModels
                     Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.Refresh.");
                 }
             }
+        }
+
+        protected virtual void OnClearCaches()
+        {
+            Image = null;
         }
 
         private void CancelTasks()

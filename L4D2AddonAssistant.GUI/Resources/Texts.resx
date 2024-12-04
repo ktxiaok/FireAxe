@@ -135,6 +135,18 @@
   <data name="CantMoveItemWithName" xml:space="preserve">
     <value>Couldn't move the item "{0}"!</value>
   </data>
+  <data name="Check" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="CheckAllTip" xml:space="preserve">
+    <value>Check all addons to keep their status up to date.</value>
+  </data>
+  <data name="ClearAllCachesTip" xml:space="preserve">
+    <value>Clear caches of all addons.</value>
+  </data>
+  <data name="ClearCaches" xml:space="preserve">
+    <value>Clear Caches</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Confirm Delete</value>
   </data>
@@ -255,6 +267,9 @@
   <data name="ImportSuccessMessage" xml:space="preserve">
     <value>Imported successfully.</value>
   </data>
+  <data name="ImportTip" xml:space="preserve">
+    <value>Import existing files to addon items.</value>
+  </data>
   <data name="IncludeName" xml:space="preserve">
     <value>Include Name</value>
   </data>
@@ -297,6 +312,9 @@
   <data name="MultipleItemsSelected" xml:space="preserve">
     <value>{0} items are selected.</value>
   </data>
+  <data name="NeedRestartHint" xml:space="preserve">
+    <value> (Need Restart)</value>
+  </data>
   <data name="New" xml:space="preserve">
     <value>New</value>
   </data>
@@ -311,6 +329,9 @@
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
+  </data>
+  <data name="OpenDirectoryTip" xml:space="preserve">
+    <value>Open a directory where the addons are stored. </value>
   </data>
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
@@ -329,6 +350,12 @@
   </data>
   <data name="PushSuccessMessage" xml:space="preserve">
     <value>Push succeeded.</value>
+  </data>
+  <data name="PushTip" xml:space="preserve">
+    <value>Push enablement states of all addons to the game.</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
   </data>
   <data name="RetainFileMessage" xml:space="preserve">
     <value>If you do this, files will be retained.</value>
@@ -386,6 +413,9 @@
   </data>
   <data name="WorkshopAddon" xml:space="preserve">
     <value>Workshop Addon</value>
+  </data>
+  <data name="WorkshopItemAutoUpdate" xml:space="preserve">
+    <value>Workshop Item Auto Update</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

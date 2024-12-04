@@ -15,13 +15,15 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">
-        <MenuItem Header="{x:Static r:Texts.Open}" Command="{Binding OpenDirectoryCommand}"/>
-        <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.Open}" Command="{Binding OpenDirectoryCommand}" ToolTip.Tip="{x:Static r:Texts.OpenDirectoryTip}"/>
+        <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}" ToolTip.Tip="{x:Static r:Texts.ImportTip}"/>
         <Separator/>
         <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>
       </MenuItem>
       <MenuItem Header="{x:Static r:Texts.Operations}">
-        <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}" ToolTip.Tip="{x:Static r:Texts.PushTip}"/>
+        <MenuItem Header="{x:Static r:Texts.Check}" Command="{Binding CheckCommand}" ToolTip.Tip="{x:Static r:Texts.CheckAllTip}"/>
+        <MenuItem Header="{x:Static r:Texts.ClearCaches}" Command="{Binding ClearCachesCommand}" ToolTip.Tip="{x:Static r:Texts.ClearAllCachesTip}"/>
         <MenuItem Header="Crash?">
           <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
         </MenuItem>

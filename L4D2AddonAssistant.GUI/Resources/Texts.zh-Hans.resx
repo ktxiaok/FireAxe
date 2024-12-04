@@ -117,14 +117,305 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Abort" xml:space="preserve">
+    <value>终止</value>
+  </data>
+  <data name="Ascending" xml:space="preserve">
+    <value>升序</value>
+  </data>
+  <data name="AuthorColon" xml:space="preserve">
+    <value>作者：</value>
+  </data>
+  <data name="AutoUpdateStrategy" xml:space="preserve">
+    <value>自动更新策略</value>
+  </data>
+  <data name="CancelMove" xml:space="preserve">
+    <value>取消移动</value>
+  </data>
+  <data name="CantMoveItemWithName" xml:space="preserve">
+    <value>无法移动项目“{0}”！</value>
+  </data>
+  <data name="Check" xml:space="preserve">
+    <value>检查</value>
+  </data>
+  <data name="CheckAllTip" xml:space="preserve">
+    <value>检查所有的模组以保持它们的状态最新。</value>
+  </data>
+  <data name="ClearAllCachesTip" xml:space="preserve">
+    <value>清除所有模组的缓存。</value>
+  </data>
+  <data name="ClearCaches" xml:space="preserve">
+    <value>清除缓存</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>确认删除</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeleteAndRetainFile" xml:space="preserve">
+    <value>删除并保留文件</value>
+  </data>
+  <data name="Descending" xml:space="preserve">
+    <value>降序</value>
+  </data>
+  <data name="DescriptionColon" xml:space="preserve">
+    <value>描述：</value>
+  </data>
   <data name="Disable" xml:space="preserve">
     <value>禁用</value>
+  </data>
+  <data name="DisableRecursively" xml:space="preserve">
+    <value>递归禁用（包括所有子项目）</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>下载</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>启用</value>
   </data>
+  <data name="EnableRecursively" xml:space="preserve">
+    <value>递归启用（包括所有子项目）</value>
+  </data>
+  <data name="EnableStrategy" xml:space="preserve">
+    <value>启用策略</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_All" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_None" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_Single" xml:space="preserve">
+    <value>唯一</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_SingleRandom" xml:space="preserve">
+    <value>随机唯一</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_Grid" xml:space="preserve">
+    <value>表格视图</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_LargeTile" xml:space="preserve">
+    <value>大瓦片视图</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_MediumTile" xml:space="preserve">
+    <value>瓦片视图</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
+    <value>小瓦片视图</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
+    <value>默认顺序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
+    <value>按启用状态排序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
+    <value>按文件大小排序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
+    <value>按名称排序</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
+    <value>禁用</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="ExceptionOccurMessage" xml:space="preserve">
+    <value>在操作中发生了异常！</value>
+  </data>
+  <data name="FavoritesColon" xml:space="preserve">
+    <value>收藏量：</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="FileSizeColon" xml:space="preserve">
+    <value>文件大小：</value>
+  </data>
+  <data name="Flatten" xml:space="preserve">
+    <value>展平</value>
+  </data>
+  <data name="GamePath" xml:space="preserve">
+    <value>游戏路径</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>组</value>
+  </data>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>忽略大小写</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="ImportErrorMessage" xml:space="preserve">
+    <value>导入失败。</value>
+  </data>
+  <data name="ImportSuccessMessage" xml:space="preserve">
+    <value>导入成功。</value>
+  </data>
+  <data name="ImportTip" xml:space="preserve">
+    <value>导入现有的文件为模组项。</value>
+  </data>
+  <data name="IncludeName" xml:space="preserve">
+    <value>包括名称</value>
+  </data>
+  <data name="IncludeVpkDescription" xml:space="preserve">
+    <value>包括VPK描述</value>
+  </data>
+  <data name="IncludeWorkshopDescription" xml:space="preserve">
+    <value>包括创意工坊描述</value>
+  </data>
+  <data name="InvalidGamePathMessage" xml:space="preserve">
+    <value>游戏路径“{0}”无效。</value>
+  </data>
+  <data name="InvalidInputMessage" xml:space="preserve">
+    <value>无效输入。</value>
+  </data>
+  <data name="InvalidMoveMessage" xml:space="preserve">
+    <value>目标组是源组的子组。</value>
+  </data>
+  <data name="ItemId" xml:space="preserve">
+    <value>项目ID</value>
+  </data>
+  <data name="ItemNameExists" xml:space="preserve">
+    <value>项目名称已存在。</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="LifetimeFavoritesColon" xml:space="preserve">
+    <value>所有收藏量：</value>
+  </data>
+  <data name="LifetimeSubscriptionsColon" xml:space="preserve">
+    <value>所有订阅量：</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>移动</value>
+  </data>
+  <data name="MoveHere" xml:space="preserve">
+    <value>移动到这里</value>
+  </data>
+  <data name="MultipleItemSelected" xml:space="preserve">
+    <value>已选中{0}个项目。</value>
+  </data>
+  <data name="NeedRestartHint" xml:space="preserve">
+    <value>（需要重启）</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>新建</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>否</value>
+  </data>
+  <data name="Null" xml:space="preserve">
+    <value>空</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>好的</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="OpenDirectoryTip" xml:space="preserve">
+    <value>打开一个存储模组的目录。</value>
+  </data>
+  <data name="Operations" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="PreparingMessage" xml:space="preserve">
+    <value>准备中...</value>
+  </data>
+  <data name="PublishedFileDetails" xml:space="preserve">
+    <value>发布文件详情</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>推送</value>
+  </data>
+  <data name="PushErrorMessage" xml:space="preserve">
+    <value>推送失败。</value>
+  </data>
+  <data name="PushSuccessMessage" xml:space="preserve">
+    <value>推送成功。如果你的游戏正在运行，请进入游戏菜单内刷新。</value>
+  </data>
+  <data name="PushTip" xml:space="preserve">
+    <value>推送所有模组的启用状态给游戏。</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="RetainFileMessage" xml:space="preserve">
+    <value>如果你要这么做的话，文件将会被保留。</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="SearchingMessage" xml:space="preserve">
+    <value>搜索中...</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>选择</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="SkilAll" xml:space="preserve">
+    <value>跳过所有</value>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>跳过</value>
+  </data>
+  <data name="SubscriptionsColon" xml:space="preserve">
+    <value>订阅量：</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="TitleColon" xml:space="preserve">
+    <value>标题：</value>
+  </data>
+  <data name="UnnamedGroup" xml:space="preserve">
+    <value>未命名组</value>
+  </data>
+  <data name="UnnamedWorkshopAddon" xml:space="preserve">
+    <value>未命名创意工坊模组</value>
+  </data>
+  <data name="UseRegex" xml:space="preserve">
+    <value>使用正则表达式</value>
+  </data>
+  <data name="VersionColon" xml:space="preserve">
+    <value>版本：</value>
+  </data>
+  <data name="ViewsColon" xml:space="preserve">
+    <value>浏览量：</value>
+  </data>
+  <data name="VpkInfo" xml:space="preserve">
+    <value>VPK信息</value>
+  </data>
+  <data name="Workshop" xml:space="preserve">
+    <value>创意工坊</value>
+  </data>
+  <data name="WorkshopAddon" xml:space="preserve">
+    <value>创意工坊模组</value>
+  </data>
+  <data name="WorkshopItemAutoUpdate" xml:space="preserve">
+    <value>创意工坊项目自动更新</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>是</value>

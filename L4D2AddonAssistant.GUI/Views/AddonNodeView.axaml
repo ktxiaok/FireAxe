@@ -72,6 +72,23 @@
       <TextBlock Text="{Binding FileSizeReadable}"/>
     </StackPanel>
 
+    <!--buttons-->
+    <StackPanel
+      Orientation="Vertical">
+      <StackPanel.Styles>
+        <Style Selector="Button">
+          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+      </StackPanel.Styles>
+      <Button
+        Content="{x:Static r:Texts.Check}"
+        Command="{Binding Check}"/>
+      <Button
+        Content="{x:Static r:Texts.ClearCaches}"
+        Command="{Binding ClearCaches}"/>
+    </StackPanel>
+
     <!--section views-->
     <StackPanel
       Name="sectionViewContainerControl"

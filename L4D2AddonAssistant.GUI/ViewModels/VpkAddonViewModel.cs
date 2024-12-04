@@ -34,5 +34,12 @@ namespace L4D2AddonAssistant.ViewModels
             var addon = AddonNode;
             Info = addon.RetrieveInfo();
         }
+
+        protected override void OnClearCaches()
+        {
+            base.OnClearCaches();
+
+            Info = null;
+        }
     }
 }

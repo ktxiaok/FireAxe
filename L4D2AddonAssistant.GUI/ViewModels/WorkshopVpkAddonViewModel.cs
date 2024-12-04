@@ -111,6 +111,13 @@ namespace L4D2AddonAssistant.ViewModels
             }
         }
 
+        protected override void OnClearCaches()
+        {
+            base.OnClearCaches();
+
+            PublishedFileDetails = null;
+        }
+
         private void CancelTasks()
         {
             if (_cts != null)

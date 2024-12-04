@@ -180,6 +180,10 @@
       </v:AddonNodeContainerView>
       <Border.ContextMenu>
         <ContextMenu>
+          <MenuItem Header="{x:Static r:Texts.Refresh}" Command="{Binding Refresh}"/>
+          
+          <Separator/>
+          
           <MenuItem Header="{x:Static r:Texts.New}">
             <MenuItem Header="{x:Static r:Texts.Group}" Command="{Binding NewGroupCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>

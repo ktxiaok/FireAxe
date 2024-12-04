@@ -535,6 +535,18 @@ namespace L4D2AddonAssistant.ViewModels
             SearchText = "";
         }
 
+        public void Refresh()
+        {
+            if (ContainerViewModel.NodeViewModels != null)
+            {
+                foreach (var viewModel in ContainerViewModel.NodeViewModels)
+                {
+                    viewModel.Refresh();
+                }
+            }
+            SingleSelection?.Refresh();
+        }
+
         private void DisposeNodesSubscription()
         {
             if (_nodesSubscription != null)
