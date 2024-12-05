@@ -62,6 +62,7 @@ namespace L4D2AddonAssistant.ViewModels
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
+            OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
 
             _settings.WhenAnyValue(x => x.GamePath).Subscribe((gamePath) =>
             {
@@ -174,6 +175,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> CheckCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ClearCachesCommand { get; } 
+
+        public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
         public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 

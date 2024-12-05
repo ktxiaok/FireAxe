@@ -70,6 +70,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 About L4D2AddonAssistant 的本地化字符串。
+        /// </summary>
+        public static string AboutApp {
+            get {
+                return ResourceManager.GetString("AboutApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 A tool for managing Left 4 Dead 2 addons. 的本地化字符串。
+        /// </summary>
+        public static string AppDescription {
+            get {
+                return ResourceManager.GetString("AppDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Ascending 的本地化字符串。
         /// </summary>
         public static string Ascending {
@@ -475,6 +493,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Help 的本地化字符串。
+        /// </summary>
+        public static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Ignore Case 的本地化字符串。
         /// </summary>
         public static string IgnoreCase {
@@ -754,7 +781,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Push succeeded. 的本地化字符串。
+        ///   查找类似 Push succeeded. If your game is running, go to the game menu to refresh addons. 的本地化字符串。
         /// </summary>
         public static string PushSuccessMessage {
             get {

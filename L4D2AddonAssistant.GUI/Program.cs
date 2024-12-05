@@ -17,7 +17,7 @@ namespace L4D2AddonAssistant
         public static void Main(string[] args)
         {
             SetupLogger();
-            Log.Information("L4D2AddonAssistant Start");
+            Log.Information("L4D2AddonAssistant Start (Version: {Version})", AppGlobal.VersionString);
             try
             {
                 BuildAvaloniaApp()

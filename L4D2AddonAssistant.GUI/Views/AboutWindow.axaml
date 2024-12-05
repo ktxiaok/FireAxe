@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:L4D2AddonAssistant"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
+        x:Class="L4D2AddonAssistant.Views.AboutWindow"
+        Title="{x:Static r:Texts.AboutApp}"
+        Width="600" Height="300"
+        WindowStartupLocation="CenterScreen">
+  <StackPanel
+    Orientation="Vertical"
+    VerticalAlignment="Top"
+    Margin="10">
+    <StackPanel.Styles>
+      <Style Selector=":is(Control)">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+      </Style>
+    </StackPanel.Styles>
+
+    <StackPanel
+      Orientation="Vertical"
+      Margin="0, 0, 5, 5">
+      <StackPanel
+        Orientation="Horizontal"
+        Margin="0, 0, 5, 5">
+        <Image
+          Source="/Assets/AppLogo.ico"
+          Width="64"
+          Height="64"
+          Margin="0, 0, 5, 0"/>
+        <TextBlock
+          Text="L4D2AddonAssistant"
+          FontSize="22"
+          FontWeight="Bold"/>
+      </StackPanel>
+      <StackPanel
+        Orientation="Horizontal">
+        <TextBlock
+          Text="{x:Static r:Texts.VersionColon}"
+          FontSize="15"/>
+        <TextBlock
+          Text="{x:Static local:AppGlobal.VersionString}"
+          FontSize="15"/>
+        
+        <TextBlock
+          Text="Powered by Avalonia!"
+          Margin="10, 0, 0, 0"/>
+      </StackPanel>
+    </StackPanel>
+
+    <Panel
+      Margin="0, 5, 5, 5">
+      <TextBlock
+        Text="{x:Static r:Texts.AppDescription}"
+        FontSize="16"/>
+    </Panel>
+    
+    <StackPanel
+      Orientation="Horizontal"
+      Margin="0, 5, 5, 5">
+      <TextBlock
+        Text="{x:Static r:Texts.AuthorColon}"/>
+      <TextBlock
+        Text="KtOrangeeK(ktxiaok)  ktxiaok@foxmail.com"/>
+    </StackPanel>
+
+    <StackPanel
+      Orientation="Horizontal"
+      Margin="0, 5, 5, 5">
+      <TextBlock
+        Text="Github Repo Link: "/>
+      <TextBlock
+        Text="{x:Static local:AppGlobal.GithubRepoLink}"/>
+    </StackPanel>
+
+    <StackPanel
+      Orientation="Horizontal"
+      Margin="0, 5, 5, 5">
+      <TextBlock
+        Text="License: "/>
+      <TextBlock
+        Text="{x:Static local:AppGlobal.License}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

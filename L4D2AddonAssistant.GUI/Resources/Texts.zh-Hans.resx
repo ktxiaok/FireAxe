@@ -120,6 +120,12 @@
   <data name="Abort" xml:space="preserve">
     <value>终止</value>
   </data>
+  <data name="AboutApp" xml:space="preserve">
+    <value>关于L4D2AddonAssistant</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>一个管理求生之路2模组的工具。</value>
+  </data>
   <data name="Ascending" xml:space="preserve">
     <value>升序</value>
   </data>
@@ -254,6 +260,9 @@
   </data>
   <data name="Group" xml:space="preserve">
     <value>组</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>帮助</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>

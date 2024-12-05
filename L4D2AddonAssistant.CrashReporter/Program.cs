@@ -7,7 +7,7 @@ namespace L4D2AddonAssistant.CrashReporter
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("L4D2AddonAssistant CrashReporter");
+            Console.WriteLine("====L4D2AddonAssistant CrashReporter====\n");
 
             if (args.Length == 0)
             {

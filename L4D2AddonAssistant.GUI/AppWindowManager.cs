@@ -9,6 +9,7 @@ namespace L4D2AddonAssistant
         private AppSettingsViewModel _settingsViewModel;
 
         private WindowReference<AppSettingsWindow>? _settingsWindow = null;
+        private WindowReference<AboutWindow>? _aboutWindow = null;
 
         public AppWindowManager(AppSettingsViewModel settingsViewModel)
         {
@@ -26,6 +27,17 @@ namespace L4D2AddonAssistant
                 });
             }
             var window = _settingsWindow.Get()!;
+            window.Show();
+            window.Activate();
+        }
+
+        public void OpenAboutWindow()
+        {
+            if (_aboutWindow == null || _aboutWindow.Get() == null)
+            {
+                _aboutWindow = new(new AboutWindow());
+            }
+            var window = _aboutWindow.Get()!;
             window.Show();
             window.Activate();
         }

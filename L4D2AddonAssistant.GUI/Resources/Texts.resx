@@ -120,6 +120,12 @@
   <data name="Abort" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="AboutApp" xml:space="preserve">
+    <value>About L4D2AddonAssistant</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>A tool for managing Left 4 Dead 2 addons.</value>
+  </data>
   <data name="Ascending" xml:space="preserve">
     <value>Ascending</value>
   </data>
@@ -255,6 +261,9 @@
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>
   </data>
@@ -349,7 +358,7 @@
     <value>Push failed.</value>
   </data>
   <data name="PushSuccessMessage" xml:space="preserve">
-    <value>Push succeeded.</value>
+    <value>Push succeeded. If your game is running, go to the game menu to refresh addons.</value>
   </data>
   <data name="PushTip" xml:space="preserve">
     <value>Push enablement states of all addons to the game.</value>
