@@ -27,7 +27,8 @@
     <v:EditableTextBlock
       Grid.Row="1" Grid.Column="1"
       Value="{Binding ItemId}"
-      Display="{Binding DisplayItemId}"/>
+      Display="{Binding DisplayItemId}"
+      Watermark="{x:Static r:Texts.InputPublishedFileIdHint}"/>
 
     <!--auto update strategy-->
     <TextBlock

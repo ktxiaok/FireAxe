@@ -64,7 +64,7 @@ namespace L4D2AddonAssistant.ViewModels
             get => AddonNode.PublishedFileId?.ToString() ?? "";
             set
             {
-                if (ulong.TryParse(value, out ulong id))
+                if (WorkshopVpkAddon.TryParsePublishedFileId(value, out var id))
                 {
                     AddonNode.PublishedFileId = id;
                     Refresh();

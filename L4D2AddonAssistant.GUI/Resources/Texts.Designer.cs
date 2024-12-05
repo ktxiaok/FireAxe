@@ -583,6 +583,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Input number or link 的本地化字符串。
+        /// </summary>
+        public static string InputPublishedFileIdHint {
+            get {
+                return ResourceManager.GetString("InputPublishedFileIdHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The game path &quot;{0}&quot; is invalid. 的本地化字符串。
         /// </summary>
         public static string InvalidGamePathMessage {

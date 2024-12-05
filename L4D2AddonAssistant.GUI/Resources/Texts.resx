@@ -291,6 +291,9 @@
   <data name="IncludeWorkshopDescription" xml:space="preserve">
     <value>Include Workshop Description</value>
   </data>
+  <data name="InputPublishedFileIdHint" xml:space="preserve">
+    <value>Input number or link</value>
+  </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>The game path "{0}" is invalid.</value>
   </data>

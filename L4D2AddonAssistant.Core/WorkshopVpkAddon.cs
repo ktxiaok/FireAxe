@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace L4D2AddonAssistant
 {
@@ -13,6 +14,8 @@ namespace L4D2AddonAssistant
         {
             Formatting = Formatting.Indented,
         };
+
+        private static Regex _publishedFileIdLinkRegex = new(@"steamcommunity\.com/sharedfiles/filedetails/\?.*id=(\d+)"); 
 
         private ulong? _publishedFileId = null;
 
@@ -87,6 +90,25 @@ namespace L4D2AddonAssistant
         {
             get => _download;
             set => NotifyAndSetIfChanged(ref _download, value);
+        }
+
+        public static bool TryParsePublishedFileId(string input, out ulong id)
+        {
+            if (ulong.TryParse(input, out id))
+            {
+                return true;
+            }
+
+            var match = _publishedFileIdLinkRegex.Match(input);
+            if (match.Success)
+            {
+                if (ulong.TryParse(match.Groups[1].ValueSpan, out id))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
         public Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(CancellationToken cancellationToken)

@@ -291,6 +291,9 @@
   <data name="IncludeWorkshopDescription" xml:space="preserve">
     <value>包括创意工坊描述</value>
   </data>
+  <data name="InputPublishedFileIdHint" xml:space="preserve">
+    <value>输入数字或链接</value>
+  </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>游戏路径“{0}”无效。</value>
   </data>
