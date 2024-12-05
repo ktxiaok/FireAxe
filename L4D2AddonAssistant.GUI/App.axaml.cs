@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
@@ -52,6 +53,8 @@ namespace L4D2AddonAssistant
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose; 
+
                 Services.GetRequiredService<AppSettings>();
 
                 desktop.ShutdownRequested += (sender, args) =>
