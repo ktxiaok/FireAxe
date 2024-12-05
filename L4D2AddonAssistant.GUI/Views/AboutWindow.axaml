@@ -31,21 +31,21 @@
           Width="64"
           Height="64"
           Margin="0, 0, 5, 0"/>
-        <TextBlock
+        <SelectableTextBlock
           Text="L4D2AddonAssistant"
           FontSize="22"
           FontWeight="Bold"/>
       </StackPanel>
       <StackPanel
         Orientation="Horizontal">
-        <TextBlock
+        <SelectableTextBlock
           Text="{x:Static r:Texts.VersionColon}"
           FontSize="15"/>
-        <TextBlock
+        <SelectableTextBlock
           Text="{x:Static local:AppGlobal.VersionString}"
           FontSize="15"/>
         
-        <TextBlock
+        <SelectableTextBlock
           Text="Powered by Avalonia!"
           Margin="10, 0, 0, 0"/>
       </StackPanel>
@@ -53,7 +53,7 @@
 
     <Panel
       Margin="0, 5, 5, 5">
-      <TextBlock
+      <SelectableTextBlock
         Text="{x:Static r:Texts.AppDescription}"
         FontSize="16"/>
     </Panel>
@@ -61,27 +61,27 @@
     <StackPanel
       Orientation="Horizontal"
       Margin="0, 5, 5, 5">
-      <TextBlock
+      <SelectableTextBlock
         Text="{x:Static r:Texts.AuthorColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Text="KtOrangeeK(ktxiaok)  ktxiaok@foxmail.com"/>
     </StackPanel>
 
     <StackPanel
       Orientation="Horizontal"
       Margin="0, 5, 5, 5">
-      <TextBlock
+      <SelectableTextBlock
         Text="Github Repo Link: "/>
-      <TextBlock
+      <SelectableTextBlock
         Text="{x:Static local:AppGlobal.GithubRepoLink}"/>
     </StackPanel>
 
     <StackPanel
       Orientation="Horizontal"
       Margin="0, 5, 5, 5">
-      <TextBlock
+      <SelectableTextBlock
         Text="License: "/>
-      <TextBlock
+      <SelectableTextBlock
         Text="{x:Static local:AppGlobal.License}"/>
     </StackPanel>
   </StackPanel>

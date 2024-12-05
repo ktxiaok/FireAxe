@@ -16,46 +16,46 @@
       Grid.Row="0"
       Grid.Column="0"
       Grid.ColumnSpan="2"/>
-    
-    <TextBlock
+
+    <SelectableTextBlock
       Text="{x:Static r:Texts.VersionColon}"
       Classes="PropertyName"
       Grid.Row="1"
       Grid.Column="0"/>
-    <TextBlock
+    <SelectableTextBlock
       Text="{Binding Info.Version}"
       Classes="PropertyValue"
       Grid.Row="1"
       Grid.Column="1"/>
 
-    <TextBlock
+    <SelectableTextBlock
       Text="{x:Static r:Texts.TitleColon}"
       Classes="PropertyName"
       Grid.Row="2"
       Grid.Column="0"/>
-    <TextBlock
+    <SelectableTextBlock
       Text="{Binding Info.Title}"
       Classes="PropertyValue"
       Grid.Row="2"
       Grid.Column="1"/>
 
-    <TextBlock
+    <SelectableTextBlock
       Text="{x:Static r:Texts.AuthorColon}"
       Classes="PropertyName"
       Grid.Row="3"
       Grid.Column="0"/>
-    <TextBlock
+    <SelectableTextBlock
       Text="{Binding Info.Author}"
       Classes="PropertyValue"
       Grid.Row="3"
       Grid.Column="1"/>
 
-    <TextBlock
+    <SelectableTextBlock
       Text="{x:Static r:Texts.DescriptionColon}"
       Classes="PropertyName"
       Grid.Row="4"
       Grid.Column="0"/>
-    <TextBlock
+    <SelectableTextBlock
       Text="{Binding Info.Description}"
       Grid.Row="5"
       Grid.Column="0"

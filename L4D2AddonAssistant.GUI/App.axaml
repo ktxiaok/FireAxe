@@ -37,18 +37,18 @@
       </Setter>
     </Style>
 
-    <Style Selector="TextBlock.Heading1">
+    <Style Selector=":is(TextBlock).Heading1">
       <Setter Property="FontWeight" Value="Bold"/>
       <Setter Property="FontSize" Value="20"/>
     </Style>
 
-    <Style Selector="TextBlock.PropertyName">
+    <Style Selector=":is(TextBlock).PropertyName">
       <Setter Property="HorizontalAlignment" Value="Left"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="Margin" Value="0, 5, 0, 5"/>
     </Style>
 
-    <Style Selector="TextBlock.PropertyValue">
+    <Style Selector=":is(TextBlock).PropertyValue">
       <Setter Property="HorizontalAlignment" Value="Right"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="Margin" Value="0, 5, 0, 5"/>

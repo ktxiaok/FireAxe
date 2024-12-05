@@ -21,7 +21,7 @@
             Name="PART_DisplayView"
             RowDefinitions="Auto"
             ColumnDefinitions="*, Auto">
-            <TextBlock 
+            <SelectableTextBlock
               Name="PART_TextBlock"
               Grid.Column="0"
               HorizontalAlignment="Right"

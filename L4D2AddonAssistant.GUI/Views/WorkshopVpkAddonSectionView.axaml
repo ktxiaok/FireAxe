@@ -62,66 +62,66 @@
         Classes="Heading1"
         Text="{x:Static r:Texts.PublishedFileDetails}"
         Margin="0, 5, 0, 5"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="1" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.TitleColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="1" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Title}"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
         Classes="PropertyName"
         Text="{x:Static r:Texts.DescriptionColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
         Text="{Binding PublishedFileDetails.Description}"
         TextWrapping="Wrap"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="4" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.ViewsColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="4" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Views}"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="5" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.SubscriptionsColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="5" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Subscriptions}"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="6" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.FavoritesColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="6" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Favorited}"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="7" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.LifetimeSubscriptionsColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="7" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.LifetimeSubscriptions}"/>
-      
-      <TextBlock
+
+      <SelectableTextBlock
         Grid.Row="8" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.LifetimeFavoritesColon}"/>
-      <TextBlock
+      <SelectableTextBlock
         Grid.Row="8" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.LifetimeFavorited}"/>

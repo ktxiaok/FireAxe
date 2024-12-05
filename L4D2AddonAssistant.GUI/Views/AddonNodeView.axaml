@@ -47,7 +47,7 @@
       Value="{Binding AddonNode.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>
-        <Style Selector="TextBlock">
+        <Style Selector=":is(TextBlock)">
           <Setter Property="FontSize" Value="20"/>
           <Setter Property="FontWeight" Value="Bold"/>
           <Setter Property="TextWrapping" Value="Wrap"/>
