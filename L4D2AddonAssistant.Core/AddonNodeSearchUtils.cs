@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Text.RegularExpressions;
 
 namespace L4D2AddonAssistant
@@ -191,16 +192,23 @@ namespace L4D2AddonAssistant
 
         private class RegexStringMatcher : IStringMatcher
         {
-            private Regex _regex;
+            private Regex? _regex = null;
             
             public RegexStringMatcher(string pattern)
             {
-                _regex = new(pattern);
+                try
+                {
+                    _regex = new(pattern);
+                }
+                catch (Exception ex)
+                {
+                    Log.Information(ex, "Exception occurred during creating Regex instance (pattern: {Pattern})", pattern);
+                }
             }
 
             public bool Match(string str)
             {
-                return _regex.IsMatch(str);
+                return _regex?.IsMatch(str) ?? false;
             }
         }
     }
