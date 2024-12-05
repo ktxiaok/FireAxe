@@ -123,6 +123,9 @@
   <data name="AboutApp" xml:space="preserve">
     <value>关于L4D2AddonAssistant</value>
   </data>
+  <data name="AddonMoveDeniedMessage" xml:space="preserve">
+    <value>模组“{0}”拒绝了移动或重命名。可能存在正在进行的任务。请稍后再试。</value>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>一个管理求生之路2模组的工具。</value>
   </data>

@@ -20,6 +20,8 @@ namespace L4D2AddonAssistant
             Log.Information("L4D2AddonAssistant Start (Version: {Version})", AppGlobal.VersionString);
             try
             {
+                RegisterObjectExplanations();
+
                 BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
             }
@@ -86,6 +88,12 @@ namespace L4D2AddonAssistant
             }
 
             crashReporterProcess.WaitForExit();
+        }
+
+        private static void RegisterObjectExplanations()
+        {
+            var defaultManager = ObjectExplanationManager.Default;
+            ExceptionExplanations.Register(defaultManager);
         }
     }
 }

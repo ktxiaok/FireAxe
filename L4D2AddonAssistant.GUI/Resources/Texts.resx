@@ -123,6 +123,9 @@
   <data name="AboutApp" xml:space="preserve">
     <value>About L4D2AddonAssistant</value>
   </data>
+  <data name="AddonMoveDeniedMessage" xml:space="preserve">
+    <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
   </data>

@@ -21,8 +21,6 @@ namespace L4D2AddonAssistant
 
         public App()
         {
-            ExceptionExplanations.Register(ObjectExplanationManager.Default);
-
             _documentDirectoryPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DocumentDirectoryName);
             Directory.CreateDirectory(_documentDirectoryPath);
 

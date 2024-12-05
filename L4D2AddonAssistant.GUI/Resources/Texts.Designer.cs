@@ -79,6 +79,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
+        /// </summary>
+        public static string AddonMoveDeniedMessage {
+            get {
+                return ResourceManager.GetString("AddonMoveDeniedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 A tool for managing Left 4 Dead 2 addons. 的本地化字符串。
         /// </summary>
         public static string AppDescription {
