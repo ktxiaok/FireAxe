@@ -115,6 +115,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Set the name automatically 的本地化字符串。
+        /// </summary>
+        public static string AutoSetName {
+            get {
+                return ResourceManager.GetString("AutoSetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Auto Update Strategy 的本地化字符串。
         /// </summary>
         public static string AutoUpdateStrategy {
@@ -714,6 +723,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string No {
             get {
                 return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 No available name 的本地化字符串。
+        /// </summary>
+        public static string NoAvailableName {
+            get {
+                return ResourceManager.GetString("NoAvailableName", resourceCulture);
             }
         }
         

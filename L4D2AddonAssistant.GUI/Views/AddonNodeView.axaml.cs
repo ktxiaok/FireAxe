@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using L4D2AddonAssistant.ViewModels;
+using L4D2AddonAssistant.Resources;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
@@ -47,6 +48,55 @@ namespace L4D2AddonAssistant.Views
             });
 
             InitializeComponent();
+
+            autoSetNameButton.Click += AutoSetNameButton_Click;
+        }
+
+        private void AutoSetNameButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            if (DataContext != null)
+            {
+                if (DataContext is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
+                {
+                    if (workshopVpkAddonViewModel.PublishedFileDetails is var details && details != null)
+                    {
+                        if (TrySetName(details.Title))
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                if (DataContext is VpkAddonViewModel vpkAddonViewModel)
+                {
+                    if (vpkAddonViewModel.Info is var info && info != null)
+                    {
+                        if (TrySetName(info.Title))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+
+            TrySetName(Texts.NoAvailableName);
+
+            bool TrySetName(string name)
+            {
+                name = name.Trim();
+                if (name.Length == 0)
+                {
+                    return false;
+                }
+
+                nameControl.IsEditing = true;
+                var textBox = nameControl.TextBox;
+                if (textBox != null)
+                {
+                    textBox.Text = name;
+                }
+                return true;
+            }
         }
 
         private void ClearSectionViews()

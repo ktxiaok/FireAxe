@@ -135,6 +135,9 @@
   <data name="AuthorColon" xml:space="preserve">
     <value>作者：</value>
   </data>
+  <data name="AutoSetName" xml:space="preserve">
+    <value>自动设置名称</value>
+  </data>
   <data name="AutoUpdateStrategy" xml:space="preserve">
     <value>自动更新策略</value>
   </data>
@@ -335,6 +338,9 @@
   </data>
   <data name="No" xml:space="preserve">
     <value>否</value>
+  </data>
+  <data name="NoAvailableName" xml:space="preserve">
+    <value>无可用名称</value>
   </data>
   <data name="Null" xml:space="preserve">
     <value>空</value>

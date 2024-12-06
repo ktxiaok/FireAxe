@@ -57,6 +57,18 @@ public class EditableTextBlock : TemplatedControl
         });
     }
 
+    public bool IsEditing
+    {
+        get => _isEditing;
+        set
+        {
+            _isEditing = value;
+            UpdateVisibility();
+        }
+    }
+
+    public TextBox? TextBox => _textBox;
+
     public string Value
     {
         get => GetValue(ValueProperty);

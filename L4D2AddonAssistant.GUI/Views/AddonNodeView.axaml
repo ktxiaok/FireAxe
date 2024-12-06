@@ -44,6 +44,7 @@
 
     <!--name-->
     <v:EditableTextBlock
+      Name="nameControl"
       Value="{Binding AddonNode.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>
@@ -81,6 +82,9 @@
           <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
       </StackPanel.Styles>
+      <Button
+        Name="autoSetNameButton"
+        Content="{x:Static r:Texts.AutoSetName}"/>
       <Button
         Content="{x:Static r:Texts.Check}"
         Command="{Binding Check}"/>
