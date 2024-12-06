@@ -192,6 +192,9 @@
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
   </data>
+  <data name="EnabledOrDisabled" xml:space="preserve">
+    <value>Enabled/Disabled</value>
+  </data>
   <data name="EnableRecursively" xml:space="preserve">
     <value>Enable Recursively (including all subitems)</value>
   </data>

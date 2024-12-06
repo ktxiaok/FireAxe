@@ -286,6 +286,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Enabled/Disabled 的本地化字符串。
+        /// </summary>
+        public static string EnabledOrDisabled {
+            get {
+                return ResourceManager.GetString("EnabledOrDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Enable Recursively (including all subitems) 的本地化字符串。
         /// </summary>
         public static string EnableRecursively {

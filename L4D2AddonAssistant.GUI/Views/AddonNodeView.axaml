@@ -61,7 +61,17 @@
     </v:EditableTextBlock>
 
     <!--enable button-->
-    <v:AddonNodeEnableButton/>
+    <StackPanel
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Margin="3">
+      <TextBlock
+        Text="{x:Static r:Texts.EnabledOrDisabled}"
+        VerticalAlignment="Center"
+        FontSize="16"/>
+      <v:AddonNodeEnableButton/>
+    </StackPanel>
 
     <!--file size-->
     <StackPanel

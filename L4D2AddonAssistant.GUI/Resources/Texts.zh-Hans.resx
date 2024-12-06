@@ -192,6 +192,9 @@
   <data name="Enable" xml:space="preserve">
     <value>启用</value>
   </data>
+  <data name="EnabledOrDisabled" xml:space="preserve">
+    <value>启用/禁用</value>
+  </data>
   <data name="EnableRecursively" xml:space="preserve">
     <value>递归启用（包括所有子项目）</value>
   </data>
