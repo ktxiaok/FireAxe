@@ -1,4 +1,8 @@
 # L4D2AddonAssistant
+**English** | **[简体中文](README.zh-Hans.md)**
+
+[Downloads](https://github.com/ktxiaok/L4D2AddonAssistant/releases)
+
 L4D2AddonAssistant is an open-source GUI tool for managing Left 4 Dead 2 addons. It has the following features:
 - Organize addons hierarchically through the concept of groups
 - Local VPK files management
