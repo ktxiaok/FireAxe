@@ -484,6 +484,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The file download is uncompleted! 的本地化字符串。
+        /// </summary>
+        public static string FileDownloadUncompleted {
+            get {
+                return ResourceManager.GetString("FileDownloadUncompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 File Size:  的本地化字符串。
         /// </summary>
         public static string FileSizeColon {

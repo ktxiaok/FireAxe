@@ -258,6 +258,9 @@
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>
+  <data name="FileDownloadUncompleted" xml:space="preserve">
+    <value>The file download is uncompleted!</value>
+  </data>
   <data name="FileSizeColon" xml:space="preserve">
     <value>File Size: </value>
   </data>

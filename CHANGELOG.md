@@ -1,1 +1,3 @@
 - improve: AddonNodeView
+- fix: WorkshopVpkAddon.FullVpkFilePath is sometimes not updated
+- improve: WorkshopVpkAddonSectionView
