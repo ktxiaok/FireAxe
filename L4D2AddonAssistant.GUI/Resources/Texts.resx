@@ -123,6 +123,12 @@
   <data name="AboutApp" xml:space="preserve">
     <value>About L4D2AddonAssistant</value>
   </data>
+  <data name="AddonChildProblemExplain" xml:space="preserve">
+    <value>There're problems in subitems.</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
+    <value>The corresponding file "{0}" doesn't exist.</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
   </data>
@@ -282,6 +288,9 @@
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
+  <data name="GetPublishedFileDetailsProblemExplain" xml:space="preserve">
+    <value>Failed to get the published file details.</value>
+  </data>
   <data name="GoToDownload" xml:space="preserve">
     <value>Go to download</value>
   </data>
@@ -329,6 +338,9 @@
   </data>
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>The target group is the subgroup of the source group.</value>
+  </data>
+  <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
+    <value>Invalid published file id.</value>
   </data>
   <data name="ItemId" xml:space="preserve">
     <value>Item ID</value>
@@ -386,6 +398,9 @@
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
+  </data>
+  <data name="Problems" xml:space="preserve">
+    <value>Problems</value>
   </data>
   <data name="PublishedFileDetails" xml:space="preserve">
     <value>Published File Details</value>
@@ -467,6 +482,9 @@
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>Workshop Item Auto Update</value>
+  </data>
+  <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
+    <value>The workshop vpk file is not loaded.</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

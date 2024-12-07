@@ -3,3 +3,4 @@
 - improve: WorkshopVpkAddonSectionView
 - improve: check addons after import and check addons before push
 - add: check for updates
+- add: addon problems display

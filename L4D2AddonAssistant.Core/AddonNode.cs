@@ -546,6 +546,22 @@ namespace L4D2AddonAssistant
         protected virtual void OnPostCheck()
         {
             FileSize = GetFileSize();
+
+            if (RequireFile)
+            {
+                try
+                {
+                    var path = FullFilePath;
+                    if (!File.Exists(path) && !Directory.Exists(path))
+                    {
+                        AddProblem(new AddonFileNotExistProblem(this));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during AddonNode.OnPostCheck");
+                }
+            }
         }
 
         protected virtual long? GetFileSize()

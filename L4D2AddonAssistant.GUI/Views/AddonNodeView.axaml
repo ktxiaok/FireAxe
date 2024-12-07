@@ -6,6 +6,7 @@
              xmlns:v="using:L4D2AddonAssistant.Views"
              xmlns:dt="using:L4D2AddonAssistant.DataTemplates"
              xmlns:r="using:L4D2AddonAssistant.Resources"
+             xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
              x:Class="L4D2AddonAssistant.Views.AddonNodeView"
              x:DataType="vm:AddonNodeViewModel">
@@ -101,6 +102,41 @@
       <Button
         Content="{x:Static r:Texts.ClearCaches}"
         Command="{Binding ClearCaches}"/>
+    </StackPanel>
+
+    <!--problems-->
+    <StackPanel
+      Orientation="Vertical"
+      IsVisible="{Binding HasProblem}">
+      <StackPanel.Styles>
+        <Style Selector=":is(TextBlock)">
+          <Setter Property="Foreground" Value="OrangeRed"/>
+        </Style>
+      </StackPanel.Styles>
+      
+      <TextBlock
+        Text="{x:Static r:Texts.Problems}"
+        Classes="Heading1"
+        Margin="0, 5, 0, 5"/>
+      <ItemsControl
+        ItemsSource="{Binding AddonNode.Problems}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <SelectableTextBlock
+              Text="{Binding Converter={x:Static conv:ObjectExplanationConverter.Default}}"
+              TextWrapping="Wrap"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Center"
+              Margin="0, 5, 0, 5"/>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </StackPanel>
 
     <!--section views-->

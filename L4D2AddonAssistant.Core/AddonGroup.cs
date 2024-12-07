@@ -156,6 +156,20 @@ namespace L4D2AddonAssistant
             }
         }
 
+        protected override void OnPostCheck()
+        {
+            base.OnPostCheck();
+
+            foreach (var child in Children)
+            {
+                if (child.Problems.Count > 0)
+                {
+                    AddProblem(new AddonChildProblem(this));
+                    break;
+                }
+            }
+        }
+
         protected virtual void OnChildEnableOrDisable(AddonNode child)
         {
             switch (_enableStrategy)

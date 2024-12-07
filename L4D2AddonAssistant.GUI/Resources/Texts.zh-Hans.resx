@@ -123,6 +123,12 @@
   <data name="AboutApp" xml:space="preserve">
     <value>关于L4D2AddonAssistant</value>
   </data>
+  <data name="AddonChildProblemExplain" xml:space="preserve">
+    <value>子项目中存在问题。</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
+    <value>对应的文件“{0}”不存在。</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>模组“{0}”拒绝了移动或重命名。可能存在正在进行的任务。请稍后再试。</value>
   </data>
@@ -282,6 +288,9 @@
   <data name="GamePath" xml:space="preserve">
     <value>游戏路径</value>
   </data>
+  <data name="GetPublishedFileDetailsProblemExplain" xml:space="preserve">
+    <value>获取发布文件详情失败。</value>
+  </data>
   <data name="GoToDownload" xml:space="preserve">
     <value>去下载</value>
   </data>
@@ -329,6 +338,9 @@
   </data>
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>目标组是源组的子组。</value>
+  </data>
+  <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
+    <value>无效的发布文件ID。</value>
   </data>
   <data name="ItemId" xml:space="preserve">
     <value>项目ID</value>
@@ -386,6 +398,9 @@
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>准备中...</value>
+  </data>
+  <data name="Problems" xml:space="preserve">
+    <value>问题</value>
   </data>
   <data name="PublishedFileDetails" xml:space="preserve">
     <value>发布文件详情</value>
@@ -467,6 +482,9 @@
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>创意工坊项目自动更新</value>
+  </data>
+  <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
+    <value>创意工坊VPK文件没有装载。</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>是</value>

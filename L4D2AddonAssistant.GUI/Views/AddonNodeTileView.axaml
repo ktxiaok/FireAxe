@@ -55,5 +55,13 @@
       HorizontalAlignment="Right"
       VerticalAlignment="Top">
     </v:AddonNodeEnableButton>
+    <PathIcon
+      Data="{StaticResource icon_warning}"
+      IsVisible="{Binding HasProblem}"
+      Foreground="OrangeRed"
+      Margin="5"
+      Width="20" Height="20"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Top"/>
   </Panel>
 </v:AddonNodeListItemView>

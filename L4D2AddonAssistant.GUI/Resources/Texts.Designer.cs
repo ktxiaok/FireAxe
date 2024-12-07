@@ -79,6 +79,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 There&apos;re problems in subitems. 的本地化字符串。
+        /// </summary>
+        public static string AddonChildProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonChildProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The corresponding file &quot;{0}&quot; doesn&apos;t exist. 的本地化字符串。
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
@@ -556,6 +574,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Failed to get the published file details. 的本地化字符串。
+        /// </summary>
+        public static string GetPublishedFileDetailsProblemExplain {
+            get {
+                return ResourceManager.GetString("GetPublishedFileDetailsProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Go to download 的本地化字符串。
         /// </summary>
         public static string GoToDownload {
@@ -696,6 +723,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string InvalidMoveMessage {
             get {
                 return ResourceManager.GetString("InvalidMoveMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Invalid published file id. 的本地化字符串。
+        /// </summary>
+        public static string InvalidPublishedFileIdMessage {
+            get {
+                return ResourceManager.GetString("InvalidPublishedFileIdMessage", resourceCulture);
             }
         }
         
@@ -867,6 +903,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string PreparingMessage {
             get {
                 return ResourceManager.GetString("PreparingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Problems 的本地化字符串。
+        /// </summary>
+        public static string Problems {
+            get {
+                return ResourceManager.GetString("Problems", resourceCulture);
             }
         }
         
@@ -1110,6 +1155,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string WorkshopItemAutoUpdate {
             get {
                 return ResourceManager.GetString("WorkshopItemAutoUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The workshop vpk file is not loaded. 的本地化字符串。
+        /// </summary>
+        public static string WorkshopVpkFileNotLoadProblemExplain {
+            get {
+                return ResourceManager.GetString("WorkshopVpkFileNotLoadProblemExplain", resourceCulture);
             }
         }
         

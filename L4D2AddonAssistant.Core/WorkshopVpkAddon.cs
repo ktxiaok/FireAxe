@@ -174,6 +174,11 @@ namespace L4D2AddonAssistant
                     _checkTaskPending = true;
                 }
             }
+
+            if (FullVpkFilePath == null)
+            {
+                AddProblem(new WorkshopVpkFileNotLoadProblem(this));
+            }
         }
 
         private void CreateCheckTask(ulong publishedFileId)
@@ -234,8 +239,10 @@ namespace L4D2AddonAssistant
                         }
                         else
                         {
-                            var problem = new GetPublishedFileDetailsProblem(this, result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId);
-                            problems.Add(problem);
+                            if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
+                            {
+                                problems.Add(new InvalidPublishedFileIdProblem(this));
+                            }
                         }
                     }
 
