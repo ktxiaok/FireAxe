@@ -6,12 +6,21 @@ namespace L4D2AddonAssistant
     {
         public static IEnumerable<AddonNode> GetAllNodes(this IAddonNodeContainer container)
         {
-            foreach (var node1 in container.Nodes)
+            foreach (var node in container.GetDescendantsByDfsPreorder())
             {
-                foreach (var node2 in node1.GetSelfAndDescendantsByDfsPreorder())
-                {
-                    yield return node2;
-                }
+                yield return node;
+            }
+        }
+
+        public static void CheckAll(this IAddonNodeContainer container)
+        {
+            foreach (var node in container.GetDescendantsByDfsPostorder())
+            {
+                node.Check();
+            }
+            if (container is AddonNode containerNode)
+            {
+                containerNode.Check();
             }
         }
     }

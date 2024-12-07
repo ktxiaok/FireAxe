@@ -152,7 +152,8 @@ namespace L4D2AddonAssistant
 
             public override void Create(AddonRoot root)
             {
-                new LocalVpkAddon(root, Group) { Name = Name};
+                var addon = new LocalVpkAddon(root, Group) { Name = Name};
+                addon.Check();
             }
         }
 

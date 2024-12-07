@@ -232,6 +232,7 @@ namespace L4D2AddonAssistant.ViewModels
         {
             if (_addonRoot != null)
             {
+                _addonRoot.CheckAll();
                 try
                 {
                     _addonRoot.Push();

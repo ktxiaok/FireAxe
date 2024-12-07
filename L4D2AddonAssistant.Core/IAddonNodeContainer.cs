@@ -3,8 +3,12 @@ using System.Collections.ObjectModel;
 
 namespace L4D2AddonAssistant
 {
-    public interface IAddonNodeContainer
+    public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
     {
+        IEnumerable<AddonNode> IHierarchyNode<AddonNode>.Children => Nodes;
+
+        bool IHierarchyNode<AddonNode>.IsNonterminal => true;
+
         ReadOnlyObservableCollection<AddonNode> Nodes { get; }
 
         IAddonNodeContainer? Parent { get; }
