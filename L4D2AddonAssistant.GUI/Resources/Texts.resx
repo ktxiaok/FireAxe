@@ -153,6 +153,12 @@
   <data name="CheckAllTip" xml:space="preserve">
     <value>Check all addons to keep their status up to date.</value>
   </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="CheckingForUpdatesMessage" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
   <data name="ClearAllCachesTip" xml:space="preserve">
     <value>Clear caches of all addons.</value>
   </data>
@@ -164,6 +170,9 @@
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
+  </data>
+  <data name="CurrentVersionLatestMessage" xml:space="preserve">
+    <value>The current version is latest.</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>
@@ -252,6 +261,9 @@
   <data name="ExceptionOccurMessage" xml:space="preserve">
     <value>Exception occurred during the operation!</value>
   </data>
+  <data name="FailedToGetLatestVersion" xml:space="preserve">
+    <value>Failed to retrieve the latest version.</value>
+  </data>
   <data name="FavoritesColon" xml:space="preserve">
     <value>Favorites: </value>
   </data>
@@ -270,11 +282,17 @@
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
+  <data name="GoToDownload" xml:space="preserve">
+    <value>Go to download</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ignore</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>
@@ -341,6 +359,9 @@
   </data>
   <data name="New" xml:space="preserve">
     <value>New</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>New version available: {0}</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
@@ -422,6 +443,9 @@
   </data>
   <data name="UnnamedWorkshopAddon" xml:space="preserve">
     <value>Unnamed Workshop Addon</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
   <data name="UseRegex" xml:space="preserve">
     <value>Use Regex</value>

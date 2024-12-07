@@ -31,6 +31,10 @@
       </MenuItem>
 
       <MenuItem Header="{x:Static r:Texts.Help}">
+        <MenuItem Header="{x:Static r:Texts.CheckForUpdates}" Command="{Binding CheckUpdateCommand}"/>
+        
+        <Separator/>
+        
         <MenuItem Header="{x:Static r:Texts.AboutApp}" Command="{Binding OpenAboutWindowCommand}"/>
       </MenuItem>
     </Menu>

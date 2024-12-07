@@ -169,6 +169,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Check for updates 的本地化字符串。
+        /// </summary>
+        public static string CheckForUpdates {
+            get {
+                return ResourceManager.GetString("CheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Checking for updates... 的本地化字符串。
+        /// </summary>
+        public static string CheckingForUpdatesMessage {
+            get {
+                return ResourceManager.GetString("CheckingForUpdatesMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Clear caches of all addons. 的本地化字符串。
         /// </summary>
         public static string ClearAllCachesTip {
@@ -201,6 +219,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string ConfirmDeleteMessage {
             get {
                 return ResourceManager.GetString("ConfirmDeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The current version is latest. 的本地化字符串。
+        /// </summary>
+        public static string CurrentVersionLatestMessage {
+            get {
+                return ResourceManager.GetString("CurrentVersionLatestMessage", resourceCulture);
             }
         }
         
@@ -466,6 +493,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Failed to retrieve the latest version. 的本地化字符串。
+        /// </summary>
+        public static string FailedToGetLatestVersion {
+            get {
+                return ResourceManager.GetString("FailedToGetLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Favorites:  的本地化字符串。
         /// </summary>
         public static string FavoritesColon {
@@ -520,6 +556,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Go to download 的本地化字符串。
+        /// </summary>
+        public static string GoToDownload {
+            get {
+                return ResourceManager.GetString("GoToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Group 的本地化字符串。
         /// </summary>
         public static string Group {
@@ -534,6 +579,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Ignore 的本地化字符串。
+        /// </summary>
+        public static string Ignore {
+            get {
+                return ResourceManager.GetString("Ignore", resourceCulture);
             }
         }
         
@@ -732,6 +786,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string New {
             get {
                 return ResourceManager.GetString("New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 New version available: {0} 的本地化字符串。
+        /// </summary>
+        public static string NewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
             }
         }
         
@@ -975,6 +1038,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string UnnamedWorkshopAddon {
             get {
                 return ResourceManager.GetString("UnnamedWorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Update 的本地化字符串。
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
             }
         }
         

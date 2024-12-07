@@ -153,6 +153,12 @@
   <data name="CheckAllTip" xml:space="preserve">
     <value>检查所有的模组以保持它们的状态最新。</value>
   </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="CheckingForUpdatesMessage" xml:space="preserve">
+    <value>正在检查更新...</value>
+  </data>
   <data name="ClearAllCachesTip" xml:space="preserve">
     <value>清除所有模组的缓存。</value>
   </data>
@@ -164,6 +170,9 @@
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
+  </data>
+  <data name="CurrentVersionLatestMessage" xml:space="preserve">
+    <value>当前版本已是最新版本。</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>默认</value>
@@ -252,6 +261,9 @@
   <data name="ExceptionOccurMessage" xml:space="preserve">
     <value>在操作中发生了异常！</value>
   </data>
+  <data name="FailedToGetLatestVersion" xml:space="preserve">
+    <value>获取最新版本失败。</value>
+  </data>
   <data name="FavoritesColon" xml:space="preserve">
     <value>收藏量：</value>
   </data>
@@ -270,11 +282,17 @@
   <data name="GamePath" xml:space="preserve">
     <value>游戏路径</value>
   </data>
+  <data name="GoToDownload" xml:space="preserve">
+    <value>去下载</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>组</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>帮助</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>忽略</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>
@@ -341,6 +359,9 @@
   </data>
   <data name="New" xml:space="preserve">
     <value>新建</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>有可用的新版本：{0}</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>否</value>
@@ -422,6 +443,9 @@
   </data>
   <data name="UnnamedWorkshopAddon" xml:space="preserve">
     <value>未命名创意工坊模组</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
   </data>
   <data name="UseRegex" xml:space="preserve">
     <value>使用正则表达式</value>

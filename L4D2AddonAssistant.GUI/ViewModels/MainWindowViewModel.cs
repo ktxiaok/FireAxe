@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant.ViewModels
@@ -24,6 +25,10 @@ namespace L4D2AddonAssistant.ViewModels
         private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
         private readonly ObservableAsPropertyHelper<string> _titleExtraInfo;
+
+        private bool _isCheckingUpdate = false;
+        private object? _checkUpdateActivity = null;
+        private CancellationTokenSource? _checkUpdateCts = null;
 
         public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient)
         {
@@ -63,6 +68,7 @@ namespace L4D2AddonAssistant.ViewModels
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
             OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
+            CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
             _settings.WhenAnyValue(x => x.GamePath).Subscribe((gamePath) =>
             {
@@ -79,26 +85,36 @@ namespace L4D2AddonAssistant.ViewModels
                 }
             });
 
-            // Try to open the LastOpenDirectory.
-            var lastOpenDir = _settings.LastOpenDirectory;
-            if (lastOpenDir != null)
-            {
-                if (Directory.Exists(lastOpenDir))
-                {
-                    OpenDirectory(lastOpenDir);
-                }
-                else
-                {
-                    _settings.LastOpenDirectory = null;
-                    _settings.Save();
-                }
-            }
-
+            bool initExecuted = false;
             this.WhenActivated((CompositeDisposable disposables) =>
             {
+                if (!initExecuted)
+                {
+                    initExecuted = true;
 
+                    CheckUpdate(true);
+
+                    // Try to open the LastOpenDirectory.
+                    var lastOpenDir = _settings.LastOpenDirectory;
+                    if (lastOpenDir != null)
+                    {
+                        if (Directory.Exists(lastOpenDir))
+                        {
+                            OpenDirectory(lastOpenDir);
+                        }
+                        else
+                        {
+                            _settings.LastOpenDirectory = null;
+                            _settings.Save();
+                        }
+                    }
+                }
             });
         }
+
+        public event Action? ShowCheckingUpdateWindow = null;
+
+        public event Action? CloseCheckingUpdateWindow = null;
 
         public ViewModelActivator Activator { get; } = new();
 
@@ -178,6 +194,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
+
         public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
 
         public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
@@ -189,6 +207,12 @@ namespace L4D2AddonAssistant.ViewModels
         public Interaction<Exception, Unit> ShowPushErrorInteraction { get; } = new();
 
         public Interaction<string, Unit> ShowInvalidGamePathInteraction { get; } = new();
+
+        public Interaction<Unit, Unit> ShowCheckUpdateFailedInteraction { get; } = new();
+
+        public Interaction<string, UpdateRequestReply> ShowUpdateRequestInteraction { get; } = new();
+
+        public Interaction<Unit, Unit> ShowCurrentVersionLatestInteraction { get; } = new();
 
         public void OpenDirectory(string dirPath)
         {
@@ -271,6 +295,88 @@ namespace L4D2AddonAssistant.ViewModels
                     addonNode.ClearCaches();
                 }
             }
+        }
+
+        public async void CheckUpdate(bool silenced)
+        {
+            if (!silenced)
+            {
+                ShowCheckingUpdateWindow?.Invoke();
+            }
+            if (_isCheckingUpdate)
+            {
+                return;
+            }
+
+            _isCheckingUpdate = true;
+            var activity = new object();
+            _checkUpdateActivity = activity;
+            _checkUpdateCts = new();
+            string? latestVersion = null;
+            try
+            {
+                latestVersion = await AppGlobal.GetLatestVersionAsync(_httpClient, _checkUpdateCts.Token);
+            }
+            catch (OperationCanceledException) { }
+            if (activity == _checkUpdateActivity)
+            {
+                _isCheckingUpdate = false;
+                _checkUpdateActivity = null;
+                _checkUpdateCts.Dispose();
+                _checkUpdateCts = null;
+            }
+
+            CloseCheckingUpdateWindow?.Invoke();
+            if (silenced)
+            {
+                if (latestVersion == null)
+                {
+                    return;
+                }
+                if (latestVersion == _settings.SuppressedUpdateRequestVersion)
+                {
+                    return;
+                }
+                if (latestVersion == AppGlobal.VersionString)
+                {
+                    return;
+                }
+            }
+
+            if (latestVersion == null)
+            {
+                await ShowCheckUpdateFailedInteraction.Handle(Unit.Default);
+            }
+            else if (latestVersion == AppGlobal.VersionString)
+            {
+                await ShowCurrentVersionLatestInteraction.Handle(Unit.Default);
+            }
+            else
+            {
+                var reply = await ShowUpdateRequestInteraction.Handle(latestVersion);
+                if (reply == UpdateRequestReply.GoToDownload)
+                {
+                    Utils.OpenWebsite(AppGlobal.GithubReleasesUrl);
+                }
+                else if (reply == UpdateRequestReply.Ignore)
+                {
+                    _settings.SuppressedUpdateRequestVersion = latestVersion;
+                }
+            }
+        }
+
+        public void CancelCheckUpdate()
+        {
+            if (!_isCheckingUpdate)
+            {
+                return;
+            }
+
+            _isCheckingUpdate = false;
+            _checkUpdateActivity = null;
+            _checkUpdateCts!.Cancel();
+            _checkUpdateCts!.Dispose();
+            _checkUpdateCts = null;
         }
 
         public void DummyCrash()
