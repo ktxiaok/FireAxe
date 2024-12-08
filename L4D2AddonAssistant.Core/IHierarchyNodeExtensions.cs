@@ -141,13 +141,13 @@ namespace L4D2AddonAssistant
             return new HierarchyPreorderDfs<T>(enumerator, skip);
         }
 
-        public static IEnumerable<T> GetDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public static IEnumerable<T> GetDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
         {
             if (!node.IsNonterminal)
             {
                 yield break;
             }
-            List<(T Parent, IEnumerator<T> Children)> stack = new() { ((T)node, node.Children.GetEnumerator()) };
+            List<(T? Parent, IEnumerator<T> Children)> stack = new() { (null, node.Children.GetEnumerator()) };
             while (stack.Count > 0)
             {
                 int lastIndex = stack.Count - 1;
@@ -166,13 +166,16 @@ namespace L4D2AddonAssistant
                 }
                 else
                 {
-                    yield return current.Parent;
+                    if (current.Parent != null)
+                    {
+                        yield return current.Parent;
+                    }
                     stack.RemoveAt(lastIndex);
                 }
             }
         }
 
-        public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
         {
             foreach (var element in node.GetDescendantsByDfsPostorder())
             {

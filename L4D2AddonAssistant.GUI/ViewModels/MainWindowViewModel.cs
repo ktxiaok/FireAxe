@@ -1,4 +1,5 @@
 ﻿using ReactiveUI;
+using Serilog;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -98,14 +99,11 @@ namespace L4D2AddonAssistant.ViewModels
                     var lastOpenDir = _settings.LastOpenDirectory;
                     if (lastOpenDir != null)
                     {
+                        _settings.LastOpenDirectory = null;
+                        _settings.Save();
                         if (Directory.Exists(lastOpenDir))
                         {
                             OpenDirectory(lastOpenDir);
-                        }
-                        else
-                        {
-                            _settings.LastOpenDirectory = null;
-                            _settings.Save();
                         }
                     }
                 }
@@ -162,10 +160,7 @@ namespace L4D2AddonAssistant.ViewModels
                     _addonRoot.GamePath = _settings.GamePath;
                     _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
-                    foreach (var addonNode in _addonRoot.GetAllNodes())
-                    {
-                        addonNode.Check();
-                    }
+                    _addonRoot.CheckAll();
                     AddonNodeExplorerViewModel = new(_addonRoot);
                 }
                 this.RaisePropertyChanged();
@@ -220,12 +215,9 @@ namespace L4D2AddonAssistant.ViewModels
 
             var addonRoot = new AddonRoot();
             addonRoot.DirectoryPath = dirPath;
-            // TEST
-            //DesignHelper.AddTestAddonNodes(addonRoot);
             AddonRoot = addonRoot;
 
             _settings.LastOpenDirectory = dirPath;
-            _settings.Save();
         }
 
         public void Save()

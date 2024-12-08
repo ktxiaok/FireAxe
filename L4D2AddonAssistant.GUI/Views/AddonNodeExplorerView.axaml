@@ -81,13 +81,13 @@
         VerticalAlignment="Center">
         <Panel>
           <Button
-          Command="{Binding ToggleOrderDirection}"
-          Content="{x:Static r:Texts.Ascending}"
-          IsVisible="{Binding IsAscendingOrder}"/>
+            Command="{Binding ToggleOrderDirection}"
+            Content="{x:Static r:Texts.Ascending}"
+            IsVisible="{Binding IsAscendingOrder, FallbackValue=false}"/>
           <Button
             Command="{Binding ToggleOrderDirection}"
             Content="{x:Static r:Texts.Descending}"
-            IsVisible="{Binding !IsAscendingOrder}"/>
+            IsVisible="{Binding !IsAscendingOrder, FallbackValue=false}"/>
         </Panel>
         <ComboBox
           Classes="EnumComboBox"
@@ -115,7 +115,7 @@
           Margin="5"/>
         <Button
           Command="{Binding ClearSearchText}"
-          IsVisible="{Binding IsSearchTextClearable}"
+          IsVisible="{Binding IsSearchTextClearable, FallbackValue=false}"
           Background="Transparent"
           VerticalAlignment="Center"
           Margin="5">
@@ -162,7 +162,7 @@
           </Button.Flyout>
         </Button>
         <TextBlock
-          IsVisible="{Binding IsSearching}"
+          IsVisible="{Binding IsSearching, FallbackValue=false}"
           Text="{x:Static r:Texts.SearchingMessage}"
           VerticalAlignment="Center"
           Margin="5"/>
