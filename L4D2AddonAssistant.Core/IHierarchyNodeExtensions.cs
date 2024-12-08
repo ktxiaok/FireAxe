@@ -141,20 +141,20 @@ namespace L4D2AddonAssistant
             return new HierarchyPreorderDfs<T>(enumerator, skip);
         }
 
-        public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public static IEnumerable<T> GetDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
         {
             if (!node.IsNonterminal)
             {
-                yield return (T)node;
+                yield break;
             }
-            List<(T parent, IEnumerator<T> children)> stack = new() { ((T)node, node.Children.GetEnumerator()) };
+            List<(T? Parent, IEnumerator<T> Children)> stack = new() { (null, node.Children.GetEnumerator()) };
             while (stack.Count > 0)
             {
                 int lastIndex = stack.Count - 1;
                 var current = stack[lastIndex];
-                if (current.children.MoveNext())
+                if (current.Children.MoveNext())
                 {
-                    T child = current.children.Current;
+                    T child = current.Children.Current;
                     if (child.IsNonterminal)
                     {
                         stack.Add((child, child.Children.GetEnumerator()));
@@ -166,10 +166,22 @@ namespace L4D2AddonAssistant
                 }
                 else
                 {
-                    yield return current.parent;
+                    if (current.Parent != null)
+                    {
+                        yield return current.Parent;
+                    }
                     stack.RemoveAt(lastIndex);
                 }
             }
+        }
+
+        public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
+        {
+            foreach (var element in node.GetDescendantsByDfsPostorder())
+            {
+                yield return element;
+            }
+            yield return (T)node;
         }
     }
 

@@ -14,6 +14,7 @@ namespace L4D2AddonAssistant
         private string? _language = null;
         private string _gamePath = "";
         private bool _isAutoUpdateWorkshopItem = true;
+        private string? _suppressedUpdateRequestVersion = null;
 
         private string _settingsFilePath;
 
@@ -96,6 +97,19 @@ namespace L4D2AddonAssistant
             set
             {
                 if (NotifyAndSetIfChanged(ref _isAutoUpdateWorkshopItem, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public string? SuppressedUpdateRequestVersion
+        {
+            get => _suppressedUpdateRequestVersion;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _suppressedUpdateRequestVersion, value))
                 {
                     RequestSave = true;
                 }

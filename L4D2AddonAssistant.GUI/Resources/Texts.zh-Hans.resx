@@ -123,6 +123,12 @@
   <data name="AboutApp" xml:space="preserve">
     <value>关于L4D2AddonAssistant</value>
   </data>
+  <data name="AddonChildProblemExplain" xml:space="preserve">
+    <value>子项目中存在问题。</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
+    <value>对应的文件“{0}”不存在。</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>模组“{0}”拒绝了移动或重命名。可能存在正在进行的任务。请稍后再试。</value>
   </data>
@@ -153,6 +159,12 @@
   <data name="CheckAllTip" xml:space="preserve">
     <value>检查所有的模组以保持它们的状态最新。</value>
   </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="CheckingForUpdatesMessage" xml:space="preserve">
+    <value>正在检查更新...</value>
+  </data>
   <data name="ClearAllCachesTip" xml:space="preserve">
     <value>清除所有模组的缓存。</value>
   </data>
@@ -164,6 +176,9 @@
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
+  </data>
+  <data name="CurrentVersionLatestMessage" xml:space="preserve">
+    <value>当前版本已是最新版本。</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>默认</value>
@@ -191,6 +206,9 @@
   </data>
   <data name="Enable" xml:space="preserve">
     <value>启用</value>
+  </data>
+  <data name="EnabledOrDisabled" xml:space="preserve">
+    <value>启用/禁用</value>
   </data>
   <data name="EnableRecursively" xml:space="preserve">
     <value>递归启用（包括所有子项目）</value>
@@ -249,11 +267,17 @@
   <data name="ExceptionOccurMessage" xml:space="preserve">
     <value>在操作中发生了异常！</value>
   </data>
+  <data name="FailedToGetLatestVersion" xml:space="preserve">
+    <value>获取最新版本失败。</value>
+  </data>
   <data name="FavoritesColon" xml:space="preserve">
     <value>收藏量：</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>文件</value>
+  </data>
+  <data name="FileDownloadUncompleted" xml:space="preserve">
+    <value>文件未下载完成！</value>
   </data>
   <data name="FileSizeColon" xml:space="preserve">
     <value>文件大小：</value>
@@ -264,11 +288,20 @@
   <data name="GamePath" xml:space="preserve">
     <value>游戏路径</value>
   </data>
+  <data name="GetPublishedFileDetailsProblemExplain" xml:space="preserve">
+    <value>获取发布文件详情失败。</value>
+  </data>
+  <data name="GoToDownload" xml:space="preserve">
+    <value>去下载</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>组</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>帮助</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>忽略</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>
@@ -306,6 +339,9 @@
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>目标组是源组的子组。</value>
   </data>
+  <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
+    <value>无效的发布文件ID。</value>
+  </data>
   <data name="ItemId" xml:space="preserve">
     <value>项目ID</value>
   </data>
@@ -336,6 +372,9 @@
   <data name="New" xml:space="preserve">
     <value>新建</value>
   </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>有可用的新版本：{0}</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>否</value>
   </data>
@@ -359,6 +398,9 @@
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>准备中...</value>
+  </data>
+  <data name="Problems" xml:space="preserve">
+    <value>问题</value>
   </data>
   <data name="PublishedFileDetails" xml:space="preserve">
     <value>发布文件详情</value>
@@ -417,6 +459,9 @@
   <data name="UnnamedWorkshopAddon" xml:space="preserve">
     <value>未命名创意工坊模组</value>
   </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
   <data name="UseRegex" xml:space="preserve">
     <value>使用正则表达式</value>
   </data>
@@ -437,6 +482,9 @@
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>创意工坊项目自动更新</value>
+  </data>
+  <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
+    <value>创意工坊VPK文件没有装载。</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>是</value>

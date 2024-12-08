@@ -2,6 +2,7 @@
 using ReactiveUI;
 using Serilog;
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -23,6 +24,8 @@ namespace L4D2AddonAssistant.ViewModels
         private byte[]? _rawImage = null;
 
         private ObservableAsPropertyHelper<AddonNodeEnableState>? _enableState = null;
+
+        private bool _hasProblem = false;
 
         private readonly bool _shouldShowFolderIcon;
         private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
@@ -46,6 +49,16 @@ namespace L4D2AddonAssistant.ViewModels
             this.WhenActivated((CompositeDisposable disposables) =>
             {
                 _isActive = true;
+
+                var addon = AddonNode;
+
+                UpdateHasProblem();
+                NotifyCollectionChangedEventHandler problemsSubscription = (object? sender, NotifyCollectionChangedEventArgs e) =>
+                {
+                    UpdateHasProblem();
+                };
+                ((INotifyCollectionChanged)addon.Problems).CollectionChanged += problemsSubscription;
+                
 
                 _enableState = _addonNode.WhenAnyValue(x => x.IsEnabled, x => x.IsEnabledInHierarchy)
                 .Select(((bool isEnabled, bool isEnabledInHierarchy) enableState) =>
@@ -90,6 +103,8 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     _isActive = false;
 
+                    ((INotifyCollectionChanged)addon.Problems).CollectionChanged -= problemsSubscription;
+
                     _enableState.Dispose();
                     _enableState = null;
 
@@ -133,6 +148,12 @@ namespace L4D2AddonAssistant.ViewModels
         }
 
         public AddonNodeEnableState EnableState => _enableState?.Value ?? AddonNodeEnableState.Disabled;
+
+        public bool HasProblem
+        {
+            get => _hasProblem;
+            private set => this.RaiseAndSetIfChanged(ref _hasProblem, value);
+        }
 
         public bool ShouldShowFolderIcon => _shouldShowFolderIcon;
 
@@ -206,6 +227,11 @@ namespace L4D2AddonAssistant.ViewModels
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = null;
             }
+        }
+
+        private void UpdateHasProblem()
+        {
+            HasProblem = AddonNode.Problems.Count > 0;
         }
     }
 }

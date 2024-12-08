@@ -79,6 +79,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 There&apos;re problems in subitems. 的本地化字符串。
+        /// </summary>
+        public static string AddonChildProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonChildProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The corresponding file &quot;{0}&quot; doesn&apos;t exist. 的本地化字符串。
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
@@ -169,6 +187,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Check for updates 的本地化字符串。
+        /// </summary>
+        public static string CheckForUpdates {
+            get {
+                return ResourceManager.GetString("CheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Checking for updates... 的本地化字符串。
+        /// </summary>
+        public static string CheckingForUpdatesMessage {
+            get {
+                return ResourceManager.GetString("CheckingForUpdatesMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Clear caches of all addons. 的本地化字符串。
         /// </summary>
         public static string ClearAllCachesTip {
@@ -201,6 +237,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string ConfirmDeleteMessage {
             get {
                 return ResourceManager.GetString("ConfirmDeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The current version is latest. 的本地化字符串。
+        /// </summary>
+        public static string CurrentVersionLatestMessage {
+            get {
+                return ResourceManager.GetString("CurrentVersionLatestMessage", resourceCulture);
             }
         }
         
@@ -282,6 +327,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Enable {
             get {
                 return ResourceManager.GetString("Enable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Enabled/Disabled 的本地化字符串。
+        /// </summary>
+        public static string EnabledOrDisabled {
+            get {
+                return ResourceManager.GetString("EnabledOrDisabled", resourceCulture);
             }
         }
         
@@ -457,6 +511,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Failed to retrieve the latest version. 的本地化字符串。
+        /// </summary>
+        public static string FailedToGetLatestVersion {
+            get {
+                return ResourceManager.GetString("FailedToGetLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Favorites:  的本地化字符串。
         /// </summary>
         public static string FavoritesColon {
@@ -471,6 +534,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string File {
             get {
                 return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The file download is uncompleted! 的本地化字符串。
+        /// </summary>
+        public static string FileDownloadUncompleted {
+            get {
+                return ResourceManager.GetString("FileDownloadUncompleted", resourceCulture);
             }
         }
         
@@ -502,6 +574,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Failed to get the published file details. 的本地化字符串。
+        /// </summary>
+        public static string GetPublishedFileDetailsProblemExplain {
+            get {
+                return ResourceManager.GetString("GetPublishedFileDetailsProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Go to download 的本地化字符串。
+        /// </summary>
+        public static string GoToDownload {
+            get {
+                return ResourceManager.GetString("GoToDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Group 的本地化字符串。
         /// </summary>
         public static string Group {
@@ -516,6 +606,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Ignore 的本地化字符串。
+        /// </summary>
+        public static string Ignore {
+            get {
+                return ResourceManager.GetString("Ignore", resourceCulture);
             }
         }
         
@@ -628,6 +727,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Invalid published file id. 的本地化字符串。
+        /// </summary>
+        public static string InvalidPublishedFileIdMessage {
+            get {
+                return ResourceManager.GetString("InvalidPublishedFileIdMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Item ID 的本地化字符串。
         /// </summary>
         public static string ItemId {
@@ -718,6 +826,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 New version available: {0} 的本地化字符串。
+        /// </summary>
+        public static string NewVersionAvailable {
+            get {
+                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 No 的本地化字符串。
         /// </summary>
         public static string No {
@@ -786,6 +903,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string PreparingMessage {
             get {
                 return ResourceManager.GetString("PreparingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Problems 的本地化字符串。
+        /// </summary>
+        public static string Problems {
+            get {
+                return ResourceManager.GetString("Problems", resourceCulture);
             }
         }
         
@@ -961,6 +1087,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Update 的本地化字符串。
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Use Regex 的本地化字符串。
         /// </summary>
         public static string UseRegex {
@@ -1020,6 +1155,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string WorkshopItemAutoUpdate {
             get {
                 return ResourceManager.GetString("WorkshopItemAutoUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The workshop vpk file is not loaded. 的本地化字符串。
+        /// </summary>
+        public static string WorkshopVpkFileNotLoadProblemExplain {
+            get {
+                return ResourceManager.GetString("WorkshopVpkFileNotLoadProblemExplain", resourceCulture);
             }
         }
         

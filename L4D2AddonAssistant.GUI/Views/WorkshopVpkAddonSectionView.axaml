@@ -14,10 +14,19 @@
     RowDefinitions="Auto, Auto, Auto, Auto, Auto"
     ColumnDefinitions="Auto, *">
     <!--title-->
-    <TextBlock
+    <StackPanel
       Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-      Text="{x:Static r:Texts.Workshop}"
-      Classes="Heading1"/>
+      Orientation="Vertical">
+      <TextBlock
+        Text="{x:Static r:Texts.Workshop}"
+        Classes="Heading1"/>
+      <TextBlock
+        Text="{x:Static r:Texts.FileDownloadUncompleted}"
+        IsVisible="{Binding !IsFileDownloadCompleted}"
+        Foreground="OrangeRed"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"/>
+    </StackPanel>
 
     <!--item id-->
     <TextBlock

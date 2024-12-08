@@ -15,6 +15,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         private readonly ObservableAsPropertyHelper<string> _displayItemId;
 
+        private ObservableAsPropertyHelper<bool>? _isFileDownloadCompleted = null;
+
         private CancellationTokenSource? _cts = null;
 
         public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
@@ -50,9 +52,16 @@ namespace L4D2AddonAssistant.ViewModels
                 })
                 .DisposeWith(disposables);
 
+                _isFileDownloadCompleted = addon.WhenAnyValue(x => x.FullVpkFilePath)
+                .Select(path => path != null)
+                .ToProperty(this, nameof(IsFileDownloadCompleted));
+
                 Disposable.Create(() =>
                 {
                     CancelTasks();
+
+                    _isFileDownloadCompleted.Dispose();
+                    _isFileDownloadCompleted = null;
                 }).DisposeWith(disposables);
             });
         }
@@ -77,6 +86,8 @@ namespace L4D2AddonAssistant.ViewModels
         }
 
         public string DisplayItemId => _displayItemId.Value;
+
+        public bool IsFileDownloadCompleted => _isFileDownloadCompleted?.Value ?? false;
 
         public DownloadItemViewModel? DownloadItemViewModel
         {

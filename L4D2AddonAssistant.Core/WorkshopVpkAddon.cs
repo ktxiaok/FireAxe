@@ -174,6 +174,11 @@ namespace L4D2AddonAssistant
                     _checkTaskPending = true;
                 }
             }
+
+            if (FullVpkFilePath == null)
+            {
+                AddProblem(new WorkshopVpkFileNotLoadProblem(this));
+            }
         }
 
         private void CreateCheckTask(ulong publishedFileId)
@@ -212,14 +217,16 @@ namespace L4D2AddonAssistant
                         Log.Error(ex, "Exception occurred during reading meta info file: {FilePath}", metaInfoPath);
                     }
                 }
+                string? vpkPathPreview = null;
                 if (metaInfo != null)
                 {
-                    var vpkPathPreview = Path.Join(dirPath, metaInfo.CurrentFile);
-                    if (File.Exists(vpkPathPreview))
+                    var path = Path.Join(dirPath, metaInfo.CurrentFile);
+                    if (File.Exists(path))
                     {
-                        _vpkPath = vpkPathPreview;
+                        vpkPathPreview = path;
                     }
                 }
+                SetVpkPath(vpkPathPreview);
 
                 _checkTask = Task.Run(() =>
                 {
@@ -232,8 +239,10 @@ namespace L4D2AddonAssistant
                         }
                         else
                         {
-                            var problem = new GetPublishedFileDetailsProblem(this, result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId);
-                            problems.Add(problem);
+                            if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
+                            {
+                                problems.Add(new InvalidPublishedFileIdProblem(this));
+                            }
                         }
                     }
 
@@ -323,7 +332,7 @@ namespace L4D2AddonAssistant
                     {
                         AddProblem(problem);
                     }
-                    _vpkPath = resultVpkPath;
+                    SetVpkPath(resultVpkPath);
 
                     if (task.Exception != null)
                     {
@@ -463,6 +472,12 @@ namespace L4D2AddonAssistant
                 return Task.FromResult(new GetPublishedFileDetailsResult(null, GetPublishedFileDetailsResultStatus.Failed));
             }
             return WebUtils.GetPublishedFileDetailsAsync(_publishedFileId.Value, Root.HttpClient, cancellationToken);
+        }
+
+        private void SetVpkPath(string? path)
+        {
+            _vpkPath = path;
+            NotifyChanged(nameof(FullVpkFilePath));
         }
     }
 }

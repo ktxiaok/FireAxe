@@ -123,6 +123,12 @@
   <data name="AboutApp" xml:space="preserve">
     <value>About L4D2AddonAssistant</value>
   </data>
+  <data name="AddonChildProblemExplain" xml:space="preserve">
+    <value>There're problems in subitems.</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
+    <value>The corresponding file "{0}" doesn't exist.</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
   </data>
@@ -153,6 +159,12 @@
   <data name="CheckAllTip" xml:space="preserve">
     <value>Check all addons to keep their status up to date.</value>
   </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="CheckingForUpdatesMessage" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
   <data name="ClearAllCachesTip" xml:space="preserve">
     <value>Clear caches of all addons.</value>
   </data>
@@ -164,6 +176,9 @@
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
+  </data>
+  <data name="CurrentVersionLatestMessage" xml:space="preserve">
+    <value>The current version is latest.</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>
@@ -191,6 +206,9 @@
   </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
+  </data>
+  <data name="EnabledOrDisabled" xml:space="preserve">
+    <value>Enabled/Disabled</value>
   </data>
   <data name="EnableRecursively" xml:space="preserve">
     <value>Enable Recursively (including all subitems)</value>
@@ -249,11 +267,17 @@
   <data name="ExceptionOccurMessage" xml:space="preserve">
     <value>Exception occurred during the operation!</value>
   </data>
+  <data name="FailedToGetLatestVersion" xml:space="preserve">
+    <value>Failed to retrieve the latest version.</value>
+  </data>
   <data name="FavoritesColon" xml:space="preserve">
     <value>Favorites: </value>
   </data>
   <data name="File" xml:space="preserve">
     <value>File</value>
+  </data>
+  <data name="FileDownloadUncompleted" xml:space="preserve">
+    <value>The file download is uncompleted!</value>
   </data>
   <data name="FileSizeColon" xml:space="preserve">
     <value>File Size: </value>
@@ -264,11 +288,20 @@
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
+  <data name="GetPublishedFileDetailsProblemExplain" xml:space="preserve">
+    <value>Failed to get the published file details.</value>
+  </data>
+  <data name="GoToDownload" xml:space="preserve">
+    <value>Go to download</value>
+  </data>
   <data name="Group" xml:space="preserve">
     <value>Group</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ignore</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>
@@ -306,6 +339,9 @@
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>The target group is the subgroup of the source group.</value>
   </data>
+  <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
+    <value>Invalid published file id.</value>
+  </data>
   <data name="ItemId" xml:space="preserve">
     <value>Item ID</value>
   </data>
@@ -336,6 +372,9 @@
   <data name="New" xml:space="preserve">
     <value>New</value>
   </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>New version available: {0}</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
@@ -359,6 +398,9 @@
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
+  </data>
+  <data name="Problems" xml:space="preserve">
+    <value>Problems</value>
   </data>
   <data name="PublishedFileDetails" xml:space="preserve">
     <value>Published File Details</value>
@@ -417,6 +459,9 @@
   <data name="UnnamedWorkshopAddon" xml:space="preserve">
     <value>Unnamed Workshop Addon</value>
   </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
   <data name="UseRegex" xml:space="preserve">
     <value>Use Regex</value>
   </data>
@@ -437,6 +482,9 @@
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>Workshop Item Auto Update</value>
+  </data>
+  <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
+    <value>The workshop vpk file is not loaded.</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

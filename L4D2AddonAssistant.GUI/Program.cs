@@ -94,6 +94,7 @@ namespace L4D2AddonAssistant
         {
             var defaultManager = ObjectExplanationManager.Default;
             ExceptionExplanations.Register(defaultManager);
+            AddonProblemExplanations.Register(defaultManager);
         }
     }
 }

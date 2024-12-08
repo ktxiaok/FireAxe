@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serilog;
+using System;
+using System.Diagnostics;
 
 namespace L4D2AddonAssistant
 {
@@ -22,6 +24,23 @@ namespace L4D2AddonAssistant
         {
             GetReadableBytes(bytes, out double value, out string unit);
             return value.ToString("F1") + unit;
+        }
+
+        public static void OpenWebsite(string url)
+        {
+            ArgumentNullException.ThrowIfNull(url);
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(url)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during Utils.OpenWebsite");
+            }
         }
     }
 }
