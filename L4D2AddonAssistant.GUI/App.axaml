@@ -5,7 +5,7 @@
   xmlns:local="using:L4D2AddonAssistant"
   xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
   xmlns:dt="using:L4D2AddonAssistant.DataTemplates"
-  RequestedThemeVariant="Default">
+  RequestedThemeVariant="Dark">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
   <Application.DataTemplates>
