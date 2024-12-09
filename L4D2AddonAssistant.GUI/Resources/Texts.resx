@@ -177,6 +177,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
   </data>
+  <data name="CreationTimeColon" xml:space="preserve">
+    <value>Creation Time: </value>
+  </data>
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>The current version is latest.</value>
   </data>
@@ -240,11 +243,17 @@
   <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
     <value>Small Tile View</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
+    <value>Sort By Creation Time</value>
+  </data>
   <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
     <value>Default Order</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
     <value>Sort By State</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
+    <value>Sort By File Creation Time</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
     <value>Sort By File Size</value>

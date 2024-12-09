@@ -11,5 +11,7 @@ namespace L4D2AddonAssistant
         public bool IsEnabled { get; set; } = false;
 
         public string Name { get; set; } = "";
+
+        public DateTime CreationTime { get; set; }
     }
 }

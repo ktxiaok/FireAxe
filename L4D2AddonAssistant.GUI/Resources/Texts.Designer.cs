@@ -241,6 +241,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Creation Time:  的本地化字符串。
+        /// </summary>
+        public static string CreationTimeColon {
+            get {
+                return ResourceManager.GetString("CreationTimeColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The current version is latest. 的本地化字符串。
         /// </summary>
         public static string CurrentVersionLatestMessage {
@@ -430,6 +439,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Sort By Creation Time 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_CreationTime {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_CreationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Default Order 的本地化字符串。
         /// </summary>
         public static string Enum_AddonNodeSortMethod_Default {
@@ -444,6 +462,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Enum_AddonNodeSortMethod_EnableState {
             get {
                 return ResourceManager.GetString("Enum_AddonNodeSortMethod_EnableState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sort By File Creation Time 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_FileCreationTime {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_FileCreationTime", resourceCulture);
             }
         }
         

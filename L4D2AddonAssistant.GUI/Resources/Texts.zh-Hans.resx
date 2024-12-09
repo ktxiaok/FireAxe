@@ -177,6 +177,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
   </data>
+  <data name="CreationTimeColon" xml:space="preserve">
+    <value>创建时间：</value>
+  </data>
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>当前版本已是最新版本。</value>
   </data>
@@ -240,11 +243,17 @@
   <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
     <value>小瓦片视图</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
+    <value>按创建时间排序</value>
+  </data>
   <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
     <value>默认顺序</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
     <value>按启用状态排序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
+    <value>按文件创建时间排序</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
     <value>按文件大小排序</value>
