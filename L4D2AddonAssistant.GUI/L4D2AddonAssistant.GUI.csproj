@@ -9,6 +9,7 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>L4D2AddonAssistant</RootNamespace>
     <ApplicationIcon>Assets/AppLogo.ico</ApplicationIcon>
+    <AssemblyName>L4D2AddonAssistant</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

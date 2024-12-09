@@ -1,6 +1,7 @@
 - add: creation time display
 - add: sort by creation time
 - add: randomly select
+- fix: fix some bugs
 # v0.2.0
 - improve: AddonNodeView
 - fix: WorkshopVpkAddon.FullVpkFilePath is sometimes not updated

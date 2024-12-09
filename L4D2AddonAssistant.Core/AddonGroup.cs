@@ -25,7 +25,6 @@ namespace L4D2AddonAssistant
                     case AddonGroupEnableStrategy.Single:
                     case AddonGroupEnableStrategy.SingleRandom:
                         {
-                            group.IsEnabled = false;
                             foreach (var child in group.Children)
                             {
                                 child.IsEnabled = false;
@@ -164,15 +163,6 @@ namespace L4D2AddonAssistant
             children[Random.Shared.Next(count)].IsEnabled = true;
         }
 
-        protected override void OnCheck()
-        {
-            base.OnCheck();
-            if (EnableStrategyProblem.TryCreate(this, out var problem))
-            {
-                AddProblem(problem);
-            }
-        }
-
         protected override void OnPostCheck()
         {
             base.OnPostCheck();
@@ -185,6 +175,11 @@ namespace L4D2AddonAssistant
                     break;
                 }
             }
+
+            if (EnableStrategyProblem.TryCreate(this, out var problem))
+            {
+                AddProblem(problem);
+            }
         }
 
         protected virtual void OnChildEnableOrDisable(AddonNode child)
@@ -196,7 +191,6 @@ namespace L4D2AddonAssistant
                     {
                         if (child.IsEnabled)
                         {
-                            IsEnabled = true;
                             foreach (var child1 in Children)
                             {
                                 if (child1 == child)
@@ -208,7 +202,6 @@ namespace L4D2AddonAssistant
                         }
                         else
                         {
-                            IsEnabled = false;
                             foreach (var child1 in Children)
                             {
                                 child1.IsEnabled = false;

@@ -79,7 +79,7 @@ namespace L4D2AddonAssistant
                 {
                     Group.NotifyChildEnableOrDisable(this);
                 }
-                AutoCheck();
+                //AutoCheck();
                 Root.RequestSave = true;
             }
         }

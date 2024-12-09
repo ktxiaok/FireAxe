@@ -12,7 +12,6 @@
     Margin="50">
     <TextBlock
       Text="{x:Static r:Texts.CheckingForUpdatesMessage}"
-      FontSize="18"
       HorizontalAlignment="Center"
       VerticalAlignment="Center"/>
   </Panel>
