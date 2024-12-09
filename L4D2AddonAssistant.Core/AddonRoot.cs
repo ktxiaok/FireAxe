@@ -44,6 +44,8 @@ namespace L4D2AddonAssistant
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
         }
 
+        public event Action<IDownloadItem>? NewDownloadItem = null;
+
         [AllowNull]
         public TaskScheduler TaskScheduler
         {
@@ -490,7 +492,7 @@ namespace L4D2AddonAssistant
                 var tasks = new List<Task>();
                 foreach (var node in Nodes)
                 {
-                    tasks.Add(node.DestroyAsync(false));
+                    tasks.Add(node.DestroyAsync());
                 }
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
@@ -520,6 +522,13 @@ namespace L4D2AddonAssistant
                     _blockAutoCheck--;
                 }
             });
+        }
+
+        public void NotifyDownloadItem(IDownloadItem downloadItem)
+        {
+            ArgumentNullException.ThrowIfNull(downloadItem);
+
+            NewDownloadItem?.Invoke(downloadItem);
         }
         
         internal void AddNode(AddonNode node)

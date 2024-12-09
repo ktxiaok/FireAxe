@@ -20,7 +20,12 @@ namespace L4D2AddonAssistant
             set
             {
                 s_currentLanguage = value;
-                Texts.Culture = value == null ? null : new CultureInfo(value);
+                var culture = value == null ? null : new CultureInfo(value);
+                Texts.Culture = culture;
+                if (culture != null)
+                {
+                    CultureInfo.CurrentUICulture = culture;
+                }
             }
         }
     }

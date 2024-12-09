@@ -27,7 +27,6 @@ namespace L4D2AddonAssistant
         private string? _vpkPath = null;
 
         private Task? _checkTask = null;
-        private bool _checkTaskPending = false;
 
         private IDownloadItem? _download = null;
 
@@ -89,7 +88,16 @@ namespace L4D2AddonAssistant
         public IDownloadItem? DownloadItem
         {
             get => _download;
-            set => NotifyAndSetIfChanged(ref _download, value);
+            set 
+            { 
+                if (NotifyAndSetIfChanged(ref _download, value))
+                {
+                    if (value != null)
+                    {
+                        Root.NotifyDownloadItem(value);
+                    }
+                }
+            }
         }
 
         public static bool TryParsePublishedFileId(string input, out ulong id)
@@ -168,10 +176,6 @@ namespace L4D2AddonAssistant
                 if (_checkTask == null)
                 {
                     CreateCheckTask(_publishedFileId.Value);
-                }
-                else
-                {
-                    _checkTaskPending = true;
                 }
             }
 
@@ -346,15 +350,6 @@ namespace L4D2AddonAssistant
                             Log.Error(ex, "Exception occurred during the check task of WorkshopVpkAddon.");
                         }
                     }
-
-                    if (_checkTaskPending)
-                    {
-                        _checkTaskPending = false;
-                        if (_publishedFileId.HasValue)
-                        {
-                            CreateCheckTask(_publishedFileId.Value);
-                        }
-                    }
                 }, addonRootTaskScheduler);
             }
             catch (Exception ex)
@@ -430,7 +425,6 @@ namespace L4D2AddonAssistant
             {
                 tasks.Add(_checkTask);
             }
-            _checkTaskPending = false;
 
             if (_getPublishedFileDetailsTask != null)
             {

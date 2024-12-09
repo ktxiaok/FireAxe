@@ -397,7 +397,14 @@ namespace L4D2AddonAssistant.ViewModels
                     continue;
                 }
                 // TODO
-                node.DestroyAsync(!retainFile);
+                if (retainFile)
+                {
+                    node.DestroyAsync();
+                }
+                else
+                {
+                    node.DestroyWithFileAsync();
+                }
             }
         }
 

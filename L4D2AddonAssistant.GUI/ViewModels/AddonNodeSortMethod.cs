@@ -7,6 +7,7 @@ namespace L4D2AddonAssistant.ViewModels
         Default,
         Name,
         EnableState,
+        CreationTime,
         FileSize
     }
 }

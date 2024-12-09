@@ -32,6 +32,8 @@ namespace L4D2AddonAssistant
 
         private long? _fileSize = null;
 
+        private DateTime _creationTime = DateTime.Now;
+
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
             OnInitSelf();
@@ -77,7 +79,7 @@ namespace L4D2AddonAssistant
                 {
                     Group.NotifyChildEnableOrDisable(this);
                 }
-                AutoCheck();
+                //AutoCheck();
                 Root.RequestSave = true;
             }
         }
@@ -199,6 +201,12 @@ namespace L4D2AddonAssistant
         {
             get => _fileSize;
             private set => NotifyAndSetIfChanged(ref _fileSize, value);
+        }
+
+        public DateTime CreationTime
+        {
+            get => _creationTime;
+            set => NotifyAndSetIfChanged(ref _creationTime, value);
         }
 
         internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
@@ -327,18 +335,14 @@ namespace L4D2AddonAssistant
             UpdateEnabledInHierarchy();
         }
 
-        public Task DestroyAsync(bool deleteFile)
+        public Task DestroyAsync()
         {
-            string? pathToDelete = null;
-            if (deleteFile && RequireFile)
-            {
-                pathToDelete = FullFilePath;
-            }
             var tasks = new List<Task>();
             foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
             {
                 tasks.Add(node.OnDestroyAsync());
             }
+
             if (Group == null)
             {
                 Root.RemoveNode(this);
@@ -347,7 +351,20 @@ namespace L4D2AddonAssistant
             {
                 Group.RemoveChild(this);
             }
+
             var resultTask = Task.WhenAll(tasks);
+            return resultTask;
+        }
+
+        public Task DestroyWithFileAsync()
+        {
+            string? pathToDelete = null;
+            if (RequireFile)
+            {
+                pathToDelete = FullFilePath;
+            }
+
+            var resultTask = DestroyAsync();
             if (pathToDelete != null)
             {
                 resultTask = resultTask.ContinueWith((task) =>
@@ -362,6 +379,7 @@ namespace L4D2AddonAssistant
                     }
                 });
             }
+
             return resultTask;
         }
 
@@ -549,18 +567,24 @@ namespace L4D2AddonAssistant
 
             if (RequireFile)
             {
+                var fullFilePath = FullFilePath;
+
                 try
                 {
-                    var path = FullFilePath;
-                    if (!File.Exists(path) && !Directory.Exists(path))
+                    if (!File.Exists(fullFilePath) && !Directory.Exists(fullFilePath))
                     {
                         AddProblem(new AddonFileNotExistProblem(this));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Exception occurred during AddonNode.OnPostCheck");
+                    LogException(ex);
                 }
+            }
+
+            void LogException(Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during AddonNode.OnPostCheck");
             }
         }
 
@@ -587,12 +611,17 @@ namespace L4D2AddonAssistant
         {
             save.IsEnabled = IsEnabled;
             save.Name = Name;
+            save.CreationTime = CreationTime;
         }
 
         protected virtual void OnLoadSave(AddonNodeSave save)
         {
             IsEnabled = save.IsEnabled;
             Name = save.Name;
+            if (save.CreationTime != default)
+            {
+                CreationTime = save.CreationTime;
+            }
         }
 
         internal virtual void OnInitSelf()

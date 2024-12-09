@@ -97,6 +97,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The strategy of enablement of the group is not applied correctly. 的本地化字符串。
+        /// </summary>
+        public static string AddonGroupEnableStrategyProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonGroupEnableStrategyProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
@@ -147,6 +156,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string AutoUpdateStrategy {
             get {
                 return ResourceManager.GetString("AutoUpdateStrategy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Cancel 的本地化字符串。
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
             }
         }
         
@@ -241,6 +259,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Creation Time:  的本地化字符串。
+        /// </summary>
+        public static string CreationTimeColon {
+            get {
+                return ResourceManager.GetString("CreationTimeColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The current version is latest. 的本地化字符串。
         /// </summary>
         public static string CurrentVersionLatestMessage {
@@ -313,11 +340,29 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Do not open the directory &quot;left4dead2/addons&quot;. 的本地化字符串。
+        /// </summary>
+        public static string DontOpenGameAddonsDirectory {
+            get {
+                return ResourceManager.GetString("DontOpenGameAddonsDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Download 的本地化字符串。
         /// </summary>
         public static string Download {
             get {
                 return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Download List 的本地化字符串。
+        /// </summary>
+        public static string DownloadList {
+            get {
+                return ResourceManager.GetString("DownloadList", resourceCulture);
             }
         }
         
@@ -430,6 +475,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Sort By Creation Time 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_CreationTime {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_CreationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Default Order 的本地化字符串。
         /// </summary>
         public static string Enum_AddonNodeSortMethod_Default {
@@ -444,6 +498,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Enum_AddonNodeSortMethod_EnableState {
             get {
                 return ResourceManager.GetString("Enum_AddonNodeSortMethod_EnableState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Sort By File Creation Time 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_FileCreationTime {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_FileCreationTime", resourceCulture);
             }
         }
         
@@ -853,6 +916,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 None 的本地化字符串。
+        /// </summary>
+        public static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Null 的本地化字符串。
         /// </summary>
         public static string Null {
@@ -894,6 +966,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Operations {
             get {
                 return ResourceManager.GetString("Operations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Pause 的本地化字符串。
+        /// </summary>
+        public static string Pause {
+            get {
+                return ResourceManager.GetString("Pause", resourceCulture);
             }
         }
         
@@ -961,11 +1042,38 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Randomly select 的本地化字符串。
+        /// </summary>
+        public static string RandomlySelect {
+            get {
+                return ResourceManager.GetString("RandomlySelect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Randomly enable a child item in groups where the strategy of enablement is &quot;Random Single&quot;. 的本地化字符串。
+        /// </summary>
+        public static string RandomlySelectTip {
+            get {
+                return ResourceManager.GetString("RandomlySelectTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Refresh 的本地化字符串。
         /// </summary>
         public static string Refresh {
             get {
                 return ResourceManager.GetString("Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Resume 的本地化字符串。
+        /// </summary>
+        public static string Resume {
+            get {
+                return ResourceManager.GetString("Resume", resourceCulture);
             }
         }
         
@@ -1065,6 +1173,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string TitleColon {
             get {
                 return ResourceManager.GetString("TitleColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tools 的本地化字符串。
+        /// </summary>
+        public static string Tools {
+            get {
+                return ResourceManager.GetString("Tools", resourceCulture);
             }
         }
         

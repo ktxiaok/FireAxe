@@ -6,6 +6,8 @@ namespace L4D2AddonAssistant
     {
         void OpenSettingsWindow();
 
+        void OpenDownloadListWindow();
+
         void OpenAboutWindow();
     }
 }

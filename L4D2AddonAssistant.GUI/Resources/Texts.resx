@@ -129,6 +129,9 @@
   <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
     <value>The corresponding file "{0}" doesn't exist.</value>
   </data>
+  <data name="AddonGroupEnableStrategyProblemExplain" xml:space="preserve">
+    <value>The strategy of enablement of the group is not applied correctly.</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="AutoUpdateStrategy" xml:space="preserve">
     <value>Auto Update Strategy</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
   <data name="CancelMove" xml:space="preserve">
     <value>Cancel Move</value>
@@ -177,6 +183,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
   </data>
+  <data name="CreationTimeColon" xml:space="preserve">
+    <value>Creation Time: </value>
+  </data>
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>The current version is latest.</value>
   </data>
@@ -201,8 +210,14 @@
   <data name="DisableRecursively" xml:space="preserve">
     <value>Disable Recursively (including all subitems)</value>
   </data>
+  <data name="DontOpenGameAddonsDirectory" xml:space="preserve">
+    <value>Do not open the directory "left4dead2/addons".</value>
+  </data>
   <data name="Download" xml:space="preserve">
     <value>Download</value>
+  </data>
+  <data name="DownloadList" xml:space="preserve">
+    <value>Download List</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
@@ -240,11 +255,17 @@
   <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
     <value>Small Tile View</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
+    <value>Sort By Creation Time</value>
+  </data>
   <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
     <value>Default Order</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
     <value>Sort By State</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
+    <value>Sort By File Creation Time</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
     <value>Sort By File Size</value>
@@ -381,6 +402,9 @@
   <data name="NoAvailableName" xml:space="preserve">
     <value>No available name</value>
   </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
   <data name="Null" xml:space="preserve">
     <value>Null</value>
   </data>
@@ -395,6 +419,9 @@
   </data>
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause</value>
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
@@ -417,8 +444,17 @@
   <data name="PushTip" xml:space="preserve">
     <value>Push enablement states of all addons to the game.</value>
   </data>
+  <data name="RandomlySelect" xml:space="preserve">
+    <value>Randomly select</value>
+  </data>
+  <data name="RandomlySelectTip" xml:space="preserve">
+    <value>Randomly enable a child item in groups where the strategy of enablement is "Random Single".</value>
+  </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
   </data>
   <data name="RetainFileMessage" xml:space="preserve">
     <value>If you do this, files will be retained.</value>
@@ -452,6 +488,9 @@
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>Title:</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
   </data>
   <data name="UnnamedGroup" xml:space="preserve">
     <value>Unnamed Group</value>

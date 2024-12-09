@@ -25,7 +25,6 @@ namespace L4D2AddonAssistant
                     case AddonGroupEnableStrategy.Single:
                     case AddonGroupEnableStrategy.SingleRandom:
                         {
-                            group.IsEnabled = false;
                             foreach (var child in group.Children)
                             {
                                 child.IsEnabled = false;
@@ -147,13 +146,21 @@ namespace L4D2AddonAssistant
             return _containerService.GetUniqueName(name);
         }
 
-        protected override void OnCheck()
+        public void EnableOneChildRandomlyIfSingleRandom()
         {
-            base.OnCheck();
-            if (EnableStrategyProblem.TryCreate(this, out var problem))
+            if (_enableStrategy != AddonGroupEnableStrategy.SingleRandom)
             {
-                AddProblem(problem);
+                return;
             }
+
+            var children = Children;
+            int count = children.Count;
+            if (count == 0)
+            {
+                return;
+            }
+
+            children[Random.Shared.Next(count)].IsEnabled = true;
         }
 
         protected override void OnPostCheck()
@@ -168,6 +175,11 @@ namespace L4D2AddonAssistant
                     break;
                 }
             }
+
+            if (EnableStrategyProblem.TryCreate(this, out var problem))
+            {
+                AddProblem(problem);
+            }
         }
 
         protected virtual void OnChildEnableOrDisable(AddonNode child)
@@ -179,7 +191,6 @@ namespace L4D2AddonAssistant
                     {
                         if (child.IsEnabled)
                         {
-                            IsEnabled = true;
                             foreach (var child1 in Children)
                             {
                                 if (child1 == child)
@@ -191,7 +202,6 @@ namespace L4D2AddonAssistant
                         }
                         else
                         {
-                            IsEnabled = false;
                             foreach (var child1 in Children)
                             {
                                 child1.IsEnabled = false;

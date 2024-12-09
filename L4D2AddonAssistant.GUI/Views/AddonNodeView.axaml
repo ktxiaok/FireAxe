@@ -84,6 +84,15 @@
       <TextBlock Text="{Binding FileSizeReadable}"/>
     </StackPanel>
 
+    <!--creation time-->
+    <StackPanel
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Margin="5">
+      <TextBlock Text="{x:Static r:Texts.CreationTimeColon}"/>
+      <TextBlock Text="{Binding AddonNode.CreationTime}"/>
+    </StackPanel>
+
     <!--buttons-->
     <StackPanel
       Orientation="Vertical">

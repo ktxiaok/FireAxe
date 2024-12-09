@@ -19,6 +19,7 @@ namespace L4D2AddonAssistant.ViewModels
         private IAppWindowManager _windowManager;
         private IDownloadService _downloadService;
         private HttpClient _httpClient;
+        private DownloadItemListViewModel _downloadItemListViewModel;
 
         private AddonRoot? _addonRoot = null;
         private IObservable<bool> _addonRootNotNull;
@@ -31,16 +32,18 @@ namespace L4D2AddonAssistant.ViewModels
         private object? _checkUpdateActivity = null;
         private CancellationTokenSource? _checkUpdateCts = null;
 
-        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient)
+        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
         {
             ArgumentNullException.ThrowIfNull(settings);
             ArgumentNullException.ThrowIfNull(windowManager);
             ArgumentNullException.ThrowIfNull(downloadService);
             ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
             _settings = settings;
             _windowManager = windowManager;
             _downloadService = downloadService;
             _httpClient = httpClient;
+            _downloadItemListViewModel = downloadItemListViewModel;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
@@ -58,16 +61,24 @@ namespace L4D2AddonAssistant.ViewModels
             OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
-                if (path != null)
+                if (path == null)
                 {
-                    OpenDirectory(path);
+                    return;
                 }
+                if (GamePathUtils.IsAddonsPath(path))
+                {
+                    await ShowDontOpenGameAddonsDirectoryInteraction.Handle(Unit.Default);
+                    return;
+                }
+                OpenDirectory(path);               
             });
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
+            OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
+            RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNull);
             OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
             CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
@@ -154,6 +165,7 @@ namespace L4D2AddonAssistant.ViewModels
                 else
                 {
                     using var blockAutoCheck = _addonRoot.BlockAutoCheck();
+                    _addonRoot.NewDownloadItem += OnAddonRootNewDownloadItem;
                     _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                     _addonRoot.DownloadService = _downloadService;
                     _addonRoot.HttpClient = _httpClient;
@@ -181,11 +193,15 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
+
         public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
         public ReactiveCommand<Unit, Unit> CheckCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ClearCachesCommand { get; } 
+
+        public ReactiveCommand<Unit, Unit> RandomlySelectCommand { get; }
 
         public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
@@ -209,9 +225,16 @@ namespace L4D2AddonAssistant.ViewModels
 
         public Interaction<Unit, Unit> ShowCurrentVersionLatestInteraction { get; } = new();
 
+        public Interaction<Unit, Unit> ShowDontOpenGameAddonsDirectoryInteraction { get; } = new();
+
         public void OpenDirectory(string dirPath)
         {
             ArgumentNullException.ThrowIfNull(dirPath);
+
+            if (GamePathUtils.IsAddonsPath(dirPath))
+            {
+                return;
+            }
 
             var addonRoot = new AddonRoot();
             addonRoot.DirectoryPath = dirPath;
@@ -285,6 +308,20 @@ namespace L4D2AddonAssistant.ViewModels
                 foreach (var addonNode in _addonRoot.GetAllNodes())
                 {
                     addonNode.ClearCaches();
+                }
+            }
+        }
+
+        public void RandomlySelect()
+        {
+            if (_addonRoot != null)
+            {
+                foreach (var addonNode in _addonRoot.GetAllNodes())
+                {
+                    if (addonNode is AddonGroup addonGroup)
+                    {
+                        addonGroup.EnableOneChildRandomlyIfSingleRandom();
+                    }
                 }
             }
         }
@@ -383,6 +420,11 @@ namespace L4D2AddonAssistant.ViewModels
                 _disposed = true;
                 _addonRoot?.DisposeAsync();
             }
+        }
+
+        private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)
+        {
+            _downloadItemListViewModel.AddDownloadItem(downloadItem);
         }
     }
 }

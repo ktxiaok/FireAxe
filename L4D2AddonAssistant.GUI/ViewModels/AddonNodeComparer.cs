@@ -35,6 +35,7 @@ namespace L4D2AddonAssistant.ViewModels
                 AddonNodeSortMethod.Name => x!.Name.CompareTo(y!.Name),
                 AddonNodeSortMethod.EnableState => GetEnableState(x!).CompareTo(GetEnableState(y!)),
                 AddonNodeSortMethod.FileSize => x!.FileSize.GetValueOrDefault(0).CompareTo(y!.FileSize.GetValueOrDefault(0)),
+                AddonNodeSortMethod.CreationTime => x!.CreationTime.CompareTo(y!.CreationTime),
                 _ => 0
             };
 
