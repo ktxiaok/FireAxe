@@ -43,5 +43,31 @@ namespace L4D2AddonAssistant
 
             return Path.Join(gamePath, "left4dead2", "addonlist.txt");
         }
+
+        public static bool IsAddonsPath(string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+
+            try
+            {
+                var path2 = Path.GetDirectoryName(path);
+                if (path2 == null)
+                {
+                    return false;
+                }
+                path2 = Path.GetDirectoryName(path2);
+                if (path2 == null)
+                {
+                    return false;
+                }
+                return CheckValidity(path2);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Exception occurred during GamePathUtils.IsAddonsPath");
+            }
+
+            return false;
+        }
     }
 }

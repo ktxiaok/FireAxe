@@ -210,6 +210,9 @@
   <data name="DisableRecursively" xml:space="preserve">
     <value>Disable Recursively (including all subitems)</value>
   </data>
+  <data name="DontOpenGameAddonsDirectory" xml:space="preserve">
+    <value>Do not open the directory "left4dead2/addons".</value>
+  </data>
   <data name="Download" xml:space="preserve">
     <value>Download</value>
   </data>

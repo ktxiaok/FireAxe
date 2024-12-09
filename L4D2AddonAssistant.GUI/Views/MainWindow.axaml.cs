@@ -148,6 +148,13 @@ namespace L4D2AddonAssistant.Views
                 context.SetOutput(Unit.Default);
             })
             .DisposeWith(disposables);
+
+            viewModel.ShowDontOpenGameAddonsDirectoryInteraction.RegisterHandler(async (context) =>
+            {
+                await CommonMessageBoxes.ShowInfo(this, Texts.DontOpenGameAddonsDirectory, Texts.Error);
+                context.SetOutput(Unit.Default);
+            })
+            .DisposeWith(disposables);
         }
 
         private void DisconnectViewModel()

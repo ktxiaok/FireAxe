@@ -61,10 +61,16 @@ namespace L4D2AddonAssistant.ViewModels
             OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
-                if (path != null)
+                if (path == null)
                 {
-                    OpenDirectory(path);
+                    return;
                 }
+                if (GamePathUtils.IsAddonsPath(path))
+                {
+                    await ShowDontOpenGameAddonsDirectoryInteraction.Handle(Unit.Default);
+                    return;
+                }
+                OpenDirectory(path);               
             });
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
@@ -219,9 +225,16 @@ namespace L4D2AddonAssistant.ViewModels
 
         public Interaction<Unit, Unit> ShowCurrentVersionLatestInteraction { get; } = new();
 
+        public Interaction<Unit, Unit> ShowDontOpenGameAddonsDirectoryInteraction { get; } = new();
+
         public void OpenDirectory(string dirPath)
         {
             ArgumentNullException.ThrowIfNull(dirPath);
+
+            if (GamePathUtils.IsAddonsPath(dirPath))
+            {
+                return;
+            }
 
             var addonRoot = new AddonRoot();
             addonRoot.DirectoryPath = dirPath;

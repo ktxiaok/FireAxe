@@ -340,6 +340,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Do not open the directory &quot;left4dead2/addons&quot;. 的本地化字符串。
+        /// </summary>
+        public static string DontOpenGameAddonsDirectory {
+            get {
+                return ResourceManager.GetString("DontOpenGameAddonsDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Download 的本地化字符串。
         /// </summary>
         public static string Download {

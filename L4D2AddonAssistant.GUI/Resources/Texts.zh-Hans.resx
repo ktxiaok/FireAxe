@@ -210,6 +210,9 @@
   <data name="DisableRecursively" xml:space="preserve">
     <value>递归禁用（包括所有子项目）</value>
   </data>
+  <data name="DontOpenGameAddonsDirectory" xml:space="preserve">
+    <value>不要去打开目录“left4dead2/addons”。</value>
+  </data>
   <data name="Download" xml:space="preserve">
     <value>下载</value>
   </data>
