@@ -129,6 +129,9 @@
   <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
     <value>对应的文件“{0}”不存在。</value>
   </data>
+  <data name="AddonGroupEnableStrategyProblemExplain" xml:space="preserve">
+    <value>组的启用策略未正确应用。</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>模组“{0}”拒绝了移动或重命名。可能存在正在进行的任务。请稍后再试。</value>
   </data>
@@ -425,6 +428,12 @@
   </data>
   <data name="PushTip" xml:space="preserve">
     <value>推送所有模组的启用状态给游戏。</value>
+  </data>
+  <data name="RandomlySelect" xml:space="preserve">
+    <value>随机选择</value>
+  </data>
+  <data name="RandomlySelectTip" xml:space="preserve">
+    <value>在启用策略为“随机唯一”的组中随机开启一个子项。</value>
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>刷新</value>

@@ -11,6 +11,7 @@ namespace L4D2AddonAssistant
             manager.Register<AddonChildProblem>((problem, arg) => Texts.AddonChildProblemExplain);
             manager.Register<InvalidPublishedFileIdProblem>((problem, arg) => Texts.InvalidPublishedFileIdMessage);
             manager.Register<WorkshopVpkFileNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);
+            manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
         }
     }
 }

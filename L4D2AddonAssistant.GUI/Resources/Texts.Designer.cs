@@ -97,6 +97,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The strategy of enablement of the group is not applied correctly. 的本地化字符串。
+        /// </summary>
+        public static string AddonGroupEnableStrategyProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonGroupEnableStrategyProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
@@ -984,6 +993,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string PushTip {
             get {
                 return ResourceManager.GetString("PushTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Randomly select 的本地化字符串。
+        /// </summary>
+        public static string RandomlySelect {
+            get {
+                return ResourceManager.GetString("RandomlySelect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Randomly enable a child item in groups where the strategy of enablement is &quot;Random Single&quot;. 的本地化字符串。
+        /// </summary>
+        public static string RandomlySelectTip {
+            get {
+                return ResourceManager.GetString("RandomlySelectTip", resourceCulture);
             }
         }
         

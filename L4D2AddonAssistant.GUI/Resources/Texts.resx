@@ -129,6 +129,9 @@
   <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
     <value>The corresponding file "{0}" doesn't exist.</value>
   </data>
+  <data name="AddonGroupEnableStrategyProblemExplain" xml:space="preserve">
+    <value>The strategy of enablement of the group is not applied correctly.</value>
+  </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
   </data>
@@ -425,6 +428,12 @@
   </data>
   <data name="PushTip" xml:space="preserve">
     <value>Push enablement states of all addons to the game.</value>
+  </data>
+  <data name="RandomlySelect" xml:space="preserve">
+    <value>Randomly select</value>
+  </data>
+  <data name="RandomlySelectTip" xml:space="preserve">
+    <value>Randomly enable a child item in groups where the strategy of enablement is "Random Single".</value>
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>

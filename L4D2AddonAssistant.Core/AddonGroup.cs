@@ -147,6 +147,23 @@ namespace L4D2AddonAssistant
             return _containerService.GetUniqueName(name);
         }
 
+        public void EnableOneChildRandomlyIfSingleRandom()
+        {
+            if (_enableStrategy != AddonGroupEnableStrategy.SingleRandom)
+            {
+                return;
+            }
+
+            var children = Children;
+            int count = children.Count;
+            if (count == 0)
+            {
+                return;
+            }
+
+            children[Random.Shared.Next(count)].IsEnabled = true;
+        }
+
         protected override void OnCheck()
         {
             base.OnCheck();

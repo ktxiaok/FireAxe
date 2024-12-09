@@ -68,6 +68,7 @@ namespace L4D2AddonAssistant.ViewModels
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
+            RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNull);
             OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
             CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
@@ -187,6 +188,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> ClearCachesCommand { get; } 
 
+        public ReactiveCommand<Unit, Unit> RandomlySelectCommand { get; }
+
         public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
@@ -285,6 +288,20 @@ namespace L4D2AddonAssistant.ViewModels
                 foreach (var addonNode in _addonRoot.GetAllNodes())
                 {
                     addonNode.ClearCaches();
+                }
+            }
+        }
+
+        public void RandomlySelect()
+        {
+            if (_addonRoot != null)
+            {
+                foreach (var addonNode in _addonRoot.GetAllNodes())
+                {
+                    if (addonNode is AddonGroup addonGroup)
+                    {
+                        addonGroup.EnableOneChildRandomlyIfSingleRandom();
+                    }
                 }
             }
         }
