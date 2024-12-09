@@ -89,7 +89,16 @@ namespace L4D2AddonAssistant
         public IDownloadItem? DownloadItem
         {
             get => _download;
-            set => NotifyAndSetIfChanged(ref _download, value);
+            set 
+            { 
+                if (NotifyAndSetIfChanged(ref _download, value))
+                {
+                    if (value != null)
+                    {
+                        Root.NotifyDownloadItem(value);
+                    }
+                }
+            }
         }
 
         public static bool TryParsePublishedFileId(string input, out ulong id)

@@ -19,6 +19,7 @@ namespace L4D2AddonAssistant.ViewModels
         private IAppWindowManager _windowManager;
         private IDownloadService _downloadService;
         private HttpClient _httpClient;
+        private DownloadItemListViewModel _downloadItemListViewModel;
 
         private AddonRoot? _addonRoot = null;
         private IObservable<bool> _addonRootNotNull;
@@ -31,16 +32,18 @@ namespace L4D2AddonAssistant.ViewModels
         private object? _checkUpdateActivity = null;
         private CancellationTokenSource? _checkUpdateCts = null;
 
-        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient)
+        public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
         {
             ArgumentNullException.ThrowIfNull(settings);
             ArgumentNullException.ThrowIfNull(windowManager);
             ArgumentNullException.ThrowIfNull(downloadService);
             ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
             _settings = settings;
             _windowManager = windowManager;
             _downloadService = downloadService;
             _httpClient = httpClient;
+            _downloadItemListViewModel = downloadItemListViewModel;
 
             _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
@@ -65,6 +68,7 @@ namespace L4D2AddonAssistant.ViewModels
             });
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
+            OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
@@ -155,6 +159,7 @@ namespace L4D2AddonAssistant.ViewModels
                 else
                 {
                     using var blockAutoCheck = _addonRoot.BlockAutoCheck();
+                    _addonRoot.NewDownloadItem += OnAddonRootNewDownloadItem;
                     _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                     _addonRoot.DownloadService = _downloadService;
                     _addonRoot.HttpClient = _httpClient;
@@ -181,6 +186,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> ImportCommand { get; }
 
         public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
@@ -400,6 +407,11 @@ namespace L4D2AddonAssistant.ViewModels
                 _disposed = true;
                 _addonRoot?.DisposeAsync();
             }
+        }
+
+        private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)
+        {
+            _downloadItemListViewModel.AddDownloadItem(downloadItem);
         }
     }
 }

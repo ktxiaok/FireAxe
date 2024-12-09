@@ -7,14 +7,18 @@ namespace L4D2AddonAssistant
     public class AppWindowManager : IAppWindowManager
     {
         private AppSettingsViewModel _settingsViewModel;
+        private DownloadItemListViewModel _downloadItemListViewModel;
 
         private WindowReference<AppSettingsWindow>? _settingsWindow = null;
+        private WindowReference<DownloadItemListWindow>? _downloadItemListWindow = null;
         private WindowReference<AboutWindow>? _aboutWindow = null;
 
-        public AppWindowManager(AppSettingsViewModel settingsViewModel)
+        public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel)
         {
             ArgumentNullException.ThrowIfNull(settingsViewModel);
+            ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
             _settingsViewModel = settingsViewModel;
+            _downloadItemListViewModel = downloadItemListViewModel;
         }
 
         public void OpenSettingsWindow()
@@ -27,6 +31,20 @@ namespace L4D2AddonAssistant
                 });
             }
             var window = _settingsWindow.Get()!;
+            window.Show();
+            window.Activate();
+        }
+
+        public void OpenDownloadListWindow()
+        {
+            if (_downloadItemListWindow == null || _downloadItemListWindow.Get() == null)
+            {
+                _downloadItemListWindow = new(new DownloadItemListWindow()
+                {
+                    DataContext = _downloadItemListViewModel
+                });
+            }
+            var window = _downloadItemListWindow.Get()!;
             window.Show();
             window.Activate();
         }

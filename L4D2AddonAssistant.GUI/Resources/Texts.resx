@@ -150,6 +150,9 @@
   <data name="AutoUpdateStrategy" xml:space="preserve">
     <value>Auto Update Strategy</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="CancelMove" xml:space="preserve">
     <value>Cancel Move</value>
   </data>
@@ -209,6 +212,9 @@
   </data>
   <data name="Download" xml:space="preserve">
     <value>Download</value>
+  </data>
+  <data name="DownloadList" xml:space="preserve">
+    <value>Download List</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
@@ -393,6 +399,9 @@
   <data name="NoAvailableName" xml:space="preserve">
     <value>No available name</value>
   </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
   <data name="Null" xml:space="preserve">
     <value>Null</value>
   </data>
@@ -407,6 +416,9 @@
   </data>
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause</value>
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
@@ -437,6 +449,9 @@
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
   </data>
   <data name="RetainFileMessage" xml:space="preserve">
     <value>If you do this, files will be retained.</value>
@@ -470,6 +485,9 @@
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>Title:</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
   </data>
   <data name="UnnamedGroup" xml:space="preserve">
     <value>Unnamed Group</value>

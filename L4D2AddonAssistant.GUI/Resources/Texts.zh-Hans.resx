@@ -150,6 +150,9 @@
   <data name="AutoUpdateStrategy" xml:space="preserve">
     <value>自动更新策略</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
   <data name="CancelMove" xml:space="preserve">
     <value>取消移动</value>
   </data>
@@ -209,6 +212,9 @@
   </data>
   <data name="Download" xml:space="preserve">
     <value>下载</value>
+  </data>
+  <data name="DownloadList" xml:space="preserve">
+    <value>下载列表</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>启用</value>
@@ -393,6 +399,9 @@
   <data name="NoAvailableName" xml:space="preserve">
     <value>无可用名称</value>
   </data>
+  <data name="None" xml:space="preserve">
+    <value>无</value>
+  </data>
   <data name="Null" xml:space="preserve">
     <value>空</value>
   </data>
@@ -407,6 +416,9 @@
   </data>
   <data name="Operations" xml:space="preserve">
     <value>操作</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>暂停</value>
   </data>
   <data name="PreparingMessage" xml:space="preserve">
     <value>准备中...</value>
@@ -437,6 +449,9 @@
   </data>
   <data name="Refresh" xml:space="preserve">
     <value>刷新</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>恢复</value>
   </data>
   <data name="RetainFileMessage" xml:space="preserve">
     <value>如果你要这么做的话，文件将会被保留。</value>
@@ -470,6 +485,9 @@
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>标题：</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>工具</value>
   </data>
   <data name="UnnamedGroup" xml:space="preserve">
     <value>未命名组</value>

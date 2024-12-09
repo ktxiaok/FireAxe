@@ -20,6 +20,10 @@
         <Separator/>
         <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>
       </MenuItem>
+
+      <MenuItem Header="{x:Static r:Texts.Tools}">
+        <MenuItem Header="{x:Static r:Texts.DownloadList}" Command="{Binding OpenDownloadListWindowCommand}"/>
+      </MenuItem>
       
       <MenuItem Header="{x:Static r:Texts.Operations}">
         <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}" ToolTip.Tip="{x:Static r:Texts.PushTip}"/>

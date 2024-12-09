@@ -34,6 +34,7 @@ namespace L4D2AddonAssistant
                 .AddSingleton<MainWindowViewModel>()
                 .AddSingleton<AppSettings>()
                 .AddSingleton<AppSettingsViewModel>()
+                .AddSingleton<DownloadItemListViewModel>()
                 .AddSingleton<SaveManager>()
                 .AddSingleton<IAppWindowManager, AppWindowManager>()
                 .AddSingleton<IDownloadService, DownloadService>()

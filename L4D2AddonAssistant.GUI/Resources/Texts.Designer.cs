@@ -160,6 +160,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Cancel 的本地化字符串。
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Cancel Move 的本地化字符串。
         /// </summary>
         public static string CancelMove {
@@ -336,6 +345,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Download {
             get {
                 return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Download List 的本地化字符串。
+        /// </summary>
+        public static string DownloadList {
+            get {
+                return ResourceManager.GetString("DownloadList", resourceCulture);
             }
         }
         
@@ -889,6 +907,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 None 的本地化字符串。
+        /// </summary>
+        public static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Null 的本地化字符串。
         /// </summary>
         public static string Null {
@@ -930,6 +957,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Operations {
             get {
                 return ResourceManager.GetString("Operations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Pause 的本地化字符串。
+        /// </summary>
+        public static string Pause {
+            get {
+                return ResourceManager.GetString("Pause", resourceCulture);
             }
         }
         
@@ -1020,6 +1056,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Refresh {
             get {
                 return ResourceManager.GetString("Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Resume 的本地化字符串。
+        /// </summary>
+        public static string Resume {
+            get {
+                return ResourceManager.GetString("Resume", resourceCulture);
             }
         }
         
@@ -1119,6 +1164,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string TitleColon {
             get {
                 return ResourceManager.GetString("TitleColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tools 的本地化字符串。
+        /// </summary>
+        public static string Tools {
+            get {
+                return ResourceManager.GetString("Tools", resourceCulture);
             }
         }
         

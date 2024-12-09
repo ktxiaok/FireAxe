@@ -44,6 +44,8 @@ namespace L4D2AddonAssistant
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
         }
 
+        public event Action<IDownloadItem>? NewDownloadItem = null;
+
         [AllowNull]
         public TaskScheduler TaskScheduler
         {
@@ -520,6 +522,13 @@ namespace L4D2AddonAssistant
                     _blockAutoCheck--;
                 }
             });
+        }
+
+        public void NotifyDownloadItem(IDownloadItem downloadItem)
+        {
+            ArgumentNullException.ThrowIfNull(downloadItem);
+
+            NewDownloadItem?.Invoke(downloadItem);
         }
         
         internal void AddNode(AddonNode node)
