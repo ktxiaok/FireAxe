@@ -327,18 +327,14 @@ namespace L4D2AddonAssistant
             UpdateEnabledInHierarchy();
         }
 
-        public Task DestroyAsync(bool deleteFile)
+        public Task DestroyAsync()
         {
-            string? pathToDelete = null;
-            if (deleteFile && RequireFile)
-            {
-                pathToDelete = FullFilePath;
-            }
             var tasks = new List<Task>();
             foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
             {
                 tasks.Add(node.OnDestroyAsync());
             }
+
             if (Group == null)
             {
                 Root.RemoveNode(this);
@@ -347,7 +343,20 @@ namespace L4D2AddonAssistant
             {
                 Group.RemoveChild(this);
             }
+
             var resultTask = Task.WhenAll(tasks);
+            return resultTask;
+        }
+
+        public Task DestroyWithFileAsync()
+        {
+            string? pathToDelete = null;
+            if (RequireFile)
+            {
+                pathToDelete = FullFilePath;
+            }
+
+            var resultTask = DestroyAsync();
             if (pathToDelete != null)
             {
                 resultTask = resultTask.ContinueWith((task) =>
@@ -362,6 +371,7 @@ namespace L4D2AddonAssistant
                     }
                 });
             }
+
             return resultTask;
         }
 

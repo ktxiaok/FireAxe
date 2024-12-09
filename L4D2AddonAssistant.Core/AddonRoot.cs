@@ -490,7 +490,7 @@ namespace L4D2AddonAssistant
                 var tasks = new List<Task>();
                 foreach (var node in Nodes)
                 {
-                    tasks.Add(node.DestroyAsync(false));
+                    tasks.Add(node.DestroyAsync());
                 }
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
