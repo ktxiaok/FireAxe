@@ -66,11 +66,7 @@ namespace L4D2AddonAssistant
                     ShutdownRequested?.Invoke();
                 };
 
-                var mainWindow = new MainWindow()
-                {
-                    DataContext = Services.GetRequiredService<MainWindowViewModel>()
-                };
-
+                var mainWindow = Services.GetRequiredService<IAppWindowManager>().CreateMainWindow(Services.GetRequiredService<MainWindowViewModel>());
                 desktop.MainWindow = mainWindow;
 
                 var saveManager = Services.GetRequiredService<SaveManager>();

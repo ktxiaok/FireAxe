@@ -142,6 +142,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 It is detected that you copied a workshop item link ({0}). Would you like to create a workshop addon? 的本地化字符串。
+        /// </summary>
+        public static string AutoDetectWorkshopItemLinkDialogMessage {
+            get {
+                return ResourceManager.GetString("AutoDetectWorkshopItemLinkDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Auto detect workshop item link in Clipboard 的本地化字符串。
+        /// </summary>
+        public static string AutoDetectWorkshopItemLinkInClipboard {
+            get {
+                return ResourceManager.GetString("AutoDetectWorkshopItemLinkInClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Set the name automatically 的本地化字符串。
         /// </summary>
         public static string AutoSetName {

@@ -12,15 +12,14 @@
         x:Class="L4D2AddonAssistant.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
-        Width="600"
-        Height="200"
+        Width="800" Height="200"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
   </Window.DataTemplates>
   <ScrollViewer>
     <Grid
-      RowDefinitions="Auto, Auto, Auto"
+      RowDefinitions="Auto, Auto, Auto, Auto"
       ColumnDefinitions="Auto, *"
       Margin="10">
       <!--language-->
@@ -74,6 +73,16 @@
         Grid.Row="2" Grid.Column="1"
         Classes="PropertyValue"
         IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+
+      <!--auto detect workshop item link in clipboard-->
+      <TextBlock
+        Grid.Row="3" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
+      <CheckBox
+        Grid.Row="3" Grid.Column="1"
+        Classes="PropertyValue"
+        IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
     </Grid>
   </ScrollViewer>
   

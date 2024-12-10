@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Avalonia.Threading;
+using ReactiveUI;
 using Serilog;
 using System;
 using System.IO;
@@ -13,6 +14,8 @@ namespace L4D2AddonAssistant.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
     {
+        private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
+
         private bool _disposed = false;
 
         private AppSettings _settings;
@@ -31,6 +34,10 @@ namespace L4D2AddonAssistant.ViewModels
         private bool _isCheckingUpdate = false;
         private object? _checkUpdateActivity = null;
         private CancellationTokenSource? _checkUpdateCts = null;
+
+        private IDisposable _checkClipboardTimer;
+        private bool _isCheckingClipboard = false;
+        private string? _lastClipboardText = null;
 
         public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
         {
@@ -119,6 +126,12 @@ namespace L4D2AddonAssistant.ViewModels
                     }
                 }
             });
+
+            _checkClipboardTimer = DispatcherTimer.Run(() =>
+            {
+                CheckClipboard();
+                return true;
+            }, CheckClipboardInterval);
         }
 
         public event Action? ShowCheckingUpdateWindow = null;
@@ -155,8 +168,7 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     return;
                 }
-                // TODO
-                _addonRoot?.DisposeAsync();
+                DisposeAddonRoot();
                 _addonRoot = value;
                 if (_addonRoot == null)
                 {
@@ -226,6 +238,8 @@ namespace L4D2AddonAssistant.ViewModels
         public Interaction<Unit, Unit> ShowCurrentVersionLatestInteraction { get; } = new();
 
         public Interaction<Unit, Unit> ShowDontOpenGameAddonsDirectoryInteraction { get; } = new();
+
+        public Interaction<string, bool> ShowAutoDetectWorkshopItemLinkDialogInteraction { get; } = new();
 
         public void OpenDirectory(string dirPath)
         {
@@ -408,6 +422,59 @@ namespace L4D2AddonAssistant.ViewModels
             _checkUpdateCts = null;
         }
 
+        public async void CheckClipboard()
+        {
+            if (_isCheckingClipboard)
+            {
+                return;
+            }
+            _isCheckingClipboard = true;
+
+            async Task Check()
+            {
+                string? clipboardText = await GetClipboardText();
+                if (_disposed)
+                {
+                    return;
+                }
+                if (clipboardText == _lastClipboardText)
+                {
+                    return;
+                }
+                _lastClipboardText = clipboardText;
+
+                var explorerViewModel = AddonNodeExplorerViewModel;
+
+                if (explorerViewModel != null && _settings.IsAutoDetectWorkshopItemLinkInClipboard)
+                {
+                    if (clipboardText != null)
+                    {
+                        if (WorkshopVpkAddon.TryParsePublishedFileIdLink(clipboardText, out var id))
+                        {
+                            bool confirm = await ShowAutoDetectWorkshopItemLinkDialogInteraction.Handle(clipboardText);
+                            if (confirm)
+                            {
+                                var addon = explorerViewModel.NewWorkshopAddon();
+                                addon.PublishedFileId = id;
+                            }
+                        }
+                    }
+                }
+            }
+            async Task<string?> GetClipboardText()
+            {
+                var clipboard = _windowManager.MainWindow?.Clipboard;
+                if (clipboard == null)
+                {
+                    return null;
+                }
+                return await clipboard.GetTextAsync();
+            }
+            await Check();
+
+            _isCheckingClipboard = false;
+        }
+
         public void DummyCrash()
         {
             throw new Exception("dummy crash");
@@ -418,7 +485,21 @@ namespace L4D2AddonAssistant.ViewModels
             if (!_disposed)
             {
                 _disposed = true;
-                _addonRoot?.DisposeAsync();
+
+                DisposeAddonRoot();
+                _checkClipboardTimer.Dispose();
+            }
+        }
+
+        private void DisposeAddonRoot()
+        {
+            if (_addonRoot != null)
+            {
+                _addonRoot.Save();
+
+                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
+                _addonRoot.DisposeAsync(); // TODO
+                _addonRoot = null;
             }
         }
 

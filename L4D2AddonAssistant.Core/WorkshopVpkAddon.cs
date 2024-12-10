@@ -107,6 +107,18 @@ namespace L4D2AddonAssistant
                 return true;
             }
 
+            if (TryParsePublishedFileIdLink(input, out id))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        public static bool TryParsePublishedFileIdLink(string input, out ulong id)
+        {
+            id = 0;
+
             var match = _publishedFileIdLinkRegex.Match(input);
             if (match.Success)
             {
@@ -115,7 +127,7 @@ namespace L4D2AddonAssistant
                     return true;
                 }
             }
-            
+
             return false;
         }
 

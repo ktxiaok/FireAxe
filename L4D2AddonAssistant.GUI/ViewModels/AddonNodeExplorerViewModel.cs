@@ -145,8 +145,8 @@ namespace L4D2AddonAssistant.ViewModels
                 this.WhenAnyValue(x => x.MovingNodes)
                 .Select((movingNodes) => movingNodes != null));
 
-            NewGroupCommand = ReactiveCommand.Create(NewGroup);
-            NewWorkshopAddonCommand = ReactiveCommand.Create(NewWorkshopAddon);
+            NewGroupCommand = ReactiveCommand.Create(() => { NewGroup(); });
+            NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
 
             DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, hasSelection);
 
@@ -368,19 +368,21 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ViewModelActivator Activator { get; }
 
-        public void NewGroup()
+        public AddonGroup NewGroup()
         {
             var group = new AddonGroup(_root, CurrentGroup);
             group.Name = group.Parent.GetUniqueNodeName(Texts.UnnamedGroup);
             Directory.CreateDirectory(group.FullFilePath);
             SetSelection?.Invoke([group]);
+            return group;
         }
 
-        public void NewWorkshopAddon()
+        public WorkshopVpkAddon NewWorkshopAddon()
         {
             var addon = new WorkshopVpkAddon(_root, CurrentGroup);
             addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
             SetSelection?.Invoke([addon]);
+            return addon;
         }
 
         public async Task Delete(bool retainFile)
