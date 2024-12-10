@@ -169,10 +169,6 @@ namespace L4D2AddonAssistant
                     {
                         string targetPath = Path.Join(Path.GetDirectoryName(sourcePath) ?? "", value + FileExtension);
                         string fullTargetPath = GetFullFilePath(targetPath);
-                        if (FileUtils.Exists(fullTargetPath))
-                        {
-                            throw new FileExistException(fullTargetPath);
-                        }
                         FileUtils.Move(fullSourcePath, fullTargetPath);
                     }
                 }
