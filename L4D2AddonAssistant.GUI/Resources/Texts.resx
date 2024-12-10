@@ -474,6 +474,9 @@
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="ShowInFileExplorer" xml:space="preserve">
+    <value>Show in the file explorer</value>
+  </data>
   <data name="Skip" xml:space="preserve">
     <value>Skip</value>
   </data>

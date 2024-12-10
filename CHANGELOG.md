@@ -1,5 +1,6 @@
 - fix: renaming bug
-- improve: change the deletion behavior from direct deletion to move to recycle bin
+- improve: change the deletion behavior from direct deletion to move to recycle bin (Windows only)
+- add: show in the file explorer
 # v0.3.0
 - add: creation time display
 - add: sort by creation time

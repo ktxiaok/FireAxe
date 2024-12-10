@@ -111,6 +111,9 @@
       <Button
         Content="{x:Static r:Texts.ClearCaches}"
         Command="{Binding ClearCaches}"/>
+      <Button
+        Content="{x:Static r:Texts.ShowInFileExplorer}"
+        Command="{Binding ShowInFileExplorer}"/>
     </StackPanel>
 
     <!--problems-->

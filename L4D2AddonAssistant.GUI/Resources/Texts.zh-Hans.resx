@@ -474,6 +474,9 @@
   <data name="Settings" xml:space="preserve">
     <value>设置</value>
   </data>
+  <data name="ShowInFileExplorer" xml:space="preserve">
+    <value>在文件资源管理器中显示</value>
+  </data>
   <data name="SkilAll" xml:space="preserve">
     <value>跳过所有</value>
   </data>

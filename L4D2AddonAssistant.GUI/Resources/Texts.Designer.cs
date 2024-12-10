@@ -1132,6 +1132,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Show in the file explorer 的本地化字符串。
+        /// </summary>
+        public static string ShowInFileExplorer {
+            get {
+                return ResourceManager.GetString("ShowInFileExplorer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Skip 的本地化字符串。
         /// </summary>
         public static string Skip {

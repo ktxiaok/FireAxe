@@ -186,6 +186,11 @@ namespace L4D2AddonAssistant.ViewModels
             Refresh();
         }
 
+        public void ShowInFileExplorer()
+        {
+            Utils.ShowFileInExplorer(AddonNode.FullFilePath);
+        }
+
         protected virtual async void OnRefresh()
         {
             CancelTasks();
