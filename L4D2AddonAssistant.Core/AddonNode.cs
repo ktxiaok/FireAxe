@@ -367,11 +367,11 @@ namespace L4D2AddonAssistant
                 {
                     try
                     {
-                        FileUtils.Delete(pathToDelete);
+                        FileUtils.MoveToRecycleBin(pathToDelete);
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Exception occurred during deleting file: {FilePath}", pathToDelete);
+                        Log.Error(ex, "Exception occurred during moving file to recycle bin: {FilePath}", pathToDelete);
                     }
                 });
             }
