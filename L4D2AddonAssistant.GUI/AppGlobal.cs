@@ -18,7 +18,7 @@ namespace L4D2AddonAssistant
 
         public const string License = "Apache-2.0 license";
 
-        public static Version Version => Assembly.GetEntryAssembly()!.GetName().Version!;
+        public static Version Version => typeof(AppGlobal).Assembly.GetName().Version!;
 
         public static string VersionString => Version.ToString(3);
 

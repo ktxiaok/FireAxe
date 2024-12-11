@@ -15,11 +15,29 @@ namespace L4D2AddonAssistant.ViewModels
         {
             this.WhenActivated((CompositeDisposable disposables) =>
             {
-                
+                addon.WhenAnyValue(x => x.VpkPriority)
+                .Subscribe(priority => this.RaisePropertyChanged(nameof(VpkPriority)))
+                .DisposeWith(disposables);
             });
         }
 
         public new VpkAddon AddonNode => (VpkAddon)base.AddonNode;
+
+        public string VpkPriority
+        {
+            get => AddonNode.VpkPriority.ToString();
+            set
+            {
+                if (int.TryParse(value, out int priority))
+                {
+                    AddonNode.VpkPriority = priority;
+                }
+                else
+                {
+                    throw new ArgumentException();
+                }
+            }
+        }
 
         public VpkAddonInfo? Info
         {

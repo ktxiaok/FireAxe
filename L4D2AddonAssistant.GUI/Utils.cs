@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace L4D2AddonAssistant
 {
@@ -40,6 +41,27 @@ namespace L4D2AddonAssistant
             catch (Exception ex)
             {
                 Log.Error(ex, "Exception occurred during Utils.OpenWebsite");
+            }
+        }
+
+        public static void ShowFileInExplorer(string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+
+            try
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start(new ProcessStartInfo()
+                    {
+                        FileName = "explorer.exe",
+                        Arguments = $" /select, {path}"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during Utils.ShowFileInExplorer");
             }
         }
     }

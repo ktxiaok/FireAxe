@@ -144,6 +144,12 @@
   <data name="AuthorColon" xml:space="preserve">
     <value>作者：</value>
   </data>
+  <data name="AutoDetectWorkshopItemLinkDialogMessage" xml:space="preserve">
+    <value>检测到你复制了一个创意工坊物品链接（{0}）。你想要创建一个创意工坊模组吗？</value>
+  </data>
+  <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
+    <value>自动检测剪切板内的创意工坊链接</value>
+  </data>
   <data name="AutoSetName" xml:space="preserve">
     <value>自动设置名称</value>
   </data>
@@ -426,6 +432,9 @@
   <data name="PreparingMessage" xml:space="preserve">
     <value>准备中...</value>
   </data>
+  <data name="Priority" xml:space="preserve">
+    <value>优先级</value>
+  </data>
   <data name="Problems" xml:space="preserve">
     <value>问题</value>
   </data>
@@ -473,6 +482,9 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>设置</value>
+  </data>
+  <data name="ShowInFileExplorer" xml:space="preserve">
+    <value>在文件资源管理器中显示</value>
   </data>
   <data name="SkilAll" xml:space="preserve">
     <value>跳过所有</value>

@@ -144,6 +144,12 @@
   <data name="AuthorColon" xml:space="preserve">
     <value>Author:</value>
   </data>
+  <data name="AutoDetectWorkshopItemLinkDialogMessage" xml:space="preserve">
+    <value>It is detected that you copied a workshop item link ({0}). Would you like to create a workshop addon?</value>
+  </data>
+  <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
+    <value>Auto detect workshop item link in Clipboard</value>
+  </data>
   <data name="AutoSetName" xml:space="preserve">
     <value>Set the name automatically</value>
   </data>
@@ -426,6 +432,9 @@
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
   </data>
+  <data name="Priority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
   <data name="Problems" xml:space="preserve">
     <value>Problems</value>
   </data>
@@ -473,6 +482,9 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="ShowInFileExplorer" xml:space="preserve">
+    <value>Show in the file explorer</value>
   </data>
   <data name="Skip" xml:space="preserve">
     <value>Skip</value>

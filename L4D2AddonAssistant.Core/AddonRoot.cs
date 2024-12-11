@@ -302,7 +302,7 @@ namespace L4D2AddonAssistant
                 }
             }
 
-            var addonEntries = new Dictionary<string, string>();           
+            var addonEntries = new Dictionary<string, (string IsEnabled, int Priority)>();           
             // Remove old entries in addonlist.
             if (addonList != null)
             {
@@ -322,7 +322,7 @@ namespace L4D2AddonAssistant
                             continue;
                         }
                     }
-                    addonEntries[name] = (string)obj.Value;
+                    addonEntries[name] = ((string)obj.Value, 0);
                 }
             }
 
@@ -330,7 +330,7 @@ namespace L4D2AddonAssistant
             foreach (string filePath in remainingFilePaths)
             {
                 string fileName = Path.GetFileName(filePath);
-                addonEntries[fileName] = "0";
+                addonEntries[fileName] = ("0", 0);
             }
 
             // Add enabled addons to entries.
@@ -370,7 +370,7 @@ namespace L4D2AddonAssistant
                     }
 
                     File.CreateSymbolicLink(Path.Join(addonsPath, linkFileName), vpkPath);
-                    addonEntries[linkFileName] = "1";
+                    addonEntries[linkFileName] = ("1", vpkAddon.VpkPriority);
                 }
             }
 
@@ -379,7 +379,13 @@ namespace L4D2AddonAssistant
             {
                 File.Create(addonListPath);
             }
-            addonList = new KVObject("AddonList", addonEntries.Select(pair => new KVObject(pair.Key, pair.Value)));
+            addonList = new KVObject("AddonList", 
+                addonEntries.Select(pair => new 
+                {
+                    Key = pair.Key, IsEnabled = pair.Value.IsEnabled, Priority = pair.Value.Priority
+                })
+                .OrderByDescending(obj => obj.Priority)
+                .Select(obj => new KVObject(obj.Key, obj.IsEnabled)));
             using (var stream = File.Open(addonListPath, FileMode.Truncate))
             {
                 kv.Serialize(stream, addonList);

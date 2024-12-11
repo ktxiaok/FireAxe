@@ -155,6 +155,14 @@ namespace L4D2AddonAssistant.Views
                 context.SetOutput(Unit.Default);
             })
             .DisposeWith(disposables);
+
+            viewModel.ShowAutoDetectWorkshopItemLinkDialogInteraction.RegisterHandler(async (context) =>
+            {
+                var link = context.Input;
+                bool confirm = await CommonMessageBoxes.Confirm(this, string.Format(Texts.AutoDetectWorkshopItemLinkDialogMessage, link), "");
+                context.SetOutput(confirm);
+            })
+            .DisposeWith(disposables);
         }
 
         private void DisconnectViewModel()

@@ -9,6 +9,7 @@ namespace L4D2AddonAssistant
         private AppSettingsViewModel _settingsViewModel;
         private DownloadItemListViewModel _downloadItemListViewModel;
 
+        private MainWindow? _mainWindow = null;
         private WindowReference<AppSettingsWindow>? _settingsWindow = null;
         private WindowReference<DownloadItemListWindow>? _downloadItemListWindow = null;
         private WindowReference<AboutWindow>? _aboutWindow = null;
@@ -19,6 +20,17 @@ namespace L4D2AddonAssistant
             ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
             _settingsViewModel = settingsViewModel;
             _downloadItemListViewModel = downloadItemListViewModel;
+        }
+
+        public MainWindow? MainWindow => _mainWindow;
+
+        public MainWindow CreateMainWindow(MainWindowViewModel viewModel)
+        {
+            _mainWindow = new MainWindow()
+            {
+                DataContext = viewModel
+            };
+            return _mainWindow;
         }
 
         public void OpenSettingsWindow()

@@ -15,6 +15,7 @@ namespace L4D2AddonAssistant
         private string _gamePath = "";
         private bool _isAutoUpdateWorkshopItem = true;
         private string? _suppressedUpdateRequestVersion = null;
+        private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
 
         private string _settingsFilePath;
 
@@ -110,6 +111,19 @@ namespace L4D2AddonAssistant
             set
             {
                 if (NotifyAndSetIfChanged(ref _suppressedUpdateRequestVersion, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public bool IsAutoDetectWorkshopItemLinkInClipboard
+        {
+            get => _isAutoDetectWorkshopItemLinkInClipboard;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _isAutoDetectWorkshopItemLinkInClipboard, value))
                 {
                     RequestSave = true;
                 }

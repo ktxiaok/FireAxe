@@ -142,6 +142,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 It is detected that you copied a workshop item link ({0}). Would you like to create a workshop addon? 的本地化字符串。
+        /// </summary>
+        public static string AutoDetectWorkshopItemLinkDialogMessage {
+            get {
+                return ResourceManager.GetString("AutoDetectWorkshopItemLinkDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Auto detect workshop item link in Clipboard 的本地化字符串。
+        /// </summary>
+        public static string AutoDetectWorkshopItemLinkInClipboard {
+            get {
+                return ResourceManager.GetString("AutoDetectWorkshopItemLinkInClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Set the name automatically 的本地化字符串。
         /// </summary>
         public static string AutoSetName {
@@ -988,6 +1006,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Priority 的本地化字符串。
+        /// </summary>
+        public static string Priority {
+            get {
+                return ResourceManager.GetString("Priority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Problems 的本地化字符串。
         /// </summary>
         public static string Problems {
@@ -1128,6 +1155,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Show in the file explorer 的本地化字符串。
+        /// </summary>
+        public static string ShowInFileExplorer {
+            get {
+                return ResourceManager.GetString("ShowInFileExplorer", resourceCulture);
             }
         }
         

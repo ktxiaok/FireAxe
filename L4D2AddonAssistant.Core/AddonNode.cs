@@ -169,10 +169,6 @@ namespace L4D2AddonAssistant
                     {
                         string targetPath = Path.Join(Path.GetDirectoryName(sourcePath) ?? "", value + FileExtension);
                         string fullTargetPath = GetFullFilePath(targetPath);
-                        if (FileUtils.Exists(fullTargetPath))
-                        {
-                            throw new FileExistException(fullTargetPath);
-                        }
                         FileUtils.Move(fullSourcePath, fullTargetPath);
                     }
                 }
@@ -371,11 +367,11 @@ namespace L4D2AddonAssistant
                 {
                     try
                     {
-                        FileUtils.Delete(pathToDelete);
+                        FileUtils.MoveToRecycleBin(pathToDelete);
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Exception occurred during deleting file: {FilePath}", pathToDelete);
+                        Log.Error(ex, "Exception occurred during moving file to recycle bin: {FilePath}", pathToDelete);
                     }
                 });
             }
