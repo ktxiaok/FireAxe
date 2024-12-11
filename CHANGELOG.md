@@ -1,3 +1,4 @@
+- improve: select all text when edit text
 # v0.4.0
 - fix: renaming bug
 - improve: change the deletion behavior from direct deletion to move to recycle bin (Windows only)

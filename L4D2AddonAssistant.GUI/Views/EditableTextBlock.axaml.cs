@@ -198,6 +198,11 @@ public class EditableTextBlock : TemplatedControl
             {
                 _editView.IsVisible = true;
             }
+            if (_textBox != null)
+            {
+                _textBox.Focus();
+                _textBox.SelectAll();
+            }
         }
         else
         {
