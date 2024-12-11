@@ -468,7 +468,15 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     return null;
                 }
-                return await clipboard.GetTextAsync();
+                try
+                {
+                    return await clipboard.GetTextAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during opening clipboard");
+                }
+                return null;
             }
             await Check();
 
