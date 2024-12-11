@@ -1,3 +1,4 @@
+# v0.4.0
 - fix: renaming bug
 - improve: change the deletion behavior from direct deletion to move to recycle bin (Windows only)
 - add: show in the file explorer (Windows only)
