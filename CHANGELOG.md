@@ -1,4 +1,5 @@
 - improve: select all text when edit text
+- fix: some workshop links can't be parsed
 # v0.4.0
 - fix: renaming bug
 - improve: change the deletion behavior from direct deletion to move to recycle bin (Windows only)

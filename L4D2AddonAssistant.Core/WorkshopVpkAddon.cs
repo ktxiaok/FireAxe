@@ -15,7 +15,7 @@ namespace L4D2AddonAssistant
             Formatting = Formatting.Indented,
         };
 
-        private static Regex _publishedFileIdLinkRegex = new(@"steamcommunity\.com/sharedfiles/filedetails/\?.*id=(\d+)"); 
+        private static Regex _publishedFileIdLinkRegex = new(@"steamcommunity\.com/(?:sharedfiles|workshop)/filedetails/\?.*id=(\d+)"); 
 
         private ulong? _publishedFileId = null;
 
