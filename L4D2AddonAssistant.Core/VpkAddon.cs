@@ -7,11 +7,25 @@ namespace L4D2AddonAssistant
 {
     public abstract class VpkAddon : AddonNode
     {
+        private int _vpkPriority = 0;
+
         private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
         public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
             
+        }
+
+        public int VpkPriority
+        {
+            get => _vpkPriority;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _vpkPriority, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
         }
 
         public abstract string? FullVpkFilePath
@@ -97,12 +111,14 @@ namespace L4D2AddonAssistant
         {
             base.OnCreateSave(save);
             var save1 = (VpkAddonSave)save;
+            save1.VpkPriority = VpkPriority;
         }
 
         protected override void OnLoadSave(AddonNodeSave save)
         {
             base.OnLoadSave(save);
             var save1 = (VpkAddonSave)save;
+            VpkPriority = save1.VpkPriority;
         }
 
         private static bool TryCreatePackage(string? path, [NotNullWhen(true)] out Package? pak)

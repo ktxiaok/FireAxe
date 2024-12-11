@@ -432,6 +432,9 @@
   <data name="PreparingMessage" xml:space="preserve">
     <value>Preparing...</value>
   </data>
+  <data name="Priority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
   <data name="Problems" xml:space="preserve">
     <value>Problems</value>
   </data>

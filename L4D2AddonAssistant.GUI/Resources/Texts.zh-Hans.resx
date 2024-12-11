@@ -432,6 +432,9 @@
   <data name="PreparingMessage" xml:space="preserve">
     <value>准备中...</value>
   </data>
+  <data name="Priority" xml:space="preserve">
+    <value>优先级</value>
+  </data>
   <data name="Problems" xml:space="preserve">
     <value>问题</value>
   </data>

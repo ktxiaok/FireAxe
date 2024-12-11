@@ -1006,6 +1006,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Priority 的本地化字符串。
+        /// </summary>
+        public static string Priority {
+            get {
+                return ResourceManager.GetString("Priority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Problems 的本地化字符串。
         /// </summary>
         public static string Problems {
