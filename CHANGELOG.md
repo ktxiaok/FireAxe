@@ -2,6 +2,7 @@
 - fix: some workshop links can't be parsed
 - improve: auto refresh images after downloading
 - fix: add try/catch block on opening clipboard
+- fix: "Single" strategy of enablement problem
 # v0.4.0
 - fix: renaming bug
 - improve: change the deletion behavior from direct deletion to move to recycle bin (Windows only)

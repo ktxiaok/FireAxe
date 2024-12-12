@@ -200,13 +200,6 @@ namespace L4D2AddonAssistant
                                 child1.IsEnabled = false;
                             }
                         }
-                        else
-                        {
-                            foreach (var child1 in Children)
-                            {
-                                child1.IsEnabled = false;
-                            }
-                        }
                         break;
                     }
                 case AddonGroupEnableStrategy.All:
