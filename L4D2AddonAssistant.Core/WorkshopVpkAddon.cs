@@ -26,13 +26,15 @@ namespace L4D2AddonAssistant
 
         private string? _vpkPath = null;
 
-        private Task? _checkTask = null;
+        private Task? _downloadCheckTask = null;
 
         private IDownloadItem? _download = null;
 
+        private bool _requestAutoSetName = false;
+
         public WorkshopVpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
-
+            PropertyChanged += WorkshopVpkAddon_PropertyChanged;
         }
 
         public override Type SaveType => typeof(WorkshopVpkAddonSave);
@@ -96,6 +98,18 @@ namespace L4D2AddonAssistant
                     {
                         Root.NotifyDownloadItem(value);
                     }
+                }
+            }
+        }
+
+        public bool RequestAutoSetName
+        {
+            get => _requestAutoSetName;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _requestAutoSetName, value))
+                {
+                    Root.RequestSave = true;
                 }
             }
         }
@@ -185,9 +199,9 @@ namespace L4D2AddonAssistant
             
             if (_publishedFileId.HasValue)
             {
-                if (_checkTask == null)
+                if (_downloadCheckTask == null)
                 {
-                    CreateCheckTask(_publishedFileId.Value);
+                    CreateDownloadCheckTask(_publishedFileId.Value);
                 }
             }
 
@@ -197,7 +211,7 @@ namespace L4D2AddonAssistant
             }
         }
 
-        private void CreateCheckTask(ulong publishedFileId)
+        private void CreateDownloadCheckTask(ulong publishedFileId)
         {
             string dirPath = FullFilePath;
             var cancellationToken = DestructionCancellationToken;
@@ -208,6 +222,8 @@ namespace L4D2AddonAssistant
                 getDetailsTask = GetPublishedFileDetailsAsync(cancellationToken);
             }
             bool requestUpdate = IsAutoUpdate;
+            bool requestAutoSetName = RequestAutoSetName;
+            string? nameToAutoSet = null;
             string? resultVpkPath = null;
             var problems = new List<AddonProblem>();
             var downloadService = Root.DownloadService;
@@ -244,7 +260,7 @@ namespace L4D2AddonAssistant
                 }
                 SetVpkPath(vpkPathPreview);
 
-                _checkTask = Task.Run(() =>
+                _downloadCheckTask = Task.Run(() =>
                 {
                     if (getDetailsTask != null)
                     {
@@ -264,6 +280,15 @@ namespace L4D2AddonAssistant
 
                     if (details != null)
                     {
+                        if (requestAutoSetName)
+                        {
+                            nameToAutoSet = FileUtils.SanitizeFileName(details.Title);
+                            if (nameToAutoSet.Length == 0)
+                            {
+                                nameToAutoSet = "UNNAMED";
+                            }
+                        }
+
                         bool needDownload = false;
 
                         if (metaInfo == null)
@@ -340,15 +365,27 @@ namespace L4D2AddonAssistant
                     }
                 });
 
-                _checkTask.ContinueWith((task) =>
+                _downloadCheckTask.ContinueWith((task) =>
                 {
-                    _checkTask = null;
+                    _downloadCheckTask = null;
                     blockMove.Dispose();
                     foreach (var problem in problems)
                     {
                         AddProblem(problem);
                     }
                     SetVpkPath(resultVpkPath);
+                    if (nameToAutoSet != null)
+                    {
+                        nameToAutoSet = Parent.GetUniqueNodeName(nameToAutoSet);
+                        try
+                        {
+                            Name = nameToAutoSet;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during setting the name of the workshop vpk addon");
+                        }
+                    }
 
                     if (task.Exception != null)
                     {
@@ -433,9 +470,9 @@ namespace L4D2AddonAssistant
             var tasks = new List<Task>();
             tasks.Add(baseTask);
 
-            if (_checkTask != null)
+            if (_downloadCheckTask != null)
             {
-                tasks.Add(_checkTask);
+                tasks.Add(_downloadCheckTask);
             }
 
             if (_getPublishedFileDetailsTask != null)
@@ -457,7 +494,8 @@ namespace L4D2AddonAssistant
             base.OnCreateSave(save);
             var save1 = (WorkshopVpkAddonSave)save;
             save1.PublishedFileId = PublishedFileId;
-            save1.AutoUpdateStrategy = AutoUpdateStrategy; 
+            save1.AutoUpdateStrategy = AutoUpdateStrategy;
+            save1.RequestAutoSetName = RequestAutoSetName;
         }
 
         protected override void OnLoadSave(AddonNodeSave save)
@@ -469,6 +507,7 @@ namespace L4D2AddonAssistant
                 PublishedFileId = save1.PublishedFileId;
             }
             AutoUpdateStrategy = save1.AutoUpdateStrategy;
+            RequestAutoSetName = save1.RequestAutoSetName;
         }
 
         private Task<GetPublishedFileDetailsResult> DoGetPublishedFileDetailsAsync(CancellationToken cancellationToken)
@@ -477,13 +516,26 @@ namespace L4D2AddonAssistant
             {
                 return Task.FromResult(new GetPublishedFileDetailsResult(null, GetPublishedFileDetailsResultStatus.Failed));
             }
-            return WebUtils.GetPublishedFileDetailsAsync(_publishedFileId.Value, Root.HttpClient, cancellationToken);
+            return PublishedFileDetailsUtils.GetPublishedFileDetailsAsync(_publishedFileId.Value, Root.HttpClient, cancellationToken);
         }
 
         private void SetVpkPath(string? path)
         {
             _vpkPath = path;
             NotifyChanged(nameof(FullVpkFilePath));
+        }
+
+        private void WorkshopVpkAddon_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Name))
+            {
+                OnNameChanged();
+            }
+        }
+
+        private void OnNameChanged()
+        {
+            RequestAutoSetName = false;
         }
     }
 }

@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="L4D2AddonAssistant.Views.NewWorkshopCollectionWindow"
+        x:DataType="vm:NewWorkshopCollectionViewModel"
+        Title="{x:Static r:Texts.WorkshopCollection}"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight">
+  <Grid
+    RowDefinitions="Auto, Auto, Auto"
+    ColumnDefinitions="Auto, 40, Auto"
+    Margin="10">
+    <TextBlock
+      Grid.Row="0" Grid.Column="0"
+      Text="{x:Static r:Texts.CollectionId}"
+      Classes="PropertyName"/>
+    <TextBox
+      Grid.Row="0" Grid.Column="2"
+      Text="{Binding CollectionId}"
+      HorizontalAlignment="Right"
+      Margin="0, 5, 0, 5"
+      Width="300"/>
+    
+    <TextBlock
+      Grid.Row="1" Grid.Column="0"
+      Text="{x:Static r:Texts.IncludeLinkedCollections}"
+      Classes="PropertyName"/>
+    <CheckBox
+      Grid.Row="1" Grid.Column="2"
+      IsChecked="{Binding IncludeLinkedCollections}"
+      Classes="PropertyValue"/>
+    
+    <Button
+      Grid.Row="2" Grid.Column="2"
+      Content="{x:Static r:Texts.Create}"
+      Command="{Binding CreateCommand}"
+      HorizontalAlignment="Right"/>
+  </Grid>
+</Window>

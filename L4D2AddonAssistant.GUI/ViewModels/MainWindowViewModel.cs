@@ -185,7 +185,7 @@ namespace L4D2AddonAssistant.ViewModels
                     _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
                     _addonRoot.CheckAll();
-                    AddonNodeExplorerViewModel = new(_addonRoot);
+                    AddonNodeExplorerViewModel = new(_addonRoot, _windowManager);
                 }
                 this.RaisePropertyChanged();
             }

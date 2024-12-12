@@ -183,11 +183,20 @@
   <data name="ClearCaches" xml:space="preserve">
     <value>清除缓存</value>
   </data>
+  <data name="CollectionId" xml:space="preserve">
+    <value>合集ID</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>确认删除</value>
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>创建</value>
+  </data>
+  <data name="CreateCollectionFailedMessage" xml:space="preserve">
+    <value>创建合集失败。请重试。</value>
   </data>
   <data name="CreationTimeColon" xml:space="preserve">
     <value>创建时间：</value>
@@ -345,6 +354,9 @@
   <data name="ImportTip" xml:space="preserve">
     <value>导入现有的文件为模组项。</value>
   </data>
+  <data name="IncludeLinkedCollections" xml:space="preserve">
+    <value>包括链接的合集</value>
+  </data>
   <data name="IncludeName" xml:space="preserve">
     <value>包括名称</value>
   </data>
@@ -356,6 +368,9 @@
   </data>
   <data name="InputPublishedFileIdHint" xml:space="preserve">
     <value>输入数字或链接</value>
+  </data>
+  <data name="InvalidCollectionIdMessage" xml:space="preserve">
+    <value>无效的合集ID。</value>
   </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>游戏路径“{0}”无效。</value>
@@ -530,6 +545,9 @@
   </data>
   <data name="WorkshopAddon" xml:space="preserve">
     <value>创意工坊模组</value>
+  </data>
+  <data name="WorkshopCollection" xml:space="preserve">
+    <value>创意工坊合集</value>
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>创意工坊项目自动更新</value>

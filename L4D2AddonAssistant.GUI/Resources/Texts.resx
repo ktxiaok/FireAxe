@@ -183,11 +183,20 @@
   <data name="ClearCaches" xml:space="preserve">
     <value>Clear Caches</value>
   </data>
+  <data name="CollectionId" xml:space="preserve">
+    <value>Collection ID</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Confirm Delete</value>
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreateCollectionFailedMessage" xml:space="preserve">
+    <value>Failed to create the collection. Please try again.</value>
   </data>
   <data name="CreationTimeColon" xml:space="preserve">
     <value>Creation Time: </value>
@@ -345,6 +354,9 @@
   <data name="ImportTip" xml:space="preserve">
     <value>Import existing files to addon items.</value>
   </data>
+  <data name="IncludeLinkedCollections" xml:space="preserve">
+    <value>Include linked collections</value>
+  </data>
   <data name="IncludeName" xml:space="preserve">
     <value>Include Name</value>
   </data>
@@ -356,6 +368,9 @@
   </data>
   <data name="InputPublishedFileIdHint" xml:space="preserve">
     <value>Input number or link</value>
+  </data>
+  <data name="InvalidCollectionIdMessage" xml:space="preserve">
+    <value>The collection id is invalid.</value>
   </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>The game path "{0}" is invalid.</value>
@@ -530,6 +545,9 @@
   </data>
   <data name="WorkshopAddon" xml:space="preserve">
     <value>Workshop Addon</value>
+  </data>
+  <data name="WorkshopCollection" xml:space="preserve">
+    <value>Workshop Collection</value>
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>Workshop Item Auto Update</value>

@@ -259,6 +259,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Collection ID 的本地化字符串。
+        /// </summary>
+        public static string CollectionId {
+            get {
+                return ResourceManager.GetString("CollectionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Confirm Delete 的本地化字符串。
         /// </summary>
         public static string ConfirmDelete {
@@ -273,6 +282,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string ConfirmDeleteMessage {
             get {
                 return ResourceManager.GetString("ConfirmDeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create 的本地化字符串。
+        /// </summary>
+        public static string Create {
+            get {
+                return ResourceManager.GetString("Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Failed to create the collection. Please try again. 的本地化字符串。
+        /// </summary>
+        public static string CreateCollectionFailedMessage {
+            get {
+                return ResourceManager.GetString("CreateCollectionFailedMessage", resourceCulture);
             }
         }
         
@@ -745,6 +772,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Include linked collections 的本地化字符串。
+        /// </summary>
+        public static string IncludeLinkedCollections {
+            get {
+                return ResourceManager.GetString("IncludeLinkedCollections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Include Name 的本地化字符串。
         /// </summary>
         public static string IncludeName {
@@ -777,6 +813,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string InputPublishedFileIdHint {
             get {
                 return ResourceManager.GetString("InputPublishedFileIdHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The collection id is invalid. 的本地化字符串。
+        /// </summary>
+        public static string InvalidCollectionIdMessage {
+            get {
+                return ResourceManager.GetString("InvalidCollectionIdMessage", resourceCulture);
             }
         }
         
@@ -1299,6 +1344,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string WorkshopAddon {
             get {
                 return ResourceManager.GetString("WorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Workshop Collection 的本地化字符串。
+        /// </summary>
+        public static string WorkshopCollection {
+            get {
+                return ResourceManager.GetString("WorkshopCollection", resourceCulture);
             }
         }
         

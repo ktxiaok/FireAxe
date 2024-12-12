@@ -6,7 +6,7 @@ using System.Text;
 
 namespace L4D2AddonAssistant
 {
-    public static class WebUtils
+    public static class PublishedFileDetailsUtils
     {
         public static Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(ulong publishedFileId, HttpClient httpClient, CancellationToken cancellationToken)
         {
@@ -57,7 +57,7 @@ namespace L4D2AddonAssistant
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning(ex, "Exception occurred during the task of WebUtils.GetPublishedFileDetailsAsync.");
+                    Log.Warning(ex, "Exception occurred during the task of PublishedFileDetailsUtils.GetPublishedFileDetailsAsync.");
                 }
 
                 if (content != null)
