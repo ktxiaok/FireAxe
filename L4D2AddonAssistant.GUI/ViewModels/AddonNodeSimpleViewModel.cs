@@ -97,6 +97,16 @@ namespace L4D2AddonAssistant.ViewModels
                 .Select((fileSize) => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)
                 .ToProperty(this, nameof(FileSizeReadable));
 
+                if (addon is VpkAddon vpkAddon)
+                {
+                    vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
+                    .Subscribe(_ =>
+                    {
+                        Refresh();
+                    })
+                    .DisposeWith(disposables);
+                }
+
                 Refresh();
 
                 Disposable.Create(() =>
