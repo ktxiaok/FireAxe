@@ -1,3 +1,4 @@
+# v0.4.1
 - improve: select all text when edit text
 - fix: some workshop links can't be parsed
 - improve: auto refresh images after downloading
