@@ -106,7 +106,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
+        ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
             get {
@@ -156,6 +156,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string AutoDetectWorkshopItemLinkInClipboard {
             get {
                 return ResourceManager.GetString("AutoDetectWorkshopItemLinkInClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Auto redownload items 的本地化字符串。
+        /// </summary>
+        public static string AutoRedownload {
+            get {
+                return ResourceManager.GetString("AutoRedownload", resourceCulture);
             }
         }
         

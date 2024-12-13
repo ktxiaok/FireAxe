@@ -15,6 +15,7 @@ namespace L4D2AddonAssistant.ViewModels
     public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
     {
         private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
+        private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(15);
 
         private bool _disposed = false;
 
@@ -38,6 +39,8 @@ namespace L4D2AddonAssistant.ViewModels
         private IDisposable _checkClipboardTimer;
         private bool _isCheckingClipboard = false;
         private string? _lastClipboardText = null;
+
+        private IDisposable _autoRedownloadTimer;
 
         public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
         {
@@ -132,6 +135,12 @@ namespace L4D2AddonAssistant.ViewModels
                 CheckClipboard();
                 return true;
             }, CheckClipboardInterval);
+
+            _autoRedownloadTimer = DispatcherTimer.Run(() =>
+            {
+                AutoRedownload();
+                return true;
+            }, AutoRedownloadInterval);
         }
 
         public event Action? ShowCheckingUpdateWindow = null;
@@ -483,6 +492,29 @@ namespace L4D2AddonAssistant.ViewModels
             _isCheckingClipboard = false;
         }
 
+        public void AutoRedownload()
+        {
+            if (_addonRoot == null)
+            {
+                return;
+            }
+            if (!_settings.IsAutoRedownload)
+            {
+                return;
+            }
+
+            foreach (var addonNode in _addonRoot.GetAllNodes())
+            {
+                if (addonNode is WorkshopVpkAddon workshopVpkAddon)
+                {
+                    if (workshopVpkAddon.FullVpkFilePath == null)
+                    {
+                        workshopVpkAddon.Check();
+                    }
+                }
+            }
+        }
+
         public void DummyCrash()
         {
             throw new Exception("dummy crash");
@@ -496,6 +528,7 @@ namespace L4D2AddonAssistant.ViewModels
 
                 DisposeAddonRoot();
                 _checkClipboardTimer.Dispose();
+                _autoRedownloadTimer.Dispose();
             }
         }
 

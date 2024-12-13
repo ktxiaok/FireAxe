@@ -133,7 +133,7 @@
     <value>The strategy of enablement of the group is not applied correctly.</value>
   </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
-    <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
+    <value>The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later.</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
@@ -149,6 +149,9 @@
   </data>
   <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
     <value>Auto detect workshop item link in Clipboard</value>
+  </data>
+  <data name="AutoRedownload" xml:space="preserve">
+    <value>Auto redownload items</value>
   </data>
   <data name="AutoSetName" xml:space="preserve">
     <value>Set the Name Automatically</value>
