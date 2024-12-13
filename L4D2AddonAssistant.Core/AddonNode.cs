@@ -184,10 +184,6 @@ namespace L4D2AddonAssistant
         {
             get 
             {
-                if (Name.Length == 0)
-                {
-                    throw new InvalidOperationException("empty name");
-                }
                 return BuildFilePath(Group, Name); 
             }
         }
@@ -196,10 +192,6 @@ namespace L4D2AddonAssistant
         {
             get 
             {
-                if (Name.Length == 0)
-                {
-                    throw new InvalidOperationException("empty name");
-                }
                 return Name + FileExtension; 
             } 
         }
@@ -208,10 +200,6 @@ namespace L4D2AddonAssistant
         {
             get 
             {
-                if (Name.Length == 0)
-                {
-                    throw new InvalidOperationException("empty name");
-                }
                 return BuildFilePath(Group, FileName); 
             }
         }
@@ -386,7 +374,7 @@ namespace L4D2AddonAssistant
         public Task DestroyWithFileAsync()
         {
             string? pathToDelete = null;
-            if (RequireFile)
+            if (RequireFile && Name.Length > 0)
             {
                 pathToDelete = FullFilePath;
             }
