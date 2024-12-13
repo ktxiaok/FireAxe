@@ -160,7 +160,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Set the name automatically 的本地化字符串。
+        ///   查找类似 Set the Name Automatically 的本地化字符串。
         /// </summary>
         public static string AutoSetName {
             get {
@@ -223,7 +223,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Check for updates 的本地化字符串。
+        ///   查找类似 Check for Updates 的本地化字符串。
         /// </summary>
         public static string CheckForUpdates {
             get {
@@ -1114,7 +1114,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Randomly select 的本地化字符串。
+        ///   查找类似 Randomly Select 的本地化字符串。
         /// </summary>
         public static string RandomlySelect {
             get {
@@ -1204,7 +1204,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Show in the file explorer 的本地化字符串。
+        ///   查找类似 Show in File Explorer 的本地化字符串。
         /// </summary>
         public static string ShowInFileExplorer {
             get {
