@@ -682,6 +682,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Flat VPK List 的本地化字符串。
+        /// </summary>
+        public static string FlatVpkList {
+            get {
+                return ResourceManager.GetString("FlatVpkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Game Path 的本地化字符串。
         /// </summary>
         public static string GamePath {
@@ -777,6 +786,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string ImportTip {
             get {
                 return ResourceManager.GetString("ImportTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Only enabled addons are included 的本地化字符串。
+        /// </summary>
+        public static string IncludeEnabledAddonsOnly {
+            get {
+                return ResourceManager.GetString("IncludeEnabledAddonsOnly", resourceCulture);
             }
         }
         

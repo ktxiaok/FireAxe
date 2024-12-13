@@ -65,6 +65,9 @@
     <Compile Update="Views\AddonNodeNavBarView.axaml.cs">
       <DependentUpon>AddonNodeNavBarView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\FlatVpkAddonListWindow.axaml.cs">
+      <DependentUpon>FlatVpkAddonListWindow.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

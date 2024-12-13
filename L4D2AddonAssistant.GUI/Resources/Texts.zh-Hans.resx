@@ -324,6 +324,9 @@
   <data name="Flatten" xml:space="preserve">
     <value>展平</value>
   </data>
+  <data name="FlatVpkList" xml:space="preserve">
+    <value>扁平VPK列表</value>
+  </data>
   <data name="GamePath" xml:space="preserve">
     <value>游戏路径</value>
   </data>
@@ -356,6 +359,9 @@
   </data>
   <data name="ImportTip" xml:space="preserve">
     <value>导入现有的文件为模组项。</value>
+  </data>
+  <data name="IncludeEnabledAddonsOnly" xml:space="preserve">
+    <value>仅包含已启用的模组</value>
   </data>
   <data name="IncludeLinkedCollections" xml:space="preserve">
     <value>包括链接的合集</value>
