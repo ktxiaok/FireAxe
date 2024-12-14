@@ -13,10 +13,16 @@
   <Grid
     RowDefinitions="Auto, Auto, Auto, Auto, Auto"
     ColumnDefinitions="Auto, *">
-    <!--title-->
+    <!--title, buttons-->
     <StackPanel
       Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
       Orientation="Vertical">
+      <StackPanel.Styles>
+        <Style Selector="Button">
+          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+      </StackPanel.Styles>
       <TextBlock
         Text="{x:Static r:Texts.Workshop}"
         Classes="Heading1"/>
@@ -26,6 +32,10 @@
         Foreground="OrangeRed"
         HorizontalAlignment="Left"
         VerticalAlignment="Center"/>
+      
+      <Button
+        Content="{x:Static r:Texts.OpenWorkshopPage}"
+        Command="{Binding OpenWorkshopPage}"/>
     </StackPanel>
 
     <!--item id-->

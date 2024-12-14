@@ -6,11 +6,11 @@ using System.Text;
 
 namespace L4D2AddonAssistant
 {
-    public static class WebUtils
+    public static class PublishedFileDetailsUtils
     {
         public static Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(ulong publishedFileId, HttpClient httpClient, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            var task = new Task<GetPublishedFileDetailsResult>(() =>
             {
                 PublishedFileDetails? content = null;
                 GetPublishedFileDetailsResultStatus status = GetPublishedFileDetailsResultStatus.Failed;
@@ -57,7 +57,7 @@ namespace L4D2AddonAssistant
                 }
                 catch (Exception ex)
                 {
-                    Log.Warning(ex, "Exception occurred during the task of WebUtils.GetPublishedFileDetailsAsync.");
+                    Log.Warning(ex, "Exception occurred during the task of PublishedFileDetailsUtils.GetPublishedFileDetailsAsync.");
                 }
 
                 if (content != null)
@@ -65,7 +65,9 @@ namespace L4D2AddonAssistant
                     status = GetPublishedFileDetailsResultStatus.Succeeded;
                 }
                 return new GetPublishedFileDetailsResult(content, status);
-            });
+            }, TaskCreationOptions.LongRunning);
+            task.Start(TaskScheduler.Default);
+            return task;
         }
     }
 

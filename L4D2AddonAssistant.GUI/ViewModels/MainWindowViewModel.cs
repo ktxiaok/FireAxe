@@ -15,6 +15,7 @@ namespace L4D2AddonAssistant.ViewModels
     public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
     {
         private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
+        private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(15);
 
         private bool _disposed = false;
 
@@ -38,6 +39,8 @@ namespace L4D2AddonAssistant.ViewModels
         private IDisposable _checkClipboardTimer;
         private bool _isCheckingClipboard = false;
         private string? _lastClipboardText = null;
+
+        private IDisposable _autoRedownloadTimer;
 
         public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
         {
@@ -82,6 +85,7 @@ namespace L4D2AddonAssistant.ViewModels
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
             OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
+            OpenFlatVpkAddonListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFlatVpkAddonListWindow(this));
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
@@ -132,6 +136,12 @@ namespace L4D2AddonAssistant.ViewModels
                 CheckClipboard();
                 return true;
             }, CheckClipboardInterval);
+
+            _autoRedownloadTimer = DispatcherTimer.Run(() =>
+            {
+                AutoRedownload();
+                return true;
+            }, AutoRedownloadInterval);
         }
 
         public event Action? ShowCheckingUpdateWindow = null;
@@ -185,7 +195,7 @@ namespace L4D2AddonAssistant.ViewModels
                     _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
                     _addonRoot.CheckAll();
-                    AddonNodeExplorerViewModel = new(_addonRoot);
+                    AddonNodeExplorerViewModel = new(_addonRoot, _windowManager);
                 }
                 this.RaisePropertyChanged();
             }
@@ -206,6 +216,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenFlatVpkAddonListWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
@@ -483,6 +495,29 @@ namespace L4D2AddonAssistant.ViewModels
             _isCheckingClipboard = false;
         }
 
+        public void AutoRedownload()
+        {
+            if (_addonRoot == null)
+            {
+                return;
+            }
+            if (!_settings.IsAutoRedownload)
+            {
+                return;
+            }
+
+            foreach (var addonNode in _addonRoot.GetAllNodes())
+            {
+                if (addonNode is WorkshopVpkAddon workshopVpkAddon)
+                {
+                    if (workshopVpkAddon.FullVpkFilePath == null)
+                    {
+                        workshopVpkAddon.Check();
+                    }
+                }
+            }
+        }
+
         public void DummyCrash()
         {
             throw new Exception("dummy crash");
@@ -496,6 +531,7 @@ namespace L4D2AddonAssistant.ViewModels
 
                 DisposeAddonRoot();
                 _checkClipboardTimer.Dispose();
+                _autoRedownloadTimer.Dispose();
             }
         }
 

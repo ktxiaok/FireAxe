@@ -9,5 +9,7 @@ namespace L4D2AddonAssistant
         public ulong? PublishedFileId { get; set; }
 
         public AutoUpdateStrategy AutoUpdateStrategy { get; set; }
+
+        public bool RequestAutoSetName { get; set; } = false;
     }
 }

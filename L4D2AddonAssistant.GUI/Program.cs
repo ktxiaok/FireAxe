@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant
 {
@@ -17,6 +18,7 @@ namespace L4D2AddonAssistant
         public static void Main(string[] args)
         {
             SetupLogger();
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
             Log.Information("L4D2AddonAssistant Start (Version: {Version})", AppGlobal.VersionString);
             try
             {
@@ -58,6 +60,11 @@ namespace L4D2AddonAssistant
                 .WriteTo.Console()
                 .WriteTo.File("Logs/Log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 31)
                 .CreateLogger();
+        }
+
+        private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Log.Error(e.Exception, "Unobserved task exception occurred");
         }
 
         private static void OpenCrashReporter(Exception ex)

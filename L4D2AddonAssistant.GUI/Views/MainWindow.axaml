@@ -23,6 +23,7 @@
 
       <MenuItem Header="{x:Static r:Texts.Tools}">
         <MenuItem Header="{x:Static r:Texts.DownloadList}" Command="{Binding OpenDownloadListWindowCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.FlatVpkList}" Command="{Binding OpenFlatVpkAddonListWindowCommand}"/>
       </MenuItem>
       
       <MenuItem Header="{x:Static r:Texts.Operations}">

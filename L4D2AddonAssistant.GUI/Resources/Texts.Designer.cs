@@ -106,7 +106,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later. 的本地化字符串。
+        ///   查找类似 The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later. 的本地化字符串。
         /// </summary>
         public static string AddonMoveDeniedMessage {
             get {
@@ -160,7 +160,16 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Set the name automatically 的本地化字符串。
+        ///   查找类似 Auto redownload items 的本地化字符串。
+        /// </summary>
+        public static string AutoRedownload {
+            get {
+                return ResourceManager.GetString("AutoRedownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the Name Automatically 的本地化字符串。
         /// </summary>
         public static string AutoSetName {
             get {
@@ -223,7 +232,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Check for updates 的本地化字符串。
+        ///   查找类似 Check for Updates 的本地化字符串。
         /// </summary>
         public static string CheckForUpdates {
             get {
@@ -259,6 +268,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Collection ID 的本地化字符串。
+        /// </summary>
+        public static string CollectionId {
+            get {
+                return ResourceManager.GetString("CollectionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Confirm Delete 的本地化字符串。
         /// </summary>
         public static string ConfirmDelete {
@@ -273,6 +291,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string ConfirmDeleteMessage {
             get {
                 return ResourceManager.GetString("ConfirmDeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Create 的本地化字符串。
+        /// </summary>
+        public static string Create {
+            get {
+                return ResourceManager.GetString("Create", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Failed to create the collection. Please try again. 的本地化字符串。
+        /// </summary>
+        public static string CreateCollectionFailedMessage {
+            get {
+                return ResourceManager.GetString("CreateCollectionFailedMessage", resourceCulture);
             }
         }
         
@@ -646,6 +682,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Flat VPK List 的本地化字符串。
+        /// </summary>
+        public static string FlatVpkList {
+            get {
+                return ResourceManager.GetString("FlatVpkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Game Path 的本地化字符串。
         /// </summary>
         public static string GamePath {
@@ -745,6 +790,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Only enabled addons are included 的本地化字符串。
+        /// </summary>
+        public static string IncludeEnabledAddonsOnly {
+            get {
+                return ResourceManager.GetString("IncludeEnabledAddonsOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Include linked collections 的本地化字符串。
+        /// </summary>
+        public static string IncludeLinkedCollections {
+            get {
+                return ResourceManager.GetString("IncludeLinkedCollections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Include Name 的本地化字符串。
         /// </summary>
         public static string IncludeName {
@@ -777,6 +840,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string InputPublishedFileIdHint {
             get {
                 return ResourceManager.GetString("InputPublishedFileIdHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The collection id is invalid. 的本地化字符串。
+        /// </summary>
+        public static string InvalidCollectionIdMessage {
+            get {
+                return ResourceManager.GetString("InvalidCollectionIdMessage", resourceCulture);
             }
         }
         
@@ -979,6 +1051,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Open Workshop Page 的本地化字符串。
+        /// </summary>
+        public static string OpenWorkshopPage {
+            get {
+                return ResourceManager.GetString("OpenWorkshopPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Operations 的本地化字符串。
         /// </summary>
         public static string Operations {
@@ -1069,7 +1150,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Randomly select 的本地化字符串。
+        ///   查找类似 Randomly Select 的本地化字符串。
         /// </summary>
         public static string RandomlySelect {
             get {
@@ -1159,7 +1240,7 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
-        ///   查找类似 Show in the file explorer 的本地化字符串。
+        ///   查找类似 Show in File Explorer 的本地化字符串。
         /// </summary>
         public static string ShowInFileExplorer {
             get {
@@ -1200,6 +1281,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 This list is sorted by priority 的本地化字符串。
+        /// </summary>
+        public static string ThisListSortByPriorityMessage {
+            get {
+                return ResourceManager.GetString("ThisListSortByPriorityMessage", resourceCulture);
             }
         }
         
@@ -1299,6 +1389,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string WorkshopAddon {
             get {
                 return ResourceManager.GetString("WorkshopAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Workshop Collection 的本地化字符串。
+        /// </summary>
+        public static string WorkshopCollection {
+            get {
+                return ResourceManager.GetString("WorkshopCollection", resourceCulture);
             }
         }
         

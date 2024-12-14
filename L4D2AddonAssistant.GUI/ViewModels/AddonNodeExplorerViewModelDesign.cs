@@ -8,7 +8,7 @@ namespace L4D2AddonAssistant.ViewModels
 {
     public class AddonNodeExplorerViewModelDesign : AddonNodeExplorerViewModel
     {
-        public AddonNodeExplorerViewModelDesign() : base(DesignHelper.CreateTestAddonRoot())
+        public AddonNodeExplorerViewModelDesign() : base(DesignHelper.CreateTestAddonRoot(), null!)
         {
 
         }

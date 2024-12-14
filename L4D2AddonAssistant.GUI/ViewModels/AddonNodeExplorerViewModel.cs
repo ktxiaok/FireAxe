@@ -20,7 +20,8 @@ namespace L4D2AddonAssistant.ViewModels
     {
         private readonly static TimeSpan SearchTextThrottleTime = TimeSpan.FromSeconds(0.5);
 
-        private readonly AddonRoot _root;
+        private readonly AddonRoot _addonRoot;
+        private readonly IAppWindowManager _windowManager;
 
         private AddonNodeContainerViewModel _containerViewModel;
 
@@ -56,11 +57,13 @@ namespace L4D2AddonAssistant.ViewModels
 
         private readonly ObservableAsPropertyHelper<IEnumerable<AddonNodeNavBarItemViewModel>> _navBarItemViewModels;
 
-        public AddonNodeExplorerViewModel(AddonRoot root)
+        public AddonNodeExplorerViewModel(AddonRoot addonRoot, IAppWindowManager windowManager)
         {
-            ArgumentNullException.ThrowIfNull(root);
+            ArgumentNullException.ThrowIfNull(addonRoot);
+            ArgumentNullException.ThrowIfNull(windowManager);
 
-            _root = root;
+            _addonRoot = addonRoot;
+            _windowManager = windowManager;
             _containerViewModel = new();
             Activator = new();
 
@@ -147,6 +150,7 @@ namespace L4D2AddonAssistant.ViewModels
 
             NewGroupCommand = ReactiveCommand.Create(() => { NewGroup(); });
             NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
+            NewWorkshopCollectionCommand = ReactiveCommand.Create(() => _windowManager.OpenNewWorkshopCollectionWindow(_addonRoot, CurrentGroup));
 
             DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, hasSelection);
 
@@ -164,7 +168,7 @@ namespace L4D2AddonAssistant.ViewModels
                                 GotoGroup(null);
                                 break;
                             }
-                            if (current.Root != _root)
+                            if (current.Root != _addonRoot)
                             {
                                 GotoGroup(null);
                                 break;
@@ -196,7 +200,7 @@ namespace L4D2AddonAssistant.ViewModels
                     var currentGroup = args.Item1;
                     var searchResultNodes = args.Item2;
                     
-                    var rawNodes = searchResultNodes ?? (currentGroup?.Children ?? _root.Nodes);
+                    var rawNodes = searchResultNodes ?? (currentGroup?.Children ?? _addonRoot.Nodes);
                     DisposeNodesSubscription();
                     _nodesSubscription = rawNodes.ToObservableChangeSet()
                     .Sort(_observableComparer)
@@ -216,7 +220,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         public event Action<IEnumerable<AddonNode>>? SetSelection = null;
 
-        public AddonRoot Root => _root;
+        public AddonRoot Root => _addonRoot;
 
         public AddonNodeContainerViewModel ContainerViewModel => _containerViewModel;
 
@@ -352,6 +356,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         public ReactiveCommand<Unit, Unit> NewWorkshopAddonCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> NewWorkshopCollectionCommand { get; }
+
         public ReactiveCommand<bool, Unit> DeleteCommand { get; }
 
 
@@ -370,7 +376,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         public AddonGroup NewGroup()
         {
-            var group = new AddonGroup(_root, CurrentGroup);
+            var group = new AddonGroup(_addonRoot, CurrentGroup);
             group.Name = group.Parent.GetUniqueNodeName(Texts.UnnamedGroup);
             Directory.CreateDirectory(group.FullFilePath);
             SetSelection?.Invoke([group]);
@@ -379,8 +385,9 @@ namespace L4D2AddonAssistant.ViewModels
 
         public WorkshopVpkAddon NewWorkshopAddon()
         {
-            var addon = new WorkshopVpkAddon(_root, CurrentGroup);
+            var addon = new WorkshopVpkAddon(_addonRoot, CurrentGroup);
             addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
+            addon.RequestAutoSetName = true;
             SetSelection?.Invoke([addon]);
             return addon;
         }
@@ -517,7 +524,7 @@ namespace L4D2AddonAssistant.ViewModels
         {
             if (group != null)
             {
-                if (!group.IsValid || group.Root != _root)
+                if (!group.IsValid || group.Root != _addonRoot)
                 {
                     return;
                 }

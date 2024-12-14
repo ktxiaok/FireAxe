@@ -1,6 +1,7 @@
 ﻿using L4D2AddonAssistant.ViewModels;
 using L4D2AddonAssistant.Views;
 using System;
+using System.Net.Http;
 
 namespace L4D2AddonAssistant
 {
@@ -8,18 +9,22 @@ namespace L4D2AddonAssistant
     {
         private AppSettingsViewModel _settingsViewModel;
         private DownloadItemListViewModel _downloadItemListViewModel;
+        private HttpClient _httpClient;
 
         private MainWindow? _mainWindow = null;
         private WindowReference<AppSettingsWindow>? _settingsWindow = null;
         private WindowReference<DownloadItemListWindow>? _downloadItemListWindow = null;
         private WindowReference<AboutWindow>? _aboutWindow = null;
+        private WindowReference<FlatVpkAddonListWindow>? _flatVpkAddonListWindow = null;
 
-        public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel)
+        public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
         {
             ArgumentNullException.ThrowIfNull(settingsViewModel);
             ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
+            ArgumentNullException.ThrowIfNull(httpClient);
             _settingsViewModel = settingsViewModel;
             _downloadItemListViewModel = downloadItemListViewModel;
+            _httpClient = httpClient;
         }
 
         public MainWindow? MainWindow => _mainWindow;
@@ -68,6 +73,29 @@ namespace L4D2AddonAssistant
                 _aboutWindow = new(new AboutWindow());
             }
             var window = _aboutWindow.Get()!;
+            window.Show();
+            window.Activate();
+        }
+
+        public void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup)
+        {
+            var window = new NewWorkshopCollectionWindow()
+            {
+                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup, _httpClient)
+            };
+            window.Show();
+        }
+
+        public void OpenFlatVpkAddonListWindow(MainWindowViewModel mainWindowViewModel)
+        {
+            if (_flatVpkAddonListWindow == null || _flatVpkAddonListWindow.Get() == null)
+            {
+                _flatVpkAddonListWindow = new(new FlatVpkAddonListWindow()
+                {
+                    DataContext = new FlatVpkAddonListViewModel(mainWindowViewModel)
+                });
+            }
+            var window = _flatVpkAddonListWindow.Get()!;
             window.Show();
             window.Activate();
         }

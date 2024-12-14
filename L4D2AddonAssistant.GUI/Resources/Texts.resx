@@ -133,7 +133,7 @@
     <value>The strategy of enablement of the group is not applied correctly.</value>
   </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
-    <value>The addon {0} denied the move or renaming. There may be ongoing tasks. Please try again later.</value>
+    <value>The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later.</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
@@ -150,8 +150,11 @@
   <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
     <value>Auto detect workshop item link in Clipboard</value>
   </data>
+  <data name="AutoRedownload" xml:space="preserve">
+    <value>Auto redownload items</value>
+  </data>
   <data name="AutoSetName" xml:space="preserve">
-    <value>Set the name automatically</value>
+    <value>Set the Name Automatically</value>
   </data>
   <data name="AutoUpdateStrategy" xml:space="preserve">
     <value>Auto Update Strategy</value>
@@ -172,7 +175,7 @@
     <value>Check all addons to keep their status up to date.</value>
   </data>
   <data name="CheckForUpdates" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>Check for Updates</value>
   </data>
   <data name="CheckingForUpdatesMessage" xml:space="preserve">
     <value>Checking for updates...</value>
@@ -183,11 +186,20 @@
   <data name="ClearCaches" xml:space="preserve">
     <value>Clear Caches</value>
   </data>
+  <data name="CollectionId" xml:space="preserve">
+    <value>Collection ID</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Confirm Delete</value>
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreateCollectionFailedMessage" xml:space="preserve">
+    <value>Failed to create the collection. Please try again.</value>
   </data>
   <data name="CreationTimeColon" xml:space="preserve">
     <value>Creation Time: </value>
@@ -312,6 +324,9 @@
   <data name="Flatten" xml:space="preserve">
     <value>Flatten</value>
   </data>
+  <data name="FlatVpkList" xml:space="preserve">
+    <value>Flat VPK List</value>
+  </data>
   <data name="GamePath" xml:space="preserve">
     <value>Game Path</value>
   </data>
@@ -345,6 +360,12 @@
   <data name="ImportTip" xml:space="preserve">
     <value>Import existing files to addon items.</value>
   </data>
+  <data name="IncludeEnabledAddonsOnly" xml:space="preserve">
+    <value>Only enabled addons are included</value>
+  </data>
+  <data name="IncludeLinkedCollections" xml:space="preserve">
+    <value>Include linked collections</value>
+  </data>
   <data name="IncludeName" xml:space="preserve">
     <value>Include Name</value>
   </data>
@@ -356,6 +377,9 @@
   </data>
   <data name="InputPublishedFileIdHint" xml:space="preserve">
     <value>Input number or link</value>
+  </data>
+  <data name="InvalidCollectionIdMessage" xml:space="preserve">
+    <value>The collection id is invalid.</value>
   </data>
   <data name="InvalidGamePathMessage" xml:space="preserve">
     <value>The game path "{0}" is invalid.</value>
@@ -423,6 +447,9 @@
   <data name="OpenDirectoryTip" xml:space="preserve">
     <value>Open a directory where the addons are stored. </value>
   </data>
+  <data name="OpenWorkshopPage" xml:space="preserve">
+    <value>Open Workshop Page</value>
+  </data>
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
   </data>
@@ -454,7 +481,7 @@
     <value>Push enablement states of all addons to the game.</value>
   </data>
   <data name="RandomlySelect" xml:space="preserve">
-    <value>Randomly select</value>
+    <value>Randomly Select</value>
   </data>
   <data name="RandomlySelectTip" xml:space="preserve">
     <value>Randomly enable a child item in groups where the strategy of enablement is "Random Single".</value>
@@ -484,7 +511,7 @@
     <value>Settings</value>
   </data>
   <data name="ShowInFileExplorer" xml:space="preserve">
-    <value>Show in the file explorer</value>
+    <value>Show in File Explorer</value>
   </data>
   <data name="Skip" xml:space="preserve">
     <value>Skip</value>
@@ -497,6 +524,9 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="ThisListSortByPriorityMessage" xml:space="preserve">
+    <value>This list is sorted by priority</value>
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>Title:</value>
@@ -530,6 +560,9 @@
   </data>
   <data name="WorkshopAddon" xml:space="preserve">
     <value>Workshop Addon</value>
+  </data>
+  <data name="WorkshopCollection" xml:space="preserve">
+    <value>Workshop Collection</value>
   </data>
   <data name="WorkshopItemAutoUpdate" xml:space="preserve">
     <value>Workshop Item Auto Update</value>

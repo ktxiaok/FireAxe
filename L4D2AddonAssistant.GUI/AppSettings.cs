@@ -16,6 +16,7 @@ namespace L4D2AddonAssistant
         private bool _isAutoUpdateWorkshopItem = true;
         private string? _suppressedUpdateRequestVersion = null;
         private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
+        private bool _isAutoRedownload = false;
 
         private string _settingsFilePath;
 
@@ -124,6 +125,19 @@ namespace L4D2AddonAssistant
             set
             {
                 if (NotifyAndSetIfChanged(ref _isAutoDetectWorkshopItemLinkInClipboard, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public bool IsAutoRedownload
+        {
+            get => _isAutoRedownload;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _isAutoRedownload, value))
                 {
                     RequestSave = true;
                 }

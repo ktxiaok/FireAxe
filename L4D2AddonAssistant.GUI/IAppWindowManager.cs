@@ -15,5 +15,9 @@ namespace L4D2AddonAssistant
         void OpenDownloadListWindow();
 
         void OpenAboutWindow();
+
+        void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
+
+        void OpenFlatVpkAddonListWindow(MainWindowViewModel mainWindowViewModel);
     }
 }

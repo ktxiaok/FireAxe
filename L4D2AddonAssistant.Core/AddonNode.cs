@@ -98,13 +98,13 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public IAddonNodeContainer Parent => ((IAddonNodeContainer?)Group) ?? Root; 
+        public IAddonNodeContainer Parent => ((IAddonNodeContainer?)Group) ?? Root;
 
         public AddonRoot Root => _root;
 
         public virtual bool RequireFile => false;
 
-        public bool IsAutoCheck => Root.IsAutoCheck; 
+        public bool IsAutoCheck => Root.IsAutoCheck;
 
         bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
 
@@ -180,13 +180,28 @@ namespace L4D2AddonAssistant
             }
         }
 
-        public string FullName => BuildFilePath(Group, Name);
+        public string FullName 
+        {
+            get 
+            {
+                return BuildFilePath(Group, Name); 
+            }
+        }
 
-        public string FileName => Name + FileExtension;
+        public string FileName 
+        {
+            get 
+            {
+                return Name + FileExtension; 
+            } 
+        }
 
         public string FilePath
         {
-            get => BuildFilePath(Group, FileName);
+            get 
+            {
+                return BuildFilePath(Group, FileName); 
+            }
         }
 
         public string FullFilePath => GetFullFilePath(FilePath);
@@ -333,6 +348,10 @@ namespace L4D2AddonAssistant
 
         public Task DestroyAsync()
         {
+            if (!IsValid)
+            {
+                return Task.CompletedTask;
+            }
             var tasks = new List<Task>();
             foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
             {
@@ -355,7 +374,7 @@ namespace L4D2AddonAssistant
         public Task DestroyWithFileAsync()
         {
             string? pathToDelete = null;
-            if (RequireFile)
+            if (RequireFile && Name.Length > 0)
             {
                 pathToDelete = FullFilePath;
             }

@@ -46,6 +46,8 @@ namespace L4D2AddonAssistant
 
         public event Action<IDownloadItem>? NewDownloadItem = null;
 
+        public bool IsValid => !_disposed;
+
         [AllowNull]
         public TaskScheduler TaskScheduler
         {

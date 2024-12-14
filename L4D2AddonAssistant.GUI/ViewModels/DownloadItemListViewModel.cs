@@ -86,11 +86,12 @@ namespace L4D2AddonAssistant.ViewModels
             ArgumentNullException.ThrowIfNull(downloadItem);
 
             _downloadItems.Add(downloadItem);
-            Task.Run(() =>
+            var waitDownloadTask = new Task(() =>
             {
                 downloadItem.Wait();
                 Dispatcher.UIThread.Post(() => RemoveDownloadItem(downloadItem));
-            });
+            }, TaskCreationOptions.LongRunning);
+            waitDownloadTask.Start(TaskScheduler.Default);
         }
 
         public void RemoveDownloadItem(IDownloadItem downloadItem)
