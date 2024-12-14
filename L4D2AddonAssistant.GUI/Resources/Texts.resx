@@ -447,6 +447,9 @@
   <data name="OpenDirectoryTip" xml:space="preserve">
     <value>Open a directory where the addons are stored. </value>
   </data>
+  <data name="OpenWorkshopPage" xml:space="preserve">
+    <value>Open Workshop Page</value>
+  </data>
   <data name="Operations" xml:space="preserve">
     <value>Operations</value>
   </data>
@@ -521,6 +524,9 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="ThisListSortByPriorityMessage" xml:space="preserve">
+    <value>This list is sorted by priority</value>
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>Title:</value>

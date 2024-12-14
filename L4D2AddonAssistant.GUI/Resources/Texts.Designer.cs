@@ -1051,6 +1051,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Open Workshop Page 的本地化字符串。
+        /// </summary>
+        public static string OpenWorkshopPage {
+            get {
+                return ResourceManager.GetString("OpenWorkshopPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Operations 的本地化字符串。
         /// </summary>
         public static string Operations {
@@ -1272,6 +1281,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 This list is sorted by priority 的本地化字符串。
+        /// </summary>
+        public static string ThisListSortByPriorityMessage {
+            get {
+                return ResourceManager.GetString("ThisListSortByPriorityMessage", resourceCulture);
             }
         }
         

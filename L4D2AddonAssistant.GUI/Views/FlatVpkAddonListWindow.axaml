@@ -36,7 +36,7 @@
         HorizontalAlignment="Right"
         VerticalAlignment="Center">
         <TextBlock
-          Text="{x:Static r:Texts.Priority}"
+          Text="{x:Static r:Texts.ThisListSortByPriorityMessage}"
           VerticalAlignment="Center"
           Margin="5, 0, 5, 0"/>
         <Button
@@ -64,7 +64,7 @@
           <DataTemplate>
             <Grid
               RowDefinitions="Auto"
-              ColumnDefinitions="30, *, 170, 30">
+              ColumnDefinitions="40, *, 170, 30">
               <Panel
                 Grid.Column="0"
                 Margin="2">

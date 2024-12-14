@@ -2,6 +2,7 @@
 - add: auto set the name of the workshop addon after download
 - add: auto redownload items (disabled by default)
 - add: flat vpk list window
+- add: open workshop page button
 # v0.4.1
 - improve: select all text when edit text
 - fix: some workshop links can't be parsed

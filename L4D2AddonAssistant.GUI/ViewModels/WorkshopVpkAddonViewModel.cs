@@ -101,6 +101,11 @@ namespace L4D2AddonAssistant.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _publishedFileDetails, value);
         }
 
+        public void OpenWorkshopPage()
+        {
+            Utils.OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={AddonNode.PublishedFileId}");
+        }
+
         protected override async void OnRefresh()
         {
             base.OnRefresh();

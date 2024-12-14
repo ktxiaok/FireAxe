@@ -447,6 +447,9 @@
   <data name="OpenDirectoryTip" xml:space="preserve">
     <value>打开一个存储模组的目录。</value>
   </data>
+  <data name="OpenWorkshopPage" xml:space="preserve">
+    <value>打开创意工坊页面</value>
+  </data>
   <data name="Operations" xml:space="preserve">
     <value>操作</value>
   </data>
@@ -521,6 +524,9 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>成功</value>
+  </data>
+  <data name="ThisListSortByPriorityMessage" xml:space="preserve">
+    <value>此列表按优先级排序</value>
   </data>
   <data name="TitleColon" xml:space="preserve">
     <value>标题：</value>
