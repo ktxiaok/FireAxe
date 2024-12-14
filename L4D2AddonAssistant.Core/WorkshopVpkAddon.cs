@@ -260,7 +260,7 @@ namespace L4D2AddonAssistant
                 }
                 SetVpkPath(vpkPathPreview);
 
-                _downloadCheckTask = Task.Run(() =>
+                _downloadCheckTask = new Task(() =>
                 {
                     if (getDetailsTask != null)
                     {
@@ -363,7 +363,8 @@ namespace L4D2AddonAssistant
                     {
                         resultVpkPath = Path.Join(dirPath, metaInfo.CurrentFile);
                     }
-                });
+                }, TaskCreationOptions.LongRunning);
+                _downloadCheckTask.Start(TaskScheduler.Default);
 
                 _downloadCheckTask.ContinueWith((task) =>
                 {
