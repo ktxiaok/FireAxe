@@ -1,3 +1,4 @@
+# v0.5.0
 - add: workshop collection creation
 - add: auto set the name of the workshop addon after download
 - add: auto redownload items (disabled by default)

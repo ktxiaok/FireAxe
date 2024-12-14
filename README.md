@@ -9,9 +9,10 @@ L4D2AddonAssistant is an open-source GUI tool for managing Left 4 Dead 2 addons.
 - Addon enablement state management
 - VPK information display
 - Workshop information display
-- Download workshop item
+- Download workshop items and collections
 - Search the addons you want
 - Addon problems display
+- VPK priority management
 - ...
 
 This project is currently in early development. More features will be added in the future.
