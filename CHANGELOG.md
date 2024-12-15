@@ -1,3 +1,4 @@
+- fix: too many download tasks will crash the program (issue #7)
 # v0.5.0
 - add: workshop collection creation
 - add: auto set the name of the workshop addon after download
