@@ -23,6 +23,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         private bool _created = false;
 
+        private bool _active = false;
+
         public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup, HttpClient httpClient)
         {
             ArgumentNullException.ThrowIfNull(addonRoot);
@@ -35,8 +37,12 @@ namespace L4D2AddonAssistant.ViewModels
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
+                _active = true;
+
                 Disposable.Create(() =>
                 {
+                    _active = false;
+
                     _createCts?.Cancel();
                 })
                 .DisposeWith(disposables);
@@ -99,7 +105,10 @@ namespace L4D2AddonAssistant.ViewModels
 
             if (itemIds == null || collectionDetails == null)
             {
-                await ShowCreateFailedInteraction.Handle(Unit.Default);
+                if (_active)
+                {
+                    await ShowCreateFailedInteraction.Handle(Unit.Default);
+                }
                 return;
             }
 
