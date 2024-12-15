@@ -414,6 +414,9 @@
   <data name="MoveHere" xml:space="preserve">
     <value>移动到这里</value>
   </data>
+  <data name="MovingMessage" xml:space="preserve">
+    <value>正在移动：{0}</value>
+  </data>
   <data name="MultipleItemSelected" xml:space="preserve">
     <value>已选中{0}个项目。</value>
   </data>

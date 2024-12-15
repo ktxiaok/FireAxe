@@ -952,6 +952,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Moving: {0} 的本地化字符串。
+        /// </summary>
+        public static string MovingMessage {
+            get {
+                return ResourceManager.GetString("MovingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 {0} items are selected. 的本地化字符串。
         /// </summary>
         public static string MultipleItemsSelected {

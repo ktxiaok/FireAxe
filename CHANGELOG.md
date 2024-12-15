@@ -1,6 +1,7 @@
 - fix: too many download tasks will crash the program (issue #7)
 - fix: cancelling a workshop collection creation will crash the program
 - fix: avoid circular references in linked workshop collections
+- add: moving addons display
 # v0.5.0
 - add: workshop collection creation
 - add: auto set the name of the workshop addon after download
