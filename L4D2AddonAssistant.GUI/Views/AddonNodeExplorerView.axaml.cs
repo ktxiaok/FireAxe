@@ -38,6 +38,7 @@ namespace L4D2AddonAssistant.Views
 
             DoubleTapped += AddonNodeExplorerView_DoubleTapped;
             AddHandler(ListBox.SelectionChangedEvent, AddonNodeExplorerView_SelectionChanged);
+            PointerReleased += AddonNodeExplorerView_PointerReleased;
 
             InitializeComponent();
         }
@@ -190,6 +191,18 @@ namespace L4D2AddonAssistant.Views
                         .Select(item => item as AddonNodeListItemViewModel)
                         .Where(x => x != null)
                         .ToArray()!;
+                }
+            }
+        }
+
+        private void AddonNodeExplorerView_PointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            if (e.InitialPressMouseButton == MouseButton.XButton1)
+            {
+                var viewModel = ViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.GotoParent();
                 }
             }
         }

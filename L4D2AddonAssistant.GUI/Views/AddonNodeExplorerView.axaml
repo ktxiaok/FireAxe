@@ -215,8 +215,8 @@
 
           <Separator/>
 
-          <MenuItem Header="{x:Static r:Texts.Move}" Command="{Binding MoveCommand}"/>
-          <MenuItem Header="{x:Static r:Texts.MoveHere}" Command="{Binding MoveHereCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.Move}" Command="{Binding MoveCommand}" HotKey="Ctrl+X"/>
+          <MenuItem Header="{x:Static r:Texts.MoveHere}" Command="{Binding MoveHereCommand}" HotKey="Ctrl+V"/>
           <MenuItem Header="{x:Static r:Texts.CancelMove}" Command="{Binding CancelMoveCommand}"/>
 
           <Separator/>
