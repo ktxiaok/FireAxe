@@ -1,3 +1,4 @@
+# v0.5.1
 - fix: too many download tasks will crash the program (issue #7)
 - fix: cancelling a workshop collection creation will crash the program
 - fix: avoid circular references in linked workshop collections
