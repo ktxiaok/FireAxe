@@ -20,6 +20,7 @@ namespace L4D2AddonAssistant
             }
 
             var resultIds = new List<ulong>();
+            var handledCollections = new HashSet<ulong>();
             var queue = new Queue<(ulong Id, bool IsCollection)>();
             queue.Enqueue((collectionId, true));
             while (queue.Count > 0)
@@ -27,14 +28,17 @@ namespace L4D2AddonAssistant
                 var next = queue.Dequeue();
                 if (next.IsCollection)
                 {
-                    var results = await GetRaw(next.Id).ConfigureAwait(false);
-                    if (results == null)
+                    if (handledCollections.Add(next.Id))
                     {
-                        return null;
-                    }
-                    foreach (var item in results)
-                    {
-                        queue.Enqueue(item);
+                        var results = await GetRaw(next.Id).ConfigureAwait(false);
+                        if (results == null)
+                        {
+                            return null;
+                        }
+                        foreach (var item in results)
+                        {
+                            queue.Enqueue(item);
+                        }
                     }
                 }
                 else

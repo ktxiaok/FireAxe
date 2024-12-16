@@ -47,6 +47,7 @@ namespace L4D2AddonAssistant.ViewModels
         private AddonGroup? _currentGroup = null;
 
         private IEnumerable<AddonNode>? _movingNodes = null;
+        private readonly ObservableAsPropertyHelper<string?> _movingNodeNames;
 
         private IReadOnlyList<AddonNodeListItemViewModel>? _selection = null;
         private readonly ObservableAsPropertyHelper<int> _selectionCount;
@@ -78,6 +79,17 @@ namespace L4D2AddonAssistant.ViewModels
             _isSearchTextClearable = this.WhenAnyValue(x => x.SearchText)
                 .Select(searchText => searchText.Length > 0)
                 .ToProperty(this, nameof(IsSearchTextClearable));
+
+            _movingNodeNames = this.WhenAnyValue(x => x.MovingNodes)
+                .Select(movingNodes =>
+                {
+                    if (movingNodes == null)
+                    {
+                        return null;
+                    }
+                    return string.Join(", ", movingNodes.Select(node => node.Name));
+                })
+                .ToProperty(this, nameof(MovingNodeNames));
 
             _selectionCount = this.WhenAnyValue(x => x.Selection)
                 .Select(selection => selection?.Count ?? 0)
@@ -297,6 +309,8 @@ namespace L4D2AddonAssistant.ViewModels
             get => _movingNodes;
             private set => this.RaiseAndSetIfChanged(ref _movingNodes, value);
         }
+
+        public string? MovingNodeNames => _movingNodeNames.Value;
 
         public IReadOnlyList<AddonNodeListItemViewModel>? Selection
         {

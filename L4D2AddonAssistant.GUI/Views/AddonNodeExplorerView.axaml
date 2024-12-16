@@ -175,39 +175,55 @@
       Grid.Column="0"
       BorderThickness="2"
       BorderBrush="Gray">
-      <v:AddonNodeContainerView
-        DataContext="{Binding ContainerViewModel}">
-      </v:AddonNodeContainerView>
+      <DockPanel>
+        <Panel
+          DockPanel.Dock="Top"
+          IsVisible="{Binding MovingNodeNames, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <ScrollViewer
+            HorizontalScrollBarVisibility="Auto">
+            <Panel
+              Margin="5, 10, 5, 20">
+              <TextBlock
+                Text="{Binding MovingNodeNames, StringFormat={x:Static r:Texts.MovingMessage}}"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"/>
+            </Panel>
+          </ScrollViewer>
+        </Panel>
+        <v:AddonNodeContainerView
+          DockPanel.Dock="Bottom"
+          DataContext="{Binding ContainerViewModel}"/>
+      </DockPanel>
       <Border.ContextMenu>
         <ContextMenu>
           <MenuItem Header="{x:Static r:Texts.Refresh}" Command="{Binding Refresh}"/>
-          
+
           <Separator/>
-          
+
           <MenuItem Header="{x:Static r:Texts.New}">
             <MenuItem Header="{x:Static r:Texts.Group}" Command="{Binding NewGroupCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopCollection}" Command="{Binding NewWorkshopCollectionCommand}"/>
           </MenuItem>
-          
+
           <Separator/>
-          
+
           <MenuItem Header="{x:Static r:Texts.Enable}" Command="{Binding EnableCommand}"/>
           <MenuItem Header="{x:Static r:Texts.Disable}" Command="{Binding DisableCommand}"/>
           <MenuItem Header="{x:Static r:Texts.EnableRecursively}" Command="{Binding EnableRecursivelyCommand}"/>
           <MenuItem Header="{x:Static r:Texts.DisableRecursively}" Command="{Binding DisableRecursivelyCommand}"/>
-          
+
           <Separator/>
-          
-          <MenuItem Header="{x:Static r:Texts.Move}" Command="{Binding MoveCommand}"/>
-          <MenuItem Header="{x:Static r:Texts.MoveHere}" Command="{Binding MoveHereCommand}"/>
+
+          <MenuItem Header="{x:Static r:Texts.Move}" Command="{Binding MoveCommand}" HotKey="Ctrl+X"/>
+          <MenuItem Header="{x:Static r:Texts.MoveHere}" Command="{Binding MoveHereCommand}" HotKey="Ctrl+V"/>
           <MenuItem Header="{x:Static r:Texts.CancelMove}" Command="{Binding CancelMoveCommand}"/>
-          
+
           <Separator/>
-          
+
           <MenuItem Header="{x:Static r:Texts.Delete}" Command="{Binding DeleteCommand}" CommandParameter="{x:False}"/>
           <MenuItem Header="{x:Static r:Texts.DeleteAndRetainFile}" Command="{Binding DeleteCommand}" CommandParameter="{x:True}"/>
-          
+
         </ContextMenu>
       </Border.ContextMenu>
     </Border>

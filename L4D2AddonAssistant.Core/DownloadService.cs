@@ -1,10 +1,8 @@
 ﻿using Downloader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
-using System.Reflection;
 
 namespace L4D2AddonAssistant
 {
@@ -43,6 +41,7 @@ namespace L4D2AddonAssistant
 
         private class DownloadItem : IDownloadItem
         {
+            private readonly DownloadService _service;
             private readonly string _url;
             private readonly string _filePath;
 
@@ -62,16 +61,20 @@ namespace L4D2AddonAssistant
 
             private Downloader.DownloadService? _download = null;
 
+            private bool _downloadCountBorrowed = false;
+
             private readonly object _downloadLock = new();
 
-            internal DownloadItem(string url, string filePath, DownloadConfiguration config)
+            internal DownloadItem(string url, string filePath, DownloadService service)
             {
+                _service = service;
                 _url = url;
                 _filePath = filePath;
 
-                Task.Run(() =>
+                var prepareTask = new Task(() =>
                 {
-                    bool downloadCreated = false;   
+                    bool downloadCreated = false;
+
                     try
                     {
                         DownloadPackage? downloadPackage = null;
@@ -106,11 +109,38 @@ namespace L4D2AddonAssistant
                             //    downloadPackage.FileName = downloadingFilePath;
                             //}
                         }
+
+                        while (true)
+                        {
+                            lock (_downloadLock)
+                            {
+                                if (_status != DownloadStatus.Preparing && _status != DownloadStatus.PreparingAndPaused)
+                                {
+                                    break;
+                                }
+                            }
+
+                            lock (_service._availableDownloadCountLock)
+                            {
+                                if (_service._availableDownloadCount > 0)
+                                {
+                                    _service._availableDownloadCount--;
+                                    lock (_downloadLock)
+                                    {
+                                        _downloadCountBorrowed = true;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            Thread.Sleep(100);
+                        }
+
                         lock (_downloadLock)
                         {
                             if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused)
                             {
-                                _download = new(config);
+                                _download = new(_service._config);
                                 _download.DownloadStarted += OnDownloadStarted;
                                 _download.DownloadProgressChanged += OnDownloadProgressChanged;
                                 _download.DownloadFileCompleted += OnDownloadFileCompleted;
@@ -143,7 +173,8 @@ namespace L4D2AddonAssistant
                     {
                         OnDownloadCompleted();
                     }
-                });
+                }, TaskCreationOptions.LongRunning);
+                prepareTask.Start(TaskScheduler.Default);
             }
 
             public string Url => _url;
@@ -404,6 +435,15 @@ namespace L4D2AddonAssistant
             {
                 lock (_downloadLock)
                 {
+                    if (_downloadCountBorrowed)
+                    {
+                        lock (_service._availableDownloadCountLock)
+                        {
+                            _service._availableDownloadCount++;
+                        }
+                        _downloadCountBorrowed = false;
+                    }
+
                     Monitor.PulseAll(_downloadLock);
                 }
             }
@@ -436,9 +476,12 @@ namespace L4D2AddonAssistant
 
         private DownloadConfiguration _config = new()
         {
-            ChunkCount = 8,
+            ChunkCount = 4,
             ParallelDownload = true
         };
+
+        private int _availableDownloadCount = 5;
+        private readonly object _availableDownloadCountLock = new();
 
         public DownloadService()
         {
@@ -450,7 +493,7 @@ namespace L4D2AddonAssistant
             ArgumentNullException.ThrowIfNull(url);
             ArgumentNullException.ThrowIfNull(filePath);
 
-            return new DownloadItem(url, filePath, _config);
+            return new DownloadItem(url, filePath, this);
         }
 
         public void Dispose()
