@@ -13,5 +13,7 @@ namespace L4D2AddonAssistant
         public string Name { get; set; } = "";
 
         public DateTime CreationTime { get; set; }
+
+        public string[] Tags { get; set; } = [];
     }
 }

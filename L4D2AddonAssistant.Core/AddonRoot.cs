@@ -25,6 +25,14 @@ namespace L4D2AddonAssistant
 
         private bool _disposed = false;
 
+        private DirectoryInfo? _directoryPath = null;
+
+        private string _gamePath = "";
+
+        private readonly ObservableCollection<string> _customTags = new();
+        private readonly ReadOnlyObservableCollection<string> _customTagsReadOnly;
+        private readonly HashSet<string> _customTagSet = new();
+
         private TaskScheduler? _taskScheduler = null;
 
         private IDownloadService? _downloadService = null;
@@ -33,14 +41,12 @@ namespace L4D2AddonAssistant
 
         private AddonNodeContainerService _containerService = new();
 
-        private DirectoryInfo? _directoryPath = null;
-
-        private string _gamePath = "";
-
         private int _blockAutoCheck = 0;
         
         public AddonRoot()
         {
+            _customTagsReadOnly = new(_customTags);
+
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
         }
 
@@ -125,6 +131,8 @@ namespace L4D2AddonAssistant
             }
         }
 
+        public ReadOnlyObservableCollection<string> CustomTags => _customTagsReadOnly;
+
         public bool IsAutoCheck => _blockAutoCheck == 0;
 
         public bool IsAutoUpdateWorkshopItem { get; set; } = true;
@@ -132,6 +140,71 @@ namespace L4D2AddonAssistant
         IAddonNodeContainer? IAddonNodeContainer.Parent => null;
 
         AddonRoot IAddonNodeContainer.Root => this;
+
+        public bool AddCustomTag(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+            if (tag.Length == 0)
+            {
+                throw new ArgumentException("empty tag string");
+            }
+
+            if (AddonTags.BuiltInTags.Contains(tag))
+            {
+                return false;
+            }
+
+            if (!_customTagSet.Add(tag))
+            {
+                return false;
+            }
+            _customTags.Add(tag);
+            return true;
+        }
+
+        public bool RemoveCustomTag(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+
+            bool result = _customTagSet.Remove(tag);
+            if (result)
+            {
+                _customTags.Remove(tag);
+            }
+            return result;
+        }
+
+        public void RefreshCustomTags()
+        {
+            foreach (var node in this.GetAllNodes())
+            {
+                foreach (var tag in node.Tags)
+                {
+                    AddCustomTag(tag);
+                }
+            }
+        }
+
+        public void RenameCustomTag(string tag, string newTag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+            ArgumentNullException.ThrowIfNull(newTag);
+            if (newTag.Length == 0)
+            {
+                throw new ArgumentException("empty tag string");
+            }
+
+            RemoveCustomTag(tag);
+            AddCustomTag(newTag);
+            foreach (var node in this.GetAllNodes())
+            {
+                if (node.ContainsTag(tag))
+                {
+                    node.RemoveTag(tag);
+                    node.AddTag(newTag);
+                }
+            }
+        }
 
         public string GetUniqueNodeName(string name)
         {
@@ -479,6 +552,7 @@ namespace L4D2AddonAssistant
         {
             var save = new AddonRootSave();
             save.Nodes = Nodes.Select(node => node.CreateSave()).ToArray();
+            save.CustomTags = [.. CustomTags];
             return save;
         }
 
@@ -489,6 +563,14 @@ namespace L4D2AddonAssistant
             foreach (var nodeSave in save.Nodes)
             {
                 AddonNode.LoadSave(nodeSave, this);
+            }
+            foreach (var tag in save.CustomTags)
+            {
+                if (string.IsNullOrEmpty(tag))
+                {
+                    continue;
+                }
+                AddCustomTag(tag);
             }
         }
 

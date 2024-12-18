@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace L4D2AddonAssistant
 {
@@ -22,6 +23,10 @@ namespace L4D2AddonAssistant
         private AddonGroup? _group = null;
 
         private AddonRoot _root;
+
+        private readonly ObservableCollection<string> _tags = new();
+        private readonly ReadOnlyObservableCollection<string> _tagsReadOnly;
+        private readonly HashSet<string> _tagSet = new(2);
 
         private readonly ObservableCollection<AddonProblem> _problems = new();
         private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
@@ -45,7 +50,10 @@ namespace L4D2AddonAssistant
             }
 
             _root = root;
+            _tagsReadOnly = new(_tags);
             _problemsReadOnly = new(_problems);
+
+            ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
 
             if (group == null)
             {
@@ -114,15 +122,27 @@ namespace L4D2AddonAssistant
 
         public bool HasChildren => HasChildren_Internal;
 
-        public bool HasProblem
+        public ReadOnlyObservableCollection<string> Tags => _tagsReadOnly;
+
+        public IEnumerable<string> TagsInHierarchy
         {
             get
             {
-                if (_problems == null)
+                return GetRawTags().Distinct();
+
+                IEnumerable<string> GetRawTags()
                 {
-                    return false;
+                    AddonNode? current = this;
+                    while (current != null)
+                    {
+                        foreach (var tag in current.Tags)
+                        {
+                            yield return tag;
+                        }
+
+                        current = current.Group;
+                    }
                 }
-                return _problems.Count > 0;
             }
         }
 
@@ -225,6 +245,41 @@ namespace L4D2AddonAssistant
         internal virtual ReadOnlyObservableCollection<AddonNode> Children_Internal => throw new NotSupportedException();
 
         internal virtual bool HasChildren_Internal => false;
+
+        public bool AddTag(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+            if (tag.Length == 0)
+            {
+                throw new ArgumentException("empty tag string");
+            }
+
+            if (!_tagSet.Add(tag))
+            {
+                return false;
+            }
+            _tags.Add(tag);
+            return true;
+        }
+
+        public bool RemoveTag(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+
+            bool result = _tagSet.Remove(tag);
+            if (result)
+            {
+                _tags.Remove(tag);
+            }
+            return result;
+        }
+
+        public bool ContainsTag(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+
+            return _tagSet.Contains(tag);
+        }
 
         public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
         {
@@ -344,6 +399,11 @@ namespace L4D2AddonAssistant
             }
 
             UpdateEnabledInHierarchy();
+
+            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
+            {
+                node.OnAncestorsChanged();
+            }
         }
 
         public Task DestroyAsync()
@@ -627,6 +687,7 @@ namespace L4D2AddonAssistant
             save.IsEnabled = IsEnabled;
             save.Name = Name;
             save.CreationTime = CreationTime;
+            save.Tags = [.. Tags];
         }
 
         protected virtual void OnLoadSave(AddonNodeSave save)
@@ -637,6 +698,19 @@ namespace L4D2AddonAssistant
             {
                 CreationTime = save.CreationTime;
             }
+            foreach (var tag in save.Tags)
+            {
+                if (string.IsNullOrEmpty(tag))
+                {
+                    continue;
+                }
+                AddTag(tag);
+            }
+        }
+
+        protected virtual void OnAncestorsChanged()
+        {
+            NotifyChanged(nameof(TagsInHierarchy));
         }
 
         internal virtual void OnInitSelf()
@@ -665,6 +739,14 @@ namespace L4D2AddonAssistant
         internal string GetFullFilePath(string path)
         {
             return Path.Join(Root.DirectoryPath, path);
+        }
+
+        private void OnTagCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
+            {
+                node.NotifyChanged(nameof(TagsInHierarchy));
+            }
         }
 
         private void UpdateEnabledInHierarchy()
