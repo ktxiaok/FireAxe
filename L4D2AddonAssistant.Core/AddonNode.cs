@@ -747,6 +747,8 @@ namespace L4D2AddonAssistant
             {
                 node.NotifyChanged(nameof(TagsInHierarchy));
             }
+
+            Root.RequestSave = true;
         }
 
         private void UpdateEnabledInHierarchy()
