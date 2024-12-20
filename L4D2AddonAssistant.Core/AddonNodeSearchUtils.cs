@@ -42,19 +42,39 @@ namespace L4D2AddonAssistant
                     }
                 }
 
-                IStringMatcher matcher;
-                if (options.IsRegex)
+                IStringMatcher? stringMatcher;
+                if (searchText.Length == 0)
                 {
-                    matcher = new RegexStringMatcher(searchText);
+                    stringMatcher = null;
+                }
+                else if (options.IsRegex)
+                {
+                    stringMatcher = new RegexStringMatcher(searchText);
                 }
                 else
                 {
-                    matcher = new DefaultStringMatcher(searchText, options.IgnoreCase);
+                    stringMatcher = new DefaultStringMatcher(searchText, options.IgnoreCase);
+                }
+
+                ITagMatcher? tagMatcher;
+                if (options.Tags == null)
+                {
+                    tagMatcher = null;
+                }
+                else
+                {
+                    tagMatcher = options.TagFilterMode switch
+                    {
+                        AddonTagFilterMode.Or => new OrModeTagMatcher(options.Tags),
+                        AddonTagFilterMode.And => new AndModeTagMatcher(options.Tags),
+                        AddonTagFilterMode.Not => new NotModeTagMatcher(options.Tags),
+                        _ => null
+                    };
                 }
 
                 foreach (var searchNode in searchNodes)
                 {
-                    if (searchNode.Match(matcher, cancellationToken))
+                    if (searchNode.Match(stringMatcher, tagMatcher, cancellationToken))
                     {
                         consumer(searchNode.AddonNode);
                     }
@@ -66,7 +86,9 @@ namespace L4D2AddonAssistant
         {
             public AddonNode AddonNode;
             public SearchNode[] Children = [];
+
             public string? Name = null;
+            public HashSet<string>? Tags = null;
 
             private SearchNode(AddonNode addonNode, AddonNodeSearchOptions options)
             {
@@ -75,14 +97,22 @@ namespace L4D2AddonAssistant
                 {
                     Name = addonNode.Name;
                 }
+                if (options.Tags != null)
+                {
+                    var tags = addonNode.TagsInHierarchy;
+                    if (tags.Any())
+                    {
+                        Tags = [.. tags];
+                    }
+                }
             }
 
-            public bool Match(IStringMatcher matcher, CancellationToken cancellationToken)
+            public bool Match(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher, CancellationToken cancellationToken)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (Children.Length == 0)
                 {
-                    return OnMatch(matcher);
+                    return OnMatch(stringMatcher, tagMatcher);
                 }
 
                 var queue = new Queue<SearchNode>();
@@ -91,7 +121,7 @@ namespace L4D2AddonAssistant
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var node = queue.Dequeue();
-                    if (node.OnMatch(matcher))
+                    if (node.OnMatch(stringMatcher, tagMatcher))
                     {
                         return true;
                     }
@@ -104,13 +134,31 @@ namespace L4D2AddonAssistant
                 return false;
             }
 
-            private bool OnMatch(IStringMatcher matcher)
+            private bool OnMatch(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher)
             {
+                return MatchString(stringMatcher) && MatchTag(tagMatcher);
+            }
+
+            private bool MatchString(IStringMatcher? matcher)
+            {
+                if (matcher == null)
+                {
+                    return true;
+                }
                 if (Name != null && matcher.Match(Name))
                 {
                     return true;
                 }
                 return false;
+            }
+
+            private bool MatchTag(ITagMatcher? matcher)
+            {
+                if (matcher == null)
+                {
+                    return true;
+                }
+                return matcher.Match(Tags);
             }
 
             private class BuildStackFrame
@@ -211,6 +259,82 @@ namespace L4D2AddonAssistant
                 return _regex?.IsMatch(str) ?? false;
             }
         }
+
+        private interface ITagMatcher
+        {
+            bool Match(ISet<string>? tags);
+        }
+
+        private class OrModeTagMatcher : ITagMatcher
+        {
+            private ISet<string> _requiredTags;
+
+            public OrModeTagMatcher(ISet<string> requiredTags)
+            {
+                _requiredTags = requiredTags;
+            }
+
+            public bool Match(ISet<string>? tags)
+            {
+                if (tags == null)
+                {
+                    return _requiredTags.Count == 0;
+                }
+                foreach (var requiredTag in _requiredTags)
+                {
+                    if (tags.Contains(requiredTag))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        private class AndModeTagMatcher : ITagMatcher
+        {
+            private ISet<string> _requiredTags;
+
+            public AndModeTagMatcher(ISet<string> requiredTags)
+            {
+                _requiredTags = requiredTags;
+            }
+
+            public bool Match(ISet<string>? tags)
+            {
+                if (tags == null)
+                {
+                    return _requiredTags.Count == 0;
+                }
+                return _requiredTags.IsSubsetOf(tags);
+            }
+        }
+
+        private class NotModeTagMatcher : ITagMatcher
+        {
+            private ISet<string> _requiredTags;
+
+            public NotModeTagMatcher(ISet<string> requiredTags)
+            {
+                _requiredTags = requiredTags;
+            }
+
+            public bool Match(ISet<string>? tags)
+            {
+                if (tags == null)
+                {
+                    return true;
+                }
+                foreach (var requiredTag in _requiredTags)
+                {
+                    if (tags.Contains(requiredTag))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
 
     public class AddonNodeSearchOptions
@@ -222,5 +346,16 @@ namespace L4D2AddonAssistant
         public bool IsRegex { get; init; } = false;
 
         public bool IncludeName { get; init; } = true;
+
+        public ISet<string>? Tags { get; init; } = null;
+
+        public AddonTagFilterMode TagFilterMode { get; init; } = AddonTagFilterMode.Or;
+    }
+
+    public enum AddonTagFilterMode
+    {
+        Or,
+        And,
+        Not
     }
 }
