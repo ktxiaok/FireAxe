@@ -48,6 +48,7 @@ namespace L4D2AddonAssistant
             _customTagsReadOnly = new(_customTags);
 
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
+            ((INotifyCollectionChanged)_customTags).CollectionChanged += OnCustomTagsCollectionChanged;
         }
 
         public event Action<IDownloadItem>? NewDownloadItem = null;
@@ -642,6 +643,11 @@ namespace L4D2AddonAssistant
         }
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            RequestSave = true;
+        }
+
+        private void OnCustomTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             RequestSave = true;
         }
