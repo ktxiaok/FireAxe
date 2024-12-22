@@ -19,5 +19,7 @@ namespace L4D2AddonAssistant
         void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
 
         void OpenFlatVpkAddonListWindow(MainWindowViewModel mainWindowViewModel);
+
+        void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
     }
 }

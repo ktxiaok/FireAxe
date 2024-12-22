@@ -195,6 +195,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
   </data>
+  <data name="ConfirmDeleteTagCompletely" xml:space="preserve">
+    <value>Are you sure you want to delete the selected tags completely?</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
   </data>
@@ -215,6 +218,12 @@
   </data>
   <data name="DeleteAndRetainFile" xml:space="preserve">
     <value>Delete And Retain Files</value>
+  </data>
+  <data name="DeleteCompletely" xml:space="preserve">
+    <value>Delete Completely</value>
+  </data>
+  <data name="DeleteTagCompletelyTip" xml:space="preserve">
+    <value>(Include tags in all addons)</value>
   </data>
   <data name="Descending" xml:space="preserve">
     <value>Descending</value>
@@ -375,8 +384,14 @@
   <data name="IncludeWorkshopDescription" xml:space="preserve">
     <value>Include Workshop Description</value>
   </data>
+  <data name="InputCannotBeEmptyMessage" xml:space="preserve">
+    <value>The input cannot be empty.</value>
+  </data>
   <data name="InputPublishedFileIdHint" xml:space="preserve">
     <value>Input number or link</value>
+  </data>
+  <data name="InputTagNameMessage" xml:space="preserve">
+    <value>Please input the name of the tag: </value>
   </data>
   <data name="InvalidCollectionIdMessage" xml:space="preserve">
     <value>The collection id is invalid.</value>
@@ -411,8 +426,14 @@
   <data name="Move" xml:space="preserve">
     <value>Move</value>
   </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
   <data name="MoveHere" xml:space="preserve">
     <value>Move Here</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Move Up</value>
   </data>
   <data name="MovingMessage" xml:space="preserve">
     <value>Moving: {0}</value>
@@ -425,6 +446,9 @@
   </data>
   <data name="New" xml:space="preserve">
     <value>New</value>
+  </data>
+  <data name="NewTag" xml:space="preserve">
+    <value>New Tag</value>
   </data>
   <data name="NewVersionAvailable" xml:space="preserve">
     <value>New version available: {0}</value>
@@ -492,6 +516,12 @@
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
   </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="RenameTag" xml:space="preserve">
+    <value>Rename Tag</value>
+  </data>
   <data name="Resume" xml:space="preserve">
     <value>Resume</value>
   </data>
@@ -527,6 +557,12 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="TagManager" xml:space="preserve">
+    <value>Tag Manager</value>
+  </data>
+  <data name="TagNameExistMessage" xml:space="preserve">
+    <value>The tag name already exists.</value>
   </data>
   <data name="ThisListSortByPriorityMessage" xml:space="preserve">
     <value>This list is sorted by priority</value>

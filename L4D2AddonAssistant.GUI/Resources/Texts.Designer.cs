@@ -295,6 +295,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Are you sure you want to delete the selected tags completely? 的本地化字符串。
+        /// </summary>
+        public static string ConfirmDeleteTagCompletely {
+            get {
+                return ResourceManager.GetString("ConfirmDeleteTagCompletely", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Create 的本地化字符串。
         /// </summary>
         public static string Create {
@@ -354,6 +363,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string DeleteAndRetainFile {
             get {
                 return ResourceManager.GetString("DeleteAndRetainFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Delete Completely 的本地化字符串。
+        /// </summary>
+        public static string DeleteCompletely {
+            get {
+                return ResourceManager.GetString("DeleteCompletely", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 (Include tags in all addons) 的本地化字符串。
+        /// </summary>
+        public static string DeleteTagCompletelyTip {
+            get {
+                return ResourceManager.GetString("DeleteTagCompletelyTip", resourceCulture);
             }
         }
         
@@ -835,11 +862,29 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 The input cannot be empty. 的本地化字符串。
+        /// </summary>
+        public static string InputCannotBeEmptyMessage {
+            get {
+                return ResourceManager.GetString("InputCannotBeEmptyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Input number or link 的本地化字符串。
         /// </summary>
         public static string InputPublishedFileIdHint {
             get {
                 return ResourceManager.GetString("InputPublishedFileIdHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Please input the name of the tag:  的本地化字符串。
+        /// </summary>
+        public static string InputTagNameMessage {
+            get {
+                return ResourceManager.GetString("InputTagNameMessage", resourceCulture);
             }
         }
         
@@ -943,11 +988,29 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Move Down 的本地化字符串。
+        /// </summary>
+        public static string MoveDown {
+            get {
+                return ResourceManager.GetString("MoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Move Here 的本地化字符串。
         /// </summary>
         public static string MoveHere {
             get {
                 return ResourceManager.GetString("MoveHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Move Up 的本地化字符串。
+        /// </summary>
+        public static string MoveUp {
+            get {
+                return ResourceManager.GetString("MoveUp", resourceCulture);
             }
         }
         
@@ -984,6 +1047,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string New {
             get {
                 return ResourceManager.GetString("New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 New Tag 的本地化字符串。
+        /// </summary>
+        public static string NewTag {
+            get {
+                return ResourceManager.GetString("NewTag", resourceCulture);
             }
         }
         
@@ -1186,6 +1258,24 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Rename 的本地化字符串。
+        /// </summary>
+        public static string Rename {
+            get {
+                return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Rename Tag 的本地化字符串。
+        /// </summary>
+        public static string RenameTag {
+            get {
+                return ResourceManager.GetString("RenameTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Resume 的本地化字符串。
         /// </summary>
         public static string Resume {
@@ -1290,6 +1380,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tag Manager 的本地化字符串。
+        /// </summary>
+        public static string TagManager {
+            get {
+                return ResourceManager.GetString("TagManager", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 The tag name already exists. 的本地化字符串。
+        /// </summary>
+        public static string TagNameExistMessage {
+            get {
+                return ResourceManager.GetString("TagNameExistMessage", resourceCulture);
             }
         }
         

@@ -16,6 +16,7 @@ namespace L4D2AddonAssistant
         private WindowReference<DownloadItemListWindow>? _downloadItemListWindow = null;
         private WindowReference<AboutWindow>? _aboutWindow = null;
         private WindowReference<FlatVpkAddonListWindow>? _flatVpkAddonListWindow = null;
+        private WindowReference<AddonTagManagerWindow>? _tagManagerWindow = null;
 
         public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
         {
@@ -96,6 +97,20 @@ namespace L4D2AddonAssistant
                 });
             }
             var window = _flatVpkAddonListWindow.Get()!;
+            window.Show();
+            window.Activate();
+        }
+
+        public void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel)
+        {
+            if (_tagManagerWindow == null || _tagManagerWindow.Get() == null)
+            {
+                _tagManagerWindow = new(new AddonTagManagerWindow()
+                {
+                    DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
+                });
+            }
+            var window = _tagManagerWindow.Get()!;
             window.Show();
             window.Activate();
         }

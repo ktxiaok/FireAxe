@@ -5,6 +5,7 @@
   xmlns:local="using:L4D2AddonAssistant"
   xmlns:conv="using:L4D2AddonAssistant.ValueConverters"
   xmlns:dt="using:L4D2AddonAssistant.DataTemplates"
+  xmlns:r="using:L4D2AddonAssistant.Resources"
   RequestedThemeVariant="Dark">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -62,6 +63,19 @@
     <Style Selector="CheckBox.PropertyValue">
       <Setter Property="HorizontalAlignment" Value="Right"/>
       <Setter Property="Margin" Value="0, 5, 0, 5"/>
+    </Style>
+
+    <Style Selector="Button.ok /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Content" Value="{x:Static r:Texts.Ok}" />
+    </Style>
+    <Style Selector="Button.yes /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Content" Value="{x:Static r:Texts.Yes}" />
+    </Style>
+    <Style Selector="Button.no /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Content" Value="{x:Static r:Texts.No}" />
+    </Style>
+    <Style Selector="Button.cancel /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Content" Value="{x:Static r:Texts.Cancel}" />
     </Style>
   </Application.Styles>
 

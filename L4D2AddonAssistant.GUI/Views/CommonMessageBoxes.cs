@@ -145,5 +145,36 @@ namespace L4D2AddonAssistant.Views
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
             }).ShowWindowDialogAsync(ownerWindow);
         }
+
+        public static async Task<string?> Input(Window ownerWindow, string message, string title, string defaultValue = "")
+        {
+            ArgumentNullException.ThrowIfNull(ownerWindow);
+            ArgumentNullException.ThrowIfNull(message);
+            ArgumentNullException.ThrowIfNull(title);
+            ArgumentNullException.ThrowIfNull(defaultValue);
+
+            var msgbox = MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams()
+            {
+                InputParams = new InputParams()
+                {
+                    DefaultValue = defaultValue
+                },
+                ButtonDefinitions = ButtonEnum.OkCancel,
+                EnterDefaultButton = ClickEnum.Ok,
+                EscDefaultButton = ClickEnum.Cancel,
+                ContentMessage = message,
+                ContentTitle = title,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            });
+            var result = await msgbox.ShowWindowDialogAsync(ownerWindow);
+            if (result == ButtonResult.Ok)
+            {
+                return msgbox.InputValue;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
+        x:Class="L4D2AddonAssistant.Views.AddonTagManagerWindow"
+        x:DataType="vm:AddonTagManagerViewModel"
+        Title="{x:Static r:Texts.TagManager}"
+        Width="400" Height="600"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel
+    Margin="5">
+    <StackPanel
+      DockPanel.Dock="Right"
+      Orientation="Vertical"
+      Margin="5">
+      <StackPanel.Styles>
+        <Style Selector="Button">
+          <Setter Property="Margin" Value="5"/>
+          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          <Setter Property="VerticalAlignment" Value="Top"/>
+          <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+      </StackPanel.Styles>
+      <Button
+        Content="{x:Static r:Texts.Refresh}"
+        Command="{Binding RefreshCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.New}"
+        Command="{Binding AddCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.Rename}"
+        Command="{Binding RenameCommand}"/>
+      <Panel Margin="10"/>
+      <Button
+        Content="{x:Static r:Texts.Delete}"
+        Command="{Binding DeleteCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.DeleteCompletely}"
+        Command="{Binding DeleteCompletelyCommand}"
+        ToolTip.Tip="{x:Static r:Texts.DeleteTagCompletelyTip}"/>
+      <Panel Margin="10"/>
+      <Button
+        Content="{x:Static r:Texts.MoveUp}"
+        Command="{Binding MoveUpCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.MoveDown}"
+        Command="{Binding MoveDownCommand}"/>
+    </StackPanel>
+    
+    <ScrollViewer
+      Margin="5">
+      <ListBox
+        ItemsSource="{Binding MainWindowViewModel.AddonRoot.CustomTags}"
+        SelectedItems="{Binding SelectedTags}"
+        SelectionMode="Multiple">
+      </ListBox>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

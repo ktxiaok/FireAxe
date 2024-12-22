@@ -175,6 +175,29 @@ namespace L4D2AddonAssistant
             return result;
         }
 
+        public bool RemoveCustomTagCompletely(string tag)
+        {
+            ArgumentNullException.ThrowIfNull(tag);
+
+            if (RemoveCustomTag(tag))
+            {
+                foreach (var node in this.GetAllNodes())
+                {
+                    node.RemoveTag(tag);
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void MoveCustomTag(int oldIndex, int newIndex)
+        {
+            _customTags.Move(oldIndex, newIndex);
+        }
+
         public void RefreshCustomTags()
         {
             foreach (var node in this.GetAllNodes())

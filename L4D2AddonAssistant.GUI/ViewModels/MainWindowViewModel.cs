@@ -86,6 +86,7 @@ namespace L4D2AddonAssistant.ViewModels
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
             OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
             OpenFlatVpkAddonListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFlatVpkAddonListWindow(this));
+            OpenTagManagerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenTagManagerWindow(this));
             PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
             CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
             ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
@@ -218,6 +219,8 @@ namespace L4D2AddonAssistant.ViewModels
         public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> OpenFlatVpkAddonListWindowCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenTagManagerWindowCommand { get; }
 
         public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 

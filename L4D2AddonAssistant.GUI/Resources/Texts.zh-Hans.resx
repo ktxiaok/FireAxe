@@ -195,6 +195,9 @@
   <data name="ConfirmDeleteMessage" xml:space="preserve">
     <value>你确定要删除选中的项目吗？此操作无法撤销。</value>
   </data>
+  <data name="ConfirmDeleteTagCompletely" xml:space="preserve">
+    <value>你确定要彻底删除选中的标签吗？</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>创建</value>
   </data>
@@ -215,6 +218,12 @@
   </data>
   <data name="DeleteAndRetainFile" xml:space="preserve">
     <value>删除并保留文件</value>
+  </data>
+  <data name="DeleteCompletely" xml:space="preserve">
+    <value>彻底删除</value>
+  </data>
+  <data name="DeleteTagCompletelyTip" xml:space="preserve">
+    <value>（包括所有模组中的标签）</value>
   </data>
   <data name="Descending" xml:space="preserve">
     <value>降序</value>
@@ -375,8 +384,14 @@
   <data name="IncludeWorkshopDescription" xml:space="preserve">
     <value>包括创意工坊描述</value>
   </data>
+  <data name="InputCannotBeEmptyMessage" xml:space="preserve">
+    <value>输入不能为空。</value>
+  </data>
   <data name="InputPublishedFileIdHint" xml:space="preserve">
     <value>输入数字或链接</value>
+  </data>
+  <data name="InputTagNameMessage" xml:space="preserve">
+    <value>请输入标签名称：</value>
   </data>
   <data name="InvalidCollectionIdMessage" xml:space="preserve">
     <value>无效的合集ID。</value>
@@ -411,8 +426,14 @@
   <data name="Move" xml:space="preserve">
     <value>移动</value>
   </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>下移</value>
+  </data>
   <data name="MoveHere" xml:space="preserve">
     <value>移动到这里</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>上移</value>
   </data>
   <data name="MovingMessage" xml:space="preserve">
     <value>正在移动：{0}</value>
@@ -425,6 +446,9 @@
   </data>
   <data name="New" xml:space="preserve">
     <value>新建</value>
+  </data>
+  <data name="NewTag" xml:space="preserve">
+    <value>新建标签</value>
   </data>
   <data name="NewVersionAvailable" xml:space="preserve">
     <value>有可用的新版本：{0}</value>
@@ -442,7 +466,7 @@
     <value>空</value>
   </data>
   <data name="Ok" xml:space="preserve">
-    <value>好的</value>
+    <value>确定</value>
   </data>
   <data name="Open" xml:space="preserve">
     <value>打开</value>
@@ -492,6 +516,12 @@
   <data name="Refresh" xml:space="preserve">
     <value>刷新</value>
   </data>
+  <data name="Rename" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="RenameTag" xml:space="preserve">
+    <value>重命名标签</value>
+  </data>
   <data name="Resume" xml:space="preserve">
     <value>恢复</value>
   </data>
@@ -527,6 +557,12 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>成功</value>
+  </data>
+  <data name="TagManager" xml:space="preserve">
+    <value>标签管理器</value>
+  </data>
+  <data name="TagNameExistMessage" xml:space="preserve">
+    <value>该标签名称已存在。</value>
   </data>
   <data name="ThisListSortByPriorityMessage" xml:space="preserve">
     <value>此列表按优先级排序</value>

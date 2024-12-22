@@ -274,6 +274,11 @@ namespace L4D2AddonAssistant
             return result;
         }
 
+        public void MoveTag(int oldIndex, int newIndex)
+        {
+            _tags.Move(oldIndex, newIndex);
+        }
+
         public bool ContainsTag(string tag)
         {
             ArgumentNullException.ThrowIfNull(tag);
