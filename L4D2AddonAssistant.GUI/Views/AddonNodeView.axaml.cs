@@ -50,6 +50,7 @@ namespace L4D2AddonAssistant.Views
             InitializeComponent();
 
             autoSetNameButton.Click += AutoSetNameButton_Click;
+            editTagButton.Click += EditTagButton_Click;
         }
 
         private void AutoSetNameButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -99,6 +100,26 @@ namespace L4D2AddonAssistant.Views
             }
         }
 
+        private void EditTagButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var window = FindWindow();
+            if (window == null)
+            {
+                return;
+            }
+            var viewModel = ViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            var tagEditorWindow = new AddonTagEditorWindow()
+            {
+                DataContext = new AddonTagEditorViewModel(viewModel.AddonNode)
+            };
+            tagEditorWindow.ShowDialog(window);
+        }
+
         private void ClearSectionViews()
         {
             sectionViewContainerControl.Children.Clear();
@@ -107,6 +128,11 @@ namespace L4D2AddonAssistant.Views
         private void AddSectionView(Control control)
         {
             sectionViewContainerControl.Children.Add(new AddonNodeSectionViewDecorator(control));
+        }
+
+        private Window? FindWindow()
+        {
+            return VisualRoot as Window;
         }
     }
 }

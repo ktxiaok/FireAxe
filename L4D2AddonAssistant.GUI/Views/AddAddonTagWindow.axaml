@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="550"
+        x:Class="L4D2AddonAssistant.Views.AddAddonTagWindow"
+        x:DataType="vm:AddAddonTagViewModel"
+        Title="{x:Static r:Texts.AddTag}"
+        Width="400" Height="800"
+        WindowStartupLocation="CenterOwner">
+  <DockPanel Margin="5">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Vertical">
+      <TextBlock
+        Text="{x:Static r:Texts.InputTagNameMessage}"
+        Margin="5"/>
+      <AutoCompleteBox
+        Name="inputBox"
+        ItemsSource="{Binding ExistingTags}"
+        Margin="5"/>
+      <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
+        <Button
+          Name="okButton"
+          Content="{x:Static r:Texts.Ok}"
+          Margin="5"/>
+        <Button
+          Name="cancelButton"
+          Content="{x:Static r:Texts.Cancel}"
+          Margin="5"/>
+      </StackPanel>
+    </StackPanel>
+    <ScrollViewer>
+      <ListBox
+        Name="existingTagsListBox"
+        ItemsSource="{Binding ExistingTags}"
+        SelectionMode="Single"
+        Margin="5">
+      </ListBox>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

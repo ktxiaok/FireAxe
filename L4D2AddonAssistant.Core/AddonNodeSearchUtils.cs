@@ -136,7 +136,7 @@ namespace L4D2AddonAssistant
 
             private bool OnMatch(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher)
             {
-                return MatchString(stringMatcher) && MatchTag(tagMatcher);
+                return MatchTag(tagMatcher) && MatchString(stringMatcher);
             }
 
             private bool MatchString(IStringMatcher? matcher)

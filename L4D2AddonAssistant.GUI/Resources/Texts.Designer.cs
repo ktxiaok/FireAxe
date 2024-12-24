@@ -79,6 +79,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Add 的本地化字符串。
+        /// </summary>
+        public static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 There&apos;re problems in subitems. 的本地化字符串。
         /// </summary>
         public static string AddonChildProblemExplain {
@@ -111,6 +120,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string AddonMoveDeniedMessage {
             get {
                 return ResourceManager.GetString("AddonMoveDeniedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Add Tag 的本地化字符串。
+        /// </summary>
+        public static string AddTag {
+            get {
+                return ResourceManager.GetString("AddTag", resourceCulture);
             }
         }
         
@@ -1384,6 +1402,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Tag Editor 的本地化字符串。
+        /// </summary>
+        public static string TagEditor {
+            get {
+                return ResourceManager.GetString("TagEditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Tag Manager 的本地化字符串。
         /// </summary>
         public static string TagManager {
@@ -1398,6 +1425,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string TagNameExistMessage {
             get {
                 return ResourceManager.GetString("TagNameExistMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tags 的本地化字符串。
+        /// </summary>
+        public static string Tags {
+            get {
+                return ResourceManager.GetString("Tags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tags of &quot;{0}&quot; 的本地化字符串。
+        /// </summary>
+        public static string TagsOf {
+            get {
+                return ResourceManager.GetString("TagsOf", resourceCulture);
             }
         }
         

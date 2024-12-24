@@ -93,6 +93,37 @@
       <TextBlock Text="{Binding AddonNode.CreationTime}"/>
     </StackPanel>
 
+    <!--tags-->
+    <StackPanel
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Margin="5">
+      <TextBlock
+        Text="{x:Static r:Texts.Tags}"
+        Classes="Heading1"
+        VerticalAlignment="Center"
+        Margin="5"/>
+      <Button Name="editTagButton">
+        <PathIcon Data="{StaticResource icon_edit}"/>
+      </Button>
+    </StackPanel>
+    <ItemsControl
+      ItemsSource="{Binding AddonNode.TagsInHierarchy}"
+      HorizontalAlignment="Center">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Panel Margin="5">
+            <v:AddonTagView/>
+          </Panel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel/>
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+    </ItemsControl>
+    
     <!--buttons-->
     <StackPanel
       Orientation="Vertical">

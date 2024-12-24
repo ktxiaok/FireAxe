@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:r="using:L4D2AddonAssistant.Resources"
+        xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+        x:Class="L4D2AddonAssistant.Views.AddonTagEditorWindow"
+        x:DataType="vm:AddonTagEditorViewModel"
+        Title="{x:Static r:Texts.TagEditor}"
+        Width="400" Height="600"
+        WindowStartupLocation="CenterOwner">
+  <DockPanel
+    Margin="5">
+    <TextBlock
+      DockPanel.Dock="Top"
+      Text="{Binding AddonNode.Name, StringFormat={x:Static r:Texts.TagsOf}}"
+      Margin="5"/>
+    <DockPanel>
+      <StackPanel
+        DockPanel.Dock="Right">
+        <StackPanel.Styles>
+          <Style Selector="Button">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+          </Style>
+        </StackPanel.Styles>
+        
+        <Button
+          Content="{x:Static r:Texts.Add}"
+          Command="{Binding AddCommand}"/>
+        <Button
+          Content="{x:Static r:Texts.Delete}"
+          Command="{Binding DeleteCommand}"/>
+        <Panel Margin="10"/>
+        <Button
+          Content="{x:Static r:Texts.MoveUp}"
+          Command="{Binding MoveUpCommand}"/>
+        <Button
+          Content="{x:Static r:Texts.MoveDown}"
+          Command="{Binding MoveDownCommand}"/>
+      </StackPanel>
+      <ScrollViewer
+        Margin="5">
+        <ListBox
+          ItemsSource="{Binding AddonNode.Tags}"
+          SelectedItems="{Binding SelectedTags}"
+          SelectionMode="Multiple">
+        </ListBox>
+      </ScrollViewer>
+    </DockPanel>
+  </DockPanel>
+</Window>

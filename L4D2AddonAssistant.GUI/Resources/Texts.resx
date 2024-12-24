@@ -123,6 +123,9 @@
   <data name="AboutApp" xml:space="preserve">
     <value>About L4D2AddonAssistant</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="AddonChildProblemExplain" xml:space="preserve">
     <value>There're problems in subitems.</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="AddonMoveDeniedMessage" xml:space="preserve">
     <value>The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later.</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add Tag</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
@@ -558,11 +564,20 @@
   <data name="Success" xml:space="preserve">
     <value>Success</value>
   </data>
+  <data name="TagEditor" xml:space="preserve">
+    <value>Tag Editor</value>
+  </data>
   <data name="TagManager" xml:space="preserve">
     <value>Tag Manager</value>
   </data>
   <data name="TagNameExistMessage" xml:space="preserve">
     <value>The tag name already exists.</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="TagsOf" xml:space="preserve">
+    <value>Tags of "{0}"</value>
   </data>
   <data name="ThisListSortByPriorityMessage" xml:space="preserve">
     <value>This list is sorted by priority</value>

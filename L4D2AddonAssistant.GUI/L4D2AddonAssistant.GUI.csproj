@@ -96,4 +96,8 @@
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\VpkAddonSectionView.axaml" />
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\AddonTagView.axaml" />
+  </ItemGroup>
 </Project>
