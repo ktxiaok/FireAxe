@@ -274,6 +274,31 @@ namespace L4D2AddonAssistant
             return result;
         }
 
+        public void RenameTag(string oldTag, string newTag)
+        {
+            ArgumentNullException.ThrowIfNull(oldTag);
+            ArgumentNullException.ThrowIfNull(newTag);
+            if (newTag.Length == 0)
+            {
+                throw new ArgumentException("empty tag string");
+            }
+            if (oldTag == newTag)
+            {
+                return;
+            }
+
+            if (!_tagSet.Remove(oldTag))
+            {
+                return;
+            }
+            int idx = _tags.IndexOf(oldTag);
+            _tags.RemoveAt(idx);
+            if (_tagSet.Add(newTag))
+            {
+                _tags.Insert(idx, newTag);
+            }
+        }
+
         public void MoveTag(int oldIndex, int newIndex)
         {
             _tags.Move(oldIndex, newIndex);
