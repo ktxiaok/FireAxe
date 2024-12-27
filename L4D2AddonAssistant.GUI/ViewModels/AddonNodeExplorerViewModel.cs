@@ -13,12 +13,13 @@ using DynamicData.Binding;
 using DynamicData;
 using System.Threading;
 using Avalonia.Threading;
+using System.Collections.Specialized;
 
 namespace L4D2AddonAssistant.ViewModels
 {
     public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     {
-        private readonly static TimeSpan SearchTextThrottleTime = TimeSpan.FromSeconds(0.5);
+        private readonly static TimeSpan SearchThrottleTime = TimeSpan.FromSeconds(0.5);
 
         private readonly AddonRoot _addonRoot;
         private readonly IAppWindowManager _windowManager;
@@ -27,6 +28,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         private ReadOnlyObservableCollection<AddonNode>? _nodes = null;
         private IDisposable? _nodesSubscription = null;
+
+        private IEnumerable<string>? _existingTags = null;
 
         private string _searchText = "";
         private readonly ObservableAsPropertyHelper<bool> _isSearchTextClearable;
@@ -38,7 +41,11 @@ namespace L4D2AddonAssistant.ViewModels
         private bool _searchIgnoreCase = true;
         private bool _isSearchFlatten = false;
         private bool _isSearchRegex = false;
-        private AddonNodeSearchOptions _searchOptions = null!;
+        private bool _isFilterEnabled = false;
+        private AddonTagFilterMode _tagFilterMode = AddonTagFilterMode.Or;
+        private IEnumerable<string> _selectedTags = [];
+        private ISet<string>? _filterTags = null;
+        private AddonNodeSearchOptions _searchOptions = new();
 
         private AddonNodeSortMethod _sortMethod = AddonNodeSortMethod.Default;
         private bool _isAscendingOrder = true;
@@ -67,11 +74,6 @@ namespace L4D2AddonAssistant.ViewModels
             _windowManager = windowManager;
             _containerViewModel = new();
             Activator = new();
-
-            this.WhenAnyValue(x => x.SearchIgnoreCase,
-                x => x.IsSearchFlatten,
-                x => x.IsSearchRegex)
-                .Subscribe(_ => UpdateSearchOptions());
 
             _observableComparer = this.WhenAnyValue(x => x.SortMethod, x => x.IsAscendingOrder)
                 .Select(((AddonNodeSortMethod SortMethod, bool IsAscendingOrder) args) => new AddonNodeComparer(args.SortMethod, args.IsAscendingOrder));
@@ -198,8 +200,28 @@ namespace L4D2AddonAssistant.ViewModels
             this.WhenAnyValue(x => x.Nodes)
                 .Subscribe((nodes) => _containerViewModel.Nodes = nodes);
 
+            this.WhenAnyValue(x => x.SelectedTags, x => x.IsFilterEnabled)
+                .Throttle(TimeSpan.FromSeconds(0.1))
+                .Subscribe(_ =>
+                {
+                    if (IsFilterEnabled)
+                    {
+                        FilterTags = new HashSet<string>(SelectedTags);
+                    }
+                    else
+                    {
+                        FilterTags = null;
+                    }
+                });
+            this.WhenAnyValue(x => x.SearchIgnoreCase,
+                x => x.IsSearchFlatten,
+                x => x.IsSearchRegex, 
+                x => x.TagFilterMode, 
+                x => x.FilterTags)
+                .Throttle(SearchThrottleTime)
+                .Subscribe(_ => UpdateSearchOptions());
             this.WhenAnyValue(x => x.SearchText)
-                .Throttle(SearchTextThrottleTime)
+                .Throttle(SearchThrottleTime)
                 .Subscribe(_ => RefreshSearch());
             this.WhenAnyValue(x => x.CurrentGroup, x => x.SearchOptions)
                 .Subscribe(_ => RefreshSearch());
@@ -222,9 +244,18 @@ namespace L4D2AddonAssistant.ViewModels
                 })
                 .DisposeWith(disposables);
 
+                NotifyCollectionChangedEventHandler onCustomTagsChanged = (sender, e) =>
+                {
+                    UpdateExistingTags();
+                };
+                ((INotifyCollectionChanged)_addonRoot.CustomTags).CollectionChanged += onCustomTagsChanged;
+                UpdateExistingTags();
+
                 Disposable.Create(() =>
                 {
                     DisposeNodesSubscription();
+
+                    ((INotifyCollectionChanged)_addonRoot.CustomTags).CollectionChanged -= onCustomTagsChanged;
                 })
                 .DisposeWith(disposables);
             });
@@ -246,6 +277,12 @@ namespace L4D2AddonAssistant.ViewModels
         {
             get => _nodes;
             private set => this.RaiseAndSetIfChanged(ref _nodes, value);
+        }
+
+        public IEnumerable<string>? ExistingTags
+        {
+            get => _existingTags;
+            private set => this.RaiseAndSetIfChanged(ref _existingTags, value);
         }
 
         public string SearchText
@@ -284,6 +321,38 @@ namespace L4D2AddonAssistant.ViewModels
         {
             get => _isSearchRegex;
             set => this.RaiseAndSetIfChanged(ref _isSearchRegex, value);
+        }
+
+        public bool IsFilterEnabled
+        {
+            get => _isFilterEnabled;
+            set => this.RaiseAndSetIfChanged(ref _isFilterEnabled, value);
+        }
+
+        public AddonTagFilterMode TagFilterMode
+        {
+            get => _tagFilterMode;
+            set => this.RaiseAndSetIfChanged(ref _tagFilterMode, value);
+        }
+
+        public IEnumerable<string> SelectedTags
+        {
+            get => _selectedTags;
+            set
+            {
+                _selectedTags = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public ISet<string>? FilterTags
+        {
+            get => _filterTags;
+            private set
+            {
+                _filterTags = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         public AddonNodeSearchOptions SearchOptions
@@ -590,8 +659,7 @@ namespace L4D2AddonAssistant.ViewModels
         private void RefreshSearch()
         {
             CancelSearch();
-            var searchText = SearchText;
-            if (searchText.Length == 0)
+            if (SearchText.Length == 0 && !IsFilterEnabled)
             {
                 SearchResultNodes = null;
             }
@@ -646,8 +714,16 @@ namespace L4D2AddonAssistant.ViewModels
             {
                 IgnoreCase = SearchIgnoreCase,
                 IsFlatten = IsSearchFlatten,
-                IsRegex = IsSearchRegex
+                IsRegex = IsSearchRegex,
+                Tags = FilterTags,
+                TagFilterMode = TagFilterMode
             };
+        }
+
+        private void UpdateExistingTags()
+        {
+            string[] tags = [.. _addonRoot.CustomTags, .. AddonTags.BuiltInTags];
+            ExistingTags = tags;
         }
     }
 }

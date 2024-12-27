@@ -141,6 +141,9 @@
   <data name="AddTag" xml:space="preserve">
     <value>Add Tag</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
   </data>
@@ -306,6 +309,15 @@
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
     <value>Sort By Name</value>
   </data>
+  <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
+    <value>And</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Not" xml:space="preserve">
+    <value>Not</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
+    <value>Or</value>
+  </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>Default</value>
   </data>
@@ -335,6 +347,12 @@
   </data>
   <data name="FileSizeColon" xml:space="preserve">
     <value>File Size: </value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FilterEnabledMessage" xml:space="preserve">
+    <value>Filter is enabled</value>
   </data>
   <data name="Flatten" xml:space="preserve">
     <value>Flatten</value>
@@ -566,6 +584,9 @@
   </data>
   <data name="TagEditor" xml:space="preserve">
     <value>Tag Editor</value>
+  </data>
+  <data name="TagFilterMode" xml:space="preserve">
+    <value>Tag Filter Mode</value>
   </data>
   <data name="TagManager" xml:space="preserve">
     <value>Tag Manager</value>

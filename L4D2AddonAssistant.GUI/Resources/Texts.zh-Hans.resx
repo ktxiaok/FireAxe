@@ -141,6 +141,9 @@
   <data name="AddTag" xml:space="preserve">
     <value>添加标签</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>所有</value>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>一个管理求生之路2模组的工具。</value>
   </data>
@@ -306,6 +309,15 @@
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
     <value>按名称排序</value>
   </data>
+  <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
+    <value>与</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Not" xml:space="preserve">
+    <value>非</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
+    <value>或</value>
+  </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>默认</value>
   </data>
@@ -335,6 +347,12 @@
   </data>
   <data name="FileSizeColon" xml:space="preserve">
     <value>文件大小：</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>筛选器</value>
+  </data>
+  <data name="FilterEnabledMessage" xml:space="preserve">
+    <value>筛选器已启用</value>
   </data>
   <data name="Flatten" xml:space="preserve">
     <value>展平</value>
@@ -566,6 +584,9 @@
   </data>
   <data name="TagEditor" xml:space="preserve">
     <value>标签编辑器</value>
+  </data>
+  <data name="TagFilterMode" xml:space="preserve">
+    <value>标签筛选器模式</value>
   </data>
   <data name="TagManager" xml:space="preserve">
     <value>标签管理器</value>

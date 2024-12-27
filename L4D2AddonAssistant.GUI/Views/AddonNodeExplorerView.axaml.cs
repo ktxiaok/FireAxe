@@ -19,6 +19,8 @@ namespace L4D2AddonAssistant.Views
 
         public AddonNodeExplorerView()
         {
+            InitializeComponent();
+
             this.WhenActivated((CompositeDisposable disposables) =>
             {
                 this.WhenAnyValue(x => x.ViewModel)
@@ -40,7 +42,10 @@ namespace L4D2AddonAssistant.Views
             AddHandler(ListBox.SelectionChangedEvent, AddonNodeExplorerView_SelectionChanged);
             PointerReleased += AddonNodeExplorerView_PointerReleased;
 
-            InitializeComponent();
+            searchOptionsButton.Click += (sender, e) =>
+            {
+                searchOptionsControl.IsVisible = !searchOptionsControl.IsVisible;
+            };
         }
 
         private void ConnectViewModel(AddonNodeExplorerViewModel viewModel)

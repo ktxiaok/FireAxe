@@ -133,6 +133,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 All 的本地化字符串。
+        /// </summary>
+        public static string All {
+            get {
+                return ResourceManager.GetString("All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 A tool for managing Left 4 Dead 2 addons. 的本地化字符串。
         /// </summary>
         public static string AppDescription {
@@ -628,6 +637,33 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 And 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonTagFilterMode_And {
+            get {
+                return ResourceManager.GetString("Enum_AddonTagFilterMode_And", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Not 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonTagFilterMode_Not {
+            get {
+                return ResourceManager.GetString("Enum_AddonTagFilterMode_Not", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Or 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonTagFilterMode_Or {
+            get {
+                return ResourceManager.GetString("Enum_AddonTagFilterMode_Or", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Default 的本地化字符串。
         /// </summary>
         public static string Enum_AutoUpdateStrategy_Default {
@@ -714,6 +750,24 @@ namespace L4D2AddonAssistant.Resources {
         public static string FileSizeColon {
             get {
                 return ResourceManager.GetString("FileSizeColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Filter 的本地化字符串。
+        /// </summary>
+        public static string Filter {
+            get {
+                return ResourceManager.GetString("Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Filter is enabled 的本地化字符串。
+        /// </summary>
+        public static string FilterEnabledMessage {
+            get {
+                return ResourceManager.GetString("FilterEnabledMessage", resourceCulture);
             }
         }
         
@@ -1407,6 +1461,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string TagEditor {
             get {
                 return ResourceManager.GetString("TagEditor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tag Filter Mode 的本地化字符串。
+        /// </summary>
+        public static string TagFilterMode {
+            get {
+                return ResourceManager.GetString("TagFilterMode", resourceCulture);
             }
         }
         

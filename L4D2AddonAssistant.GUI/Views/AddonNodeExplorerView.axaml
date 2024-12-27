@@ -6,6 +6,7 @@
              xmlns:vm="using:L4D2AddonAssistant.ViewModels"
              xmlns:r="using:L4D2AddonAssistant.Resources"
              xmlns:me="using:L4D2AddonAssistant.MarkupExtensions"
+             xmlns:local="using:L4D2AddonAssistant"
              mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
              x:Class="L4D2AddonAssistant.Views.AddonNodeExplorerView"
              x:DataType="vm:AddonNodeExplorerViewModel">
@@ -122,45 +123,17 @@
           <PathIcon Data="{StaticResource icon_dismiss}"/>
         </Button>
         <Button
+          Name="searchOptionsButton"
           Background="Transparent"
           VerticalAlignment="Center"
           Margin="5">
           <PathIcon Data="{StaticResource icon_more}"/>
-          <Button.Flyout>
-            <Flyout>
-              <Grid
-                RowDefinitions="Auto, Auto, Auto"
-                ColumnDefinitions="Auto, 20, Auto">
-                <Grid.Styles>
-                  <Style Selector="TextBlock">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                  </Style>
-                </Grid.Styles>
-                
-                <TextBlock
-                  Grid.Row="0" Grid.Column="0"
-                  Text="{x:Static r:Texts.IgnoreCase}"/>
-                <CheckBox
-                  Grid.Row="0" Grid.Column="2"
-                  IsChecked="{Binding SearchIgnoreCase}"/>
-                
-                <TextBlock
-                  Grid.Row="1" Grid.Column="0"
-                  Text="{x:Static r:Texts.Flatten}"/>
-                <CheckBox
-                  Grid.Row="1" Grid.Column="2"
-                  IsChecked="{Binding IsSearchFlatten}"/>
-                
-                <TextBlock
-                  Grid.Row="2" Grid.Column="0"
-                  Text="{x:Static r:Texts.UseRegex}"/>
-                <CheckBox
-                  Grid.Row="2" Grid.Column="2"
-                  IsChecked="{Binding IsSearchRegex}"/>
-              </Grid>
-            </Flyout>
-          </Button.Flyout>
         </Button>
+        <TextBlock
+          Text="{x:Static r:Texts.FilterEnabledMessage}"
+          IsVisible="{Binding IsFilterEnabled, FallbackValue=False}"
+          VerticalAlignment="Center"
+          Margin="5"/>
         <TextBlock
           IsVisible="{Binding IsSearching, FallbackValue=false}"
           Text="{x:Static r:Texts.SearchingMessage}"
@@ -176,6 +149,7 @@
       BorderThickness="2"
       BorderBrush="Gray">
       <DockPanel>
+        <!--moving nodes-->
         <Panel
           DockPanel.Dock="Top"
           IsVisible="{Binding MovingNodeNames, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -190,8 +164,84 @@
             </Panel>
           </ScrollViewer>
         </Panel>
+        <!--search options-->
+        <Panel
+          DockPanel.Dock="Left"
+          Name="searchOptionsControl"
+          IsVisible="False">
+          <ScrollViewer
+            Width="250"
+            HorizontalScrollBarVisibility="Disabled">
+            <StackPanel
+              Orientation="Vertical"
+              Margin="5">
+              <StackPanel.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="VerticalAlignment" Value="Center"/>
+                  <Setter Property="Margin" Value="5"/>
+                  <Setter Property="TextWrapping" Value="Wrap"/>
+                </Style>
+                <Style Selector="CheckBox">
+                  <Setter Property="HorizontalAlignment" Value="Right"/>
+                  <Setter Property="Margin" Value="5"/>
+                </Style>
+                <Style Selector="ComboBox">
+                  <Setter Property="HorizontalAlignment" Value="Right"/>
+                  <Setter Property="VerticalAlignment" Value="Center"/>
+                  <Setter Property="Margin" Value="5"/>
+                </Style>
+              </StackPanel.Styles>
+              <Grid
+                RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+                ColumnDefinitions="Auto, *">
+                <TextBlock
+                  Grid.Row="0" Grid.Column="0"
+                  Text="{x:Static r:Texts.IgnoreCase}"/>
+                <CheckBox
+                  Grid.Row="0" Grid.Column="1"
+                  IsChecked="{Binding SearchIgnoreCase}"/>
+
+                <TextBlock
+                  Grid.Row="1" Grid.Column="0"
+                  Text="{x:Static r:Texts.Flatten}"/>
+                <CheckBox
+                  Grid.Row="1" Grid.Column="1"
+                  IsChecked="{Binding IsSearchFlatten}"/>
+
+                <TextBlock
+                  Grid.Row="2" Grid.Column="0"
+                  Text="{x:Static r:Texts.UseRegex}"/>
+                <CheckBox
+                  Grid.Row="2" Grid.Column="1"
+                  IsChecked="{Binding IsSearchRegex}"/>
+
+                <TextBlock
+                  Grid.Row="3" Grid.Column="0"
+                  Text="{x:Static r:Texts.Filter}"/>
+                <CheckBox
+                  Grid.Row="3" Grid.Column="1"
+                  IsChecked="{Binding IsFilterEnabled}"/>
+
+                <TextBlock
+                  Grid.Row="4" Grid.Column="0"
+                  Text="{x:Static r:Texts.TagFilterMode}"/>
+                <ComboBox
+                  Grid.Row="4" Grid.Column="1"
+                  ItemsSource="{Binding Source={me:EnumValues {x:Type local:AddonTagFilterMode}}}"
+                  Classes="EnumComboBox"
+                  SelectedItem="{Binding TagFilterMode}"/>
+              </Grid>
+              <StackPanel
+                Orientation="Vertical"
+                IsVisible="{Binding IsFilterEnabled}">
+                <TextBlock
+                  Text="{x:Static r:Texts.Tags}"/>
+                <v:AddonTagCheckBoxList/>
+              </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </Panel>
         <v:AddonNodeContainerView
-          DockPanel.Dock="Bottom"
           DataContext="{Binding ContainerViewModel}"/>
       </DockPanel>
       <Border.ContextMenu>

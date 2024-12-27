@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="using:System"
+             xmlns:r="using:L4D2AddonAssistant.Resources"
+             xmlns:vm="using:L4D2AddonAssistant.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="100"
+             x:Class="L4D2AddonAssistant.Views.AddonTagCheckBox"
+             x:DataType="sys:String">
+  <DockPanel>
+    <CheckBox
+      DockPanel.Dock="Left"
+      Name="checkBox"
+      Margin="5"/>
+    <TextBlock
+      Text="{Binding}"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Center"
+      Margin="5"/>
+  </DockPanel>
+</UserControl>
