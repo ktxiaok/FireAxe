@@ -8,66 +8,65 @@ namespace L4D2AddonAssistant
 {
     public static class PublishedFileDetailsUtils
     {
-        public static Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(ulong publishedFileId, HttpClient httpClient, CancellationToken cancellationToken)
+        public static async Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(ulong publishedFileId, HttpClient httpClient, CancellationToken cancellationToken)
         {
-            var task = new Task<GetPublishedFileDetailsResult>(() =>
+            PublishedFileDetails? content = null;
+            GetPublishedFileDetailsResultStatus status = GetPublishedFileDetailsResultStatus.Failed;
+
+            try
             {
-                PublishedFileDetails? content = null;
-                GetPublishedFileDetailsResultStatus status = GetPublishedFileDetailsResultStatus.Failed;
-
-                try
+                var postContent = new StringContent($"itemcount=1&publishedfileids[0]={publishedFileId}", Encoding.UTF8, "application/x-www-form-urlencoded");
+                var response = await httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", postContent, cancellationToken).ConfigureAwait(false);
+                var responseContentStr = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                var json = JObject.Parse(responseContentStr);
+                if (json.TryGetValue("response", out var responseToken) && responseToken is JObject responseObj)
                 {
-                    var postContent = new StringContent($"itemcount=1&publishedfileids[0]={publishedFileId}", Encoding.UTF8, "application/x-www-form-urlencoded");
-                    var response = httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", postContent, cancellationToken).Result;
-                    var responseContentStr = response.Content.ReadAsStringAsync(cancellationToken).Result;
-                    var json = JObject.Parse(responseContentStr);
-                    if (json.TryGetValue("response", out var responseToken) && responseToken is JObject responseObj)
+                    if (responseObj.TryGetValue("publishedfiledetails", out var detailsToken) && detailsToken is JArray detailsArray)
                     {
-                        if (responseObj.TryGetValue("publishedfiledetails", out var detailsToken) && detailsToken is JArray detailsArray)
+                        if (detailsArray.Count == 1)
                         {
-                            if (detailsArray.Count == 1)
+                            var elementToken = detailsArray[0];
+                            if (elementToken is JObject element)
                             {
-                                var elementToken = detailsArray[0];
-                                if (elementToken is JObject element)
+                                if (element.TryGetValue("result", out var resultTypeToken) && resultTypeToken.Type == JTokenType.Integer)
                                 {
-                                    if (element.TryGetValue("result", out var resultTypeToken) && resultTypeToken.Type == JTokenType.Integer)
+                                    int resultType = (int)resultTypeToken;
+                                    if (resultType == 1)
                                     {
-                                        int resultType = (int)resultTypeToken;
-                                        if (resultType == 1)
+                                        if (element.TryGetValue("consumer_app_id", out var consumerAppIdToken) && consumerAppIdToken.Type == JTokenType.Integer && (int)consumerAppIdToken == 550)
                                         {
-                                            if (element.TryGetValue("consumer_app_id", out var consumerAppIdToken) && consumerAppIdToken.Type == JTokenType.Integer && (int)consumerAppIdToken == 550)
-                                            {
-                                                content = element.ToObject<PublishedFileDetails>();
-                                            }
-                                            else
-                                            {
-                                                status = GetPublishedFileDetailsResultStatus.InvalidPublishedFileId;
-                                            }
-
+                                            content = element.ToObject<PublishedFileDetails>();
                                         }
-                                        else if (resultType == 9)
+                                        else
                                         {
                                             status = GetPublishedFileDetailsResultStatus.InvalidPublishedFileId;
                                         }
+
+                                    }
+                                    else if (resultType == 9)
+                                    {
+                                        status = GetPublishedFileDetailsResultStatus.InvalidPublishedFileId;
                                     }
                                 }
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    Log.Warning(ex, "Exception occurred during the task of PublishedFileDetailsUtils.GetPublishedFileDetailsAsync.");
-                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Exception occurred during the task of PublishedFileDetailsUtils.GetPublishedFileDetailsAsync.");
+            }
 
-                if (content != null)
-                {
-                    status = GetPublishedFileDetailsResultStatus.Succeeded;
-                }
-                return new GetPublishedFileDetailsResult(content, status);
-            }, TaskCreationOptions.LongRunning);
-            task.Start(TaskScheduler.Default);
-            return task;
+            if (content != null)
+            {
+                status = GetPublishedFileDetailsResultStatus.Succeeded;
+            }
+            return new GetPublishedFileDetailsResult(content, status);
         }
     }
 

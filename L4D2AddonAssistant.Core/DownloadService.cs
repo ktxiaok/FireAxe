@@ -15,29 +15,8 @@ namespace L4D2AddonAssistant
 
         private static readonly JsonSerializerSettings s_downloadInfoJsonSettings = new()
         {
-            Formatting = Formatting.Indented,
-            //ContractResolver = DownloadInfoContractResolver.Instance
+            Formatting = Formatting.Indented
         };
-
-        //private class DownloadInfoContractResolver : DefaultContractResolver
-        //{
-        //    public static readonly DownloadInfoContractResolver Instance = new();
-
-        //    protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        //    {
-        //        var property = base.CreateProperty(member, memberSerialization);
-
-        //        if (property.DeclaringType == typeof(DownloadPackage))
-        //        {
-        //            if (property.PropertyName == nameof(DownloadPackage.Storage))
-        //            {
-        //                property.Ignored = true;
-        //            }
-        //        }
-
-        //        return property;
-        //    }
-        //}
 
         private class DownloadItem : IDownloadItem
         {
@@ -65,13 +44,16 @@ namespace L4D2AddonAssistant
 
             private readonly object _downloadLock = new();
 
+            private readonly TaskCompletionSource _waitTaskCompletionSource = new();
+
             internal DownloadItem(string url, string filePath, DownloadService service)
             {
                 _service = service;
                 _url = url;
                 _filePath = filePath;
 
-                var prepareTask = new Task(() =>
+                Task.Run(() => Prepare());
+                async void Prepare()
                 {
                     bool downloadCreated = false;
 
@@ -120,20 +102,12 @@ namespace L4D2AddonAssistant
                                 }
                             }
 
-                            lock (_service._availableDownloadCountLock)
+                            var availableDownloads = _service._availableDownloads;
+                            if (await availableDownloads.WaitAsync(100).ConfigureAwait(false))
                             {
-                                if (_service._availableDownloadCount > 0)
-                                {
-                                    _service._availableDownloadCount--;
-                                    lock (_downloadLock)
-                                    {
-                                        _downloadCountBorrowed = true;
-                                    }
-                                    break;
-                                }
+                                _downloadCountBorrowed = true;
+                                break;
                             }
-
-                            Thread.Sleep(100);
                         }
 
                         lock (_downloadLock)
@@ -171,10 +145,9 @@ namespace L4D2AddonAssistant
 
                     if (!downloadCreated)
                     {
-                        OnDownloadCompleted();
+                        OnCompleted();
                     }
-                }, TaskCreationOptions.LongRunning);
-                prepareTask.Start(TaskScheduler.Default);
+                }
             }
 
             public string Url => _url;
@@ -296,6 +269,11 @@ namespace L4D2AddonAssistant
                 }
             }
 
+            public Task WaitAsync()
+            {
+                return _waitTaskCompletionSource.Task;
+            }
+
             public void Dispose()
             {
                 Downloader.DownloadService? downloadToDispose = null;
@@ -380,7 +358,7 @@ namespace L4D2AddonAssistant
                 //    DisposeDownload(downloadToDispose);
                 //}
 
-                OnDownloadCompleted();
+                OnCompleted();
             }
 
             private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
@@ -431,21 +409,20 @@ namespace L4D2AddonAssistant
                 }
             }
 
-            private void OnDownloadCompleted()
+            private void OnCompleted()
             {
                 lock (_downloadLock)
                 {
                     if (_downloadCountBorrowed)
                     {
-                        lock (_service._availableDownloadCountLock)
-                        {
-                            _service._availableDownloadCount++;
-                        }
+                        _service._availableDownloads.Release();
                         _downloadCountBorrowed = false;
                     }
 
                     Monitor.PulseAll(_downloadLock);
                 }
+
+                _waitTaskCompletionSource.SetResult();
             }
 
             private static void DisposeDownload(Downloader.DownloadService download)
@@ -480,8 +457,7 @@ namespace L4D2AddonAssistant
             ParallelDownload = true
         };
 
-        private int _availableDownloadCount = 5;
-        private readonly object _availableDownloadCountLock = new();
+        private SemaphoreSlim _availableDownloads = new(5);
 
         public DownloadService()
         {
@@ -498,7 +474,7 @@ namespace L4D2AddonAssistant
 
         public void Dispose()
         {
-
+            _availableDownloads.Dispose();
         }
     }
 }

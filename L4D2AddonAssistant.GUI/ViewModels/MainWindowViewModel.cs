@@ -552,7 +552,7 @@ namespace L4D2AddonAssistant.ViewModels
 
         private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)
         {
-            _downloadItemListViewModel.AddDownloadItem(downloadItem);
+            _downloadItemListViewModel.Add(downloadItem);
         }
     }
 }

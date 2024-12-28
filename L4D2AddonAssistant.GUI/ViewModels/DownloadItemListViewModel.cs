@@ -7,18 +7,22 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace L4D2AddonAssistant.ViewModels
 {
-    public class DownloadItemListViewModel : ViewModelBase, IActivatableViewModel
+    public class DownloadItemListViewModel : ViewModelBase, IActivatableViewModel, IDisposable
     {
+        private static TimeSpan CleanInterval = TimeSpan.FromSeconds(0.5);
+
+        private bool _disposed = false;
+
         private readonly ObservableCollection<IDownloadItem> _downloadItems = new();
         private readonly ReadOnlyObservableCollection<DownloadItemViewModel> _downloadItemViewModels;
 
         private IReadOnlyList<DownloadItemViewModel>? _selection = null;
-
         private readonly ObservableAsPropertyHelper<bool> _hasSelection;
+
+        private IDisposable _cleanTimer;
 
         public DownloadItemListViewModel()
         {
@@ -37,7 +41,12 @@ namespace L4D2AddonAssistant.ViewModels
                     return selection.Count > 0;
                 })
                 .ToProperty(this, nameof(HasSelection));
-                
+
+            _cleanTimer = DispatcherTimer.Run(() =>
+            {
+                Clean();
+                return true;
+            }, CleanInterval);
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
@@ -81,24 +90,35 @@ namespace L4D2AddonAssistant.ViewModels
 
         public bool HasSelection => _hasSelection.Value;
 
-        public void AddDownloadItem(IDownloadItem downloadItem)
+        public void Add(IDownloadItem downloadItem)
         {
             ArgumentNullException.ThrowIfNull(downloadItem);
 
             _downloadItems.Add(downloadItem);
-            var waitDownloadTask = new Task(() =>
-            {
-                downloadItem.Wait();
-                Dispatcher.UIThread.Post(() => RemoveDownloadItem(downloadItem));
-            }, TaskCreationOptions.LongRunning);
-            waitDownloadTask.Start(TaskScheduler.Default);
         }
 
-        public void RemoveDownloadItem(IDownloadItem downloadItem)
+        public void Remove(IDownloadItem downloadItem)
         {
             ArgumentNullException.ThrowIfNull(downloadItem);
 
             _downloadItems.Remove(downloadItem);
+        }
+
+        public void Clean()
+        {
+            int i = 0;
+            while (i < _downloadItems.Count)
+            {
+                var downloadItem = _downloadItems[i];
+                if (downloadItem.Status.IsCompleted())
+                {
+                    _downloadItems.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
+                }
+            }
         }
 
         public void Pause()
@@ -123,6 +143,17 @@ namespace L4D2AddonAssistant.ViewModels
             {
                 download.Cancel();
             }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
+
+            _cleanTimer.Dispose();
         }
     }
 }
