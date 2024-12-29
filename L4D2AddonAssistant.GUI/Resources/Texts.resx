@@ -195,6 +195,9 @@
   <data name="ClearCaches" xml:space="preserve">
     <value>Clear Caches</value>
   </data>
+  <data name="CloseDirectory" xml:space="preserve">
+    <value>Close Directory</value>
+  </data>
   <data name="CollectionId" xml:space="preserve">
     <value>Collection ID</value>
   </data>
@@ -494,6 +497,9 @@
   </data>
   <data name="Open" xml:space="preserve">
     <value>Open</value>
+  </data>
+  <data name="OpenDirectory" xml:space="preserve">
+    <value>Open Directory</value>
   </data>
   <data name="OpenDirectoryTip" xml:space="preserve">
     <value>Open a directory where the addons are stored. </value>

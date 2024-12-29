@@ -195,6 +195,9 @@
   <data name="ClearCaches" xml:space="preserve">
     <value>清除缓存</value>
   </data>
+  <data name="CloseDirectory" xml:space="preserve">
+    <value>关闭目录</value>
+  </data>
   <data name="CollectionId" xml:space="preserve">
     <value>合集ID</value>
   </data>
@@ -494,6 +497,9 @@
   </data>
   <data name="Open" xml:space="preserve">
     <value>打开</value>
+  </data>
+  <data name="OpenDirectory" xml:space="preserve">
+    <value>打开目录</value>
   </data>
   <data name="OpenDirectoryTip" xml:space="preserve">
     <value>打开一个存储模组的目录。</value>

@@ -82,6 +82,7 @@ namespace L4D2AddonAssistant.ViewModels
                 }
                 OpenDirectory(path);               
             });
+            CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNull);
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
             OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
             OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
@@ -179,8 +180,18 @@ namespace L4D2AddonAssistant.ViewModels
                 {
                     return;
                 }
-                DisposeAddonRoot();
+
+                if (_addonRoot != null)
+                {
+                    _addonRoot.Save();
+
+                    _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
+                    _addonRoot.DisposeAsync(); // TODO
+                    _addonRoot = null;
+                }
+
                 _addonRoot = value;
+
                 if (_addonRoot == null)
                 {
                     AddonNodeExplorerViewModel = null;
@@ -211,6 +222,8 @@ namespace L4D2AddonAssistant.ViewModels
         public string TitleExtraInfo => _titleExtraInfo.Value;
 
         public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> CloseDirectoryCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ImportCommand { get; }
 
@@ -270,6 +283,13 @@ namespace L4D2AddonAssistant.ViewModels
             AddonRoot = addonRoot;
 
             _settings.LastOpenDirectory = dirPath;
+        }
+
+        public void CloseDirectory()
+        {
+            AddonRoot = null;
+
+            _settings.LastOpenDirectory = null;
         }
 
         public void Save()
@@ -532,21 +552,9 @@ namespace L4D2AddonAssistant.ViewModels
             {
                 _disposed = true;
 
-                DisposeAddonRoot();
+                AddonRoot = null;
                 _checkClipboardTimer.Dispose();
                 _autoRedownloadTimer.Dispose();
-            }
-        }
-
-        private void DisposeAddonRoot()
-        {
-            if (_addonRoot != null)
-            {
-                _addonRoot.Save();
-
-                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
-                _addonRoot.DisposeAsync(); // TODO
-                _addonRoot = null;
             }
         }
 

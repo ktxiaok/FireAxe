@@ -15,7 +15,8 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">
-        <MenuItem Header="{x:Static r:Texts.Open}" Command="{Binding OpenDirectoryCommand}" ToolTip.Tip="{x:Static r:Texts.OpenDirectoryTip}"/>
+        <MenuItem Header="{x:Static r:Texts.OpenDirectory}" Command="{Binding OpenDirectoryCommand}" ToolTip.Tip="{x:Static r:Texts.OpenDirectoryTip}"/>
+        <MenuItem Header="{x:Static r:Texts.CloseDirectory}" Command="{Binding CloseDirectoryCommand}"/>
         <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}" ToolTip.Tip="{x:Static r:Texts.ImportTip}"/>
         <Separator/>
         <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>

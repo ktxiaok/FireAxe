@@ -295,6 +295,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Close Directory 的本地化字符串。
+        /// </summary>
+        public static string CloseDirectory {
+            get {
+                return ResourceManager.GetString("CloseDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Collection ID 的本地化字符串。
         /// </summary>
         public static string CollectionId {
@@ -1191,6 +1200,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Open Directory 的本地化字符串。
+        /// </summary>
+        public static string OpenDirectory {
+            get {
+                return ResourceManager.GetString("OpenDirectory", resourceCulture);
             }
         }
         
