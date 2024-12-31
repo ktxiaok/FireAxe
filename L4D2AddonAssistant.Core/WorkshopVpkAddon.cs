@@ -26,6 +26,8 @@ namespace L4D2AddonAssistant
 
         private string? _vpkPath = null;
 
+        private WorkshopVpkFileNotLoadProblem? _vpkNotLoadProblem = null; 
+
         private Task? _downloadCheckTask = null;
 
         private IDownloadItem? _download = null;
@@ -196,7 +198,9 @@ namespace L4D2AddonAssistant
         protected override void OnCheck()
         {
             base.OnCheck();
-            
+
+            _vpkNotLoadProblem = null;
+
             if (_publishedFileId.HasValue)
             {
                 if (_downloadCheckTask == null)
@@ -207,7 +211,8 @@ namespace L4D2AddonAssistant
 
             if (FullVpkFilePath == null)
             {
-                AddProblem(new WorkshopVpkFileNotLoadProblem(this));
+                _vpkNotLoadProblem = new(this);
+                AddProblem(_vpkNotLoadProblem);
             }
         }
 
@@ -376,12 +381,24 @@ namespace L4D2AddonAssistant
                 _downloadCheckTask.ContinueWith((task) =>
                 {
                     _downloadCheckTask = null;
+
                     blockMove.Dispose();
+
                     foreach (var problem in problems)
                     {
                         AddProblem(problem);
                     }
+
                     SetVpkPath(resultVpkPath);
+                    if (resultVpkPath != null)
+                    {
+                        if (_vpkNotLoadProblem != null)
+                        {
+                            RemoveProblem(_vpkNotLoadProblem);
+                            _vpkNotLoadProblem = null;
+                        }
+                    }
+
                     if (nameToAutoSet != null)
                     {
                         nameToAutoSet = Parent.GetUniqueNodeName(nameToAutoSet);
