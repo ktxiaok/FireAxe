@@ -365,13 +365,12 @@ namespace L4D2AddonAssistant.ViewModels
 
         public void Check()
         {
-            if (_addonRoot != null)
+            if (_addonRoot == null)
             {
-                foreach (var addonNode in _addonRoot.GetAllNodes())
-                {
-                    addonNode.Check();
-                }
+                return;
             }
+
+            _addonRoot.CheckAll();
         }
 
         public void ClearCaches()

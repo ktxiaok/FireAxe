@@ -192,6 +192,10 @@ namespace L4D2AddonAssistant.ViewModels
 
         public void Check()
         {
+            if (AddonNode is AddonGroup addonGroup)
+            {
+                addonGroup.CheckAll();
+            }
             AddonNode.Check();
             Refresh();
         }
