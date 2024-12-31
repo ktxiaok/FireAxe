@@ -1,5 +1,6 @@
 - add: addon tag management
 - improve: improve performance
+- improve: add version check when opening directory
 - change: rename the menu item "File->Open" to "File->Open Directory"
 - add: add menu item "File->Close Directory"
 # v0.5.1

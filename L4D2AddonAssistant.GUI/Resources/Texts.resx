@@ -210,6 +210,9 @@
   <data name="ConfirmDeleteTagCompletely" xml:space="preserve">
     <value>Are you sure you want to delete the selected tags completely?</value>
   </data>
+  <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
+    <value>Higher version of files are opening. This will cause file information loss. Are you sure you want to continue?</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
   </data>
@@ -635,6 +638,9 @@
   </data>
   <data name="VpkInfo" xml:space="preserve">
     <value>VPK Information</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
   <data name="Workshop" xml:space="preserve">
     <value>Workshop</value>

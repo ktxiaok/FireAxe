@@ -210,6 +210,9 @@
   <data name="ConfirmDeleteTagCompletely" xml:space="preserve">
     <value>你确定要彻底删除选中的标签吗？</value>
   </data>
+  <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
+    <value>正在打开高版本的文件。这将会导致文件信息丢失。你确定要继续吗？</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>创建</value>
   </data>
@@ -635,6 +638,9 @@
   </data>
   <data name="VpkInfo" xml:space="preserve">
     <value>VPK信息</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>警告</value>
   </data>
   <data name="Workshop" xml:space="preserve">
     <value>创意工坊</value>

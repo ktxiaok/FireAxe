@@ -19,6 +19,8 @@ namespace L4D2AddonAssistant.ViewModels
 
         private bool _disposed = false;
 
+        private bool _inited = false;
+
         private AppSettings _settings;
         private IAppWindowManager _windowManager;
         private IDownloadService _downloadService;
@@ -80,7 +82,7 @@ namespace L4D2AddonAssistant.ViewModels
                     await ShowDontOpenGameAddonsDirectoryInteraction.Handle(Unit.Default);
                     return;
                 }
-                OpenDirectory(path);               
+                await OpenDirectory(path);               
             });
             CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNull);
             ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
@@ -110,27 +112,9 @@ namespace L4D2AddonAssistant.ViewModels
                 }
             });
 
-            bool initExecuted = false;
             this.WhenActivated((CompositeDisposable disposables) =>
             {
-                if (!initExecuted)
-                {
-                    initExecuted = true;
-
-                    CheckUpdate(true);
-
-                    // Try to open the LastOpenDirectory.
-                    var lastOpenDir = _settings.LastOpenDirectory;
-                    if (lastOpenDir != null)
-                    {
-                        _settings.LastOpenDirectory = null;
-                        _settings.Save();
-                        if (Directory.Exists(lastOpenDir))
-                        {
-                            OpenDirectory(lastOpenDir);
-                        }
-                    }
-                }
+                
             });
 
             _checkClipboardTimer = DispatcherTimer.Run(() =>
@@ -269,13 +253,53 @@ namespace L4D2AddonAssistant.ViewModels
 
         public Interaction<string, bool> ShowAutoDetectWorkshopItemLinkDialogInteraction { get; } = new();
 
-        public void OpenDirectory(string dirPath)
+        public Interaction<string, bool> ConfirmOpenHigherVersionFileInteraction { get; } = new();
+
+        public async void InitIfNot()
+        {
+            if (_inited)
+            {
+                return;
+            }
+            _inited = true;
+
+            CheckUpdate(true);
+
+            // Try to open the LastOpenDirectory.
+            var lastOpenDir = _settings.LastOpenDirectory;
+            if (lastOpenDir != null)
+            {
+                _settings.LastOpenDirectory = null;
+                _settings.Save();
+                if (Directory.Exists(lastOpenDir))
+                {
+                    await OpenDirectory(lastOpenDir);
+                }
+            }
+        }
+
+        public async Task OpenDirectory(string dirPath)
         {
             ArgumentNullException.ThrowIfNull(dirPath);
 
             if (GamePathUtils.IsAddonsPath(dirPath))
             {
                 return;
+            }
+
+            string versionFilePath = Path.Join(dirPath, AddonRoot.VersionFileName);
+            if (File.Exists(versionFilePath))
+            {
+                if (Version.TryParse(File.ReadAllText(versionFilePath), out var version))
+                {
+                    if (version > AppGlobal.Version)
+                    {
+                        if (!(await ConfirmOpenHigherVersionFileInteraction.Handle($"{dirPath} v{version.ToString(3)}")))
+                        {
+                            return;
+                        }
+                    }
+                }
             }
 
             var addonRoot = new AddonRoot();

@@ -340,6 +340,15 @@ namespace L4D2AddonAssistant.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Higher version of files are opening. This will cause file information loss. Are you sure you want to continue? 的本地化字符串。
+        /// </summary>
+        public static string ConfirmOpenHigherVersionFileMessage {
+            get {
+                return ResourceManager.GetString("ConfirmOpenHigherVersionFileMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Create 的本地化字符串。
         /// </summary>
         public static string Create {
@@ -1614,6 +1623,15 @@ namespace L4D2AddonAssistant.Resources {
         public static string VpkInfo {
             get {
                 return ResourceManager.GetString("VpkInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Warning 的本地化字符串。
+        /// </summary>
+        public static string Warning {
+            get {
+                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
         

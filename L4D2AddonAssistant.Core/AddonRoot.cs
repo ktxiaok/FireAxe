@@ -12,6 +12,7 @@ namespace L4D2AddonAssistant
     public class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable
     {
         public const string SaveFileName = ".addonroot";
+        public const string VersionFileName = ".addonrootversion";
 
         private static JsonSerializerSettings s_jsonSettings = new()
         {
@@ -566,6 +567,10 @@ namespace L4D2AddonAssistant
             string path = Path.Join(dirPath, SaveFileName);
             string json = JsonConvert.SerializeObject(save, s_jsonSettings);
             File.WriteAllText(path, json);
+
+            string versionPath = Path.Join(dirPath, VersionFileName);
+            string version = typeof(AddonRoot).Assembly.GetName().Version!.ToString(3);
+            File.WriteAllText(versionPath, version);
         }
 
         public static AddonRootSave? LoadFile(string dirPath)

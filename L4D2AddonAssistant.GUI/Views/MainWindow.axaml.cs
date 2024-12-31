@@ -35,6 +35,8 @@ namespace L4D2AddonAssistant.Views
                     DisconnectViewModel();
                 })
                 .DisposeWith(disposables);
+
+                ViewModel?.InitIfNot();
             });
         }
 
@@ -160,6 +162,14 @@ namespace L4D2AddonAssistant.Views
             {
                 var link = context.Input;
                 bool confirm = await CommonMessageBoxes.Confirm(this, string.Format(Texts.AutoDetectWorkshopItemLinkDialogMessage, link), "");
+                context.SetOutput(confirm);
+            })
+            .DisposeWith(disposables);
+
+            viewModel.ConfirmOpenHigherVersionFileInteraction.RegisterHandler(async (context) =>
+            {
+                var path = context.Input;
+                bool confirm = await CommonMessageBoxes.Confirm(this, $"{Texts.ConfirmOpenHigherVersionFileMessage}\n({path})", Texts.Warning);
                 context.SetOutput(confirm);
             })
             .DisposeWith(disposables);

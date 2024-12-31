@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L4D2AddonAssistant.Core", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "L4D2AddonAssistant.CrashReporter", "L4D2AddonAssistant.CrashReporter\L4D2AddonAssistant.CrashReporter.csproj", "{77A1ADA3-3D91-489E-B98C-F38D863340BF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{962B7D1D-4333-4D2D-B402-A18CB808DDD4}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
