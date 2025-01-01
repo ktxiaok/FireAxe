@@ -1,4 +1,5 @@
 - add: addon tag management
+- fix: push will fail if there're files with the same name
 - improve: improve performance
 - improve: add version check when opening directory
 - improve: auto remove WorkshopVpkFileNotLoadProblem when the download completes

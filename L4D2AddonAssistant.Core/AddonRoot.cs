@@ -478,7 +478,12 @@ namespace L4D2AddonAssistant
                         continue;
                     }
 
-                    File.CreateSymbolicLink(Path.Join(addonsPath, linkFileName), vpkPath);
+                    string linkFilePath = Path.Join(addonsPath, linkFileName);
+                    if (File.Exists(linkFilePath))
+                    {
+                        continue;
+                    }
+                    File.CreateSymbolicLink(linkFilePath, vpkPath);
                     addonEntries[linkFileName] = ("1", vpkAddon.VpkPriority);
                 }
             }
