@@ -1,0 +1,663 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Abort" xml:space="preserve">
+    <value>Abort</value>
+  </data>
+  <data name="AboutApp" xml:space="preserve">
+    <value>About FireAxe</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AddonChildProblemExplain" xml:space="preserve">
+    <value>There're problems in subitems.</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain" xml:space="preserve">
+    <value>The corresponding file "{0}" doesn't exist.</value>
+  </data>
+  <data name="AddonGroupEnableStrategyProblemExplain" xml:space="preserve">
+    <value>The strategy of enablement of the group is not applied correctly.</value>
+  </data>
+  <data name="AddonMoveDeniedMessage" xml:space="preserve">
+    <value>The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later.</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add Tag</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>A tool for managing Left 4 Dead 2 addons.</value>
+  </data>
+  <data name="Ascending" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
+  <data name="AuthorColon" xml:space="preserve">
+    <value>Author:</value>
+  </data>
+  <data name="AutoDetectWorkshopItemLinkDialogMessage" xml:space="preserve">
+    <value>It is detected that you copied a workshop item link ({0}). Would you like to create a workshop addon?</value>
+  </data>
+  <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
+    <value>Auto detect workshop item link in Clipboard</value>
+  </data>
+  <data name="AutoRedownload" xml:space="preserve">
+    <value>Auto redownload items</value>
+  </data>
+  <data name="AutoSetName" xml:space="preserve">
+    <value>Set the Name Automatically</value>
+  </data>
+  <data name="AutoUpdateStrategy" xml:space="preserve">
+    <value>Auto Update Strategy</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CancelMove" xml:space="preserve">
+    <value>Cancel Move</value>
+  </data>
+  <data name="CantMoveItemWithName" xml:space="preserve">
+    <value>Couldn't move the item "{0}"!</value>
+  </data>
+  <data name="Check" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="CheckAllTip" xml:space="preserve">
+    <value>Check all addons to keep their status up to date.</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="CheckingForUpdatesMessage" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="ClearAllCachesTip" xml:space="preserve">
+    <value>Clear caches of all addons.</value>
+  </data>
+  <data name="ClearCaches" xml:space="preserve">
+    <value>Clear Caches</value>
+  </data>
+  <data name="CloseDirectory" xml:space="preserve">
+    <value>Close Directory</value>
+  </data>
+  <data name="CollectionId" xml:space="preserve">
+    <value>Collection ID</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>Are you sure you want to delete the selected items? This cannot be undone. </value>
+  </data>
+  <data name="ConfirmDeleteTagCompletely" xml:space="preserve">
+    <value>Are you sure you want to delete the selected tags completely?</value>
+  </data>
+  <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
+    <value>Higher version of files are opening. This will cause file information loss. Are you sure you want to continue?</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="CreateCollectionFailedMessage" xml:space="preserve">
+    <value>Failed to create the collection. Please try again.</value>
+  </data>
+  <data name="CreationTimeColon" xml:space="preserve">
+    <value>Creation Time: </value>
+  </data>
+  <data name="CurrentVersionLatestMessage" xml:space="preserve">
+    <value>The current version is latest.</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteAndRetainFile" xml:space="preserve">
+    <value>Delete And Retain Files</value>
+  </data>
+  <data name="DeleteCompletely" xml:space="preserve">
+    <value>Delete Completely</value>
+  </data>
+  <data name="DeleteTagCompletelyTip" xml:space="preserve">
+    <value>(Include tags in all addons)</value>
+  </data>
+  <data name="Descending" xml:space="preserve">
+    <value>Descending</value>
+  </data>
+  <data name="DescriptionColon" xml:space="preserve">
+    <value>Description:</value>
+  </data>
+  <data name="Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="DisableRecursively" xml:space="preserve">
+    <value>Disable Recursively (including all subitems)</value>
+  </data>
+  <data name="DontOpenGameAddonsDirectory" xml:space="preserve">
+    <value>Do not open the directory "left4dead2/addons".</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="DownloadList" xml:space="preserve">
+    <value>Download List</value>
+  </data>
+  <data name="Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="EnabledOrDisabled" xml:space="preserve">
+    <value>Enabled/Disabled</value>
+  </data>
+  <data name="EnableRecursively" xml:space="preserve">
+    <value>Enable Recursively (including all subitems)</value>
+  </data>
+  <data name="EnableStrategy" xml:space="preserve">
+    <value>Strategy of Enablement</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_Single" xml:space="preserve">
+    <value>Single</value>
+  </data>
+  <data name="Enum_AddonGroupEnableStrategy_SingleRandom" xml:space="preserve">
+    <value>Random Single</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_Grid" xml:space="preserve">
+    <value>Grid View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_LargeTile" xml:space="preserve">
+    <value>Large Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_MediumTile" xml:space="preserve">
+    <value>Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeListItemViewKind_SmallTile" xml:space="preserve">
+    <value>Small Tile View</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
+    <value>Sort By Creation Time</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
+    <value>Default Order</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
+    <value>Sort By State</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
+    <value>Sort By File Creation Time</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
+    <value>Sort By File Size</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
+    <value>Sort By Name</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
+    <value>And</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Not" xml:space="preserve">
+    <value>Not</value>
+  </data>
+  <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
+    <value>Or</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ExceptionOccurMessage" xml:space="preserve">
+    <value>Exception occurred during the operation!</value>
+  </data>
+  <data name="FailedToGetLatestVersion" xml:space="preserve">
+    <value>Failed to retrieve the latest version.</value>
+  </data>
+  <data name="FavoritesColon" xml:space="preserve">
+    <value>Favorites: </value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="FileDownloadUncompleted" xml:space="preserve">
+    <value>The file download is uncompleted!</value>
+  </data>
+  <data name="FileSizeColon" xml:space="preserve">
+    <value>File Size: </value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FilterEnabledMessage" xml:space="preserve">
+    <value>Filter is enabled</value>
+  </data>
+  <data name="Flatten" xml:space="preserve">
+    <value>Flatten</value>
+  </data>
+  <data name="FlatVpkList" xml:space="preserve">
+    <value>Flat VPK List</value>
+  </data>
+  <data name="GamePath" xml:space="preserve">
+    <value>Game Path</value>
+  </data>
+  <data name="GetPublishedFileDetailsProblemExplain" xml:space="preserve">
+    <value>Failed to get the published file details.</value>
+  </data>
+  <data name="GoToDownload" xml:space="preserve">
+    <value>Go to download</value>
+  </data>
+  <data name="Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>Ignore</value>
+  </data>
+  <data name="IgnoreCase" xml:space="preserve">
+    <value>Ignore Case</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportErrorMessage" xml:space="preserve">
+    <value>Failed to import.</value>
+  </data>
+  <data name="ImportSuccessMessage" xml:space="preserve">
+    <value>Imported successfully.</value>
+  </data>
+  <data name="ImportTip" xml:space="preserve">
+    <value>Import existing files to addon items.</value>
+  </data>
+  <data name="IncludeEnabledAddonsOnly" xml:space="preserve">
+    <value>Only enabled addons are included</value>
+  </data>
+  <data name="IncludeLinkedCollections" xml:space="preserve">
+    <value>Include linked collections</value>
+  </data>
+  <data name="IncludeName" xml:space="preserve">
+    <value>Include Name</value>
+  </data>
+  <data name="IncludeVpkDescription" xml:space="preserve">
+    <value>Include VPK Description</value>
+  </data>
+  <data name="IncludeWorkshopDescription" xml:space="preserve">
+    <value>Include Workshop Description</value>
+  </data>
+  <data name="InputCannotBeEmptyMessage" xml:space="preserve">
+    <value>The input cannot be empty.</value>
+  </data>
+  <data name="InputPublishedFileIdHint" xml:space="preserve">
+    <value>Input number or link</value>
+  </data>
+  <data name="InputTagNameMessage" xml:space="preserve">
+    <value>Please input the name of the tag: </value>
+  </data>
+  <data name="InvalidCollectionIdMessage" xml:space="preserve">
+    <value>The collection id is invalid.</value>
+  </data>
+  <data name="InvalidGamePathMessage" xml:space="preserve">
+    <value>The game path "{0}" is invalid.</value>
+  </data>
+  <data name="InvalidInputMessage" xml:space="preserve">
+    <value>Invalid input.</value>
+  </data>
+  <data name="InvalidMoveMessage" xml:space="preserve">
+    <value>The target group is the subgroup of the source group.</value>
+  </data>
+  <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
+    <value>Invalid published file id.</value>
+  </data>
+  <data name="ItemId" xml:space="preserve">
+    <value>Item ID</value>
+  </data>
+  <data name="ItemNameExists" xml:space="preserve">
+    <value>The name of the item already exists.</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LifetimeFavoritesColon" xml:space="preserve">
+    <value>Lifetime Favorites: </value>
+  </data>
+  <data name="LifetimeSubscriptionsColon" xml:space="preserve">
+    <value>Lifetime Subscriptions: </value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
+  <data name="MoveHere" xml:space="preserve">
+    <value>Move Here</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Move Up</value>
+  </data>
+  <data name="MovingMessage" xml:space="preserve">
+    <value>Moving: {0}</value>
+  </data>
+  <data name="MultipleItemsSelected" xml:space="preserve">
+    <value>{0} items are selected.</value>
+  </data>
+  <data name="NeedRestartHint" xml:space="preserve">
+    <value> (Need Restart)</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="NewTag" xml:space="preserve">
+    <value>New Tag</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>New version available: {0}</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="NoAvailableName" xml:space="preserve">
+    <value>No available name</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Null" xml:space="preserve">
+    <value>Null</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="OpenDirectory" xml:space="preserve">
+    <value>Open Directory</value>
+  </data>
+  <data name="OpenDirectoryTip" xml:space="preserve">
+    <value>Open a directory where the addons are stored. </value>
+  </data>
+  <data name="OpenWorkshopPage" xml:space="preserve">
+    <value>Open Workshop Page</value>
+  </data>
+  <data name="Operations" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="PreparingMessage" xml:space="preserve">
+    <value>Preparing...</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="Problems" xml:space="preserve">
+    <value>Problems</value>
+  </data>
+  <data name="PublishedFileDetails" xml:space="preserve">
+    <value>Published File Details</value>
+  </data>
+  <data name="Push" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="PushErrorMessage" xml:space="preserve">
+    <value>Push failed.</value>
+  </data>
+  <data name="PushSuccessMessage" xml:space="preserve">
+    <value>Push succeeded. If your game is running, go to the game menu to refresh addons.</value>
+  </data>
+  <data name="PushTip" xml:space="preserve">
+    <value>Push enablement states of all addons to the game.</value>
+  </data>
+  <data name="RandomlySelect" xml:space="preserve">
+    <value>Randomly Select</value>
+  </data>
+  <data name="RandomlySelectTip" xml:space="preserve">
+    <value>Randomly enable a child item in groups where the strategy of enablement is "Random Single".</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="RenameTag" xml:space="preserve">
+    <value>Rename Tag</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="RetainFileMessage" xml:space="preserve">
+    <value>If you do this, files will be retained.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SearchingMessage" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ShowInFileExplorer" xml:space="preserve">
+    <value>Show in File Explorer</value>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="SkipAll" xml:space="preserve">
+    <value>Skip All</value>
+  </data>
+  <data name="SubscriptionsColon" xml:space="preserve">
+    <value>Subscriptions: </value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="TagEditor" xml:space="preserve">
+    <value>Tag Editor</value>
+  </data>
+  <data name="TagFilterMode" xml:space="preserve">
+    <value>Tag Filter Mode</value>
+  </data>
+  <data name="TagManager" xml:space="preserve">
+    <value>Tag Manager</value>
+  </data>
+  <data name="TagNameExistMessage" xml:space="preserve">
+    <value>The tag name already exists.</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="TagsOf" xml:space="preserve">
+    <value>Tags of "{0}"</value>
+  </data>
+  <data name="ThisListSortByPriorityMessage" xml:space="preserve">
+    <value>This list is sorted by priority</value>
+  </data>
+  <data name="TitleColon" xml:space="preserve">
+    <value>Title:</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="UnnamedGroup" xml:space="preserve">
+    <value>Unnamed Group</value>
+  </data>
+  <data name="UnnamedWorkshopAddon" xml:space="preserve">
+    <value>Unnamed Workshop Addon</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="UseRegex" xml:space="preserve">
+    <value>Use Regex</value>
+  </data>
+  <data name="VersionColon" xml:space="preserve">
+    <value>Version:</value>
+  </data>
+  <data name="ViewsColon" xml:space="preserve">
+    <value>Views: </value>
+  </data>
+  <data name="VpkInfo" xml:space="preserve">
+    <value>VPK Information</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Workshop" xml:space="preserve">
+    <value>Workshop</value>
+  </data>
+  <data name="WorkshopAddon" xml:space="preserve">
+    <value>Workshop Addon</value>
+  </data>
+  <data name="WorkshopCollection" xml:space="preserve">
+    <value>Workshop Collection</value>
+  </data>
+  <data name="WorkshopItemAutoUpdate" xml:space="preserve">
+    <value>Workshop Item Auto Update</value>
+  </data>
+  <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
+    <value>The workshop vpk file is not loaded.</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+</root>

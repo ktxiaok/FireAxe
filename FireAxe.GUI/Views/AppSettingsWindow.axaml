@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:conv="using:FireAxe.ValueConverters"
+        xmlns:me="using:FireAxe.MarkupExtensions"
+        xmlns:dt="using:FireAxe.DataTemplates"
+        xmlns:local="using:FireAxe"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
+        x:Class="FireAxe.Views.AppSettingsWindow"
+        x:DataType="vm:AppSettingsViewModel"
+        Title="{x:Static r:Texts.Settings}"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen">
+  <Window.DataTemplates>
+    <dt:ExceptionExplainer Scene="Input"/>
+  </Window.DataTemplates>
+  <ScrollViewer>
+    <Grid
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+      ColumnDefinitions="Auto, 50, *"
+      Margin="10">
+      <!--language-->
+      <StackPanel
+        Grid.Row="0" Grid.Column="0"
+        Orientation="Horizontal">
+        <TextBlock
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.Language}"/>
+        <TextBlock
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.NeedRestartHint}"/>
+      </StackPanel>
+      <ComboBox
+        Grid.Row="0" Grid.Column="2"
+        HorizontalAlignment="Right"
+        ItemsSource="{Binding LanguageItemsSource}"
+        SelectedItem="{Binding Settings.Language}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{ReflectionBinding Converter={x:Static conv:LanguageNativeNameConverter.Instance}}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <!--game path-->
+      <TextBlock
+        Grid.Row="1" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.GamePath}"/>
+      <StackPanel
+        Grid.Row="1" Grid.Column="2"
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
+        <TextBox
+          Text="{Binding Settings.GamePath}"
+          Width="250" 
+          Margin="5"/>
+        <Button
+          Command="{Binding SelectGamePathCommand}"
+          Content="{x:Static r:Texts.Select}"
+          Margin="5"/>
+      </StackPanel>
+
+      <!--workshop item auto update-->
+      <TextBlock
+        Grid.Row="2" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
+      <CheckBox
+        Grid.Row="2" Grid.Column="2"
+        Classes="PropertyValue"
+        IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+
+      <!--auto detect workshop item link in clipboard-->
+      <TextBlock
+        Grid.Row="3" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
+      <CheckBox
+        Grid.Row="3" Grid.Column="2"
+        Classes="PropertyValue"
+        IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
+
+      <!--auto redownload-->
+      <TextBlock
+        Grid.Row="4" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.AutoRedownload}"/>
+      <CheckBox
+        Grid.Row="4" Grid.Column="2"
+        Classes="PropertyValue"
+        IsChecked="{Binding Settings.IsAutoRedownload}"/>
+    </Grid>
+  </ScrollViewer>
+  
+</Window>

@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
+             x:Class="FireAxe.Views.AddonNodeSectionViewDecorator">
+  <Border
+    Name="decorator"
+    Margin="0, 5, 0, 5"
+    Padding="5"
+    BorderBrush="Gray"
+    BorderThickness="1"
+    CornerRadius="5">
+    <TextBlock>Content</TextBlock>
+  </Border>
+</UserControl>

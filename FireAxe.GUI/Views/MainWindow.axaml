@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="using:FireAxe.Views"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="FireAxe.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/AppLogo.ico"
+        Title="{Binding TitleExtraInfo, StringFormat=FireAxe{0}}"
+        WindowStartupLocation="CenterScreen"
+        Width="1400" Height="900">
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="{x:Static r:Texts.File}">
+        <MenuItem Header="{x:Static r:Texts.OpenDirectory}" Command="{Binding OpenDirectoryCommand}" ToolTip.Tip="{x:Static r:Texts.OpenDirectoryTip}"/>
+        <MenuItem Header="{x:Static r:Texts.CloseDirectory}" Command="{Binding CloseDirectoryCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}" ToolTip.Tip="{x:Static r:Texts.ImportTip}"/>
+        <Separator/>
+        <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>
+      </MenuItem>
+
+      <MenuItem Header="{x:Static r:Texts.Tools}">
+        <MenuItem Header="{x:Static r:Texts.TagManager}" Command="{Binding OpenTagManagerWindowCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.DownloadList}" Command="{Binding OpenDownloadListWindowCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.FlatVpkList}" Command="{Binding OpenFlatVpkAddonListWindowCommand}"/>
+      </MenuItem>
+      
+      <MenuItem Header="{x:Static r:Texts.Operations}">
+        <MenuItem Header="{x:Static r:Texts.Push}" Command="{Binding PushCommand}" ToolTip.Tip="{x:Static r:Texts.PushTip}"/>
+        <MenuItem Header="{x:Static r:Texts.Check}" Command="{Binding CheckCommand}" ToolTip.Tip="{x:Static r:Texts.CheckAllTip}"/>
+        <MenuItem Header="{x:Static r:Texts.ClearCaches}" Command="{Binding ClearCachesCommand}" ToolTip.Tip="{x:Static r:Texts.ClearAllCachesTip}"/>
+        <MenuItem Header="{x:Static r:Texts.RandomlySelect}" Command="{Binding RandomlySelectCommand}" ToolTip.Tip="{x:Static r:Texts.RandomlySelectTip}"/>
+        <MenuItem Header="Crash?">
+          <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
+        </MenuItem>
+      </MenuItem>
+
+      <MenuItem Header="{x:Static r:Texts.Help}">
+        <MenuItem Header="{x:Static r:Texts.CheckForUpdates}" Command="{Binding CheckUpdateCommand}"/>
+        
+        <Separator/>
+        
+        <MenuItem Header="{x:Static r:Texts.AboutApp}" Command="{Binding OpenAboutWindowCommand}"/>
+      </MenuItem>
+    </Menu>
+    
+    <v:AddonNodeExplorerView DataContext="{Binding AddonNodeExplorerViewModel}"/>
+  </DockPanel>
+</Window>

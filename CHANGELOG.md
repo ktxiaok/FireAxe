@@ -1,3 +1,4 @@
+- change: rename L4D2AddonAssistant to FireAxe
 - add: addon tag management
 - fix: push will fail if there're files with the same name
 - improve: improve performance
