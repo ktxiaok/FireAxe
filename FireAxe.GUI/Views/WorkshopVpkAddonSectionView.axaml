@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             xmlns:local="using:FireAxe"
+             xmlns:me="using:FireAxe.MarkupExtensions"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="800"
+             x:Class="FireAxe.Views.WorkshopVpkAddonSectionView"
+             x:DataType="vm:WorkshopVpkAddonViewModel">
+  <Grid
+    RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+    ColumnDefinitions="Auto, *">
+    <!--title, buttons-->
+    <StackPanel
+      Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+      Orientation="Vertical">
+      <StackPanel.Styles>
+        <Style Selector="Button">
+          <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+      </StackPanel.Styles>
+      <TextBlock
+        Text="{x:Static r:Texts.Workshop}"
+        Classes="Heading1"/>
+      <TextBlock
+        Text="{x:Static r:Texts.FileDownloadUncompleted}"
+        IsVisible="{Binding !IsFileDownloadCompleted}"
+        Foreground="OrangeRed"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"/>
+      
+      <Button
+        Content="{x:Static r:Texts.OpenWorkshopPage}"
+        Command="{Binding OpenWorkshopPage}"/>
+      <Button
+        Content="{x:Static r:Texts.ApplyTagsFromWorkshop}"
+        Command="{Binding ApplyTagsFromWorkshopCommand}"/>
+    </StackPanel>
+
+    <!--item id-->
+    <TextBlock
+      Grid.Row="1" Grid.Column="0"
+      Text="{x:Static r:Texts.ItemId}"
+      Classes="PropertyName"/>
+    <v:EditableTextBlock
+      Grid.Row="1" Grid.Column="1"
+      Value="{Binding ItemId}"
+      Display="{Binding DisplayItemId}"
+      Watermark="{x:Static r:Texts.InputPublishedFileIdHint}"/>
+
+    <!--auto update strategy-->
+    <TextBlock
+      Grid.Row="2" Grid.Column="0"
+      Classes="PropertyName"
+      Text="{x:Static r:Texts.AutoUpdateStrategy}"/>
+    <ComboBox
+      Grid.Row="2" Grid.Column="1"
+      Classes="EnumComboBox PropertyValue"
+      ItemsSource="{Binding Source={me:EnumValues {x:Type local:AutoUpdateStrategy}}}"
+      SelectedItem="{Binding AddonNode.AutoUpdateStrategy}"/>
+
+    <!--download item-->
+    <StackPanel
+      Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+      Margin="0, 5, 0, 5"
+      IsVisible="{Binding DownloadItemViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.Download}"/>
+      <v:DownloadItemView DataContext="{Binding DownloadItemViewModel}"/>
+    </StackPanel>
+
+    <!--published file details-->
+    <Grid
+      Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+      ColumnDefinitions="Auto, *">
+      <TextBlock
+        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="Heading1"
+        Text="{x:Static r:Texts.PublishedFileDetails}"
+        Margin="0, 5, 0, 5"/>
+
+      <SelectableTextBlock
+        Grid.Row="1" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.TitleColon}"/>
+      <SelectableTextBlock
+        Grid.Row="1" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Title}"/>
+      
+      <SelectableTextBlock
+        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.TagsColon}"/>
+      <SelectableTextBlock
+        Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+        Text="{Binding WorkshopTagsString}"
+        TextWrapping="Wrap"/>
+
+      <SelectableTextBlock
+        Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.DescriptionColon}"/>
+      <SelectableTextBlock
+        Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+        Text="{Binding PublishedFileDetails.Description}"
+        TextWrapping="Wrap"/>
+
+      <SelectableTextBlock
+        Grid.Row="6" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.ViewsColon}"/>
+      <SelectableTextBlock
+        Grid.Row="6" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Views}"/>
+
+      <SelectableTextBlock
+        Grid.Row="7" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.SubscriptionsColon}"/>
+      <SelectableTextBlock
+        Grid.Row="7" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Subscriptions}"/>
+
+      <SelectableTextBlock
+        Grid.Row="8" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.FavoritesColon}"/>
+      <SelectableTextBlock
+        Grid.Row="8" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.Favorited}"/>
+
+      <SelectableTextBlock
+        Grid.Row="9" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.LifetimeSubscriptionsColon}"/>
+      <SelectableTextBlock
+        Grid.Row="9" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.LifetimeSubscriptions}"/>
+
+      <SelectableTextBlock
+        Grid.Row="10" Grid.Column="0"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.LifetimeFavoritesColon}"/>
+      <SelectableTextBlock
+        Grid.Row="10" Grid.Column="1"
+        Classes="PropertyValue"
+        Text="{Binding PublishedFileDetails.LifetimeFavorited}"/>
+    </Grid>
+  </Grid>
+</UserControl>

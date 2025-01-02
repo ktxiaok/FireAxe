@@ -1,3 +1,15 @@
+# v0.6.0
+- change: rename L4D2AddonAssistant to FireAxe
+- add: addon tag management
+- add: add the ability to apply tags from workshop
+- add: add some menu items to AddonNodeExplorerView
+- fix: push will fail if there're files with the same name
+- improve: improve performance
+- improve: add version check when opening directory
+- improve: auto remove WorkshopVpkFileNotLoadProblem when the download completes
+- change: rename the menu item "File->Open" to "File->Open Directory"
+- add: add menu item "File->Close Directory"
+- bugfixes
 # v0.5.1
 - fix: too many download tasks will crash the program (issue #7)
 - fix: cancelling a workshop collection creation will crash the program
