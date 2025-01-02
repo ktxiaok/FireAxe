@@ -273,7 +273,14 @@
 
           <MenuItem Header="{x:Static r:Texts.Delete}" Command="{Binding DeleteCommand}" CommandParameter="{x:False}"/>
           <MenuItem Header="{x:Static r:Texts.DeleteAndRetainFile}" Command="{Binding DeleteCommand}" CommandParameter="{x:True}"/>
+          
+          <Separator/>
 
+          <MenuItem Header="{x:Static r:Texts.More}">
+            <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDefaultRecursively}" Command="{Binding SetAutoUpdateStrategyToDefaultRecursivelyCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToEnabledRecursively}" Command="{Binding SetAutoUpdateStrategyToEnabledRecursivelyCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDisabledRecursively}" Command="{Binding SetAutoUpdateStrategyToDisabledRecursivelyCommand}"/>
+          </MenuItem>
         </ContextMenu>
       </Border.ContextMenu>
     </Border>

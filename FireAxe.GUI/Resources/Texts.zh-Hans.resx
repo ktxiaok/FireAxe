@@ -456,6 +456,9 @@
   <data name="LifetimeSubscriptionsColon" xml:space="preserve">
     <value>所有订阅量：</value>
   </data>
+  <data name="More" xml:space="preserve">
+    <value>更多</value>
+  </data>
   <data name="Move" xml:space="preserve">
     <value>移动</value>
   </data>
@@ -575,6 +578,15 @@
   </data>
   <data name="Select" xml:space="preserve">
     <value>选择</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToDefaultRecursively" xml:space="preserve">
+    <value>递归地设置自动更新策略为默认</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToDisabledRecursively" xml:space="preserve">
+    <value>递归地设置自动更新策略为禁用</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToEnabledRecursively" xml:space="preserve">
+    <value>递归地设置自动更新策略为启用</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>设置</value>

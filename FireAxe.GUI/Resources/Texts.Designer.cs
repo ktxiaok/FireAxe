@@ -1078,6 +1078,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 More 的本地化字符串。
+        /// </summary>
+        public static string More {
+            get {
+                return ResourceManager.GetString("More", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Move 的本地化字符串。
         /// </summary>
         public static string Move {
@@ -1434,6 +1443,33 @@ namespace FireAxe.Resources {
         public static string Select {
             get {
                 return ResourceManager.GetString("Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the auto update strategy to Default recursively 的本地化字符串。
+        /// </summary>
+        public static string SetAutoUpdateStrategyToDefaultRecursively {
+            get {
+                return ResourceManager.GetString("SetAutoUpdateStrategyToDefaultRecursively", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the auto update strategy to Disabled recursively 的本地化字符串。
+        /// </summary>
+        public static string SetAutoUpdateStrategyToDisabledRecursively {
+            get {
+                return ResourceManager.GetString("SetAutoUpdateStrategyToDisabledRecursively", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Set the auto update strategy to Enabled recursively 的本地化字符串。
+        /// </summary>
+        public static string SetAutoUpdateStrategyToEnabledRecursively {
+            get {
+                return ResourceManager.GetString("SetAutoUpdateStrategyToEnabledRecursively", resourceCulture);
             }
         }
         

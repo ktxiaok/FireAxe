@@ -168,6 +168,10 @@ namespace FireAxe.ViewModels
 
             DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, hasSelection);
 
+            SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Default));
+            SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Enabled));
+            SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Disabled));
+
             // Ensure the validity of the current group.
             this.WhenAnyValue(x => x.CurrentGroup!.IsValid)
                 .Subscribe((isValid) =>
@@ -443,6 +447,12 @@ namespace FireAxe.ViewModels
 
         public ReactiveCommand<bool, Unit> DeleteCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToDefaultRecursivelyCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToEnabledRecursivelyCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToDisabledRecursivelyCommand { get; }
+
 
         public Interaction<bool, bool> ConfirmDeleteInteraction { get; } = new();
 
@@ -644,6 +654,20 @@ namespace FireAxe.ViewModels
                 }
             }
             SingleSelection?.Refresh();
+        }
+
+        public void SetAutoUpdateStrategyRecursively(AutoUpdateStrategy strategy)
+        {
+            foreach (var addonNode1 in SelectedNodes)
+            {
+                foreach (var addonNode2 in addonNode1.GetSelfAndDescendantsByDfsPreorder())
+                {
+                    if (addonNode2 is WorkshopVpkAddon workshopVpkAddon)
+                    {
+                        workshopVpkAddon.AutoUpdateStrategy = strategy;
+                    }
+                }
+            }
         }
 
         private void DisposeNodesSubscription()

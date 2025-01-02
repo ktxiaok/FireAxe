@@ -456,6 +456,9 @@
   <data name="LifetimeSubscriptionsColon" xml:space="preserve">
     <value>Lifetime Subscriptions: </value>
   </data>
+  <data name="More" xml:space="preserve">
+    <value>More</value>
+  </data>
   <data name="Move" xml:space="preserve">
     <value>Move</value>
   </data>
@@ -575,6 +578,15 @@
   </data>
   <data name="Select" xml:space="preserve">
     <value>Select</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToDefaultRecursively" xml:space="preserve">
+    <value>Set the auto update strategy to Default recursively</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToDisabledRecursively" xml:space="preserve">
+    <value>Set the auto update strategy to Disabled recursively</value>
+  </data>
+  <data name="SetAutoUpdateStrategyToEnabledRecursively" xml:space="preserve">
+    <value>Set the auto update strategy to Enabled recursively</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
