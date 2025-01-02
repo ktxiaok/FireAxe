@@ -9,6 +9,8 @@
     <RootNamespace>FireAxe</RootNamespace>
     <ApplicationIcon>Assets/AppLogo.ico</ApplicationIcon>
     <AssemblyName>FireAxe</AssemblyName>
+    <Configurations>Debug;Release;release-win-x64</Configurations>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

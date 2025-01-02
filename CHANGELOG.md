@@ -1,3 +1,4 @@
+# v0.6.0
 - change: rename L4D2AddonAssistant to FireAxe
 - add: addon tag management
 - add: add the ability to apply tags from workshop

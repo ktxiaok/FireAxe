@@ -1,3 +1,4 @@
+![FireAxe Logo](FireAxe.GUI/Assets/AppLogo.ico)
 # FireAxe
 **[English](README.md)** | **简体中文**
 
