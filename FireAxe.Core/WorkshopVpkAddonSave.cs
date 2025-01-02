@@ -11,5 +11,7 @@ namespace FireAxe
         public AutoUpdateStrategy AutoUpdateStrategy { get; set; }
 
         public bool RequestAutoSetName { get; set; } = false;
+
+        public bool RequestApplyTagsFromWorkshop { get; set; } = true;
     }
 }

@@ -29,10 +29,11 @@
       Grid.Column="1"
       Text="{Binding AddonNode.Name}"
       VerticalAlignment="Center"
-      TextTrimming="CharacterEllipsis"/>
+      TextWrapping="Wrap"/>
     <Panel
       Grid.Column="2"
-      ClipToBounds="True">
+      ClipToBounds="True"
+      Margin="0, 0, 5, 0">
       <Panel.Styles>
         <Style Selector="TextBlock">
           <Setter Property="FontSize" Value="11"/>
@@ -49,7 +50,7 @@
         </ItemsControl.ItemTemplate>
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
-            <StackPanel Orientation="Horizontal"/>
+            <WrapPanel/>
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
       </ItemsControl>

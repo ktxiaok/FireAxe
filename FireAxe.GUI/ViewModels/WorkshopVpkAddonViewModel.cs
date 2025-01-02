@@ -1,6 +1,8 @@
 ﻿using FireAxe.Resources;
 using ReactiveUI;
 using System;
+using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -14,6 +16,8 @@ namespace FireAxe.ViewModels
         private PublishedFileDetails? _publishedFileDetails = null;
 
         private readonly ObservableAsPropertyHelper<string> _displayItemId;
+
+        private readonly ObservableAsPropertyHelper<string> _workshopTagsString;
 
         private ObservableAsPropertyHelper<bool>? _isFileDownloadCompleted = null;
 
@@ -31,6 +35,29 @@ namespace FireAxe.ViewModels
                     return itemId;
                 })
                 .ToProperty(this, nameof(DisplayItemId));
+
+            _workshopTagsString = this.WhenAnyValue(x => x.PublishedFileDetails)
+                .Select(details =>
+                {
+                    if (details == null)
+                    {
+                        return "";
+                    }
+                    var tags = details.Tags;
+                    if (tags == null)
+                    {
+                        return "";
+                    }
+                    return string.Join(", ", tags.Select(tagObj => tagObj.Tag));
+                })
+                .ToProperty(this, nameof(WorkshopTagsString));
+
+            ApplyTagsFromWorkshopCommand = ReactiveCommand.Create(() =>
+            {
+                var addon = AddonNode;
+                addon.RequestApplyTagsFromWorkshop = true;
+                addon.Check();
+            });
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
@@ -87,6 +114,8 @@ namespace FireAxe.ViewModels
 
         public string DisplayItemId => _displayItemId.Value;
 
+        public string WorkshopTagsString => _workshopTagsString.Value;
+
         public bool IsFileDownloadCompleted => _isFileDownloadCompleted?.Value ?? false;
 
         public DownloadItemViewModel? DownloadItemViewModel
@@ -100,6 +129,8 @@ namespace FireAxe.ViewModels
             get => _publishedFileDetails;
             private set => this.RaiseAndSetIfChanged(ref _publishedFileDetails, value);
         }
+
+        public ReactiveCommand<Unit, Unit> ApplyTagsFromWorkshopCommand { get; }
 
         public void OpenWorkshopPage()
         {

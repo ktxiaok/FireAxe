@@ -151,6 +151,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Apply Tags from Workshop 的本地化字符串。
+        /// </summary>
+        public static string ApplyTagsFromWorkshop {
+            get {
+                return ResourceManager.GetString("ApplyTagsFromWorkshop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Ascending 的本地化字符串。
         /// </summary>
         public static string Ascending {
@@ -1524,6 +1533,15 @@ namespace FireAxe.Resources {
         public static string Tags {
             get {
                 return ResourceManager.GetString("Tags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Tags:  的本地化字符串。
+        /// </summary>
+        public static string TagsColon {
+            get {
+                return ResourceManager.GetString("TagsColon", resourceCulture);
             }
         }
         

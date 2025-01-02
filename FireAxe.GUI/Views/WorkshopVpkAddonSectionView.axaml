@@ -7,7 +7,7 @@
              xmlns:r="using:FireAxe.Resources"
              xmlns:local="using:FireAxe"
              xmlns:me="using:FireAxe.MarkupExtensions"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="800"
              x:Class="FireAxe.Views.WorkshopVpkAddonSectionView"
              x:DataType="vm:WorkshopVpkAddonViewModel">
   <Grid
@@ -36,6 +36,9 @@
       <Button
         Content="{x:Static r:Texts.OpenWorkshopPage}"
         Command="{Binding OpenWorkshopPage}"/>
+      <Button
+        Content="{x:Static r:Texts.ApplyTagsFromWorkshop}"
+        Command="{Binding ApplyTagsFromWorkshopCommand}"/>
     </StackPanel>
 
     <!--item id-->
@@ -74,7 +77,7 @@
     <!--published file details-->
     <Grid
       Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
-      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto"
       ColumnDefinitions="Auto, *">
       <TextBlock
         Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
@@ -90,58 +93,67 @@
         Grid.Row="1" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Title}"/>
-
+      
       <SelectableTextBlock
         Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
         Classes="PropertyName"
-        Text="{x:Static r:Texts.DescriptionColon}"/>
+        Text="{x:Static r:Texts.TagsColon}"/>
       <SelectableTextBlock
         Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+        Text="{Binding WorkshopTagsString}"
+        TextWrapping="Wrap"/>
+
+      <SelectableTextBlock
+        Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.DescriptionColon}"/>
+      <SelectableTextBlock
+        Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
         Text="{Binding PublishedFileDetails.Description}"
         TextWrapping="Wrap"/>
 
       <SelectableTextBlock
-        Grid.Row="4" Grid.Column="0"
+        Grid.Row="6" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.ViewsColon}"/>
       <SelectableTextBlock
-        Grid.Row="4" Grid.Column="1"
+        Grid.Row="6" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Views}"/>
 
       <SelectableTextBlock
-        Grid.Row="5" Grid.Column="0"
+        Grid.Row="7" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.SubscriptionsColon}"/>
       <SelectableTextBlock
-        Grid.Row="5" Grid.Column="1"
+        Grid.Row="7" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Subscriptions}"/>
 
       <SelectableTextBlock
-        Grid.Row="6" Grid.Column="0"
+        Grid.Row="8" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.FavoritesColon}"/>
       <SelectableTextBlock
-        Grid.Row="6" Grid.Column="1"
+        Grid.Row="8" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.Favorited}"/>
 
       <SelectableTextBlock
-        Grid.Row="7" Grid.Column="0"
+        Grid.Row="9" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.LifetimeSubscriptionsColon}"/>
       <SelectableTextBlock
-        Grid.Row="7" Grid.Column="1"
+        Grid.Row="9" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.LifetimeSubscriptions}"/>
 
       <SelectableTextBlock
-        Grid.Row="8" Grid.Column="0"
+        Grid.Row="10" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.LifetimeFavoritesColon}"/>
       <SelectableTextBlock
-        Grid.Row="8" Grid.Column="1"
+        Grid.Row="10" Grid.Column="1"
         Classes="PropertyValue"
         Text="{Binding PublishedFileDetails.LifetimeFavorited}"/>
     </Grid>

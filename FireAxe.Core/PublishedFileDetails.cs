@@ -5,6 +5,12 @@ namespace FireAxe
 {
     public class PublishedFileDetails
     {
+        public class TagObject
+        {
+            [JsonProperty("tag")]
+            public required string Tag { get; init; }
+        }
+
         [JsonProperty("file_url")]
         public required string FileUrl { get; init; }
 
@@ -37,5 +43,8 @@ namespace FireAxe
 
         [JsonProperty("views")]
         public required uint Views { get; init; }
+
+        [JsonProperty("tags")]
+        public IReadOnlyList<TagObject>? Tags { get; init; }
     }
 }

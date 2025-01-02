@@ -147,6 +147,9 @@
   <data name="AppDescription" xml:space="preserve">
     <value>A tool for managing Left 4 Dead 2 addons.</value>
   </data>
+  <data name="ApplyTagsFromWorkshop" xml:space="preserve">
+    <value>Apply Tags from Workshop</value>
+  </data>
   <data name="Ascending" xml:space="preserve">
     <value>Ascending</value>
   </data>
@@ -605,6 +608,9 @@
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
+  </data>
+  <data name="TagsColon" xml:space="preserve">
+    <value>Tags: </value>
   </data>
   <data name="TagsOf" xml:space="preserve">
     <value>Tags of "{0}"</value>

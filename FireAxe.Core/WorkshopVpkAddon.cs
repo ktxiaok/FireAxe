@@ -34,6 +34,8 @@ namespace FireAxe
 
         private bool _requestAutoSetName = false;
 
+        private bool _requestApplyTagsFromWorkshop = true;
+
         public WorkshopVpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
             PropertyChanged += WorkshopVpkAddon_PropertyChanged;
@@ -110,6 +112,18 @@ namespace FireAxe
             set
             {
                 if (NotifyAndSetIfChanged(ref _requestAutoSetName, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
+        }
+
+        public bool RequestApplyTagsFromWorkshop
+        {
+            get => _requestApplyTagsFromWorkshop;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _requestApplyTagsFromWorkshop, value))
                 {
                     Root.RequestSave = true;
                 }
@@ -228,6 +242,7 @@ namespace FireAxe
             }
             bool requestUpdate = IsAutoUpdate;
             bool requestAutoSetName = RequestAutoSetName;
+            bool requestApplyTagsFromWorkshop = RequestApplyTagsFromWorkshop;
             string? nameToAutoSet = null;
             string? resultVpkPath = null;
             var problems = new List<AddonProblem>();
@@ -294,6 +309,22 @@ namespace FireAxe
                                 if (nameToAutoSet.Length == 0)
                                 {
                                     nameToAutoSet = "UNNAMED";
+                                }
+                            }
+
+                            if (requestApplyTagsFromWorkshop)
+                            {
+                                var tags = details.Tags;
+                                if (tags != null)
+                                {
+                                    await addonRootTaskFactory.StartNew(() =>
+                                    {
+                                        foreach (var tagObj in tags)
+                                        {
+                                            AddTag(tagObj.Tag);
+                                        }
+                                        RequestApplyTagsFromWorkshop = false;
+                                    });
                                 }
                             }
 
@@ -508,6 +539,7 @@ namespace FireAxe
             save1.PublishedFileId = PublishedFileId;
             save1.AutoUpdateStrategy = AutoUpdateStrategy;
             save1.RequestAutoSetName = RequestAutoSetName;
+            save1.RequestApplyTagsFromWorkshop = RequestApplyTagsFromWorkshop;
         }
 
         protected override void OnLoadSave(AddonNodeSave save)
@@ -520,6 +552,7 @@ namespace FireAxe
             }
             AutoUpdateStrategy = save1.AutoUpdateStrategy;
             RequestAutoSetName = save1.RequestAutoSetName;
+            RequestApplyTagsFromWorkshop = save1.RequestApplyTagsFromWorkshop;
         }
 
         private Task<GetPublishedFileDetailsResult> DoGetPublishedFileDetailsAsync(CancellationToken cancellationToken)

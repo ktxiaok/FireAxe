@@ -1,5 +1,6 @@
 - change: rename L4D2AddonAssistant to FireAxe
 - add: addon tag management
+- add: add the ability to apply tags from workshop
 - fix: push will fail if there're files with the same name
 - improve: improve performance
 - improve: add version check when opening directory

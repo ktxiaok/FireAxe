@@ -147,6 +147,9 @@
   <data name="AppDescription" xml:space="preserve">
     <value>一个管理求生之路2模组的工具。</value>
   </data>
+  <data name="ApplyTagsFromWorkshop" xml:space="preserve">
+    <value>应用创意工坊标签</value>
+  </data>
   <data name="Ascending" xml:space="preserve">
     <value>升序</value>
   </data>
@@ -605,6 +608,9 @@
   </data>
   <data name="Tags" xml:space="preserve">
     <value>标签</value>
+  </data>
+  <data name="TagsColon" xml:space="preserve">
+    <value>标签：</value>
   </data>
   <data name="TagsOf" xml:space="preserve">
     <value>“{0}”的标签</value>
