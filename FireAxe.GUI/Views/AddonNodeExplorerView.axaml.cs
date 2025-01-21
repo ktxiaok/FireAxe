@@ -31,9 +31,14 @@ namespace FireAxe.Views
                 })
                 .DisposeWith(disposables);
 
+                var topLevel = TopLevel.GetTopLevel(this)!;
+                topLevel.KeyDown += HandleKeyDown;
+
                 Disposable.Create(() =>
                 {
                     DisconnectViewModel();
+
+                    topLevel.KeyDown -= HandleKeyDown;
                 })
                 .DisposeWith(disposables);
             });
@@ -208,6 +213,29 @@ namespace FireAxe.Views
                 if (viewModel != null)
                 {
                     viewModel.GotoParent();
+                }
+            }
+        }
+
+        private async void HandleKeyDown(object? sender, KeyEventArgs e)
+        {
+            var viewModel = ViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+            {
+                if (e.Key == Key.X)
+                {
+                    e.Handled = true;
+                    viewModel.Move();
+                }
+                else if (e.Key == Key.V)
+                {
+                    e.Handled = true;
+                    await viewModel.MoveHere();
                 }
             }
         }
