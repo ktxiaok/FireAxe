@@ -114,14 +114,18 @@ namespace FireAxe
 
         public string DirectoryPath
         {
-            get => _directoryPath?.FullName ?? "";
+            get => _directoryPath?.FullName ?? throw new InvalidOperationException("DirectoryPath is not set");
             set
             {
                 _directoryPath = new(value);
                 _directoryPath.Create();
                 RequestSave = true;
+
+                Directory.CreateDirectory(CacheDirectoryPath);
             }
         }
+
+        public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir/caches");
 
         public string GamePath
         {

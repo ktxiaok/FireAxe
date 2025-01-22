@@ -54,14 +54,19 @@ namespace FireAxe
             set
             {
                 ArgumentNullException.ThrowIfNull(value);
-
-                if (NotifyAndSetIfChanged(ref _publishedFileId, value))
+                if (value == _publishedFileId)
                 {
-                    _download?.Cancel();
-                    ClearCaches();
-                    AutoCheck();
-                    Root.RequestSave = true;
+                    return;
                 }
+
+                ClearCaches();
+
+                _publishedFileId = value;
+                NotifyChanged();
+
+                _download?.Cancel();
+                AutoCheck();
+                Root.RequestSave = true;
             }
         }
 
@@ -209,6 +214,24 @@ namespace FireAxe
             _publishedFileDetails.SetTarget(null);
         }
 
+        public override void ClearCacheFiles()
+        {
+            base.ClearCacheFiles();
+
+            string imagePath = GetImageCacheFilePath();
+            try
+            {
+                if (File.Exists(imagePath))
+                {
+                    File.Delete(imagePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during deleting the image cache file: {FilePath}", imagePath);
+            }
+        }
+
         protected override void OnCheck()
         {
             base.OnCheck();
@@ -233,6 +256,8 @@ namespace FireAxe
         private void CreateDownloadCheckTask(ulong publishedFileId)
         {
             string dirPath = FullFilePath;
+            string imageCacheFilePath = GetImageCacheFilePath();
+            var httpClient = Root.HttpClient;
             var cancellationToken = DestructionCancellationToken;
             var details = PublishedFileDetailsCache;
             Task<GetPublishedFileDetailsResult>? getDetailsTask = null;
@@ -328,6 +353,32 @@ namespace FireAxe
                                 }
                             }
 
+                            byte[]? image = null;
+                            string imageUrl = details.PreviewUrl;
+                            try
+                            {
+                                image = await httpClient.GetByteArrayAsync(imageUrl, cancellationToken).ConfigureAwait(false);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error(ex, "Exception occurred during downloading the image: {Url}", imageUrl);
+                            }
+                            if (image != null)
+                            {
+                                try
+                                {
+                                    await File.WriteAllBytesAsync(imageCacheFilePath, image).ConfigureAwait(false);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Error(ex, "Exception occurred during writing the image cache file: {FilePath}", imageCacheFilePath);
+                                }
+                            }
+
                             bool needDownload = false;
 
                             if (metaInfo == null)
@@ -403,6 +454,7 @@ namespace FireAxe
                             resultVpkPath = Path.Join(dirPath, metaInfo.CurrentFile);
                         }
                     }
+                    catch (OperationCanceledException) { }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Exception occurred during the download check task of a WorkshopVpkAddon");
@@ -450,60 +502,72 @@ namespace FireAxe
             }
         }
 
-        protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
+        protected override async Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
         {
+            byte[]? image = null;
             var httpClient = Root.HttpClient;
-            return GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ContinueWith<byte[]?>((task) =>
+
+            string imageCacheFilePath = GetImageCacheFilePath();
+            try
             {
-                if (task.IsCanceled)
+                if (File.Exists(imageCacheFilePath))
                 {
-                    throw new TaskCanceledException();
+                    image = await File.ReadAllBytesAsync(imageCacheFilePath, cancellationToken).ConfigureAwait(false);
                 }
-                var result = task.Result;
-                if (result != null)
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during reading the image cache file: {FilePath}", imageCacheFilePath);
+            }
+            if (image != null)
+            {
+                return image;
+            }
+
+            var publishedFileDetails = await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false);
+            if (publishedFileDetails != null)
+            {
+                string imageUrl = publishedFileDetails.PreviewUrl;
+                try
                 {
-                    string url = result.PreviewUrl;
+                    image = await httpClient.GetByteArrayAsync(imageUrl, cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during downloading the image: {Url}", imageUrl);
+                }
+                if (image != null)
+                {
                     try
                     {
-                        return httpClient.GetByteArrayAsync(url, cancellationToken).Result;
+                        await File.WriteAllBytesAsync(imageCacheFilePath, image).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Exception occurred during getting the preview image of the published file.\nTitle: {Title}\nUrl: {Url}", result.Title, url);
+                        Log.Error(ex, "Exception occurred during writing the image cache file: {FilePath}", imageCacheFilePath);
                     }
                 }
-                return null;
-            }).ContinueWith<Task<byte[]?>>((task) =>
-            {
-                if (task.IsCanceled)
-                {
-                    throw new TaskCanceledException();
-                }
-                var result = task.Result;
-                if (result == null)
-                {
-                    return base.DoGetImageAsync(cancellationToken);
-                }
-                else
-                {
-                    return Task.FromResult<byte[]?>(result);
-                }
-            }, Root.TaskScheduler).ContinueWith((task) => 
-            {
-                if (task.IsCanceled)
-                {
-                    throw new TaskCanceledException();
-                }
-                var task2 = task.Result;
-                try
-                {
-                    return task2.Result;
-                }
-                catch (AggregateException ex)
-                {
-                    throw ex.InnerExceptions[0];
-                }
-            });
+            }
+
+            return image;
+        }
+
+        private string GetImageCacheFilePath()
+        {
+            return Path.Join(Root.CacheDirectoryPath, GetImageCacheFileName());
+        }
+
+        private string GetImageCacheFileName()
+        {
+            return $"workshop_image_{PublishedFileId.GetValueOrDefault(0)}";
         }
 
         protected override Task OnDestroyAsync()

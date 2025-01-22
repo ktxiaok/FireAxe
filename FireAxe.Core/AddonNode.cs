@@ -463,6 +463,13 @@ namespace FireAxe
 
         public Task DestroyWithFileAsync()
         {
+            if (!IsValid)
+            {
+                return Task.CompletedTask;
+            }
+
+            ClearCacheFiles();
+
             string? pathToDelete = null;
             if (RequireFile && Name.Length > 0)
             {
@@ -504,7 +511,13 @@ namespace FireAxe
 
         public virtual void ClearCaches()
         {
+            ClearCacheFiles();
             _image.SetTarget(null);
+        }
+
+        public virtual void ClearCacheFiles()
+        {
+
         }
 
         private class CreateSaveStackFrame
