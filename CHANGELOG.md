@@ -1,3 +1,4 @@
+- upgrade: update dependent packages
 - add: workshop preview image cache (issue #11)
 - fix: hotkeys conflict with TextBox (issue #12)
 # v0.6.0
