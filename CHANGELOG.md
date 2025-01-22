@@ -1,6 +1,7 @@
 - upgrade: update dependent packages
 - add: workshop preview image cache (issue #11)
 - fix: hotkeys conflict with TextBox (issue #12)
+- bugfixes
 # v0.6.0
 - change: rename L4D2AddonAssistant to FireAxe
 - add: addon tag management

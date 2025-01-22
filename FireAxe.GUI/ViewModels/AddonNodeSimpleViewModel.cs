@@ -100,6 +100,7 @@ namespace FireAxe.ViewModels
                 if (addon is VpkAddon vpkAddon)
                 {
                     vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
+                    .Skip(1)
                     .Subscribe(_ =>
                     {
                         Refresh();
