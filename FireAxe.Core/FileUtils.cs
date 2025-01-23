@@ -12,7 +12,7 @@ namespace FireAxe
 
         // Struct which contains information that the SHFileOperation function uses to perform file operations. 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        public struct SHFILEOPSTRUCT
+        private struct SHFILEOPSTRUCT
         {
             public IntPtr hwnd;
             [MarshalAs(UnmanagedType.U4)]
@@ -192,6 +192,13 @@ namespace FireAxe
             }
 
             return result;
+        }
+
+        public static string NormalizePath(string path)
+        {
+            ArgumentNullException.ThrowIfNull(path);
+
+            return path.Replace('\\', '/');
         }
     }
 }
