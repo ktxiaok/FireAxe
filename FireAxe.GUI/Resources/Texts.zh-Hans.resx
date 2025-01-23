@@ -228,6 +228,9 @@
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>当前版本已是最新版本。</value>
   </data>
+  <data name="CustomizePreviewImage" xml:space="preserve">
+    <value>自定义预览图像</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>默认</value>
   </data>

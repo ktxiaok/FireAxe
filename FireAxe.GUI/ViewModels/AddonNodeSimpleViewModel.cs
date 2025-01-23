@@ -27,7 +27,7 @@ namespace FireAxe.ViewModels
 
         private bool _hasProblem = false;
 
-        private readonly bool _shouldShowFolderIcon;
+        private ObservableAsPropertyHelper<bool>? _shouldShowFolderIcon = null;
         private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
         private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
 
@@ -39,7 +39,6 @@ namespace FireAxe.ViewModels
         {
             _addonNode = addonNode;
             Activator = new();
-            _shouldShowFolderIcon = _addonNode is AddonGroup;
 
             ToggleEnabledCommand = ReactiveCommand.Create(() => 
             {
@@ -81,30 +80,32 @@ namespace FireAxe.ViewModels
                 })
                 .ToProperty(this, nameof(EnableState));
 
-                _shouldShowUnknownImage = (_shouldShowFolderIcon ?
-                Observable.Return(false) :
-                this.WhenAnyValue(x => x.Image)
-                .Select(image => image == null))
+                _shouldShowFolderIcon = this.WhenAnyValue(x => x.Image)
+                .Select(image => image == null && _addonNode is AddonGroup)
+                .ToProperty(this, nameof(ShouldShowFolderIcon));
+
+                _shouldShowUnknownImage = this.WhenAnyValue(x => x.Image)
+                .Select(image => image == null && _addonNode is not AddonGroup)
                 .ToProperty(this, nameof(ShouldShowUnknownImage));
 
-                _shouldShowImage = (_shouldShowFolderIcon ?
-                    Observable.Return(false) :
-                    this.WhenAnyValue(x => x.Image)
-                    .Select(image => image != null))
+                _shouldShowImage = this.WhenAnyValue(x => x.Image)
+                    .Select(image => image != null)
                     .ToProperty(this, nameof(ShouldShowImage));
 
                 _fileSizeReadable = this.WhenAnyValue(x => x.AddonNode.FileSize)
                 .Select((fileSize) => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)
                 .ToProperty(this, nameof(FileSizeReadable));
 
+                addon.WhenAnyValue(x => x.CustomImagePath)
+                .Skip(1)
+                .Throttle(TimeSpan.FromSeconds(0.5))
+                .Subscribe(_ => Refresh())
+                .DisposeWith(disposables);
                 if (addon is VpkAddon vpkAddon)
                 {
                     vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
                     .Skip(1)
-                    .Subscribe(_ =>
-                    {
-                        Refresh();
-                    })
+                    .Subscribe(_ => Refresh())
                     .DisposeWith(disposables);
                 }
 
@@ -118,6 +119,9 @@ namespace FireAxe.ViewModels
 
                     _enableState.Dispose();
                     _enableState = null;
+
+                    _shouldShowFolderIcon.Dispose();
+                    _shouldShowFolderIcon = null;
 
                     _shouldShowUnknownImage.Dispose();
                     _shouldShowUnknownImage = null;
@@ -166,7 +170,7 @@ namespace FireAxe.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _hasProblem, value);
         }
 
-        public bool ShouldShowFolderIcon => _shouldShowFolderIcon;
+        public bool ShouldShowFolderIcon => _shouldShowFolderIcon?.Value ?? false;
 
         public bool ShouldShowUnknownImage => _shouldShowUnknownImage?.Value ?? false;
 
@@ -206,7 +210,7 @@ namespace FireAxe.ViewModels
             Utils.ShowFileInExplorer(AddonNode.FullFilePath);
         }
 
-        protected virtual async void OnRefresh()
+        protected virtual void OnRefresh()
         {
             CancelTasks();
             _cancellationTokenSource = new();
@@ -214,22 +218,58 @@ namespace FireAxe.ViewModels
 
             var addon = AddonNode;
 
-            byte[]? imageData = null;
-            try
+            RefreshImage();
+
+            async void RefreshImage()
             {
-                imageData = await addon.GetImageAllowCacheAsync(cancellationToken);
-            }
-            catch (OperationCanceledException) { }
-            _rawImage = imageData;
-            if (imageData != null)
-            {
+                Image = null;
+                _rawImage = null;
+
+                byte[]? imageData = null;
+
                 try
                 {
-                    Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+                    var customImagePath = addon.CustomImageFullPath;
+                    if (customImagePath != null)
+                    {
+                        try
+                        {
+                            if (File.Exists(customImagePath))
+                            {
+                                imageData = await File.ReadAllBytesAsync(customImagePath, cancellationToken);
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during reading custom image: {FilePath}", customImagePath);
+                        }
+                    }
+
+                    if (imageData == null)
+                    {
+                        imageData = await addon.GetImageAllowCacheAsync(cancellationToken);
+                        _rawImage = imageData;
+                    }
                 }
-                catch (Exception ex)
+                catch (OperationCanceledException) 
                 {
-                    Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.Refresh.");
+                    return;
+                }
+
+                if (imageData != null)
+                {
+                    try
+                    {
+                        Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.OnRefresh.");
+                    }
                 }
             }
         }

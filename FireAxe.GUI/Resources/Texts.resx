@@ -228,6 +228,9 @@
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>The current version is latest.</value>
   </data>
+  <data name="CustomizePreviewImage" xml:space="preserve">
+    <value>Customize Preview Image</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>
   </data>

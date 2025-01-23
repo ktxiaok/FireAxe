@@ -394,6 +394,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Customize Preview Image 的本地化字符串。
+        /// </summary>
+        public static string CustomizePreviewImage {
+            get {
+                return ResourceManager.GetString("CustomizePreviewImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Default 的本地化字符串。
         /// </summary>
         public static string Default {

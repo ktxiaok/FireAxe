@@ -1,3 +1,4 @@
+- add: addon preview image customization (issue #11)
 - upgrade: update dependent packages
 - add: workshop preview image cache (issue #11)
 - fix: hotkeys conflict with TextBox (issue #12)
