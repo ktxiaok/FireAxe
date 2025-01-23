@@ -125,7 +125,7 @@ namespace FireAxe
             }
         }
 
-        public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir/caches");
+        public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir", "caches");
 
         public string GamePath
         {
