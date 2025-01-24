@@ -1,3 +1,4 @@
+# v0.6.1
 - add: addon preview image customization (issue #11)
 - upgrade: update dependent packages
 - add: workshop preview image cache (issue #11)
