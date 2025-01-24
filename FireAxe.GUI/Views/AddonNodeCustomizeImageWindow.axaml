@@ -20,15 +20,17 @@
     Margin="10"
     HorizontalAlignment="Center"
     VerticalAlignment="Center">
+    <TextBlock
+      Text="{x:Static r:Texts.ImagePathColon}"
+      Margin="5"
+      VerticalAlignment="Center"/>
     <TextBox
       Text="{Binding CustomImagePath}"
       Margin="5"
-      Width="400"
-      VerticalAlignment="Center"/>
+      Width="400"/>
     <Button
       Content="{x:Static r:Texts.Select}"
       Command="{Binding SelectCustomImagePathCommand}"
-      Margin="5"
-      VerticalAlignment="Center"/>
+      Margin="5"/>
   </StackPanel>
 </Window>

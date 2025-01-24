@@ -889,6 +889,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Image Path:  的本地化字符串。
+        /// </summary>
+        public static string ImagePathColon {
+            get {
+                return ResourceManager.GetString("ImagePathColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Import 的本地化字符串。
         /// </summary>
         public static string Import {

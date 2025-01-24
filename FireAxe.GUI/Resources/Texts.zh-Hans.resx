@@ -393,6 +393,9 @@
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>
   </data>
+  <data name="ImagePathColon" xml:space="preserve">
+    <value>图片路径：</value>
+  </data>
   <data name="Import" xml:space="preserve">
     <value>导入</value>
   </data>
