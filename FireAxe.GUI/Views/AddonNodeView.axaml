@@ -145,6 +145,9 @@
       <Button
         Content="{x:Static r:Texts.ShowInFileExplorer}"
         Command="{Binding ShowInFileExplorer}"/>
+      <Button
+        Name="customizeImageButton"
+        Content="{x:Static r:Texts.CustomizePreviewImage}"/>
     </StackPanel>
 
     <!--problems-->

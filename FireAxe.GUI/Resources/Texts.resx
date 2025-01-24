@@ -228,6 +228,9 @@
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>The current version is latest.</value>
   </data>
+  <data name="CustomizePreviewImage" xml:space="preserve">
+    <value>Customize Preview Image</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>
   </data>
@@ -389,6 +392,9 @@
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>
+  </data>
+  <data name="ImagePathColon" xml:space="preserve">
+    <value>Image Path: </value>
   </data>
   <data name="Import" xml:space="preserve">
     <value>Import</value>

@@ -39,6 +39,8 @@ namespace FireAxe
 
         private DateTime _creationTime = DateTime.Now;
 
+        private string? _customImagePath = null;
+
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
             OnInitSelf();
@@ -237,7 +239,50 @@ namespace FireAxe
         public DateTime CreationTime
         {
             get => _creationTime;
-            set => NotifyAndSetIfChanged(ref _creationTime, value);
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _creationTime, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
+        }
+
+        public string? CustomImagePath
+        {
+            get => _customImagePath;
+            set
+            {
+                if (value != null && !FileUtils.IsValidPath(value))
+                {
+                    throw new ArgumentException($"invalid path: {value}");
+                }
+                if (NotifyAndSetIfChanged(ref _customImagePath, value))
+                {
+                    Root.RequestSave = true;
+                }
+            }
+        }
+
+        public string? CustomImageFullPath
+        {
+            get
+            {
+                var path = CustomImagePath;
+                if (path == null)
+                {
+                    return null;
+                }
+                try
+                {
+                    return GetFullFilePath(path);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during getting full path of custom image: {CustomImagePath}", path);
+                }
+                return null;
+            }
         }
 
         internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
@@ -463,6 +508,13 @@ namespace FireAxe
 
         public Task DestroyWithFileAsync()
         {
+            if (!IsValid)
+            {
+                return Task.CompletedTask;
+            }
+
+            ClearCacheFiles();
+
             string? pathToDelete = null;
             if (RequireFile && Name.Length > 0)
             {
@@ -504,7 +556,13 @@ namespace FireAxe
 
         public virtual void ClearCaches()
         {
+            ClearCacheFiles();
             _image.SetTarget(null);
+        }
+
+        public virtual void ClearCacheFiles()
+        {
+
         }
 
         private class CreateSaveStackFrame
@@ -718,6 +776,7 @@ namespace FireAxe
             save.Name = Name;
             save.CreationTime = CreationTime;
             save.Tags = [.. Tags];
+            save.CustomImagePath = CustomImagePath;
         }
 
         protected virtual void OnLoadSave(AddonNodeSave save)
@@ -736,6 +795,7 @@ namespace FireAxe
                 }
                 AddTag(tag);
             }
+            CustomImagePath = save.CustomImagePath;
         }
 
         protected virtual void OnAncestorsChanged()

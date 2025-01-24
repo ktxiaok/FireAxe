@@ -51,6 +51,7 @@ namespace FireAxe.Views
 
             autoSetNameButton.Click += AutoSetNameButton_Click;
             editTagButton.Click += EditTagButton_Click;
+            customizeImageButton.Click += CustomizeImageButton_Click;
         }
 
         private void AutoSetNameButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -118,6 +119,26 @@ namespace FireAxe.Views
                 DataContext = new AddonTagEditorViewModel(viewModel.AddonNode)
             };
             tagEditorWindow.ShowDialog(window);
+        }
+
+        private void CustomizeImageButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var viewModel = ViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+            var window = FindWindow();
+            if (window == null)
+            {
+                return;
+            }
+
+            var customizeImageWindow = new AddonNodeCustomizeImageWindow()
+            {
+                DataContext = new AddonNodeCustomizeImageViewModel(viewModel.AddonNode)
+            };
+            customizeImageWindow.ShowDialog(window);
         }
 
         private void ClearSectionViews()

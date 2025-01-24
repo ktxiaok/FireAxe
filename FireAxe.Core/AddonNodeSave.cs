@@ -15,5 +15,7 @@ namespace FireAxe
         public DateTime CreationTime { get; set; }
 
         public string[] Tags { get; set; } = [];
+
+        public string? CustomImagePath { get; set; } = null;
     }
 }

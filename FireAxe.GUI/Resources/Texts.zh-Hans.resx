@@ -228,6 +228,9 @@
   <data name="CurrentVersionLatestMessage" xml:space="preserve">
     <value>当前版本已是最新版本。</value>
   </data>
+  <data name="CustomizePreviewImage" xml:space="preserve">
+    <value>自定义预览图像</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>默认</value>
   </data>
@@ -389,6 +392,9 @@
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>
+  </data>
+  <data name="ImagePathColon" xml:space="preserve">
+    <value>图片路径：</value>
   </data>
   <data name="Import" xml:space="preserve">
     <value>导入</value>

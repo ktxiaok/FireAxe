@@ -19,17 +19,17 @@ namespace FireAxe.Views
             var storage = ownerWindow.StorageProvider;
             var options = new FolderPickerOpenOptions() { AllowMultiple = false };
             var folders = await storage.OpenFolderPickerAsync(options);
-            if (folders.Count == 1)
+            if (folders.Count != 1)
             {
-                var folder = folders[0];
-                var path = folder.Path;
-                if (path.IsFile)
-                {
-                    return path.LocalPath;
-                }
+                return null;
             }
-
-            return null;
+            var folder = folders[0];
+            var path = folder.Path;
+            if (!path.IsFile)
+            {
+                return null;
+            }
+            return FileUtils.NormalizePath(path.LocalPath);
         }
 
         public static async Task<bool> Confirm(Window ownerWindow, string message, string title)
