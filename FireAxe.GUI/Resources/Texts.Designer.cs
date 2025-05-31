@@ -322,6 +322,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Color Theme 的本地化字符串。
+        /// </summary>
+        public static string ColorTheme {
+            get {
+                return ResourceManager.GetString("ColorTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Confirm Delete 的本地化字符串。
         /// </summary>
         public static string ConfirmDelete {
@@ -696,6 +705,33 @@ namespace FireAxe.Resources {
         public static string Enum_AddonTagFilterMode_Or {
             get {
                 return ResourceManager.GetString("Enum_AddonTagFilterMode_Or", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Dark 的本地化字符串。
+        /// </summary>
+        public static string Enum_AppColorTheme_Dark {
+            get {
+                return ResourceManager.GetString("Enum_AppColorTheme_Dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Default 的本地化字符串。
+        /// </summary>
+        public static string Enum_AppColorTheme_Default {
+            get {
+                return ResourceManager.GetString("Enum_AppColorTheme_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Light 的本地化字符串。
+        /// </summary>
+        public static string Enum_AppColorTheme_Light {
+            get {
+                return ResourceManager.GetString("Enum_AppColorTheme_Light", resourceCulture);
             }
         }
         

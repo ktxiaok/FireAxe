@@ -204,6 +204,9 @@
   <data name="CollectionId" xml:space="preserve">
     <value>Collection ID</value>
   </data>
+  <data name="ColorTheme" xml:space="preserve">
+    <value>Color Theme</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Confirm Delete</value>
   </data>
@@ -329,6 +332,15 @@
   </data>
   <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
     <value>Or</value>
+  </data>
+  <data name="Enum_AppColorTheme_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Enum_AppColorTheme_Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Enum_AppColorTheme_Light" xml:space="preserve">
+    <value>Light</value>
   </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>Default</value>

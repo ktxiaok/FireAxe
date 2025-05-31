@@ -19,7 +19,7 @@
   </Window.DataTemplates>
   <ScrollViewer>
     <Grid
-      RowDefinitions="Auto, Auto, Auto, Auto, Auto"
+      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
       ColumnDefinitions="Auto, 50, *"
       Margin="10">
       <!--language-->
@@ -35,7 +35,7 @@
       </StackPanel>
       <ComboBox
         Grid.Row="0" Grid.Column="2"
-        HorizontalAlignment="Right"
+        Classes="PropertyValue"
         ItemsSource="{Binding LanguageItemsSource}"
         SelectedItem="{Binding Settings.Language}">
         <ComboBox.ItemTemplate>
@@ -45,13 +45,24 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
 
-      <!--game path-->
+      <!--color theme-->
       <TextBlock
         Grid.Row="1" Grid.Column="0"
         Classes="PropertyName"
+        Text="{x:Static r:Texts.ColorTheme}"/>
+      <ComboBox
+        Grid.Row="1" Grid.Column="2"
+        Classes="EnumComboBox PropertyValue"
+        ItemsSource="{Binding Source={me:EnumValues {x:Type local:AppColorTheme}}}"
+        SelectedItem="{Binding Settings.ColorTheme}"/>
+
+      <!--game path-->
+      <TextBlock
+        Grid.Row="2" Grid.Column="0"
+        Classes="PropertyName"
         Text="{x:Static r:Texts.GamePath}"/>
       <StackPanel
-        Grid.Row="1" Grid.Column="2"
+        Grid.Row="2" Grid.Column="2"
         Orientation="Horizontal"
         HorizontalAlignment="Right">
         <TextBox
@@ -66,31 +77,31 @@
 
       <!--workshop item auto update-->
       <TextBlock
-        Grid.Row="2" Grid.Column="0"
+        Grid.Row="3" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
       <CheckBox
-        Grid.Row="2" Grid.Column="2"
+        Grid.Row="3" Grid.Column="2"
         Classes="PropertyValue"
         IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
 
       <!--auto detect workshop item link in clipboard-->
       <TextBlock
-        Grid.Row="3" Grid.Column="0"
+        Grid.Row="4" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
       <CheckBox
-        Grid.Row="3" Grid.Column="2"
+        Grid.Row="4" Grid.Column="2"
         Classes="PropertyValue"
         IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
 
       <!--auto redownload-->
       <TextBlock
-        Grid.Row="4" Grid.Column="0"
+        Grid.Row="5" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.AutoRedownload}"/>
       <CheckBox
-        Grid.Row="4" Grid.Column="2"
+        Grid.Row="5" Grid.Column="2"
         Classes="PropertyValue"
         IsChecked="{Binding Settings.IsAutoRedownload}"/>
     </Grid>

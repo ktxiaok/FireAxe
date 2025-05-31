@@ -204,6 +204,9 @@
   <data name="CollectionId" xml:space="preserve">
     <value>合集ID</value>
   </data>
+  <data name="ColorTheme" xml:space="preserve">
+    <value>颜色主题</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>确认删除</value>
   </data>
@@ -329,6 +332,15 @@
   </data>
   <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
     <value>或</value>
+  </data>
+  <data name="Enum_AppColorTheme_Dark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Enum_AppColorTheme_Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="Enum_AppColorTheme_Light" xml:space="preserve">
+    <value>浅色</value>
   </data>
   <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
     <value>默认</value>

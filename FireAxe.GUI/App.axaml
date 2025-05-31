@@ -5,9 +5,7 @@
   xmlns:local="using:FireAxe"
   xmlns:conv="using:FireAxe.ValueConverters"
   xmlns:dt="using:FireAxe.DataTemplates"
-  xmlns:r="using:FireAxe.Resources"
-  RequestedThemeVariant="Dark">
-  <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  xmlns:r="using:FireAxe.Resources">
 
   <Application.DataTemplates>
     <dt:ViewLocator/>
