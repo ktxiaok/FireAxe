@@ -237,6 +237,19 @@ namespace FireAxe.Views
                     e.Handled = true;
                     await viewModel.MoveHere();
                 }
+                else if (e.Key == Key.F)
+                {
+                    e.Handled = true;
+                    searchTextBox.Focus();
+                }
+            }
+            else
+            {
+                if (e.Key == Key.Delete)
+                {
+                    e.Handled = true;
+                    await viewModel.Delete(false);
+                }
             }
         }
     }

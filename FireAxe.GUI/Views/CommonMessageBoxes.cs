@@ -38,27 +38,16 @@ namespace FireAxe.Views
             ArgumentNullException.ThrowIfNull(message);
             ArgumentNullException.ThrowIfNull(title);
 
-            var textYes = Texts.Yes;
-            var textNo = Texts.No;
-            var result = await MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
+            var result = await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams()
             {
-                ButtonDefinitions =
-                [
-                    new ButtonDefinition { Name = textYes },
-                    new ButtonDefinition { Name = textNo, IsDefault = true }
-                ],
-                ContentMessage = message,
                 ContentTitle = title,
+                ContentMessage = message,
+                ButtonDefinitions = ButtonEnum.YesNo,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            }).ShowWindowDialogAsync(ownerWindow);
-            if (result == textYes)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+                EnterDefaultButton = ClickEnum.Yes
+            })
+                .ShowWindowDialogAsync(ownerWindow);
+            return result == ButtonResult.Yes;
         }
 
         public static async Task<ErrorOperationReply> GetErrorOperationReply(Window ownerWindow, string message, string? title = null)

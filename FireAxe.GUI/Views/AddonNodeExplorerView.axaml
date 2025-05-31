@@ -103,6 +103,7 @@
         HorizontalAlignment="Left"
         VerticalAlignment="Center">
         <TextBox
+          Name="searchTextBox"
           Text="{Binding SearchText}"
           Watermark="{x:Static r:Texts.Search}"
           VerticalAlignment="Center"
