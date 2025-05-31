@@ -1,4 +1,5 @@
 ﻿using Avalonia.Styling;
+using FireAxe.ViewModels;
 using Newtonsoft.Json;
 using ReactiveUI;
 using Serilog;
@@ -16,6 +17,9 @@ namespace FireAxe
         private bool _disposed = false;
         private CompositeDisposable _disposables = new();
 
+        private AddonNodeSortMethod _addonNodeSortMethod = AddonNodeSortMethod.Default;
+        private bool _isAddonNodeAscendingOrder = true;
+        private AddonNodeListItemViewKind _addonNodeListItemViewKind = AddonNodeListItemViewKind.MediumTile;
         private string? _lastOpenDirectory = null;
         private string? _language = null;
         private string _gamePath = "";
@@ -26,7 +30,7 @@ namespace FireAxe
 
         private string _settingsFilePath;
 
-        private App _app;
+        private readonly App _app;
 
         public AppSettings(App app)
         {
@@ -47,6 +51,45 @@ namespace FireAxe
         }
 
         public bool RequestSave { get; set; } = true;
+
+        [JsonProperty]
+        public AddonNodeSortMethod AddonNodeSortMethod
+        {
+            get => _addonNodeSortMethod;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _addonNodeSortMethod, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public bool IsAddonNodeAscendingOrder
+        {
+            get => _isAddonNodeAscendingOrder;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _isAddonNodeAscendingOrder, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
+
+        [JsonProperty]
+        public AddonNodeListItemViewKind AddonNodeListItemViewKind
+        {
+            get => _addonNodeListItemViewKind;
+            set
+            {
+                if (NotifyAndSetIfChanged(ref _addonNodeListItemViewKind, value))
+                {
+                    RequestSave = true;
+                }
+            }
+        }
 
         [JsonProperty]
         public string? LastOpenDirectory

@@ -19,6 +19,9 @@ namespace FireAxe.ViewModels
 
         private bool _disposed = false;
 
+        private CompositeDisposable _disposables = new();
+        private CompositeDisposable? _addonNodeExplorerViewModelDisposables = null;
+
         private bool _inited = false;
 
         private AppSettings _settings;
@@ -97,20 +100,60 @@ namespace FireAxe.ViewModels
             OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
             CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
-            _settings.WhenAnyValue(x => x.GamePath).Subscribe((gamePath) =>
-            {
-                if (_addonRoot != null)
+            _settings.WhenAnyValue(x => x.GamePath)
+                .Subscribe(gamePath =>
                 {
-                    _addonRoot.GamePath = gamePath;
-                }
-            });
-            _settings.WhenAnyValue(x => x.IsAutoUpdateWorkshopItem).Subscribe((isAutoUpdateWorkshopItem) =>
-            {
-                if (_addonRoot != null)
+                    if (_addonRoot != null)
+                    {
+                        _addonRoot.GamePath = gamePath;
+                    }
+                })
+                .DisposeWith(_disposables);
+            _settings.WhenAnyValue(x => x.IsAutoUpdateWorkshopItem)
+                .Subscribe(isAutoUpdateWorkshopItem =>
                 {
-                    _addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
-                }
-            });
+                    if (_addonRoot != null)
+                    {
+                        _addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
+                    }
+                })
+                .DisposeWith(_disposables);
+            this.WhenAnyValue(x => x.AddonNodeExplorerViewModel)
+                .Subscribe(explorerViewModel =>
+                {
+                    if (_addonNodeExplorerViewModelDisposables != null)
+                    {
+                        _addonNodeExplorerViewModelDisposables.Dispose();
+                        _addonNodeExplorerViewModelDisposables = null;
+                    }
+                    if (explorerViewModel == null)
+                    {
+                        return;
+                    }
+                    _addonNodeExplorerViewModelDisposables = new();
+                    var disposables = _addonNodeExplorerViewModelDisposables;
+                    explorerViewModel.SortMethod = _settings.AddonNodeSortMethod;
+                    explorerViewModel.IsAscendingOrder = _settings.IsAddonNodeAscendingOrder;
+                    explorerViewModel.ContainerViewModel.ListItemViewKind = _settings.AddonNodeListItemViewKind;
+                    explorerViewModel.WhenAnyValue(x => x.SortMethod)
+                    .BindTo(_settings, x => x.AddonNodeSortMethod)
+                    .DisposeWith(disposables);
+                    explorerViewModel.WhenAnyValue(x => x.IsAscendingOrder)
+                    .BindTo(_settings, x => x.IsAddonNodeAscendingOrder)
+                    .DisposeWith(disposables);
+                    explorerViewModel.WhenAnyValue(x => x.ContainerViewModel.ListItemViewKind)
+                    .BindTo(_settings, x => x.AddonNodeListItemViewKind)
+                    .DisposeWith(disposables);
+                    _settings.WhenAnyValue(x => x.AddonNodeSortMethod)
+                    .BindTo(explorerViewModel, x => x.SortMethod)
+                    .DisposeWith(disposables);
+                    _settings.WhenAnyValue(x => x.IsAddonNodeAscendingOrder)
+                    .BindTo(explorerViewModel, x => x.IsAscendingOrder)
+                    .DisposeWith(disposables);
+                    _settings.WhenAnyValue(x => x.AddonNodeListItemViewKind)
+                    .BindTo(explorerViewModel, x => x.ContainerViewModel.ListItemViewKind)
+                    .DisposeWith(disposables);
+                });
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
@@ -571,14 +614,17 @@ namespace FireAxe.ViewModels
 
         public void Dispose()
         {
-            if (!_disposed)
+            if (_disposed)
             {
-                _disposed = true;
-
-                AddonRoot = null;
-                _checkClipboardTimer.Dispose();
-                _autoRedownloadTimer.Dispose();
+                return;
             }
+            _disposed = true;
+
+            _disposables.Dispose();
+            _addonNodeExplorerViewModelDisposables?.Dispose();
+            AddonRoot = null;
+            _checkClipboardTimer.Dispose();
+            _autoRedownloadTimer.Dispose();
         }
 
         private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)
