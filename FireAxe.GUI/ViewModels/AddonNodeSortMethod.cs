@@ -8,6 +8,7 @@ namespace FireAxe.ViewModels
         Name,
         EnableState,
         CreationTime,
-        FileSize
+        FileSize,
+        Tag
     }
 }

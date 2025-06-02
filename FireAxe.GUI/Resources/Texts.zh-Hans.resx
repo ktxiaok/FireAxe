@@ -324,6 +324,9 @@
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
     <value>按名称排序</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_Tag" xml:space="preserve">
+    <value>按标签排序</value>
+  </data>
   <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
     <value>与</value>
   </data>

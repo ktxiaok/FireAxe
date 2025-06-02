@@ -682,6 +682,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   查找类似 Sort By Tags 的本地化字符串。
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_Tag {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_Tag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 And 的本地化字符串。
         /// </summary>
         public static string Enum_AddonTagFilterMode_And {

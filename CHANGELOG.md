@@ -1,6 +1,7 @@
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized
+- add: sort addons by tags
 # v0.6.1
 - add: addon preview image customization (issue #11)
 - upgrade: update dependent packages

@@ -324,6 +324,9 @@
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
     <value>Sort By Name</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_Tag" xml:space="preserve">
+    <value>Sort By Tags</value>
+  </data>
   <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
     <value>And</value>
   </data>
