@@ -171,40 +171,36 @@ namespace FireAxe
             var task = _getPublishedFileDetailsTask;
             if (task == null)
             {
-                task = DoGetPublishedFileDetailsAsync(DestructionCancellationToken);
-                _getPublishedFileDetailsTask = task;
-                _getPublishedFileDetailsTask.ContinueWith((task) =>
+                var rootTaskScheduler = Root.TaskScheduler;
+                var rawTask = DoGetPublishedFileDetailsAsync(DestructionCancellationToken);
+                async Task<GetPublishedFileDetailsResult> RunTask()
                 {
-                    _getPublishedFileDetailsTask = null;
-                    var result = task.Result;
-                    if (result.IsSucceeded)
-                    {
-                        _publishedFileDetails.SetTarget(result.Content);
-                    }
-                }, Root.TaskScheduler);
+                    var result = await rawTask.ConfigureAwait(false);
+                    var endingTask = new Task(() => _publishedFileDetails.SetTarget(result.IsSucceeded ? result.Content : null));
+                    endingTask.Start(rootTaskScheduler);
+                    await endingTask.ConfigureAwait(false);
+                    return result;
+                }
+                task = RunTask();
+                _getPublishedFileDetailsTask = task;
+                _getPublishedFileDetailsTask.ContinueWith(_ => _getPublishedFileDetailsTask = null, rootTaskScheduler);
             }
             return task.WaitAsync(cancellationToken);
         }
 
-        public Task<PublishedFileDetails?> GetPublishedFileDetailsAllowCacheAsync(CancellationToken cancellationToken)
+        public async Task<PublishedFileDetails?> GetPublishedFileDetailsAllowCacheAsync(CancellationToken cancellationToken)
         {
             var cache = PublishedFileDetailsCache;
             if (cache != null)
             {
-                return Task.FromResult(cache)!;
+                return cache;
             }
-            return GetPublishedFileDetailsAsync(cancellationToken).ContinueWith((task) =>
+            var result = await GetPublishedFileDetailsAsync(cancellationToken).ConfigureAwait(false);
+            if (result.IsSucceeded)
             {
-                if (task.IsCompletedSuccessfully)
-                {
-                    var result = task.Result;
-                    if (result.IsSucceeded)
-                    {
-                        return result.Content;
-                    }
-                }
-                return null;
-            });
+                return result.Content;
+            }
+            return null;
         }
 
         public override void ClearCaches()
@@ -242,7 +238,8 @@ namespace FireAxe
             {
                 if (_downloadCheckTask == null)
                 {
-                    CreateDownloadCheckTask(_publishedFileId.Value);
+                    _downloadCheckTask = RunDownloadCheckTask(_publishedFileId.Value);
+                    _downloadCheckTask.ContinueWith(_ => _downloadCheckTask = null, Root.TaskScheduler);
                 }
             }
 
@@ -253,7 +250,7 @@ namespace FireAxe
             }
         }
 
-        private void CreateDownloadCheckTask(ulong publishedFileId)
+        private async Task RunDownloadCheckTask(ulong publishedFileId)
         {
             string dirPath = FullFilePath;
             string imageCacheFilePath = GetImageCacheFilePath();
@@ -305,163 +302,159 @@ namespace FireAxe
                 }
                 SetVpkPath(vpkPathPreview);
 
-                _downloadCheckTask = RunDownloadCheckTask();
-                async Task RunDownloadCheckTask()
+                try
                 {
-                    try
+                    if (getDetailsTask != null)
                     {
-                        if (getDetailsTask != null)
+                        var result = await getDetailsTask.ConfigureAwait(false);
+                        if (result.IsSucceeded)
                         {
-                            var result = await getDetailsTask.ConfigureAwait(false);
-                            if (result.IsSucceeded)
+                            details = result.Content;
+                        }
+                        else
+                        {
+                            if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
                             {
-                                details = result.Content;
+                                problems.Add(new InvalidPublishedFileIdProblem(this));
                             }
-                            else
+                        }
+                    }
+
+                    if (details != null)
+                    {
+                        if (requestAutoSetName)
+                        {
+                            nameToAutoSet = FileUtils.SanitizeFileName(details.Title);
+                            if (nameToAutoSet.Length == 0)
                             {
-                                if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
-                                {
-                                    problems.Add(new InvalidPublishedFileIdProblem(this));
-                                }
+                                nameToAutoSet = "UNNAMED";
                             }
                         }
 
-                        if (details != null)
+                        if (requestApplyTagsFromWorkshop)
                         {
-                            if (requestAutoSetName)
+                            var tags = details.Tags;
+                            if (tags != null)
                             {
-                                nameToAutoSet = FileUtils.SanitizeFileName(details.Title);
-                                if (nameToAutoSet.Length == 0)
+                                await addonRootTaskFactory.StartNew(() =>
                                 {
-                                    nameToAutoSet = "UNNAMED";
-                                }
-                            }
-
-                            if (requestApplyTagsFromWorkshop)
-                            {
-                                var tags = details.Tags;
-                                if (tags != null)
-                                {
-                                    await addonRootTaskFactory.StartNew(() =>
+                                    foreach (var tagObj in tags)
                                     {
-                                        foreach (var tagObj in tags)
-                                        {
-                                            AddTag(tagObj.Tag);
-                                        }
-                                        RequestApplyTagsFromWorkshop = false;
-                                    });
-                                }
+                                        AddTag(tagObj.Tag);
+                                    }
+                                    RequestApplyTagsFromWorkshop = false;
+                                });
                             }
+                        }
 
-                            byte[]? image = null;
-                            string imageUrl = details.PreviewUrl;
+                        byte[]? image = null;
+                        string imageUrl = details.PreviewUrl;
+                        try
+                        {
+                            image = await httpClient.GetByteArrayAsync(imageUrl, cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during downloading the image: {Url}", imageUrl);
+                        }
+                        if (image != null)
+                        {
                             try
                             {
-                                image = await httpClient.GetByteArrayAsync(imageUrl, cancellationToken).ConfigureAwait(false);
-                            }
-                            catch (OperationCanceledException)
-                            {
-                                throw;
+                                await File.WriteAllBytesAsync(imageCacheFilePath, image).ConfigureAwait(false);
                             }
                             catch (Exception ex)
                             {
-                                Log.Error(ex, "Exception occurred during downloading the image: {Url}", imageUrl);
+                                Log.Error(ex, "Exception occurred during writing the image cache file: {FilePath}", imageCacheFilePath);
                             }
-                            if (image != null)
-                            {
-                                try
-                                {
-                                    await File.WriteAllBytesAsync(imageCacheFilePath, image).ConfigureAwait(false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Error(ex, "Exception occurred during writing the image cache file: {FilePath}", imageCacheFilePath);
-                                }
-                            }
+                        }
 
-                            bool needDownload = false;
+                        bool needDownload = false;
 
-                            if (metaInfo == null)
+                        if (metaInfo == null)
+                        {
+                            needDownload = true;
+                        }
+                        else
+                        {
+                            if (metaInfo.PublishedFileId != publishedFileId)
                             {
                                 needDownload = true;
                             }
-                            else
+                            if (requestUpdate && metaInfo.TimeUpdated != details.TimeUpdated)
                             {
-                                if (metaInfo.PublishedFileId != publishedFileId)
-                                {
-                                    needDownload = true;
-                                }
-                                if (requestUpdate && metaInfo.TimeUpdated != details.TimeUpdated)
-                                {
-                                    needDownload = true;
-                                }
-                                if (!File.Exists(Path.Join(dirPath, metaInfo.CurrentFile)))
-                                {
-                                    needDownload = true;
-                                }
+                                needDownload = true;
                             }
-
-                            if (needDownload)
+                            if (!File.Exists(Path.Join(dirPath, metaInfo.CurrentFile)))
                             {
-                                // Delete the old meta info file.
-                                if (File.Exists(metaInfoPath))
-                                {
-                                    File.Delete(metaInfoPath);
-                                }
-
-                                string downloadFileName = $"{details.Title}-{details.TimeUpdated}.vpk";
-                                downloadFileName = FileUtils.SanitizeFileName(downloadFileName);
-                                if (downloadFileName == "")
-                                {
-                                    downloadFileName = "UNNAMED.vpk";
-                                }
-                                downloadFileName = FileUtils.GetUniqueFileName(downloadFileName, dirPath);
-                                string downloadFilePath = Path.Join(dirPath, downloadFileName);
-                                string url = details.FileUrl;
-
-                                using (var download = downloadService.Download(url, downloadFilePath))
-                                {
-                                    await addonRootTaskFactory.StartNew(() => DownloadItem = download).ConfigureAwait(false);
-                                    await download.WaitAsync().ConfigureAwait(false);
-                                    await addonRootTaskFactory.StartNew(() => DownloadItem = null).ConfigureAwait(false);
-                                    var status = download.Status;
-                                    if (status == DownloadStatus.Succeeded)
-                                    {
-                                        metaInfo = new WorkshopVpkMetaInfo()
-                                        {
-                                            PublishedFileId = publishedFileId,
-                                            TimeUpdated = details.TimeUpdated,
-                                            CurrentFile = downloadFileName
-                                        };
-                                        File.WriteAllText(metaInfoPath, JsonConvert.SerializeObject(metaInfo, s_metaInfoJsonSettings));
-                                    }
-                                    else if (status == DownloadStatus.Failed)
-                                    {
-                                        var problem = new DownloadFailedProblem(this)
-                                        {
-                                            Url = url,
-                                            FilePath = downloadFilePath,
-                                            Exception = download.Exception
-                                        };
-                                        problems.Add(problem);
-                                    }
-                                }
+                                needDownload = true;
                             }
                         }
 
-                        if (metaInfo != null)
+                        if (needDownload)
                         {
-                            resultVpkPath = Path.Join(dirPath, metaInfo.CurrentFile);
+                            // Delete the old meta info file.
+                            if (File.Exists(metaInfoPath))
+                            {
+                                File.Delete(metaInfoPath);
+                            }
+
+                            string downloadFileName = $"{details.Title}-{details.TimeUpdated}.vpk";
+                            downloadFileName = FileUtils.SanitizeFileName(downloadFileName);
+                            if (downloadFileName == "")
+                            {
+                                downloadFileName = "UNNAMED.vpk";
+                            }
+                            downloadFileName = FileUtils.GetUniqueFileName(downloadFileName, dirPath);
+                            string downloadFilePath = Path.Join(dirPath, downloadFileName);
+                            string url = details.FileUrl;
+
+                            using (var download = downloadService.Download(url, downloadFilePath))
+                            {
+                                await addonRootTaskFactory.StartNew(() => DownloadItem = download).ConfigureAwait(false);
+                                await download.WaitAsync().ConfigureAwait(false);
+                                await addonRootTaskFactory.StartNew(() => DownloadItem = null).ConfigureAwait(false);
+                                var status = download.Status;
+                                if (status == DownloadStatus.Succeeded)
+                                {
+                                    metaInfo = new WorkshopVpkMetaInfo()
+                                    {
+                                        PublishedFileId = publishedFileId,
+                                        TimeUpdated = details.TimeUpdated,
+                                        CurrentFile = downloadFileName
+                                    };
+                                    File.WriteAllText(metaInfoPath, JsonConvert.SerializeObject(metaInfo, s_metaInfoJsonSettings));
+                                }
+                                else if (status == DownloadStatus.Failed)
+                                {
+                                    var problem = new DownloadFailedProblem(this)
+                                    {
+                                        Url = url,
+                                        FilePath = downloadFilePath,
+                                        Exception = download.Exception
+                                    };
+                                    problems.Add(problem);
+                                }
+                            }
                         }
                     }
-                    catch (OperationCanceledException) { }
-                    catch (Exception ex)
+
+                    if (metaInfo != null)
                     {
-                        Log.Error(ex, "Exception occurred during the download check task of a WorkshopVpkAddon");
+                        resultVpkPath = Path.Join(dirPath, metaInfo.CurrentFile);
                     }
                 }
+                catch (OperationCanceledException) { }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during the download check task of a WorkshopVpkAddon");
+                }
 
-                _downloadCheckTask.ContinueWith((task) =>
+                await addonRootTaskFactory.StartNew(() =>
                 {
                     _downloadCheckTask = null;
 
@@ -494,11 +487,11 @@ namespace FireAxe
                             Log.Error(ex, "Exception occurred during setting the name of the workshop vpk addon");
                         }
                     }
-                }, addonRootTaskScheduler);
+                });
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Exception occurred during WorkshopVpkAddon.CreateCheckTask.");
+                Log.Error(ex, "Exception occurred during WorkshopVpkAddon.RunDownloadCheckTask.");
             }
         }
 

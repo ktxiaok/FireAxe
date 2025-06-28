@@ -361,16 +361,20 @@ namespace FireAxe
             var task = _getImageTask;
             if (task == null)
             {
-                task = DoGetImageAsync(DestructionCancellationToken);
-                _getImageTask = task;
-                _getImageTask.ContinueWith((task) =>
+                var rootTaskScheduler = Root.TaskScheduler;
+                var destructionCancellationToken = DestructionCancellationToken;
+                var rawGetImageTask = DoGetImageAsync(destructionCancellationToken);
+                async Task<byte[]?> RunGetImageTask()
                 {
-                    _getImageTask = null;
-                    if (task.IsCompletedSuccessfully)
-                    {
-                        _image.SetTarget(task.Result);
-                    }
-                }, Root.TaskScheduler);
+                    var image = await rawGetImageTask.ConfigureAwait(false);
+                    var endingTask = new Task(() => _image.SetTarget(image));
+                    endingTask.Start(rootTaskScheduler);
+                    await endingTask.ConfigureAwait(false);
+                    return image;
+                }
+                task = RunGetImageTask();
+                _getImageTask = task;
+                _getImageTask.ContinueWith(_ => _getImageTask = null, rootTaskScheduler);
             }
             return task.WaitAsync(cancellationToken);
         }
