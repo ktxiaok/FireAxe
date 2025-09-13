@@ -8,6 +8,8 @@ namespace FireAxe
 {
     public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
     {
+        public const string NullName = "__null__";
+
         private bool _isValid = true;
 
         private CancellationTokenSource _destructionCancellationTokenSource = new();
@@ -18,7 +20,7 @@ namespace FireAxe
 
         private int _blockMove = 0;
 
-        private string _name = "";
+        private string _name = NullName;
 
         private AddonGroup? _group = null;
 
@@ -175,6 +177,10 @@ namespace FireAxe
                 if (value == _name)
                 {
                     return;
+                }
+                if (value == NullName)
+                {
+                    throw new ArgumentException($"Couldn't set the name to \"{NullName}\" because it's a reserved name.");
                 }
 
                 ThrowIfMoveDenied();
