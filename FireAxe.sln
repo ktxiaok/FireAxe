@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireAxe.Core", "FireAxe.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireAxe.CrashReporter", "FireAxe.CrashReporter\FireAxe.CrashReporter.csproj", "{77A1ADA3-3D91-489E-B98C-F38D863340BF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{962B7D1D-4333-4D2D-B402-A18CB808DDD4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{962B7D1D-4333-4D2D-B402-A18CB808DDD4}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props

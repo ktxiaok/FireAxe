@@ -20,15 +20,21 @@ namespace FireAxe
 
         private int _blockMove = 0;
 
+        private Guid _id = Guid.Empty;
+
         private string _name = NullName;
 
         private AddonGroup? _group = null;
 
-        private AddonRoot _root;
+        private readonly AddonRoot _root;
 
         private readonly ObservableCollection<string> _tags = new();
         private readonly ReadOnlyObservableCollection<string> _tagsReadOnly;
         private readonly HashSet<string> _tagSet = new(2);
+
+        private DateTime _creationTime = DateTime.Now;
+
+        private string? _customImagePath = null;
 
         private readonly ObservableCollection<AddonProblem> _problems = new();
         private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
@@ -38,10 +44,6 @@ namespace FireAxe
         private Task<byte[]?>? _getImageTask = null;
 
         private long? _fileSize = null;
-
-        private DateTime _creationTime = DateTime.Now;
-
-        private string? _customImagePath = null;
 
         public AddonNode(AddonRoot root, AddonGroup? group = null)
         {
@@ -58,6 +60,8 @@ namespace FireAxe
             _problemsReadOnly = new(_problems);
 
             ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
+
+            SetNewId();
 
             if (group == null)
             {
@@ -97,6 +101,23 @@ namespace FireAxe
         }
 
         public bool IsEnabledInHierarchy => _allowEnabledInHierarchy && _isEnabled;
+
+        public Guid Id
+        {
+            get => _id;
+            set
+            {
+                if (value == _id)
+                {
+                    return;
+                }
+
+                Root.RegisterNodeId(value, _id, this);
+                _id = value;
+                NotifyChanged();
+                Root.RequestSave = true;
+            }
+        }
 
         public AddonGroup? Group
         {
@@ -296,6 +317,19 @@ namespace FireAxe
         internal virtual ReadOnlyObservableCollection<AddonNode> Children_Internal => throw new NotSupportedException();
 
         internal virtual bool HasChildren_Internal => false;
+
+        public void SetNewId()
+        {
+            while (true)
+            {
+                try
+                {
+                    Id = Guid.NewGuid();
+                    return;
+                }
+                catch (AddonNodeIdExistsException) { }
+            }
+        }
 
         public bool AddTag(string tag)
         {
@@ -718,6 +752,8 @@ namespace FireAxe
             _isValid = false;
             NotifyChanged(nameof(IsValid));
 
+            Root.UnregisterNodeId(_id);
+
             var task = Task.CompletedTask;
             _destructionCancellationTokenSource.Cancel();
             _destructionCancellationTokenSource.Dispose();
@@ -782,6 +818,7 @@ namespace FireAxe
 
         protected virtual void OnCreateSave(AddonNodeSave save)
         {
+            save.Id = Id;
             save.IsEnabled = IsEnabled;
             save.Name = Name;
             save.CreationTime = CreationTime;
@@ -791,6 +828,10 @@ namespace FireAxe
 
         protected virtual void OnLoadSave(AddonNodeSave save)
         {
+            if (save.Id.HasValue)
+            {
+                Id = save.Id.Value;
+            }
             IsEnabled = save.IsEnabled;
             Name = save.Name;
             if (save.CreationTime != default)

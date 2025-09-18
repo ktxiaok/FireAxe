@@ -37,6 +37,8 @@ namespace FireAxe
         private readonly ReadOnlyObservableCollection<string> _customTagsReadOnly;
         private readonly HashSet<string> _customTagSet = new();
 
+        private readonly Dictionary<Guid, AddonNode> _idToNode = new();
+
         private Task<AddonConflictResult>? _checkConflictsTask = null;
 
         private TaskScheduler? _taskScheduler = null;
@@ -521,8 +523,7 @@ namespace FireAxe
 
                     if (vpkAddon is LocalVpkAddon localVpkAddon)
                     {
-                        localVpkAddon.ValidateVpkGuid();
-                        linkFileName = BuildLocalVpkFileName(localVpkAddon.VpkGuid);
+                        linkFileName = BuildLocalVpkFileName(localVpkAddon.Id);
                     }
                     else if (vpkAddon is WorkshopVpkAddon workshopVpkAddon)
                     {
@@ -761,6 +762,32 @@ namespace FireAxe
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        internal void RegisterNodeId(Guid newId, Guid oldId, AddonNode node)
+        {
+            if (newId != Guid.Empty)
+            {
+                if (_idToNode.ContainsKey(newId))
+                {
+                    throw new AddonNodeIdExistsException(newId, node);
+                }
+                _idToNode[newId] = node;
+            }
+            if (oldId != Guid.Empty)
+            {
+                _idToNode.Remove(oldId);
+            }
+        }
+
+        internal void UnregisterNodeId(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return;
+            }
+
+            _idToNode.Remove(id);
         }
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

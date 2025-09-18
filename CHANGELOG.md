@@ -1,3 +1,4 @@
+- add: add the feature to check for addon conflicts
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized
