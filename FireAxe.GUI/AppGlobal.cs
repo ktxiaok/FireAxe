@@ -27,7 +27,7 @@ namespace FireAxe
             var url = GitHubApiUrl + "/releases/latest";
             try
             {
-                var response = await httpClient.GetAsync(url, cancellationToken);
+                using var response = await httpClient.GetAsync(url, cancellationToken);
                 response.EnsureSuccessStatusCode();
                 var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
                 var jobj = JObject.Parse(responseJson);

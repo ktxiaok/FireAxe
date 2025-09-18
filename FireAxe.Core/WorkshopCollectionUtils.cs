@@ -53,8 +53,8 @@ namespace FireAxe
             {
                 try
                 {
-                    var postContent = new StringContent($"collectioncount=1&publishedfileids[0]={collectionId}", Encoding.UTF8, "application/x-www-form-urlencoded");
-                    var response = await httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/", postContent, cancellationToken).ConfigureAwait(false);
+                    using var postContent = new StringContent($"collectioncount=1&publishedfileids[0]={collectionId}", Encoding.UTF8, "application/x-www-form-urlencoded");
+                    using var response = await httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/", postContent, cancellationToken).ConfigureAwait(false);
                     response.EnsureSuccessStatusCode();
                     var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                     var jobj = JObject.Parse(responseJson);

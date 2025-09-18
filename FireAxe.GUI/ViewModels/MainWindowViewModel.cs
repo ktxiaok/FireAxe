@@ -422,7 +422,7 @@ namespace FireAxe.ViewModels
         {
             if (_addonRoot != null)
             {
-                foreach (var addonNode in _addonRoot.GetAllNodes())
+                foreach (var addonNode in _addonRoot.GetDescendantNodes())
                 {
                     addonNode.ClearCaches();
                 }
@@ -433,7 +433,7 @@ namespace FireAxe.ViewModels
         {
             if (_addonRoot != null)
             {
-                foreach (var addonNode in _addonRoot.GetAllNodes())
+                foreach (var addonNode in _addonRoot.GetDescendantNodes())
                 {
                     if (addonNode is AddonGroup addonGroup)
                     {
@@ -597,7 +597,7 @@ namespace FireAxe.ViewModels
                 return;
             }
 
-            foreach (var addonNode in _addonRoot.GetAllNodes())
+            foreach (var addonNode in _addonRoot.GetDescendantNodes())
             {
                 if (addonNode is WorkshopVpkAddon workshopVpkAddon)
                 {

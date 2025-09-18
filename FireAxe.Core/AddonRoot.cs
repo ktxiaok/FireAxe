@@ -193,7 +193,7 @@ namespace FireAxe
 
             if (RemoveCustomTag(tag))
             {
-                foreach (var node in this.GetAllNodes())
+                foreach (var node in this.GetDescendantNodes())
                 {
                     node.RemoveTag(tag);
                 }
@@ -212,7 +212,7 @@ namespace FireAxe
 
         public void RefreshCustomTags()
         {
-            foreach (var node in this.GetAllNodes())
+            foreach (var node in this.GetDescendantNodes())
             {
                 foreach (var tag in node.Tags)
                 {
@@ -245,7 +245,7 @@ namespace FireAxe
                 _customTags.Insert(idx, newTag);
             }
 
-            foreach (var node in this.GetAllNodes())
+            foreach (var node in this.GetDescendantNodes())
             {
                 node.RenameTag(oldTag, newTag);
             }
@@ -504,7 +504,7 @@ namespace FireAxe
             }
 
             // Add enabled addons to entries.
-            foreach (var addon in this.GetAllNodes())
+            foreach (var addon in this.GetDescendantNodes())
             {
                 if (!addon.IsEnabledInHierarchy)
                 {

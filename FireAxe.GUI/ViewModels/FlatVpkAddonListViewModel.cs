@@ -116,7 +116,7 @@ namespace FireAxe.ViewModels
                 {
                     return;
                 }
-                foreach (var addonNode in addonRoot.GetAllNodes())
+                foreach (var addonNode in addonRoot.GetDescendantNodes())
                 {
                     if (IncludeEnabledOnly && !addonNode.IsEnabledInHierarchy)
                     {

@@ -137,6 +137,8 @@ namespace FireAxe
 
         public virtual bool RequireFile => false;
 
+        public bool MayHaveFile => RequireFile && Name != NullName;
+
         public bool IsAutoCheck => Root.IsAutoCheck;
 
         bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
@@ -210,7 +212,7 @@ namespace FireAxe
                 parentInternal.ThrowIfNodeNameInvalid(value);
 
                 // Try to move the file.
-                if (RequireFile && _name.Length > 0)
+                if (MayHaveFile)
                 {
                     string sourcePath = BuildFilePath(Group, FileName);
                     string fullSourcePath = GetFullFilePath(sourcePath);
@@ -480,7 +482,7 @@ namespace FireAxe
             containerInternal.ThrowIfNodeNameInvalid(Name);
 
             // Try to move the file.
-            if (RequireFile && Name.Length > 0)
+            if (MayHaveFile)
             {
                 string fileName = FileName;
                 string sourcePath = BuildFilePath(Group, fileName);
@@ -550,38 +552,33 @@ namespace FireAxe
             return resultTask;
         }
 
-        public Task DestroyWithFileAsync()
+        public async Task DestroyWithFileAsync()
         {
             if (!IsValid)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             ClearCacheFiles();
 
             string? pathToDelete = null;
-            if (RequireFile && Name.Length > 0)
+            if (MayHaveFile)
             {
                 pathToDelete = FullFilePath;
             }
 
-            var resultTask = DestroyAsync();
+            await DestroyAsync().ConfigureAwait(false);
             if (pathToDelete != null)
             {
-                resultTask = resultTask.ContinueWith((task) =>
+                try
                 {
-                    try
-                    {
-                        FileUtils.MoveToRecycleBin(pathToDelete);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Exception occurred during moving file to recycle bin: {FilePath}", pathToDelete);
-                    }
-                });
+                    FileUtils.MoveToRecycleBin(pathToDelete);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during moving file to recycle bin: {FilePath}", pathToDelete);
+                }
             }
-
-            return resultTask;
         }
 
         public void Check()
