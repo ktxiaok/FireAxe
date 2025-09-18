@@ -27,6 +27,8 @@ namespace FireAxe
 
         private bool _disposed = false;
 
+        private CancellationTokenSource _cancellationTokenSource = new();
+
         private DirectoryInfo? _directoryPath = null;
 
         private string _gamePath = "";
@@ -34,6 +36,8 @@ namespace FireAxe
         private readonly ObservableCollection<string> _customTags = new();
         private readonly ReadOnlyObservableCollection<string> _customTagsReadOnly;
         private readonly HashSet<string> _customTagSet = new();
+
+        private Task<AddonConflictResult>? _checkConflictsTask = null;
 
         private TaskScheduler? _taskScheduler = null;
 
@@ -248,6 +252,56 @@ namespace FireAxe
         public string GetUniqueNodeName(string name)
         {
             return _containerService.GetUniqueName(name);
+        }
+
+        public void Check()
+        {
+            CheckConflictsAsync();
+            this.CheckDescendants();
+        }
+
+        public Task<AddonConflictResult> CheckConflictsAsync()
+        {
+            if (_checkConflictsTask != null)
+            {
+                return _checkConflictsTask;
+            }
+
+            _checkConflictsTask = AddonConflictUtils.FindConflicts(Nodes, _cancellationTokenSource.Token);
+            _checkConflictsTask.ContinueWith(
+                task => 
+                {
+                    _checkConflictsTask = null;
+                    
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        var conflictResult = task.Result;
+                        if (conflictResult.HasConflict)
+                        {
+                            foreach (var addon in conflictResult.ConflictingVpkAddons)
+                            {
+                                if (addon is VpkAddon vpkAddon)
+                                {
+                                    vpkAddon._conflictingFiles.Clear();
+                                    foreach (var file in conflictResult.ConflictingVpkAddonToFiles[addon])
+                                    {
+                                        vpkAddon._conflictingFiles.Add(file);
+                                    }
+
+                                    vpkAddon._conflictingAddons.Clear();
+                                    foreach (var conflictingAddon in conflictResult.GetConflictingAddons(addon))
+                                    {
+                                        vpkAddon._conflictingAddons.Add(conflictingAddon);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, 
+                TaskScheduler
+            );
+
+            return _checkConflictsTask;
         }
 
         private abstract class ImportItem
@@ -641,7 +695,13 @@ namespace FireAxe
             if (!_disposed)
             {
                 _disposed = true;
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose();
                 var tasks = new List<Task>();
+                if (_checkConflictsTask != null)
+                {
+                    tasks.Add(_checkConflictsTask);
+                }
                 foreach (var node in Nodes)
                 {
                     tasks.Add(node.DestroyAsync());

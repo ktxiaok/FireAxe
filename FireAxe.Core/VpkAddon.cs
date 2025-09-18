@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using SteamDatabase.ValvePak;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe
@@ -9,11 +10,22 @@ namespace FireAxe
     {
         private int _vpkPriority = 0;
 
+        private readonly ObservableCollection<string> _conflictIgnoringFiles = new();
+        private readonly ReadOnlyObservableCollection<string> _conflictIgnoringFilesReadOnly;
+        private readonly HashSet<string> _conflictIgnoringFileSet = new HashSet<string>();
+
+        internal readonly ObservableCollection<string> _conflictingFiles = new();
+        private readonly ReadOnlyObservableCollection<string> _conflictingFilesReadOnly;
+        internal readonly ObservableCollection<AddonNode> _conflictingAddons = new();
+        private readonly ReadOnlyObservableCollection<AddonNode> _conflictingAddonsReadOnly;
+
         private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
         public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
         {
-            
+            _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
+            _conflictingFilesReadOnly = new(_conflictingFiles);
+            _conflictingAddonsReadOnly = new(_conflictingAddons);
         }
 
         public int VpkPriority
@@ -27,6 +39,12 @@ namespace FireAxe
                 }
             }
         }
+
+        public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
+
+        public ReadOnlyObservableCollection<string> ConflictingFiles => _conflictingFilesReadOnly;
+
+        public ReadOnlyObservableCollection<AddonNode> ConflictingAddons => _conflictingAddonsReadOnly;
 
         public abstract string? FullVpkFilePath
         {
@@ -107,11 +125,56 @@ namespace FireAxe
             _addonInfo.SetTarget(null);
         }
 
+        public bool AddConflictIgnoringFile(string file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
+            bool result = _conflictIgnoringFileSet.Add(file);
+            if (!result)
+            {
+                return false;
+            }
+            _conflictIgnoringFiles.Add(file);
+            Root.RequestSave = true;
+
+            return result;
+        }
+
+        public bool RemoveConflictIgnoringFile(string file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
+            bool result = _conflictIgnoringFileSet.Remove(file);
+            if (!result)
+            {
+                return false;
+            }
+            _conflictIgnoringFiles.Remove(file);
+            Root.RequestSave = true;
+
+            return result;
+        }
+
+        public void ClearConflictIgnoringFiles()
+        {
+            _conflictIgnoringFileSet.Clear();
+            _conflictIgnoringFiles.Clear();
+            Root.RequestSave = true;
+        }
+
+        public bool ContainsConflictIgnoringFile(string file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
+            return _conflictIgnoringFileSet.Contains(file);
+        }
+
         protected override void OnCreateSave(AddonNodeSave save)
         {
             base.OnCreateSave(save);
             var save1 = (VpkAddonSave)save;
             save1.VpkPriority = VpkPriority;
+            save1.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
         }
 
         protected override void OnLoadSave(AddonNodeSave save)
@@ -119,6 +182,11 @@ namespace FireAxe
             base.OnLoadSave(save);
             var save1 = (VpkAddonSave)save;
             VpkPriority = save1.VpkPriority;
+            ClearConflictIgnoringFiles();
+            foreach (var file in save1.ConflictIgnoringFiles)
+            {
+                AddConflictIgnoringFile(file);
+            }
         }
 
         private static bool TryCreatePackage(string? path, [NotNullWhen(true)] out Package? pak)

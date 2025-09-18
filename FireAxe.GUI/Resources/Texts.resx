@@ -219,6 +219,18 @@
   <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
     <value>Higher version of files are opening. This will cause file information loss. Are you sure you want to continue?</value>
   </data>
+  <data name="ConflictIgnoringFiles" xml:space="preserve">
+    <value>Conflict Ignoring Files</value>
+  </data>
+  <data name="ConflictingAddons" xml:space="preserve">
+    <value>Conflicting Addons</value>
+  </data>
+  <data name="ConflictingDetails" xml:space="preserve">
+    <value>Conflicting Details</value>
+  </data>
+  <data name="ConflictingFiles" xml:space="preserve">
+    <value>Conflicting Files</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
   </data>
@@ -269,6 +281,9 @@
   </data>
   <data name="DownloadList" xml:space="preserve">
     <value>Download List</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>Empty</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
@@ -404,6 +419,9 @@
   </data>
   <data name="Ignore" xml:space="preserve">
     <value>Ignore</value>
+  </data>
+  <data name="IgnoreAll" xml:space="preserve">
+    <value>Ignore All</value>
   </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>

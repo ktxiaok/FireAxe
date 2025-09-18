@@ -199,7 +199,7 @@ namespace FireAxe.ViewModels
         {
             if (AddonNode is AddonGroup addonGroup)
             {
-                addonGroup.CheckAll();
+                addonGroup.CheckDescendants();
             }
             AddonNode.Check();
             Refresh();

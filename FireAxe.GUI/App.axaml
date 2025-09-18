@@ -75,6 +75,12 @@
     <Style Selector="Button.cancel /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Content" Value="{x:Static r:Texts.Cancel}" />
     </Style>
+
+    <Style Selector="Border.Level1">
+      <Setter Property="BorderBrush" Value="Gray"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="5"/>
+    </Style>
   </Application.Styles>
 
   <Application.Resources>
@@ -84,6 +90,9 @@
         <ResourceInclude Source="/Views/EditableTextBlock.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
+
+    <Thickness x:Key="ExpanderHeaderPadding">5</Thickness>
+    <Thickness x:Key="ExpanderContentPadding">5</Thickness>
   </Application.Resources>
   
 </Application>

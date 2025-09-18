@@ -233,7 +233,7 @@ namespace FireAxe.ViewModels
                     _addonRoot.GamePath = _settings.GamePath;
                     _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
                     _addonRoot.LoadFile();
-                    _addonRoot.CheckAll();
+                    _addonRoot.Check();
                     AddonNodeExplorerViewModel = new(_addonRoot, _windowManager);
                 }
                 this.RaisePropertyChanged();
@@ -385,25 +385,27 @@ namespace FireAxe.ViewModels
 
         public async Task Push()
         {
-            if (_addonRoot != null)
+            if (_addonRoot == null)
             {
-                _addonRoot.CheckAll();
-                try
-                {
-                    _addonRoot.Push();
-                }
-                catch (InvalidGamePathException)
-                {
-                    await ShowInvalidGamePathInteraction.Handle(_addonRoot.GamePath);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    await ShowPushErrorInteraction.Handle(ex);
-                    return;
-                }
-                await ShowPushSuccessInteraction.Handle(Unit.Default);
+                return;
             }
+            
+            _addonRoot.Check();
+            try
+            {
+                _addonRoot.Push();
+            }
+            catch (InvalidGamePathException)
+            {
+                await ShowInvalidGamePathInteraction.Handle(_addonRoot.GamePath);
+                return;
+            }
+            catch (Exception ex)
+            {
+                await ShowPushErrorInteraction.Handle(ex);
+                return;
+            }
+            await ShowPushSuccessInteraction.Handle(Unit.Default);
         }
 
         public void Check()
@@ -413,7 +415,7 @@ namespace FireAxe.ViewModels
                 return;
             }
 
-            _addonRoot.CheckAll();
+            _addonRoot.Check();
         }
 
         public void ClearCaches()

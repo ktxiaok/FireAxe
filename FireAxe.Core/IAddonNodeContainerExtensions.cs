@@ -12,15 +12,11 @@ namespace FireAxe
             }
         }
 
-        public static void CheckAll(this IAddonNodeContainer container)
+        public static void CheckDescendants(this IAddonNodeContainer container)
         {
             foreach (var node in container.GetDescendantsByDfsPostorder())
             {
                 node.Check();
-            }
-            if (container is AddonNode containerNode)
-            {
-                containerNode.Check();
             }
         }
     }

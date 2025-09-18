@@ -219,6 +219,18 @@
   <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
     <value>正在打开高版本的文件。这将会导致文件信息丢失。你确定要继续吗？</value>
   </data>
+  <data name="ConflictIgnoringFiles" xml:space="preserve">
+    <value>冲突忽略文件</value>
+  </data>
+  <data name="ConflictingAddons" xml:space="preserve">
+    <value>冲突模组</value>
+  </data>
+  <data name="ConflictingDetails" xml:space="preserve">
+    <value>冲突详情</value>
+  </data>
+  <data name="ConflictingFiles" xml:space="preserve">
+    <value>冲突文件</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>创建</value>
   </data>
@@ -269,6 +281,9 @@
   </data>
   <data name="DownloadList" xml:space="preserve">
     <value>下载列表</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>空</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>启用</value>
@@ -405,6 +420,9 @@
   <data name="Ignore" xml:space="preserve">
     <value>忽略</value>
   </data>
+  <data name="IgnoreAll" xml:space="preserve">
+    <value>忽略全部</value>
+  </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>忽略大小写</value>
   </data>
@@ -495,7 +513,7 @@
   <data name="MovingMessage" xml:space="preserve">
     <value>正在移动：{0}</value>
   </data>
-  <data name="MultipleItemSelected" xml:space="preserve">
+  <data name="MultipleItemsSelected" xml:space="preserve">
     <value>已选中{0}个项目。</value>
   </data>
   <data name="NeedRestartHint" xml:space="preserve">
@@ -615,11 +633,11 @@
   <data name="ShowInFileExplorer" xml:space="preserve">
     <value>在文件资源管理器中显示</value>
   </data>
-  <data name="SkilAll" xml:space="preserve">
-    <value>跳过所有</value>
-  </data>
   <data name="Skip" xml:space="preserve">
     <value>跳过</value>
+  </data>
+  <data name="SkipAll" xml:space="preserve">
+    <value>跳过所有</value>
   </data>
   <data name="SubscriptionsColon" xml:space="preserve">
     <value>订阅量：</value>

@@ -7,5 +7,7 @@ namespace FireAxe
         public override Type TargetType => typeof(VpkAddon);
 
         public int VpkPriority { get; set; } = 0;
+
+        public string[] ConflictIgnoringFiles { get; set; } = [];
     }
 }
