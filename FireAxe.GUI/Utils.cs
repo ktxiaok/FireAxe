@@ -64,5 +64,14 @@ namespace FireAxe
                 Log.Error(ex, "Exception occurred during Utils.ShowFileInExplorer");
             }
         }
+
+        public static void DisposeAndSetNull(ref IDisposable? disposable)
+        {
+            if (disposable != null)
+            {
+                disposable.Dispose();
+                disposable = null;
+            }
+        }
     }
 }

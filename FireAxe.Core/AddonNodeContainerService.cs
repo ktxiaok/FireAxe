@@ -5,25 +5,38 @@ namespace FireAxe
 {
     internal class AddonNodeContainerService
     {
+        private readonly IAddonNodeContainer _container;
+
         private ObservableCollection<AddonNode> _nodes;
         private ReadOnlyObservableCollection<AddonNode> _nodesReadOnly;
 
         private Dictionary<string, AddonNode> _nodeNames = new();
 
-        public AddonNodeContainerService()
+        public AddonNodeContainerService(IAddonNodeContainer container)
         {
+            _container = container;
             _nodes = new();
             _nodesReadOnly = new(_nodes);
         }
 
+        public IAddonNodeContainer Container => _container;
+
         public ReadOnlyObservableCollection<AddonNode> Nodes => _nodesReadOnly;
 
-        public void AddUncheckName(AddonNode node)
+        public void AddUnchecked(AddonNode node)
         {
             ArgumentNullException.ThrowIfNull(node);
 
             ChangeNameUnchecked(null, node.Name, node);
+            foreach (var nodeOrDescendant in node.GetSelfAndDescendantsByDfsPreorder())
+            {
+                nodeOrDescendant.NotifyAncestorsChanged();
+            }
             _nodes.Add(node);
+            foreach (var containerOrAncestor in _container.GetSelfAndAncestors())
+            {
+                ((IAddonNodeContainerInternal)containerOrAncestor).NotifyDescendantNodeMoved(node);
+            }
         }
 
         public void Remove(AddonNode node)
@@ -31,11 +44,15 @@ namespace FireAxe
             ArgumentNullException.ThrowIfNull(node);
 
             var name = node.Name;
-            if (name.Length > 0)
+            if (name != AddonNode.NullName)
             {
                 _nodeNames.Remove(name);
             }
             _nodes.Remove(node);
+            foreach (var containerOrAncestor in _container.GetSelfAndAncestors())
+            {
+                ((IAddonNodeContainerInternal)containerOrAncestor).NotifyDescendantNodeMoved(node);
+            }
         }
 
         public string GetUniqueName(string name)
@@ -80,11 +97,14 @@ namespace FireAxe
             ArgumentNullException.ThrowIfNull(newName);
             ArgumentNullException.ThrowIfNull(node);
 
-            if (oldName != null && oldName.Length > 0)
+            if (oldName != null && oldName != AddonNode.NullName)
             {
                 _nodeNames.Remove(oldName);
             }
-            _nodeNames[newName] = node;
+            if (newName != AddonNode.NullName)
+            {
+                _nodeNames[newName] = node;
+            }
         }
     }
 }

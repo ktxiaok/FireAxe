@@ -16,8 +16,8 @@ namespace FireAxe
 
         internal readonly ObservableCollection<string> _conflictingFiles = new();
         private readonly ReadOnlyObservableCollection<string> _conflictingFilesReadOnly;
-        internal readonly ObservableCollection<AddonNode> _conflictingAddons = new();
-        private readonly ReadOnlyObservableCollection<AddonNode> _conflictingAddonsReadOnly;
+        internal readonly ObservableCollection<Guid> _conflictingAddonIds = new();
+        private readonly ReadOnlyObservableCollection<Guid> _conflictingAddonIdsReadOnly;
 
         private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
@@ -25,7 +25,7 @@ namespace FireAxe
         {
             _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
             _conflictingFilesReadOnly = new(_conflictingFiles);
-            _conflictingAddonsReadOnly = new(_conflictingAddons);
+            _conflictingAddonIdsReadOnly = new(_conflictingAddonIds);
         }
 
         public int VpkPriority
@@ -44,7 +44,7 @@ namespace FireAxe
 
         public ReadOnlyObservableCollection<string> ConflictingFiles => _conflictingFilesReadOnly;
 
-        public ReadOnlyObservableCollection<AddonNode> ConflictingAddons => _conflictingAddonsReadOnly;
+        public ReadOnlyObservableCollection<Guid> ConflictingAddonIds => _conflictingAddonIdsReadOnly;
 
         public abstract string? FullVpkFilePath
         {

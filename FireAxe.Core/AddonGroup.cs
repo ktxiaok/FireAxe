@@ -141,6 +141,8 @@ namespace FireAxe
 
         IAddonNodeContainer? IAddonNodeContainer.Parent => Group;
 
+        public event Action<AddonNode>? DescendantNodeMoved = null;
+
         public string GetUniqueNodeName(string name)
         {
             return _containerService.GetUniqueName(name);
@@ -232,12 +234,12 @@ namespace FireAxe
         internal override void OnInitSelf()
         {
             base.OnInitSelf();
-            _containerService = new();
+            _containerService = new(this);
         }
 
         internal void AddChild(AddonNode child)
         {
-            _containerService.AddUncheckName(child);
+            _containerService.AddUnchecked(child);
             NotifyChildEnableOrDisable(child);
             AutoCheck();
         }
@@ -267,6 +269,11 @@ namespace FireAxe
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        void IAddonNodeContainerInternal.NotifyDescendantNodeMoved(AddonNode node)
+        {
+            DescendantNodeMoved?.Invoke(node);
         }
 
         private void AddonGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)

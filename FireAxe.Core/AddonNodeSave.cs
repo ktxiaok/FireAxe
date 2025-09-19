@@ -8,7 +8,7 @@ namespace FireAxe
         [JsonIgnore]
         public virtual Type TargetType => typeof(AddonNode);
 
-        public Guid? Id { get; set; } = null; 
+        public Guid Id { get; set; } = Guid.Empty; 
 
         public bool IsEnabled { get; set; } = false;
 

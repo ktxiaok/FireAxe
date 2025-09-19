@@ -47,12 +47,13 @@ namespace FireAxe
 
         private HttpClient? _httpClient = null;
 
-        private AddonNodeContainerService _containerService = new();
+        private readonly AddonNodeContainerService _containerService;
 
         private int _blockAutoCheck = 0;
         
         public AddonRoot()
         {
+            _containerService = new(this);
             _customTagsReadOnly = new(_customTags);
 
             ((INotifyCollectionChanged)Nodes).CollectionChanged += OnCollectionChanged;
@@ -153,6 +154,19 @@ namespace FireAxe
         IAddonNodeContainer? IAddonNodeContainer.Parent => null;
 
         AddonRoot IAddonNodeContainer.Root => this;
+
+        public event Action<AddonNode>? DescendantNodeMoved = null;
+
+        public event Action<AddonNode>? DescendantNodeCreated = null;
+
+        public event Action<AddonNode>? DescendantNodeDestructionStarted = null;
+
+        public event Action<AddonNode>? DescendantNodeDestroyed = null;
+
+        public bool TryGetDescendantNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
+        {
+            return _idToNode.TryGetValue(id, out node);
+        }
 
         public bool AddCustomTag(string tag)
         {
@@ -290,10 +304,10 @@ namespace FireAxe
                                         vpkAddon._conflictingFiles.Add(file);
                                     }
 
-                                    vpkAddon._conflictingAddons.Clear();
+                                    vpkAddon._conflictingAddonIds.Clear();
                                     foreach (var conflictingAddon in conflictResult.GetConflictingAddons(addon))
                                     {
-                                        vpkAddon._conflictingAddons.Add(conflictingAddon);
+                                        vpkAddon._conflictingAddonIds.Add(conflictingAddon.Id);
                                     }
                                 }
                             }
@@ -746,7 +760,7 @@ namespace FireAxe
         
         internal void AddNode(AddonNode node)
         {
-            _containerService.AddUncheckName(node);
+            _containerService.AddUnchecked(node);
         }
 
         internal void RemoveNode(AddonNode node)
@@ -762,6 +776,26 @@ namespace FireAxe
         void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
         {
             _containerService.ChangeNameUnchecked(oldName, newName, node);
+        }
+
+        void IAddonNodeContainerInternal.NotifyDescendantNodeMoved(AddonNode node)
+        {
+            DescendantNodeMoved?.Invoke(node);
+        }
+
+        internal void NotifyDescendantNodeCreated(AddonNode node)
+        {
+            DescendantNodeCreated?.Invoke(node);
+        }
+
+        internal void NotifyDescendantNodeDestructionStarted(AddonNode node)
+        {
+            DescendantNodeDestructionStarted?.Invoke(node);
+        }
+
+        internal void NotifyDescendantNodeDestroyed(AddonNode node)
+        {
+            DescendantNodeDestroyed?.Invoke(node);
         }
 
         internal void RegisterNodeId(Guid newId, Guid oldId, AddonNode node)

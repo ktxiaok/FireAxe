@@ -65,15 +65,15 @@ namespace FireAxe
 
         public static IEnumerable<T> GetDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
         {
-            return new EnumerableWrapper<T>(() => GetDescendantsEnumByDfsPreorder(node));
+            return new EnumerableWrapper<T>(() => GetDescendantsEnumeratorByDfsPreorder(node));
         }
 
         public static IEnumerable<T> GetSelfAndDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
         {
-            return new EnumerableWrapper<T>(() => GetSelfAndDescendantsEnumByDfsPreorder(node));
+            return new EnumerableWrapper<T>(() => GetSelfAndDescendantsEnumeratorByDfsPreorder(node));
         }
 
-        public static IHierarchyPreorderDfs<T> GetDescendantsEnumByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public static IHierarchyPreorderDfs<T> GetDescendantsEnumeratorByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
         {
             bool needSkip = false;
             var enumerator = GetEnumerator();
@@ -109,9 +109,9 @@ namespace FireAxe
             return new HierarchyPreorderDfs<T>(enumerator, skip);
         }
 
-        public static IHierarchyPreorderDfs<T> GetSelfAndDescendantsEnumByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public static IHierarchyPreorderDfs<T> GetSelfAndDescendantsEnumeratorByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
         {
-            Lazy<IHierarchyPreorderDfs<T>> dfsLazy = new(() => node.GetDescendantsEnumByDfsPreorder(), false);
+            Lazy<IHierarchyPreorderDfs<T>> dfsLazy = new(() => node.GetDescendantsEnumeratorByDfsPreorder(), false);
             bool needSkip = false;
             IEnumerator<T> GetEnumerator()
             {
@@ -182,6 +182,25 @@ namespace FireAxe
                 yield return element;
             }
             yield return (T)node;
+        }
+
+        public static IEnumerable<IHierarchyNode<T>> GetAncestors<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        {
+            var current = node.Parent;
+            while (current != null)
+            {
+                yield return current;
+                current = current.Parent;
+            }
+        }
+
+        public static IEnumerable<IHierarchyNode<T>> GetSelfAndAncestors<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
+        {
+            yield return node;
+            foreach (var ancestor in node.GetAncestors())
+            {
+                yield return ancestor;
+            }
         }
     }
 

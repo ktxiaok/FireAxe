@@ -9,11 +9,15 @@ namespace FireAxe
 
         bool IHierarchyNode<AddonNode>.IsNonterminal => true;
 
+        IHierarchyNode<AddonNode>? IHierarchyNode<AddonNode>.Parent => Parent;
+
         ReadOnlyObservableCollection<AddonNode> Nodes { get; }
 
-        IAddonNodeContainer? Parent { get; }
+        new IAddonNodeContainer? Parent { get; }
 
         AddonRoot Root { get; }
+
+        event Action<AddonNode>? DescendantNodeMoved;
 
         string GetUniqueNodeName(string name);
     }
@@ -23,5 +27,7 @@ namespace FireAxe
         void ThrowIfNodeNameInvalid(string name);
 
         void ChangeNameUnchecked(string? oldName, string newName, AddonNode node);
+
+        void NotifyDescendantNodeMoved(AddonNode node);
     }
 }

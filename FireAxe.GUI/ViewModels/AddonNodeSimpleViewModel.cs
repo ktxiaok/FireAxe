@@ -80,17 +80,9 @@ namespace FireAxe.ViewModels
                 })
                 .ToProperty(this, nameof(EnableState));
 
-                _shouldShowFolderIcon = this.WhenAnyValue(x => x.Image)
-                .Select(image => image == null && _addonNode is AddonGroup)
-                .ToProperty(this, nameof(ShouldShowFolderIcon));
-
-                _shouldShowUnknownImage = this.WhenAnyValue(x => x.Image)
-                .Select(image => image == null && _addonNode is not AddonGroup)
-                .ToProperty(this, nameof(ShouldShowUnknownImage));
-
-                _shouldShowImage = this.WhenAnyValue(x => x.Image)
-                    .Select(image => image != null)
-                    .ToProperty(this, nameof(ShouldShowImage));
+                AddonNodeViewModelUtils.CreateIconShowingObservableProperties(
+                    this, this.WhenAnyValue(x => x.AddonNode), this.WhenAnyValue(x => x.Image).Select(img => img != null),
+                    out _shouldShowUnknownImage, out _shouldShowImage, out _shouldShowFolderIcon);
 
                 _fileSizeReadable = this.WhenAnyValue(x => x.AddonNode.FileSize)
                 .Select((fileSize) => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)

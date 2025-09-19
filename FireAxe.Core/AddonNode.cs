@@ -40,7 +40,7 @@ namespace FireAxe
         private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
         private bool _isBusyChecking = false;
 
-        private WeakReference<byte[]?> _image = new(null);
+        private readonly WeakReference<byte[]?> _imageCache = new(null);
         private Task<byte[]?>? _getImageTask = null;
 
         private long? _fileSize = null;
@@ -65,14 +65,15 @@ namespace FireAxe
 
             if (group == null)
             {
+                UpdateEnabledInHierarchy();
                 root.AddNode(this);
             }
             else
             {
-                group.AddChild(this);
                 Group = group;
+                UpdateEnabledInHierarchy();
+                group.AddChild(this);
             }
-            UpdateEnabledInHierarchy();
         }
 
         public virtual Type SaveType => typeof(AddonNodeSave);
@@ -107,6 +108,10 @@ namespace FireAxe
             get => _id;
             set
             {
+                if (value == Guid.Empty)
+                {
+                    throw new ArgumentException("Cannot set Id to Guid.Empty");
+                }
                 if (value == _id)
                 {
                     return;
@@ -132,6 +137,8 @@ namespace FireAxe
         }
 
         public IAddonNodeContainer Parent => ((IAddonNodeContainer?)Group) ?? Root;
+
+        IHierarchyNode<AddonNode>? IHierarchyNode<AddonNode>.Parent => Parent;
 
         public AddonRoot Root => _root;
 
@@ -179,11 +186,16 @@ namespace FireAxe
         {
             get
             {
-                if (_image.TryGetTarget(out var target))
+                if (_imageCache.TryGetTarget(out var target))
                 {
                     return target;
                 }
                 return null;
+            }
+            private set
+            {
+                _imageCache.SetTarget(value);
+                NotifyChanged();
             }
         }
 
@@ -398,7 +410,7 @@ namespace FireAxe
             return _tagSet.Contains(tag);
         }
 
-        public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken)
+        public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken = default)
         {
             var task = _getImageTask;
             if (task == null)
@@ -409,7 +421,7 @@ namespace FireAxe
                 async Task<byte[]?> RunGetImageTask()
                 {
                     var image = await rawGetImageTask.ConfigureAwait(false);
-                    var endingTask = new Task(() => _image.SetTarget(image));
+                    var endingTask = new Task(() => ImageCache = image);
                     endingTask.Start(rootTaskScheduler);
                     await endingTask.ConfigureAwait(false);
                     return image;
@@ -421,7 +433,7 @@ namespace FireAxe
             return task.WaitAsync(cancellationToken);
         }
 
-        public Task<byte[]?> GetImageAllowCacheAsync(CancellationToken cancellationToken)
+        public Task<byte[]?> GetImageAllowCacheAsync(CancellationToken cancellationToken = default)
         {
             var cache = ImageCache;
             if (cache != null)
@@ -460,25 +472,25 @@ namespace FireAxe
             return true;
         }
 
-        public void MoveTo(AddonGroup? group)
+        public void MoveTo(AddonGroup? targetGroup)
         {
             // Check the argument.
-            if (group != null && Root != group.Root)
+            if (targetGroup != null && Root != targetGroup.Root)
             {
                 ThrowDifferentRootException();
             }
-            if (!CanMoveTo(group))
+            if (!CanMoveTo(targetGroup))
             {
                 ThrowMoveGroupToItselfException();
             }
-            if (group == Group)
+            if (targetGroup == Group)
             {
                 return;
             }
 
             ThrowIfMoveDenied();
 
-            var containerInternal = group == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)group;
+            var containerInternal = targetGroup == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)targetGroup;
             containerInternal.ThrowIfNodeNameInvalid(Name);
 
             // Try to move the file.
@@ -489,20 +501,17 @@ namespace FireAxe
                 string fullSourcePath = GetFullFilePath(sourcePath);
                 if (FileUtils.Exists(fullSourcePath))
                 {
-                    string targetPath = BuildFilePath(group, fileName);
+                    string targetPath = BuildFilePath(targetGroup, fileName);
                     string fullTargetPath = GetFullFilePath(targetPath);
                     FileUtils.Move(fullSourcePath, fullTargetPath);
                 }
             }
 
-            if (group == null)
+            if (targetGroup == null)
             {
-                if (Group == null)
-                {
-                    return;
-                }
-                Group.RemoveChild(this);
+                Group!.RemoveChild(this);
                 Group = null;
+                UpdateEnabledInHierarchy();
                 Root.AddNode(this);
             }
             else
@@ -515,15 +524,9 @@ namespace FireAxe
                 {
                     Group.RemoveChild(this);
                 }
-                group.AddChild(this);
-                Group = group;
-            }
-
-            UpdateEnabledInHierarchy();
-
-            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
-            {
-                node.OnAncestorsChanged();
+                Group = targetGroup;
+                UpdateEnabledInHierarchy();
+                targetGroup.AddChild(this);
             }
         }
 
@@ -598,7 +601,7 @@ namespace FireAxe
         public virtual void ClearCaches()
         {
             ClearCacheFiles();
-            _image.SetTarget(null);
+            ImageCache = null;
         }
 
         public virtual void ClearCacheFiles()
@@ -825,9 +828,9 @@ namespace FireAxe
 
         protected virtual void OnLoadSave(AddonNodeSave save)
         {
-            if (save.Id.HasValue)
+            if (save.Id != Guid.Empty)
             {
-                Id = save.Id.Value;
+                Id = save.Id;
             }
             IsEnabled = save.IsEnabled;
             Name = save.Name;
@@ -849,6 +852,11 @@ namespace FireAxe
         protected virtual void OnAncestorsChanged()
         {
             NotifyChanged(nameof(TagsInHierarchy));
+        }
+
+        internal void NotifyAncestorsChanged()
+        {
+            OnAncestorsChanged();
         }
 
         internal virtual void OnInitSelf()
@@ -891,7 +899,7 @@ namespace FireAxe
 
         private void UpdateEnabledInHierarchy()
         {
-            var dfs = this.GetSelfAndDescendantsEnumByDfsPreorder();
+            var dfs = this.GetSelfAndDescendantsEnumeratorByDfsPreorder();
             while (dfs.MoveNext())
             {
                 var current = dfs.Current;

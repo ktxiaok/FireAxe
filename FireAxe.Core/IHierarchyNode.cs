@@ -8,5 +8,7 @@ namespace FireAxe
         bool IsNonterminal { get; }
 
         IEnumerable<T> Children { get; }
+
+        IHierarchyNode<T>? Parent { get; }
     }
 }
