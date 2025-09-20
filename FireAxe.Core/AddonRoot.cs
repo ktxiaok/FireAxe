@@ -147,7 +147,7 @@ namespace FireAxe
 
         public ReadOnlyObservableCollection<string> CustomTags => _customTagsReadOnly;
 
-        public bool IsAutoCheck => _blockAutoCheck == 0;
+        public bool IsAutoCheckEnabled => _blockAutoCheck == 0;
 
         public bool IsAutoUpdateWorkshopItem { get; set; } = true;
 

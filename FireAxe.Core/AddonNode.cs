@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-
+ 
 namespace FireAxe
 {
     public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
@@ -36,9 +36,11 @@ namespace FireAxe
 
         private string? _customImagePath = null;
 
-        private readonly ObservableCollection<AddonProblem> _problems = new();
+        internal readonly ObservableCollection<AddonProblem> _problems = new();
         private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
         private bool _isBusyChecking = false;
+
+        private readonly AddonProblemSource _fileNotExistProblemSource;
 
         private readonly WeakReference<byte[]?> _imageCache = new(null);
         private Task<byte[]?>? _getImageTask = null;
@@ -52,6 +54,8 @@ namespace FireAxe
 
             ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
             ((INotifyCollectionChanged)_problems).CollectionChanged += OnProblemCollectionChanged;
+
+            _fileNotExistProblemSource = new(this);
         }
 
         public virtual Type SaveType => typeof(AddonNodeSave);
@@ -124,7 +128,7 @@ namespace FireAxe
 
         public bool MayHaveFile => RequireFile && Name != NullName;
 
-        public bool IsAutoCheck => Root.IsAutoCheck;
+        public bool IsAutoCheckEnabled => Root.IsAutoCheckEnabled;
 
         bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
 
@@ -616,20 +620,6 @@ namespace FireAxe
             }
         }
 
-        public void Check()
-        {
-            if (_isBusyChecking)
-            {
-                return;
-            }
-
-            _isBusyChecking = true;
-            _problems.Clear();
-            OnCheck();
-            OnPostCheck();
-            _isBusyChecking = false;
-        }
-
         public virtual void ClearCaches()
         {
             ClearCacheFiles();
@@ -745,26 +735,6 @@ namespace FireAxe
             }
         }
 
-        protected void AutoCheck()
-        {
-            if (IsAutoCheck)
-            {
-                Check();
-            }
-        }
-
-        protected void AddProblem(AddonProblem problem)
-        {
-            ArgumentNullException.ThrowIfNull(problem);
-
-            _problems.Add(problem);
-        }
-
-        internal void RemoveProblem(AddonProblem problem)
-        {
-            _problems.Remove(problem);
-        }
-
         protected IDisposable BlockMove()
         {
             _blockMove++;
@@ -808,6 +778,27 @@ namespace FireAxe
             return task;
         }
 
+        public void Check()
+        {
+            if (_isBusyChecking)
+            {
+                return;
+            }
+
+            _isBusyChecking = true;
+            OnCheck();
+            OnPostCheck();
+            _isBusyChecking = false;
+        }
+
+        protected void AutoCheck()
+        {
+            if (IsAutoCheckEnabled)
+            {
+                Check();
+            }
+        }
+
         protected virtual void OnCheck()
         {
             
@@ -815,28 +806,29 @@ namespace FireAxe
 
         protected virtual void OnPostCheck()
         {
+            CheckFiles();
+        }
+
+        public void CheckFiles()
+        {
             FileSize = GetFileSize();
 
+            _fileNotExistProblemSource.Clear();
             if (RequireFile)
             {
                 var fullFilePath = FullFilePath;
 
                 try
                 {
-                    if (!File.Exists(fullFilePath) && !Directory.Exists(fullFilePath))
+                    if (!FileUtils.Exists(fullFilePath))
                     {
-                        AddProblem(new AddonFileNotExistProblem(this));
+                        new AddonFileNotExistProblem(_fileNotExistProblemSource).Submit();
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogException(ex);
+                    Log.Error(ex, "Exception occurred during AddonNode.CheckFiles.");
                 }
-            }
-
-            void LogException(Exception ex)
-            {
-                Log.Error(ex, "Exception occurred during AddonNode.OnPostCheck");
             }
         }
 
@@ -937,7 +929,7 @@ namespace FireAxe
 
         private void OnProblemCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (IsAutoCheck)
+            if (IsAutoCheckEnabled)
             {
                 Group?.Check();
             }

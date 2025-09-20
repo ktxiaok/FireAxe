@@ -11,15 +11,16 @@ namespace FireAxe
     {
         public class EnableStrategyProblem : AddonProblem
         {
-            public EnableStrategyProblem(AddonGroup source) : base(source)
+            public EnableStrategyProblem(AddonProblemSource<AddonGroup> problemSource) : base(problemSource)
             {
+
             }
 
-            public new AddonGroup Source => (AddonGroup)base.Source;
+            public new AddonGroup Addon => (AddonGroup)base.Addon;
 
-            protected override bool OnAutoSolve()
+            protected override bool OnAutomaticallyFix()
             {
-                var group = Source;
+                var group = Addon;
                 switch (group.EnableStrategy)
                 {
                     case AddonGroupEnableStrategy.Single:
@@ -41,22 +42,25 @@ namespace FireAxe
                             break;
                         }
                 }
-                return !Check(group);
+                return !HasProblem(group);
             }
 
-            public static bool TryCreate(AddonGroup group, [NotNullWhen(true)] out EnableStrategyProblem? problem)
+            public static EnableStrategyProblem? TryCreate(AddonProblemSource<AddonGroup> problemSource)
             {
-                problem = null;
-                if (Check(group))
+                ArgumentNullException.ThrowIfNull(problemSource);
+
+                if (HasProblem(problemSource.Addon))
                 {
-                    problem = new(group);
+                    return new EnableStrategyProblem(problemSource);
                 }
-                return problem != null;
+
+                return null;
             }
 
-            // returns true when there's a problem
-            private static bool Check(AddonGroup group)
+            public static bool HasProblem(AddonGroup group)
             {
+                ArgumentNullException.ThrowIfNull(group);
+
                 switch (group.EnableStrategy)
                 {
                     case AddonGroupEnableStrategy.Single:
@@ -107,9 +111,15 @@ namespace FireAxe
 
         private bool _isBusyHandlingChildEnableOrDisable = false;
 
+        private readonly AddonProblemSource<AddonGroup> _childrenProblemSource;
+        private readonly AddonProblemSource<AddonGroup> _enableStrategyProblemSource;
+
         protected AddonGroup()
         {
             _containerService = new(this);
+
+            _childrenProblemSource = new(this);
+            _enableStrategyProblemSource = new(this);
 
             ((INotifyCollectionChanged)Children).CollectionChanged += OnCollectionChanged;
             PropertyChanged += OnPropertyChanged;
@@ -131,8 +141,11 @@ namespace FireAxe
                 }
                 _enableStrategy = value;
                 NotifyChanged();
-                AutoCheck();
                 Root.RequestSave = true;
+                if (IsAutoCheckEnabled)
+                {
+                    CheckEnableStrategy();
+                }
             }
         }
 
@@ -168,23 +181,32 @@ namespace FireAxe
             children[Random.Shared.Next(count)].IsEnabled = true;
         }
 
-        protected override void OnPostCheck()
+        public void CheckChildrenProblems()
         {
-            base.OnPostCheck();
-
+            _childrenProblemSource.Clear();
             foreach (var child in Children)
             {
                 if (child.Problems.Count > 0)
                 {
-                    AddProblem(new AddonChildProblem(this));
+                    new AddonChildrenProblem(_childrenProblemSource).Submit();
                     break;
                 }
             }
+        }
 
-            if (EnableStrategyProblem.TryCreate(this, out var problem))
-            {
-                AddProblem(problem);
-            }
+        public void CheckEnableStrategy()
+        {
+            _enableStrategyProblemSource.Clear();
+            EnableStrategyProblem.TryCreate(_enableStrategyProblemSource)?.Submit();
+        }
+
+        protected override void OnPostCheck()
+        {
+            base.OnPostCheck();
+
+            CheckChildrenProblems();
+
+            CheckEnableStrategy();
         }
 
         protected virtual void OnChildEnableOrDisable(AddonNode child)
@@ -218,6 +240,11 @@ namespace FireAxe
                         break;
                     }
             }
+
+            if (IsAutoCheckEnabled)
+            {
+                CheckEnableStrategy();
+            }
         }
 
         protected override void OnCreateSave(AddonNodeSave save)
@@ -238,13 +265,11 @@ namespace FireAxe
         {
             _containerService.AddUnchecked(child);
             NotifyChildEnableOrDisable(child);
-            AutoCheck();
         }
 
         internal void RemoveChild(AddonNode child)
         {
             _containerService.Remove(child);
-            AutoCheck();
         }
 
         internal void NotifyChildEnableOrDisable(AddonNode child)
@@ -303,10 +328,7 @@ namespace FireAxe
 
         private void OnDescendantNodeMoved(AddonNode obj)
         {
-            if (IsAutoCheck)
-            {
-                Check();
-            }
+            AutoCheck();
         }
     }
 

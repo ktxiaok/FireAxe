@@ -8,13 +8,11 @@ namespace FireAxe
 {
     public class AddonFileNotExistProblem : AddonProblem
     {
-        private string _filePath;
-
-        public AddonFileNotExistProblem(AddonNode source) : base(source)
+        public AddonFileNotExistProblem(AddonProblemSource problemSource) : base(problemSource)
         {
-            _filePath = source.FilePath;
+            FilePath = Addon.FullFilePath;
         }
 
-        public string FilePath => _filePath;
+        public string FilePath { get; }
     }
 }

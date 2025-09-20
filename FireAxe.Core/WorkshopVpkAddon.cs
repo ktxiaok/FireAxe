@@ -26,7 +26,9 @@ namespace FireAxe
 
         private string? _fullVpkPath = null;
 
-        private WorkshopVpkFileNotLoadProblem? _vpkNotLoadProblem = null; 
+        private readonly AddonProblemSource<WorkshopVpkAddon> _vpkNotLoadProblemSource;
+        private readonly AddonProblemSource<WorkshopVpkAddon> _invalidPublishedFileIdProblemSource;
+        private readonly AddonProblemSource _downloadFailedProblemSource;
 
         private Task? _downloadCheckTask = null;
 
@@ -38,7 +40,11 @@ namespace FireAxe
 
         protected WorkshopVpkAddon()
         {
-            PropertyChanged += WorkshopVpkAddon_PropertyChanged;
+            _vpkNotLoadProblemSource = new(this);
+            _invalidPublishedFileIdProblemSource = new(this);
+            _downloadFailedProblemSource = new(this);
+
+            PropertyChanged += OnPropertyChanged;
         }
 
         public override Type SaveType => typeof(WorkshopVpkAddonSave);
@@ -233,11 +239,9 @@ namespace FireAxe
             }
         }
 
-        protected override void OnCheck()
+        public void CheckDownload()
         {
-            base.OnCheck();
-
-            _vpkNotLoadProblem = null;
+            _vpkNotLoadProblemSource.Clear();
 
             if (_publishedFileId.HasValue)
             {
@@ -250,9 +254,15 @@ namespace FireAxe
 
             if (FullVpkFilePath == null)
             {
-                _vpkNotLoadProblem = new(this);
-                AddProblem(_vpkNotLoadProblem);
+                new WorkshopVpkNotLoadProblem(_vpkNotLoadProblemSource).Submit();
             }
+        }
+
+        protected override void OnCheck()
+        {
+            base.OnCheck();
+
+            CheckDownload();
         }
 
         private async Task RunDownloadCheckTask(ulong publishedFileId)
@@ -272,11 +282,14 @@ namespace FireAxe
             bool requestApplyTagsFromWorkshop = RequestApplyTagsFromWorkshop;
             string? nameToAutoSet = null;
             string? resultVpkPath = null;
-            var problems = new List<AddonProblem>();
             var downloadService = Root.DownloadService;
             var addonRootTaskScheduler = Root.TaskScheduler;
             var addonRootTaskFactory = new TaskFactory(addonRootTaskScheduler);
             IDisposable blockMove = BlockMove();
+
+            _invalidPublishedFileIdProblemSource.Clear();
+            _downloadFailedProblemSource.Clear();
+
             try
             {
                 Directory.CreateDirectory(dirPath);
@@ -320,7 +333,7 @@ namespace FireAxe
                         {
                             if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
                             {
-                                problems.Add(new InvalidPublishedFileIdProblem(this));
+                                await addonRootTaskFactory.StartNew(() => new InvalidPublishedFileIdProblem(_invalidPublishedFileIdProblemSource).Submit()).ConfigureAwait(false);
                             }
                         }
                     }
@@ -436,13 +449,13 @@ namespace FireAxe
                                 }
                                 else if (status == DownloadStatus.Failed)
                                 {
-                                    var problem = new DownloadFailedProblem(this)
-                                    {
-                                        Url = url,
-                                        FilePath = downloadFilePath,
-                                        Exception = download.Exception
-                                    };
-                                    problems.Add(problem);
+                                    await addonRootTaskFactory.StartNew(
+                                        () => new AddonDownloadFailedProblem(_downloadFailedProblemSource)
+                                        {
+                                            Url = url,
+                                            FilePath = downloadFilePath,
+                                            Exception = download.Exception
+                                        }.Submit()).ConfigureAwait(false);
                                 }
                             }
                         }
@@ -465,19 +478,10 @@ namespace FireAxe
 
                     blockMove.Dispose();
 
-                    foreach (var problem in problems)
-                    {
-                        AddProblem(problem);
-                    }
-
                     SetFullVpkPath(resultVpkPath);
                     if (resultVpkPath != null)
                     {
-                        if (_vpkNotLoadProblem != null)
-                        {
-                            RemoveProblem(_vpkNotLoadProblem);
-                            _vpkNotLoadProblem = null;
-                        }
+                        _vpkNotLoadProblemSource.Clear();
                     }
 
                     if (nameToAutoSet != null)
@@ -632,7 +636,7 @@ namespace FireAxe
             NotifyChanged(nameof(FullVpkFilePath));
         }
 
-        private void WorkshopVpkAddon_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Name))
             {
