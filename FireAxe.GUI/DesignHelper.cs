@@ -15,7 +15,7 @@ namespace FireAxe
         public static AddonNode CreateTestAddonNode()
         {
             var root = CreateEmptyAddonRoot();
-            var node = new AddonNode(root);
+            var node = AddonNode.Create<AddonNode>(root);
             node.Name = "test_node";
             return node;
         }
@@ -23,7 +23,7 @@ namespace FireAxe
         public static AddonGroup CreateTestAddonGroup()
         {
             var root = CreateEmptyAddonRoot();
-            var group = new AddonGroup(root);
+            var group = AddonNode.Create<AddonGroup>(root);
             group.Name = "test_group";
             return group;
         }
@@ -65,7 +65,7 @@ namespace FireAxe
 
             for (int i = 100; i <= 150; ++i)
             {
-                var node = new AddonNode(root);
+                var node = AddonNode.Create<AddonNode>(root);
                 node.Name = "node_" + i;
             }
         }

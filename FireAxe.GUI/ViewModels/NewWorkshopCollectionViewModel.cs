@@ -122,12 +122,12 @@ namespace FireAxe.ViewModels
                 _addonGroup = null;
             }
 
-            var collectionGroup = new AddonGroup(_addonRoot, _addonGroup);
+            var collectionGroup = AddonNode.Create<AddonGroup>(_addonRoot, _addonGroup);
             var collectionName = collectionGroup.Parent.GetUniqueNodeName(FileUtils.SanitizeFileName(collectionDetails.Title));
             collectionGroup.Name = collectionName;
             foreach (var itemId in itemIds)
             {
-                var addon = new WorkshopVpkAddon(_addonRoot, collectionGroup);
+                var addon = AddonNode.Create<WorkshopVpkAddon>(_addonRoot, collectionGroup);
                 addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
                 addon.RequestAutoSetName = true;
                 addon.PublishedFileId = itemId;

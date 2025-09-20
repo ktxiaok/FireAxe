@@ -21,10 +21,10 @@ namespace FireAxe
 
         private AutoUpdateStrategy _autoUpdateStrategy = AutoUpdateStrategy.Default;
 
-        private WeakReference<PublishedFileDetails?> _publishedFileDetails = new(null);
+        private readonly WeakReference<PublishedFileDetails?> _publishedFileDetailsCache = new(null);
         private Task<GetPublishedFileDetailsResult>? _getPublishedFileDetailsTask = null;
 
-        private string? _vpkPath = null;
+        private string? _fullVpkPath = null;
 
         private WorkshopVpkFileNotLoadProblem? _vpkNotLoadProblem = null; 
 
@@ -36,7 +36,7 @@ namespace FireAxe
 
         private bool _requestApplyTagsFromWorkshop = true;
 
-        public WorkshopVpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
+        protected WorkshopVpkAddon()
         {
             PropertyChanged += WorkshopVpkAddon_PropertyChanged;
         }
@@ -45,7 +45,7 @@ namespace FireAxe
 
         public override string FileExtension => ".workshop";
 
-        public override string? FullVpkFilePath => _vpkPath;
+        public override string? FullVpkFilePath => _fullVpkPath;
 
         [DisallowNull]
         public ulong? PublishedFileId
@@ -88,11 +88,16 @@ namespace FireAxe
         {
             get
             {
-                if (_publishedFileDetails.TryGetTarget(out var target))
+                if (_publishedFileDetailsCache.TryGetTarget(out var target))
                 {
                     return target;
                 }
                 return null;
+            }
+            private set
+            {
+                _publishedFileDetailsCache.SetTarget(value);
+                NotifyChanged();
             }
         }
 
@@ -166,7 +171,7 @@ namespace FireAxe
             return false;
         }
 
-        public Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(CancellationToken cancellationToken)
+        public Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(CancellationToken cancellationToken = default)
         {
             var task = _getPublishedFileDetailsTask;
             if (task == null)
@@ -176,7 +181,7 @@ namespace FireAxe
                 async Task<GetPublishedFileDetailsResult> RunTask()
                 {
                     var result = await rawTask.ConfigureAwait(false);
-                    var endingTask = new Task(() => _publishedFileDetails.SetTarget(result.IsSucceeded ? result.Content : null));
+                    var endingTask = new Task(() => PublishedFileDetailsCache = result.IsSucceeded ? result.Content : null);
                     endingTask.Start(rootTaskScheduler);
                     await endingTask.ConfigureAwait(false);
                     return result;
@@ -207,7 +212,7 @@ namespace FireAxe
         {
             base.ClearCaches();
 
-            _publishedFileDetails.SetTarget(null);
+            PublishedFileDetailsCache = null;
         }
 
         public override void ClearCacheFiles()
@@ -300,7 +305,7 @@ namespace FireAxe
                         vpkPathPreview = path;
                     }
                 }
-                SetVpkPath(vpkPathPreview);
+                SetFullVpkPath(vpkPathPreview);
 
                 try
                 {
@@ -465,7 +470,7 @@ namespace FireAxe
                         AddProblem(problem);
                     }
 
-                    SetVpkPath(resultVpkPath);
+                    SetFullVpkPath(resultVpkPath);
                     if (resultVpkPath != null)
                     {
                         if (_vpkNotLoadProblem != null)
@@ -565,10 +570,7 @@ namespace FireAxe
 
         protected override Task OnDestroyAsync()
         {
-            var baseTask = base.OnDestroyAsync();
-
             var tasks = new List<Task>();
-            tasks.Add(baseTask);
 
             if (_downloadCheckTask != null)
             {
@@ -581,10 +583,13 @@ namespace FireAxe
             }
 
             var download = _download;
-            tasks.Add(Task.Run(() =>
+            if (download != null)
             {
-                download?.Dispose();
-            }));
+                tasks.Add(Task.Run(download.Dispose));
+            }
+
+            var baseTask = base.OnDestroyAsync();
+            tasks.Add(baseTask);
 
             return Task.WhenAll(tasks);
         }
@@ -621,9 +626,9 @@ namespace FireAxe
             return PublishedFileDetailsUtils.GetPublishedFileDetailsAsync(_publishedFileId.Value, Root.HttpClient, cancellationToken);
         }
 
-        private void SetVpkPath(string? path)
+        private void SetFullVpkPath(string? path)
         {
-            _vpkPath = path;
+            _fullVpkPath = path;
             NotifyChanged(nameof(FullVpkFilePath));
         }
 

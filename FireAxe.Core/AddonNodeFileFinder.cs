@@ -152,7 +152,8 @@ namespace FireAxe
                 {
                     break;
                 }
-                current.Up.Group = new AddonGroup(_addonRoot, current.Group) { Name = current.Up.DirectoryName!};
+                current.Up.Group = AddonNode.Create<AddonGroup>(_addonRoot, current.Group);
+                current.Up.Group.Name = current.Up.DirectoryName!;
                 current = current.Up;
             }
             

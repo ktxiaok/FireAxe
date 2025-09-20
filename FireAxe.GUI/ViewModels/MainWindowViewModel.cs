@@ -213,7 +213,7 @@ namespace FireAxe.ViewModels
                     _addonRoot.Save();
 
                     _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
-                    _addonRoot.DisposeAsync(); // TODO
+                    _addonRoot.DisposeAsync().AsTask(); // TODO
                     _addonRoot = null;
                 }
 

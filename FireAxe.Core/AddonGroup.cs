@@ -101,16 +101,19 @@ namespace FireAxe
             }
         }
 
-        private AddonNodeContainerService _containerService = null!;
+        private readonly AddonNodeContainerService _containerService;
 
         private AddonGroupEnableStrategy _enableStrategy = AddonGroupEnableStrategy.None;
 
         private bool _isBusyHandlingChildEnableOrDisable = false;
 
-        public AddonGroup(AddonRoot root, AddonGroup? group = null) : base(root, group)
+        protected AddonGroup()
         {
+            _containerService = new(this);
+
             ((INotifyCollectionChanged)Children).CollectionChanged += OnCollectionChanged;
-            PropertyChanged += AddonGroup_PropertyChanged;
+            PropertyChanged += OnPropertyChanged;
+            DescendantNodeMoved += OnDescendantNodeMoved;
         }
 
         public override Type SaveType => typeof(AddonGroupSave);
@@ -231,12 +234,6 @@ namespace FireAxe
             EnableStrategy = save1.EnableStrategy;
         }
 
-        internal override void OnInitSelf()
-        {
-            base.OnInitSelf();
-            _containerService = new(this);
-        }
-
         internal void AddChild(AddonNode child)
         {
             _containerService.AddUnchecked(child);
@@ -276,7 +273,7 @@ namespace FireAxe
             DescendantNodeMoved?.Invoke(node);
         }
 
-        private void AddonGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(IsEnabled))
             {
@@ -302,6 +299,14 @@ namespace FireAxe
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Root.RequestSave = true;
+        }
+
+        private void OnDescendantNodeMoved(AddonNode obj)
+        {
+            if (IsAutoCheck)
+            {
+                Check();
+            }
         }
     }
 

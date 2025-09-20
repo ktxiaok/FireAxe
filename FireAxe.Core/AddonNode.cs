@@ -26,7 +26,7 @@ namespace FireAxe
 
         private AddonGroup? _group = null;
 
-        private readonly AddonRoot _root;
+        private AddonRoot? _root = null;
 
         private readonly ObservableCollection<string> _tags = new();
         private readonly ReadOnlyObservableCollection<string> _tagsReadOnly;
@@ -45,35 +45,13 @@ namespace FireAxe
 
         private long? _fileSize = null;
 
-        public AddonNode(AddonRoot root, AddonGroup? group = null)
+        protected AddonNode()
         {
-            OnInitSelf();
-
-            ArgumentNullException.ThrowIfNull(root);
-            if (group != null && group.Root != root)
-            {
-                ThrowDifferentRootException();
-            }
-
-            _root = root;
             _tagsReadOnly = new(_tags);
             _problemsReadOnly = new(_problems);
 
             ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
-
-            SetNewId();
-
-            if (group == null)
-            {
-                UpdateEnabledInHierarchy();
-                root.AddNode(this);
-            }
-            else
-            {
-                Group = group;
-                UpdateEnabledInHierarchy();
-                group.AddChild(this);
-            }
+            ((INotifyCollectionChanged)_problems).CollectionChanged += OnProblemCollectionChanged;
         }
 
         public virtual Type SaveType => typeof(AddonNodeSave);
@@ -140,7 +118,7 @@ namespace FireAxe
 
         IHierarchyNode<AddonNode>? IHierarchyNode<AddonNode>.Parent => Parent;
 
-        public AddonRoot Root => _root;
+        public AddonRoot Root => _root ?? throw new InvalidOperationException($"{nameof(Root)} is uninitialized");
 
         public virtual bool RequireFile => false;
 
@@ -331,6 +309,47 @@ namespace FireAxe
         internal virtual ReadOnlyObservableCollection<AddonNode> Children_Internal => throw new NotSupportedException();
 
         internal virtual bool HasChildren_Internal => false;
+
+        public static AddonNode Create(Type addonType, AddonRoot root, AddonGroup? group = null)
+        {
+            ArgumentNullException.ThrowIfNull(addonType);
+            if (!addonType.IsAssignableTo(typeof(AddonNode)))
+            {
+                throw new ArgumentException($"{nameof(addonType)} must be a subtype of {nameof(AddonNode)}");
+            }
+            ArgumentNullException.ThrowIfNull(root);
+            if (group != null && group.Root != root)
+            {
+                ThrowDifferentRootException();
+            }
+
+            var node = (AddonNode)Activator.CreateInstance(addonType, true)!;
+
+            node._root = root;
+
+            node.SetNewId();
+
+            if (group == null)
+            {
+                node.UpdateEnabledInHierarchy();
+                node.Create();
+                root.AddNode(node);
+            }
+            else
+            {
+                node.Group = group;
+                node.UpdateEnabledInHierarchy();
+                node.Create();
+                group.AddChild(node);
+            }
+
+            return node;
+        }
+
+        public static T Create<T>(AddonRoot root, AddonGroup? group = null) where T : AddonNode
+        {
+            return (T)Create(typeof(T), root, group);
+        }
 
         public void SetNewId()
         {
@@ -536,22 +555,35 @@ namespace FireAxe
             {
                 return Task.CompletedTask;
             }
+
             var tasks = new List<Task>();
-            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
+            foreach (var node in this.GetSelfAndDescendantsByDfsPostorder())
             {
                 tasks.Add(node.OnDestroyAsync());
             }
 
-            if (Group == null)
+            var group = Group;
+            var root = Root;
+
+            if (group == null)
             {
-                Root.RemoveNode(this);
+                root.RemoveNode(this);
             }
             else
             {
-                Group.RemoveChild(this);
+                group.RemoveChild(this);
             }
 
+            var rootTaskScheduler = root.TaskScheduler;
+
+            root.NotifyDescendantNodeDestructionStarted(this);
+
             var resultTask = Task.WhenAll(tasks);
+            resultTask.ContinueWith(task =>
+            {
+                root.NotifyDescendantNodeDestroyed(this);
+            }, rootTaskScheduler);
+            
             return resultTask;
         }
 
@@ -709,7 +741,7 @@ namespace FireAxe
 
             AddonNode NewNode(AddonNodeSave save, AddonGroup? group)
             {
-                return (AddonNode)Activator.CreateInstance(save.TargetType, root, group)!;
+                return AddonNode.Create(save.TargetType, root, group);
             }
         }
 
@@ -745,6 +777,17 @@ namespace FireAxe
                     disposed = true;
                 }
             });
+        }
+
+        protected virtual void OnCreate()
+        {
+
+        }
+
+        private void Create()
+        {
+            OnCreate();
+            Root.NotifyDescendantNodeCreated(this);
         }
 
         protected virtual Task OnDestroyAsync()
@@ -859,11 +902,6 @@ namespace FireAxe
             OnAncestorsChanged();
         }
 
-        internal virtual void OnInitSelf()
-        {
-
-        }
-
         internal static string BuildFilePath(AddonGroup? group, string name)
         {
             if (group == null)
@@ -895,6 +933,14 @@ namespace FireAxe
             }
 
             Root.RequestSave = true;
+        }
+
+        private void OnProblemCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (IsAutoCheck)
+            {
+                Group?.Check();
+            }
         }
 
         private void UpdateEnabledInHierarchy()
@@ -930,12 +976,12 @@ namespace FireAxe
 
         private static void ThrowDifferentRootException()
         {
-            throw new InvalidOperationException("Couldn't move to a group whose root is different!");
+            throw new InvalidOperationException("Different AddonRoot instance");
         }
 
         private static void ThrowMoveGroupToItselfException()
         {
-            throw new InvalidOperationException("Couldn't move a group to itself!");
+            throw new InvalidOperationException("Cannot move a AddonGroup instance to itself!");
         }
     }
 }

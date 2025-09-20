@@ -21,7 +21,7 @@ namespace FireAxe
 
         private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
-        public VpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
+        protected VpkAddon()
         {
             _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
             _conflictingFilesReadOnly = new(_conflictingFiles);

@@ -338,7 +338,8 @@ namespace FireAxe
 
             public override void Create(AddonRoot root)
             {
-                var addon = new LocalVpkAddon(root, Group) { Name = Name};
+                var addon = AddonNode.Create<LocalVpkAddon>(root, Group);
+                addon.Name = Name;
                 addon.Check();
             }
         }
@@ -358,11 +359,9 @@ namespace FireAxe
 
             public override void Create(AddonRoot root)
             {
-                new WorkshopVpkAddon(root, Group)
-                {
-                    Name = Name,
-                    PublishedFileId = PublishedFileId
-                };
+                var addon = AddonNode.Create<WorkshopVpkAddon>(root, Group);
+                addon.Name = Name;
+                addon.PublishedFileId = PublishedFileId;
             }
         }
 

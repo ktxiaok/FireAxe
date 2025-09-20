@@ -469,7 +469,7 @@ namespace FireAxe.ViewModels
 
         public AddonGroup NewGroup()
         {
-            var group = new AddonGroup(_addonRoot, CurrentGroup);
+            var group = AddonNode.Create<AddonGroup>(_addonRoot, CurrentGroup);
             group.Name = group.Parent.GetUniqueNodeName(Texts.UnnamedGroup);
             Directory.CreateDirectory(group.FullFilePath);
             SetSelection?.Invoke([group]);
@@ -478,7 +478,7 @@ namespace FireAxe.ViewModels
 
         public WorkshopVpkAddon NewWorkshopAddon()
         {
-            var addon = new WorkshopVpkAddon(_addonRoot, CurrentGroup);
+            var addon = AddonNode.Create<WorkshopVpkAddon>(_addonRoot, CurrentGroup);
             addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
             addon.RequestAutoSetName = true;
             SetSelection?.Invoke([addon]);
@@ -683,7 +683,7 @@ namespace FireAxe.ViewModels
         private void RefreshSearch()
         {
             CancelSearch();
-            if (SearchText.Length == 0 && !IsFilterEnabled)
+            if (SearchText.Length == 0 && !IsFilterEnabled && !SearchOptions.IsFlatten)
             {
                 SearchResultNodes = null;
             }

@@ -4,7 +4,7 @@ namespace FireAxe
 {
     public class LocalVpkAddon : VpkAddon
     {
-        public LocalVpkAddon(AddonRoot root, AddonGroup? group) : base(root, group)
+        protected LocalVpkAddon()
         {
 
         }
