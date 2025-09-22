@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using ReactiveUI;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -65,7 +66,7 @@ namespace FireAxe
             }
         }
 
-        public static void DisposeAndSetNull(ref IDisposable? disposable)
+        public static void DisposeAndSetNull<T>(ref T? disposable) where T : class, IDisposable
         {
             if (disposable != null)
             {

@@ -116,7 +116,7 @@ namespace FireAxe.Views
 
             var tagEditorWindow = new AddonTagEditorWindow()
             {
-                DataContext = new AddonTagEditorViewModel(viewModel.AddonNode)
+                DataContext = new AddonTagEditorViewModel(viewModel.Addon)
             };
             tagEditorWindow.ShowDialog(window);
         }
@@ -136,7 +136,7 @@ namespace FireAxe.Views
 
             var customizeImageWindow = new AddonNodeCustomizeImageWindow()
             {
-                DataContext = new AddonNodeCustomizeImageViewModel(viewModel.AddonNode)
+                DataContext = new AddonNodeCustomizeImageViewModel(viewModel.Addon)
             };
             customizeImageWindow.ShowDialog(window);
         }

@@ -30,7 +30,7 @@ namespace FireAxe.ViewModels
             });
         }
 
-        public new VpkAddon AddonNode => (VpkAddon)base.AddonNode;
+        public new VpkAddon AddonNode => (VpkAddon)base.Addon;
 
         public string Priority
         {

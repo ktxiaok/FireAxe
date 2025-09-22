@@ -7,172 +7,197 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class WorkshopVpkAddonViewModel : VpkAddonViewModel
 {
-    public class WorkshopVpkAddonViewModel : VpkAddonViewModel
+    private DownloadItemViewModel? _downloadItemViewModel = null;
+
+    private PublishedFileDetails? _publishedFileDetails = null;
+
+    private readonly ObservableAsPropertyHelper<string> _displayItemId;
+
+    private readonly ObservableAsPropertyHelper<string> _workshopTagsString;
+
+    private ObservableAsPropertyHelper<bool>? _isFileDownloadCompleted = null;
+
+    public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
     {
-        private DownloadItemViewModel? _downloadItemViewModel = null;
+        _displayItemId = this.WhenAnyValue(x => x.ItemId)
+            .Select(itemId =>
+            {
+                if (itemId.Length == 0)
+                {
+                    return Texts.Null;
+                }
+                return itemId;
+            })
+            .ToProperty(this, nameof(DisplayItemId));
 
-        private PublishedFileDetails? _publishedFileDetails = null;
+        _workshopTagsString = this.WhenAnyValue(x => x.PublishedFileDetails)
+            .Select(details =>
+            {
+                if (details == null)
+                {
+                    return "";
+                }
+                var tags = details.Tags;
+                if (tags == null)
+                {
+                    return "";
+                }
+                return string.Join(", ", tags.Select(tagObj => tagObj.Tag));
+            })
+            .ToProperty(this, nameof(WorkshopTagsString));
 
-        private readonly ObservableAsPropertyHelper<string> _displayItemId;
-
-        private readonly ObservableAsPropertyHelper<string> _workshopTagsString;
-
-        private ObservableAsPropertyHelper<bool>? _isFileDownloadCompleted = null;
-
-        private CancellationTokenSource? _cts = null;
-
-        public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
+        ApplyTagsFromWorkshopCommand = ReactiveCommand.Create(() =>
         {
-            _displayItemId = this.WhenAnyValue(x => x.ItemId)
-                .Select(itemId =>
-                {
-                    if (itemId.Length == 0)
-                    {
-                        return Texts.Null;
-                    }
-                    return itemId;
-                })
-                .ToProperty(this, nameof(DisplayItemId));
-
-            _workshopTagsString = this.WhenAnyValue(x => x.PublishedFileDetails)
-                .Select(details =>
-                {
-                    if (details == null)
-                    {
-                        return "";
-                    }
-                    var tags = details.Tags;
-                    if (tags == null)
-                    {
-                        return "";
-                    }
-                    return string.Join(", ", tags.Select(tagObj => tagObj.Tag));
-                })
-                .ToProperty(this, nameof(WorkshopTagsString));
-
-            ApplyTagsFromWorkshopCommand = ReactiveCommand.Create(() =>
+            var addon = Addon;
+            if (addon == null)
             {
-                var addon = AddonNode;
-                addon.RequestApplyTagsFromWorkshop = true;
-                addon.Check();
-            });
+                return;
+            }
 
-            this.WhenActivated((CompositeDisposable disposables) =>
+            addon.RequestApplyTagsFromWorkshop = true;
+            addon.Check();
+        });
+    }
+
+    public new WorkshopVpkAddon? Addon => (WorkshopVpkAddon?)((AddonNodeViewModel)this).Addon;
+
+    public override Type AddonType => typeof(WorkshopVpkAddon);
+
+    public string ItemId
+    {
+        get => Addon?.PublishedFileId?.ToString() ?? "";
+        set
+        {
+            if (!WorkshopVpkAddon.TryParsePublishedFileId(value, out var id))
             {
-                addon.WhenAnyValue(x => x.PublishedFileId)
-                .Subscribe((id) => this.RaisePropertyChanged(nameof(ItemId)))
-                .DisposeWith(disposables);
+                throw new ArgumentException("Invalid published file id."); 
+            }
 
-                addon.WhenAnyValue(x => x.DownloadItem)
-                .Subscribe((downloadItem) =>
-                {
-                    if (downloadItem == null)
-                    {
-                        DownloadItemViewModel = null;
-                    }
-                    else
-                    {
-                        DownloadItemViewModel = new(downloadItem);
-                    }
-                })
-                .DisposeWith(disposables);
+            var addon = Addon;
+            if (addon == null)
+            {
+                return;
+            }
 
-                _isFileDownloadCompleted = addon.WhenAnyValue(x => x.FullVpkFilePath)
-                .Select(path => path != null)
-                .ToProperty(this, nameof(IsFileDownloadCompleted));
+            addon.PublishedFileId = id;
+        }
+    }
 
-                Disposable.Create(() =>
-                {
-                    CancelTasks();
+    public string DisplayItemId => _displayItemId.Value;
 
-                    _isFileDownloadCompleted.Dispose();
-                    _isFileDownloadCompleted = null;
-                }).DisposeWith(disposables);
-            });
+    public string WorkshopTagsString => _workshopTagsString.Value;
+
+    public bool IsFileDownloadCompleted => _isFileDownloadCompleted?.Value ?? false;
+
+    public DownloadItemViewModel? DownloadItemViewModel
+    {
+        get => _downloadItemViewModel;
+        private set => this.RaiseAndSetIfChanged(ref _downloadItemViewModel, value);
+    }
+
+    public PublishedFileDetails? PublishedFileDetails
+    {
+        get => _publishedFileDetails;
+        private set => this.RaiseAndSetIfChanged(ref _publishedFileDetails, value);
+    }
+
+    public ReactiveCommand<Unit, Unit> ApplyTagsFromWorkshopCommand { get; }
+
+    public void OpenWorkshopPage()
+    {
+        var addon = Addon;
+        if (addon == null)
+        {
+            return;
         }
 
-        public new WorkshopVpkAddon AddonNode => (WorkshopVpkAddon)((AddonNodeViewModel)this).AddonNode;
+        Utils.OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={addon.PublishedFileId}");
+    }
 
-        public string ItemId
-        {
-            get => AddonNode.PublishedFileId?.ToString() ?? "";
-            set
+    protected override void OnNewAddon(AddonNode addon0, CompositeDisposable disposables)
+    {
+        base.OnNewAddon(addon0, disposables);
+
+        var addon = (WorkshopVpkAddon)addon0;
+
+        addon.WhenAnyValue(x => x.PublishedFileId)
+            .Subscribe(_ => this.RaisePropertyChanged(nameof(ItemId)))
+            .DisposeWith(disposables);
+
+        addon.WhenAnyValue(x => x.DownloadItem)
+            .Subscribe(downloadItem =>
             {
-                if (WorkshopVpkAddon.TryParsePublishedFileId(value, out var id))
+                if (downloadItem == null)
                 {
-                    AddonNode.PublishedFileId = id;
-                    Refresh();
+                    DownloadItemViewModel = null;
                 }
                 else
                 {
-                    throw new ArgumentException();
+                    DownloadItemViewModel = new(downloadItem);
                 }
+            })
+            .DisposeWith(disposables);
+
+        _isFileDownloadCompleted = addon.WhenAnyValue(x => x.FullVpkFilePath)
+            .Select(path => path != null)
+            .ToProperty(this, nameof(IsFileDownloadCompleted));
+
+        Disposable.Create(() =>
+        {
+            Utils.DisposeAndSetNull(ref _isFileDownloadCompleted);
+        }).DisposeWith(disposables);
+    }
+
+    protected override void OnNullAddon()
+    {
+        base.OnNullAddon();
+
+        this.RaisePropertyChanged(nameof(ItemId));
+        DownloadItemViewModel = null;
+    }
+
+    protected override void OnRefresh(CancellationToken cancellationToken)
+    {
+        base.OnRefresh(cancellationToken);
+
+        var addon = Addon;
+        var refreshId = CurrentRefreshId;
+
+        async void RefreshPublishedFileDetails()
+        {
+            PublishedFileDetails = null;
+
+            if (addon == null)
+            {
+                return;
             }
-        }
-
-        public string DisplayItemId => _displayItemId.Value;
-
-        public string WorkshopTagsString => _workshopTagsString.Value;
-
-        public bool IsFileDownloadCompleted => _isFileDownloadCompleted?.Value ?? false;
-
-        public DownloadItemViewModel? DownloadItemViewModel
-        {
-            get => _downloadItemViewModel;
-            private set => this.RaiseAndSetIfChanged(ref _downloadItemViewModel, value);
-        }
-
-        public PublishedFileDetails? PublishedFileDetails
-        {
-            get => _publishedFileDetails;
-            private set => this.RaiseAndSetIfChanged(ref _publishedFileDetails, value);
-        }
-
-        public ReactiveCommand<Unit, Unit> ApplyTagsFromWorkshopCommand { get; }
-
-        public void OpenWorkshopPage()
-        {
-            Utils.OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={AddonNode.PublishedFileId}");
-        }
-
-        protected override async void OnRefresh()
-        {
-            base.OnRefresh();
-
-            var addon = AddonNode;
-            PublishedFileDetails? publishedFileDetails = null;
-            CancelTasks();
-            _cts = new();
 
             try
             {
-                publishedFileDetails = await addon.GetPublishedFileDetailsAllowCacheAsync(_cts.Token);
+                var result = await addon.GetPublishedFileDetailsAllowCacheAsync(cancellationToken);
+                if (refreshId != CurrentRefreshId)
+                {
+                    return;
+                }
+                PublishedFileDetails = result;
             }
-            catch (OperationCanceledException) { }
-            
-            if (publishedFileDetails != null)
+            catch (OperationCanceledException)
             {
-                PublishedFileDetails = publishedFileDetails;
+                return;
             }
         }
 
-        protected override void OnClearCaches()
-        {
-            base.OnClearCaches();
+        RefreshPublishedFileDetails();
+    }
 
-            PublishedFileDetails = null;
-        }
+    protected override void OnClearCaches()
+    {
+        base.OnClearCaches();
 
-        private void CancelTasks()
-        {
-            if (_cts != null)
-            {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = null;
-            }
-        }
+        PublishedFileDetails = null;
     }
 }

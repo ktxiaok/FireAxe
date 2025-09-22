@@ -71,7 +71,7 @@ namespace FireAxe.Views
                 {
                     if (obj is AddonNodeSimpleViewModel viewModel)
                     {
-                        return viewModel.AddonNode;
+                        return viewModel.Addon;
                     }
                     return null;
                 });
@@ -180,7 +180,7 @@ namespace FireAxe.Views
                 {
                     if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
                     {
-                        if (listItemViewModel.AddonNode is AddonGroup addonGroup)
+                        if (listItemViewModel.Addon is AddonGroup addonGroup)
                         {
                             viewModel.GotoGroup(addonGroup);
                             e.Handled = true;

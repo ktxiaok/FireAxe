@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 
 namespace FireAxe.ViewModels
 {
@@ -13,29 +14,30 @@ namespace FireAxe.ViewModels
 
         public VpkAddonViewModel(VpkAddon addon) : base(addon)
         {
-            this.WhenActivated((CompositeDisposable disposables) =>
-            {
-                addon.WhenAnyValue(x => x.VpkPriority)
-                .Subscribe(priority => this.RaisePropertyChanged(nameof(VpkPriority)))
-                .DisposeWith(disposables);
-            });
+            
         }
 
-        public new VpkAddon AddonNode => (VpkAddon)base.AddonNode;
+        public new VpkAddon? Addon => (VpkAddon?)base.Addon;
 
-        public string VpkPriority
+        public override Type AddonType => typeof(VpkAddon);
+
+        public string? VpkPriority
         {
-            get => AddonNode.VpkPriority.ToString();
+            get => Addon?.VpkPriority.ToString();
             set
             {
-                if (int.TryParse(value, out int priority))
+                if (!int.TryParse(value, out int priority))
                 {
-                    AddonNode.VpkPriority = priority;
+                    throw new ArgumentException($"{nameof(VpkPriority)} must be a integer.");
                 }
-                else
+
+                var addon = Addon;
+                if (addon == null)
                 {
-                    throw new ArgumentException();
+                    return;
                 }
+
+                addon.VpkPriority = priority;
             }
         }
 
@@ -45,12 +47,30 @@ namespace FireAxe.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _info, value);
         }
 
-        protected override void OnRefresh()
+        protected override void OnNewAddon(AddonNode addon, CompositeDisposable disposables)
         {
-            base.OnRefresh();
+            base.OnNewAddon(addon, disposables);
 
-            var addon = AddonNode;
-            Info = addon.RetrieveInfo();
+            var vpkAddon = (VpkAddon)addon;
+            vpkAddon.WhenAnyValue(x => x.VpkPriority)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(VpkPriority)))
+                .DisposeWith(disposables);
+        }
+
+        protected override void OnNullAddon()
+        {
+            base.OnNullAddonNode();
+
+            this.RaisePropertyChanged(nameof(VpkPriority));
+        }
+
+        protected override void OnRefresh(CancellationToken cancellationToken)
+        {
+            base.OnRefresh(cancellationToken);
+
+            var addon = Addon;
+
+            Info = addon?.RetrieveInfo();
         }
 
         protected override void OnClearCaches()

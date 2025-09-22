@@ -163,6 +163,8 @@ namespace FireAxe
 
         public event Action<AddonNode>? DescendantNodeDestroyed = null;
 
+        public event Action<AddonNode>? NewNodeIdRegistered = null;
+
         public bool TryGetDescendantNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
         {
             return _idToNode.TryGetValue(id, out node);
@@ -821,6 +823,11 @@ namespace FireAxe
             }
 
             _idToNode.Remove(id);
+        }
+
+        internal void NotifyNewNodeIdRegistered(AddonNode node)
+        {
+            NewNodeIdRegistered?.Invoke(node);
         }
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

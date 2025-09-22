@@ -107,7 +107,7 @@ namespace FireAxe.ViewModels
                 {
                     if (selection != null && selection.Count == 1)
                     {
-                        return AddonNodeViewModel.Create(selection[0].AddonNode);
+                        return AddonNodeViewModel.Create(selection[0].Addon);
                     }
                     else
                     {
@@ -122,7 +122,7 @@ namespace FireAxe.ViewModels
                     {
                         return null;
                     }
-                    return string.Join(", ", selection.Select(viewModel => viewModel.AddonNode.Name));
+                    return string.Join(", ", selection.Select(viewModel => viewModel.Addon.Name));
                 })
                 .ToProperty(this, nameof(SelectionNames));
 
@@ -404,7 +404,7 @@ namespace FireAxe.ViewModels
                 {
                     return [];
                 }
-                return selection.Select((viewModel) => viewModel.AddonNode);
+                return selection.Select((viewModel) => viewModel.Addon);
             }
         }
 

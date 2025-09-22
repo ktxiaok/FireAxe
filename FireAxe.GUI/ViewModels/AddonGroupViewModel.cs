@@ -9,6 +9,8 @@ namespace FireAxe.ViewModels
 
         }
 
-        public new AddonGroup AddonNode => (AddonGroup)base.AddonNode;
+        public new AddonGroup? Addon => (AddonGroup?)base.Addon;
+
+        public override Type AddonType => typeof(AddonGroup);
     }
 }

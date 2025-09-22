@@ -102,6 +102,7 @@ namespace FireAxe
                 Root.RegisterNodeId(value, _id, this);
                 _id = value;
                 NotifyChanged();
+                Root.NotifyNewNodeIdRegistered(this);
                 Root.RequestSave = true;
             }
         }
