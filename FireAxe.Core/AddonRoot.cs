@@ -559,7 +559,7 @@ public class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNodeContai
                     continue;
                 }
                 File.CreateSymbolicLink(linkFilePath, vpkPath);
-                addonEntries[linkFileName] = ("1", vpkAddon.VpkPriority);
+                addonEntries[linkFileName] = ("1", vpkAddon.PriorityInHierarchy);
             }
         }
 

@@ -717,4 +717,7 @@
   <data name="Yes" xml:space="preserve">
     <value>是</value>
   </data>
+  <data name="GlobalPriority" xml:space="preserve">
+    <value>全局优先级</value>
+  </data>
 </root>

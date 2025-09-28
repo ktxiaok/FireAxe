@@ -934,6 +934,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Global Priority.
+        /// </summary>
+        public static string GlobalPriority {
+            get {
+                return ResourceManager.GetString("GlobalPriority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Go to download.
         /// </summary>
         public static string GoToDownload {

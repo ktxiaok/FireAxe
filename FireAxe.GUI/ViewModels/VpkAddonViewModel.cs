@@ -21,47 +21,10 @@ public abstract class VpkAddonViewModel : AddonNodeViewModel
 
     public override Type AddonType => typeof(VpkAddon);
 
-    public string? VpkPriority
-    {
-        get => Addon?.VpkPriority.ToString();
-        set
-        {
-            if (!int.TryParse(value, out int priority))
-            {
-                throw new ArgumentException($"{nameof(VpkPriority)} must be a integer.");
-            }
-
-            var addon = Addon;
-            if (addon == null)
-            {
-                return;
-            }
-
-            addon.VpkPriority = priority;
-        }
-    }
-
     public VpkAddonInfo? Info
     {
         get => _info;
         private set => this.RaiseAndSetIfChanged(ref _info, value);
-    }
-
-    protected override void OnNewAddon(AddonNode addon, CompositeDisposable disposables)
-    {
-        base.OnNewAddon(addon, disposables);
-
-        var vpkAddon = (VpkAddon)addon;
-        vpkAddon.WhenAnyValue(x => x.VpkPriority)
-            .Subscribe(_ => this.RaisePropertyChanged(nameof(VpkPriority)))
-            .DisposeWith(disposables);
-    }
-
-    protected override void OnNullAddon()
-    {
-        base.OnNullAddon();
-
-        this.RaisePropertyChanged(nameof(VpkPriority));
     }
 
     protected override void OnRefresh(CancellationToken cancellationToken)

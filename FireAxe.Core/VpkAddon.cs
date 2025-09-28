@@ -8,8 +8,6 @@ namespace FireAxe;
 
 public abstract class VpkAddon : AddonNode
 {
-    private int _vpkPriority = 0;
-
     private readonly ObservableCollection<string> _conflictIgnoringFiles = new();
     private readonly ReadOnlyObservableCollection<string> _conflictIgnoringFilesReadOnly;
     private readonly HashSet<string> _conflictIgnoringFileSet = new HashSet<string>();
@@ -26,18 +24,6 @@ public abstract class VpkAddon : AddonNode
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
         _conflictingFilesReadOnly = new(_conflictingFiles);
         _conflictingAddonIdsReadOnly = new(_conflictingAddonIds);
-    }
-
-    public int VpkPriority
-    {
-        get => _vpkPriority;
-        set
-        {
-            if (NotifyAndSetIfChanged(ref _vpkPriority, value))
-            {
-                Root.RequestSave = true;
-            }
-        }
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
@@ -173,7 +159,6 @@ public abstract class VpkAddon : AddonNode
     {
         base.OnCreateSave(save);
         var save1 = (VpkAddonSave)save;
-        save1.VpkPriority = VpkPriority;
         save1.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
     }
 
@@ -181,7 +166,6 @@ public abstract class VpkAddon : AddonNode
     {
         base.OnLoadSave(save);
         var save1 = (VpkAddonSave)save;
-        VpkPriority = save1.VpkPriority;
         ClearConflictIgnoringFiles();
         foreach (var file in save1.ConflictIgnoringFiles)
         {

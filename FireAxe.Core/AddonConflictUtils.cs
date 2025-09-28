@@ -42,7 +42,7 @@ public static class AddonConflictUtils
                     using var pak = new Package();
                     pak.Read(vpkItem.VpkPath);
                     var addon = vpkItem.Addon;
-                    var priority = addon.VpkPriority;
+                    var priority = addon.PriorityInHierarchy;
                     if (!vpkPriorityGroups.TryGetValue(priority, out var priorityGroup))
                     {
                         priorityGroup = (new(), new());
@@ -165,7 +165,7 @@ public class AddonConflictResult
                     {
                         foreach (var addon2 in addons)
                         {
-                            if (addon2 != addon && addon2.VpkPriority == addon.VpkPriority)
+                            if (addon2 != addon && addon2.PriorityInHierarchy == addon.PriorityInHierarchy)
                             {
                                 yield return addon2;
                             }

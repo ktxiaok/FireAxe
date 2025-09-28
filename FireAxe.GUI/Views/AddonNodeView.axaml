@@ -18,6 +18,15 @@
   </UserControl.DataTemplates>
   <StackPanel
     Orientation="Vertical">
+    <StackPanel.Styles>
+      <Style Selector="DockPanel.PropertyRow">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0, 5, 0, 5"/>
+        <Setter Property="LastChildFill" Value="False"/>
+      </Style>
+    </StackPanel.Styles>
+    
     <!--image-->
     <Border
       Margin="5"
@@ -59,55 +68,100 @@
       <v:AddonNodeEnableButton/>
     </StackPanel>
 
-    <!--file size-->
-    <StackPanel
-      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}}"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
-      <TextBlock Text="{x:Static r:Texts.FileSizeColon}"/>
-      <TextBlock Text="{Binding FileSizeReadable}"/>
-    </StackPanel>
-
-    <!--creation time-->
-    <StackPanel
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
-      <TextBlock Text="{x:Static r:Texts.CreationTimeColon}"/>
-      <TextBlock Text="{Binding Addon.CreationTime}"/>
-    </StackPanel>
+    <!--priority-->
+    <DockPanel Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.Priority}"/>
+      <v:EditableTextBlock
+        DockPanel.Dock="Right"
+        Value="{Binding Priority}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"/>
+    </DockPanel>
+    <DockPanel Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.GlobalPriority}"/>
+      <SelectableTextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding Addon.PriorityInHierarchy}"/>
+    </DockPanel>
 
     <!--tags-->
-    <StackPanel
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
+    <Border
+      Classes="Level1"
+      Margin="0, 5, 0, 5">
+      <StackPanel Orientation="Vertical">
+        <StackPanel
+          Orientation="Horizontal"
+          HorizontalAlignment="Left"
+          Margin="0, 5, 0, 5">
+          <TextBlock
+            Text="{x:Static r:Texts.Tags}"
+            Classes="Heading1"
+            VerticalAlignment="Center"
+            Margin="5"/>
+          <Button Name="editTagButton">
+            <PathIcon Data="{StaticResource icon_edit}"/>
+          </Button>
+        </StackPanel>
+        <Panel>
+          <ItemsControl
+            ItemsSource="{Binding Addon.TagsInHierarchy}"
+            HorizontalAlignment="Left">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Panel Margin="5">
+                  <v:AddonTagView/>
+                </Panel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock
+            IsVisible="{Binding Addon.TagsInHierarchy, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"
+            Text="{x:Static r:Texts.Empty}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Margin="5"/>
+        </Panel>
+      </StackPanel>
+    </Border>
+
+    <!--file size-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
       <TextBlock
-        Text="{x:Static r:Texts.Tags}"
-        Classes="Heading1"
-        VerticalAlignment="Center"
-        Margin="5"/>
-      <Button Name="editTagButton">
-        <PathIcon Data="{StaticResource icon_edit}"/>
-      </Button>
-    </StackPanel>
-    <ItemsControl
-      ItemsSource="{Binding Addon.TagsInHierarchy}"
-      HorizontalAlignment="Center">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Panel Margin="5">
-            <v:AddonTagView/>
-          </Panel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <WrapPanel/>
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-    </ItemsControl>
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.FileSizeColon}"/>
+      <TextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding FileSizeReadable}"/>
+    </DockPanel>
+
+    <!--creation time-->
+    <DockPanel
+      Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.CreationTimeColon}"/>
+      <TextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding Addon.CreationTime}"/>
+    </DockPanel>
     
     <!--buttons-->
     <StackPanel

@@ -14,6 +14,8 @@ public class AddonNodeSave
 
     public string Name { get; set; } = "";
 
+    public int Priority { get; set; } = 0; 
+
     public DateTime CreationTime { get; set; }
 
     public string[] Tags { get; set; } = [];

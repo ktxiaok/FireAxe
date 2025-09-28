@@ -28,6 +28,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
 
     private AddonRoot? _root = null;
 
+    private int _priority = 0; 
+
     private readonly ObservableCollection<string> _tags = new();
     private readonly ReadOnlyObservableCollection<string> _tagsReadOnly;
     private readonly HashSet<string> _tagSet = new(2);
@@ -104,6 +106,35 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
             NotifyChanged();
             Root.NotifyNewNodeIdRegistered(this);
             Root.RequestSave = true;
+        }
+    }
+
+    public int Priority
+    {
+        get => _priority;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref _priority, value))
+            {
+                NotifyChanged(nameof(PriorityInHierarchy));
+                Root.RequestSave = true;
+            }
+        }
+    }
+
+    public int PriorityInHierarchy
+    {
+        get
+        {
+            int result = 0;
+            foreach (var selfOrAncestor in this.GetSelfAndAncestors())
+            {
+                if (selfOrAncestor is AddonNode node)
+                {
+                    result += node.Priority;
+                }
+            }
+            return result;
         }
     }
 
@@ -857,6 +888,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
         save.Id = Id;
         save.IsEnabled = IsEnabled;
         save.Name = Name;
+        save.Priority = Priority;
         save.CreationTime = CreationTime;
         save.Tags = [.. Tags];
         save.CustomImagePath = CustomImagePath;
@@ -870,6 +902,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
         }
         IsEnabled = save.IsEnabled;
         Name = save.Name;
+        Priority = save.Priority;
         if (save.CreationTime != default)
         {
             CreationTime = save.CreationTime;
@@ -887,6 +920,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
 
     protected virtual void OnAncestorsChanged()
     {
+        NotifyChanged(nameof(PriorityInHierarchy));
         NotifyChanged(nameof(TagsInHierarchy));
     }
 
