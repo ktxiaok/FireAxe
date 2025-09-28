@@ -1,31 +1,30 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IDownloadItem : IDisposable
 {
-    public interface IDownloadItem : IDisposable
-    {
-        string Url { get; }
+    string Url { get; }
 
-        string FilePath { get; }
+    string FilePath { get; }
 
-        long DownloadedBytes { get; }
+    long DownloadedBytes { get; }
 
-        long TotalBytes { get; }
+    long TotalBytes { get; }
 
-        double BytesPerSecondSpeed { get; }
+    double BytesPerSecondSpeed { get; }
 
-        DownloadStatus Status { get; }
+    DownloadStatus Status { get; }
 
-        Exception Exception { get; }
+    Exception Exception { get; }
 
-        void Pause();
+    void Pause();
 
-        void Resume();
+    void Resume();
 
-        void Cancel();
+    void Cancel();
 
-        void Wait();
+    void Wait();
 
-        Task WaitAsync();
-    }
+    Task WaitAsync();
 }

@@ -5,27 +5,37 @@
              xmlns:v="using:FireAxe.Views"
              xmlns:vm="using:FireAxe.ViewModels"
              xmlns:r="using:FireAxe.Resources"
+             xmlns:conv="using:FireAxe.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FireAxe.Views.DownloadItemListView"
              x:DataType="vm:DownloadItemListViewModel">
-  <ListBox
-    ItemsSource="{Binding DownloadItemViewModels}"
-    SelectionMode="Multiple"
-    Background="{DynamicResource brush_background}">
-    <ListBox.ItemTemplate>
-      <DataTemplate>
-        <Panel Margin="5">
-          <v:DownloadItemView/>
-        </Panel>
-      </DataTemplate>
-    </ListBox.ItemTemplate>
+  <Panel>
+    <ListBox
+      ItemsSource="{Binding DownloadItemViewModels}"
+      SelectionMode="Multiple"
+      Background="{DynamicResource brush_background}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Panel Margin="5">
+            <v:DownloadItemView/>
+          </Panel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
 
-    <ListBox.ContextMenu>
-      <ContextMenu>
-        <MenuItem Header="{x:Static r:Texts.Pause}" Command="{Binding Pause}"/>
-        <MenuItem Header="{x:Static r:Texts.Resume}" Command="{Binding Resume}"/>
-        <MenuItem Header="{x:Static r:Texts.Cancel}" Command="{Binding Cancel}"/>
-      </ContextMenu>
-    </ListBox.ContextMenu>
-  </ListBox>
+      <ListBox.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="{x:Static r:Texts.Pause}" Command="{Binding Pause}"/>
+          <MenuItem Header="{x:Static r:Texts.Resume}" Command="{Binding Resume}"/>
+          <MenuItem Header="{x:Static r:Texts.Cancel}" Command="{Binding Cancel}"/>
+        </ContextMenu>
+      </ListBox.ContextMenu>
+    </ListBox>
+    
+    <TextBlock
+      IsVisible="{Binding DownloadItemViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}"
+      Text="{x:Static r:Texts.Empty}"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Top"
+      Margin="20"/>
+  </Panel>
 </UserControl>

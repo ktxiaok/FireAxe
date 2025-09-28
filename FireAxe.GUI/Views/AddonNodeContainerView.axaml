@@ -5,6 +5,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:FireAxe.ViewModels"
   xmlns:v="using:FireAxe.Views"
+  xmlns:r="using:FireAxe.Resources"
+  xmlns:conv="using:FireAxe.ValueConverters"
   mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
   x:Class="FireAxe.Views.AddonNodeContainerView"
   x:DataType="vm:AddonNodeContainerViewModel">
@@ -42,7 +44,7 @@
     <Panel>
       <!--tile view-->
       <ListBox
-        IsVisible="{Binding IsTileView}"
+        IsVisible="{Binding IsTileView, FallbackValue=False}"
         ItemsSource="{Binding NodeViewModels}"
         SelectionMode="Multiple">
         <ListBox.ItemTemplate>
@@ -61,7 +63,7 @@
 
       <!--grid view-->
       <ListBox
-        IsVisible="{Binding IsGridView}"
+        IsVisible="{Binding IsGridView, FallbackValue=False}"
         ItemsSource="{Binding NodeViewModels}"
         SelectionMode="Multiple">
         <ListBox.ItemTemplate>
@@ -77,6 +79,14 @@
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
       </ListBox>
+
+      <!--empty hint-->
+      <TextBlock
+        IsVisible="{Binding NodeViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}"
+        Text="{x:Static r:Texts.Empty}"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Top"
+        Margin="20"/>
     </Panel>
   </ScrollViewer>
 </UserControl>

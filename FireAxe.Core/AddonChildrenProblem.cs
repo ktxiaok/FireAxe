@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AddonChildrenProblem : AddonProblem
 {
-    public class AddonChildrenProblem : AddonProblem
+    public AddonChildrenProblem(AddonProblemSource<AddonGroup> problemSource) : base(problemSource)
     {
-        public AddonChildrenProblem(AddonProblemSource<AddonGroup> problemSource) : base(problemSource)
-        {
 
-        }
-
-        public new AddonGroup Addon => (AddonGroup)base.Addon;
     }
+
+    public new AddonGroup Addon => (AddonGroup)base.Addon;
 }

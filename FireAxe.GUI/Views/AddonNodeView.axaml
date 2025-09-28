@@ -24,29 +24,14 @@
       BoxShadow="{StaticResource boxshadow_regular}">
       <Panel
         Margin="10">
-        <Image
-          Name="image"
-          Source="{Binding Image}"
-          IsVisible="{Binding ShouldShowImage}"
-          Width="250"
-          Height="250"/>
-        <PathIcon
-          Data="{StaticResource icon_question}"
-          IsVisible="{Binding ShouldShowUnknownImage}"
-          Width="150"
-          Height="150"/>
-        <PathIcon
-          Data="{StaticResource icon_folder}"
-          IsVisible="{Binding ShouldShowFolderIcon}"
-          Width="150"
-          Height="150"/>
+        <v:AddonIconView ImageSize="250" SpecialIconSize="150"/>
       </Panel>
     </Border>
 
     <!--name-->
     <v:EditableTextBlock
       Name="nameControl"
-      Value="{Binding AddonNode.Name}"
+      Value="{Binding Addon.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>
         <Style Selector=":is(TextBlock)">
@@ -90,7 +75,7 @@
       HorizontalAlignment="Center"
       Margin="5">
       <TextBlock Text="{x:Static r:Texts.CreationTimeColon}"/>
-      <TextBlock Text="{Binding AddonNode.CreationTime}"/>
+      <TextBlock Text="{Binding Addon.CreationTime}"/>
     </StackPanel>
 
     <!--tags-->
@@ -108,7 +93,7 @@
       </Button>
     </StackPanel>
     <ItemsControl
-      ItemsSource="{Binding AddonNode.TagsInHierarchy}"
+      ItemsSource="{Binding Addon.TagsInHierarchy}"
       HorizontalAlignment="Center">
       <ItemsControl.ItemTemplate>
         <DataTemplate>
@@ -151,39 +136,45 @@
     </StackPanel>
 
     <!--problems-->
-    <StackPanel
-      Orientation="Vertical"
-      IsVisible="{Binding HasProblem}">
-      <StackPanel.Styles>
-        <Style Selector=":is(TextBlock)">
-          <Setter Property="Foreground" Value="OrangeRed"/>
-        </Style>
-      </StackPanel.Styles>
+    <Border
+      IsVisible="{Binding Addon.Problems.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+      Classes="Level1"
+      BorderBrush="{DynamicResource brush_warning}"
+      Padding="5"
+      Margin="0, 5, 0, 5">
+      <StackPanel
+        Orientation="Vertical">
+        <StackPanel.Styles>
+          <Style Selector=":is(TextBlock)">
+            <Setter Property="Foreground" Value="{DynamicResource brush_warning}"/>
+          </Style>
+        </StackPanel.Styles>
       
-      <TextBlock
-        Text="{x:Static r:Texts.Problems}"
-        Classes="Heading1"
-        Margin="0, 5, 0, 5"/>
-      <ItemsControl
-        ItemsSource="{Binding AddonNode.Problems}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"/>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
+        <TextBlock
+          Text="{x:Static r:Texts.Problems}"
+          Classes="Heading1"
+          Margin="0, 5, 0, 5"/>
+        <ItemsControl
+          ItemsSource="{Binding Addon.Problems}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
 
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <SelectableTextBlock
-              Text="{Binding Converter={x:Static conv:ObjectExplanationConverter.Default}}"
-              TextWrapping="Wrap"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Center"
-              Margin="0, 5, 0, 5"/>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <SelectableTextBlock
+                Text="{Binding Converter={x:Static conv:ObjectExplanationConverter.Default}}"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="0, 5, 0, 5"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Border>
 
     <!--section views-->
     <StackPanel

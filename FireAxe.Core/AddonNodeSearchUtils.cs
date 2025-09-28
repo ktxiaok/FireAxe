@@ -2,360 +2,359 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace FireAxe
+namespace FireAxe;
+
+public static class AddonNodeSearchUtils
 {
-    public static class AddonNodeSearchUtils
+    public static Task SearchAsync(IEnumerable<AddonNode> addonNodes, string searchText, AddonNodeSearchOptions options, Action<AddonNode> consumer, CancellationToken cancellationToken)
     {
-        public static Task SearchAsync(IEnumerable<AddonNode> addonNodes, string searchText, AddonNodeSearchOptions options, Action<AddonNode> consumer, CancellationToken cancellationToken)
+        ArgumentNullException.ThrowIfNull(addonNodes);
+        ArgumentNullException.ThrowIfNull(searchText);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(consumer);
+
+        var searchNodes = new List<SearchNode>();
+        foreach (var addonNode in addonNodes)
         {
-            ArgumentNullException.ThrowIfNull(addonNodes);
-            ArgumentNullException.ThrowIfNull(searchText);
-            ArgumentNullException.ThrowIfNull(options);
-            ArgumentNullException.ThrowIfNull(consumer);
-
-            var searchNodes = new List<SearchNode>();
-            foreach (var addonNode in addonNodes)
-            {
-                searchNodes.Add(SearchNode.Build(addonNode, options));
-            }
-            return Task.Run(() =>
-            {
-                if (options.IsFlatten)
-                {
-                    int i = 0;
-                    while (i < searchNodes.Count)
-                    {
-                        var node = searchNodes[i];
-                        foreach (var childNode in node.Children)
-                        {
-                            searchNodes.Add(childNode);
-                        }
-                        if (node.AddonNode is AddonGroup)
-                        {
-                            searchNodes.RemoveAt(i);
-                        }
-                        else
-                        {
-                            node.Children = [];
-                            i++;
-                        }
-                    }
-                }
-
-                IStringMatcher? stringMatcher;
-                if (searchText.Length == 0)
-                {
-                    stringMatcher = null;
-                }
-                else if (options.IsRegex)
-                {
-                    stringMatcher = new RegexStringMatcher(searchText);
-                }
-                else
-                {
-                    stringMatcher = new DefaultStringMatcher(searchText, options.IgnoreCase);
-                }
-
-                ITagMatcher? tagMatcher;
-                if (options.Tags == null)
-                {
-                    tagMatcher = null;
-                }
-                else
-                {
-                    tagMatcher = options.TagFilterMode switch
-                    {
-                        AddonTagFilterMode.Or => new OrModeTagMatcher(options.Tags),
-                        AddonTagFilterMode.And => new AndModeTagMatcher(options.Tags),
-                        AddonTagFilterMode.Not => new NotModeTagMatcher(options.Tags),
-                        _ => null
-                    };
-                }
-
-                foreach (var searchNode in searchNodes)
-                {
-                    if (searchNode.Match(stringMatcher, tagMatcher, cancellationToken))
-                    {
-                        consumer(searchNode.AddonNode);
-                    }
-                }
-            }, cancellationToken);
+            searchNodes.Add(SearchNode.Build(addonNode, options));
         }
-
-        private class SearchNode
+        return Task.Run(() =>
         {
-            public AddonNode AddonNode;
-            public SearchNode[] Children = [];
-
-            public string? Name = null;
-            public HashSet<string>? Tags = null;
-
-            private SearchNode(AddonNode addonNode, AddonNodeSearchOptions options)
+            if (options.IsFlatten)
             {
-                AddonNode = addonNode;
-                if (options.IncludeName)
+                int i = 0;
+                while (i < searchNodes.Count)
                 {
-                    Name = addonNode.Name;
-                }
-                if (options.Tags != null)
-                {
-                    var tags = addonNode.TagsInHierarchy;
-                    if (tags.Any())
-                    {
-                        Tags = [.. tags];
-                    }
-                }
-            }
-
-            public bool Match(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher, CancellationToken cancellationToken)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (Children.Length == 0)
-                {
-                    return OnMatch(stringMatcher, tagMatcher);
-                }
-
-                var queue = new Queue<SearchNode>();
-                queue.Enqueue(this);
-                while (queue.Count > 0)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    var node = queue.Dequeue();
-                    if (node.OnMatch(stringMatcher, tagMatcher))
-                    {
-                        return true;
-                    }
+                    var node = searchNodes[i];
                     foreach (var childNode in node.Children)
                     {
-                        queue.Enqueue(childNode);
+                        searchNodes.Add(childNode);
                     }
-                }
-
-                return false;
-            }
-
-            private bool OnMatch(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher)
-            {
-                return MatchTag(tagMatcher) && MatchString(stringMatcher);
-            }
-
-            private bool MatchString(IStringMatcher? matcher)
-            {
-                if (matcher == null)
-                {
-                    return true;
-                }
-                if (Name != null && matcher.Match(Name))
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            private bool MatchTag(ITagMatcher? matcher)
-            {
-                if (matcher == null)
-                {
-                    return true;
-                }
-                return matcher.Match(Tags);
-            }
-
-            private class BuildStackFrame
-            {
-                public SearchNode SearchNode;
-                public List<SearchNode> ChildSearchNodes = new();
-                public IEnumerator<AddonNode> AddonNodeEnumerator;
-
-                public BuildStackFrame(SearchNode searchNode, IEnumerator<AddonNode> addonNodeEnumerator)
-                {
-                    SearchNode = searchNode;
-                    AddonNodeEnumerator = addonNodeEnumerator;
-                }
-
-                public BuildStackFrame(AddonGroup addonGroup, AddonNodeSearchOptions options)
-                {
-                    SearchNode = new SearchNode(addonGroup, options);
-                    AddonNodeEnumerator = addonGroup.Children.GetEnumerator();
-                }
-            }
-
-            public static SearchNode Build(AddonNode addonNode, AddonNodeSearchOptions options)
-            {
-                var addonGroup = addonNode as AddonGroup;
-                if (addonGroup == null)
-                {
-                    return new SearchNode(addonNode, options);
-                }
-
-                var stack = new List<BuildStackFrame>();
-                var firstStackFrame = new BuildStackFrame(addonGroup, options);
-                stack.Add(firstStackFrame);
-
-                while (stack.Count > 0)
-                {
-                    var frame = stack[stack.Count - 1];
-                    if (frame.AddonNodeEnumerator.MoveNext())
+                    if (node.AddonNode is AddonGroup)
                     {
-                        var childAddonNode = frame.AddonNodeEnumerator.Current;
-                        var childSearchNode = new SearchNode(childAddonNode, options);
-                        frame.ChildSearchNodes.Add(childSearchNode);
-                        if (childAddonNode is AddonGroup childAddonGroup)
-                        {
-                            stack.Add(new BuildStackFrame(childSearchNode, childAddonGroup.Children.GetEnumerator()));
-                        }
+                        searchNodes.RemoveAt(i);
                     }
                     else
                     {
-                        frame.SearchNode.Children = frame.ChildSearchNodes.ToArray();
-                        stack.RemoveAt(stack.Count - 1);
+                        node.Children = [];
+                        i++;
                     }
                 }
-
-                return firstStackFrame.SearchNode;
-            }
-        }
-
-        private interface IStringMatcher
-        {
-            bool Match(string str);
-        }
-
-        private class DefaultStringMatcher : IStringMatcher
-        {
-            private string _targetStr;
-            private StringComparison _stringComparison;
-
-            public DefaultStringMatcher(string targetStr, bool ignoreCase)
-            {
-                _targetStr = targetStr;
-                _stringComparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
             }
 
-            public bool Match(string str)
+            IStringMatcher? stringMatcher;
+            if (searchText.Length == 0)
             {
-                return str.Contains(_targetStr, _stringComparison);
+                stringMatcher = null;
             }
-        }
-
-        private class RegexStringMatcher : IStringMatcher
-        {
-            private Regex? _regex = null;
-            
-            public RegexStringMatcher(string pattern)
+            else if (options.IsRegex)
             {
-                try
+                stringMatcher = new RegexStringMatcher(searchText);
+            }
+            else
+            {
+                stringMatcher = new DefaultStringMatcher(searchText, options.IgnoreCase);
+            }
+
+            ITagMatcher? tagMatcher;
+            if (options.Tags == null)
+            {
+                tagMatcher = null;
+            }
+            else
+            {
+                tagMatcher = options.TagFilterMode switch
                 {
-                    _regex = new(pattern);
-                }
-                catch (Exception ex)
+                    AddonTagFilterMode.Or => new OrModeTagMatcher(options.Tags),
+                    AddonTagFilterMode.And => new AndModeTagMatcher(options.Tags),
+                    AddonTagFilterMode.Not => new NotModeTagMatcher(options.Tags),
+                    _ => null
+                };
+            }
+
+            foreach (var searchNode in searchNodes)
+            {
+                if (searchNode.Match(stringMatcher, tagMatcher, cancellationToken))
                 {
-                    Log.Information(ex, "Exception occurred during creating Regex instance (pattern: {Pattern})", pattern);
+                    consumer(searchNode.AddonNode);
                 }
             }
+        }, cancellationToken);
+    }
 
-            public bool Match(string str)
-            {
-                return _regex?.IsMatch(str) ?? false;
-            }
-        }
+    private class SearchNode
+    {
+        public AddonNode AddonNode;
+        public SearchNode[] Children = [];
 
-        private interface ITagMatcher
+        public string? Name = null;
+        public HashSet<string>? Tags = null;
+
+        private SearchNode(AddonNode addonNode, AddonNodeSearchOptions options)
         {
-            bool Match(ISet<string>? tags);
-        }
-
-        private class OrModeTagMatcher : ITagMatcher
-        {
-            private ISet<string> _requiredTags;
-
-            public OrModeTagMatcher(ISet<string> requiredTags)
+            AddonNode = addonNode;
+            if (options.IncludeName)
             {
-                _requiredTags = requiredTags;
+                Name = addonNode.Name;
             }
-
-            public bool Match(ISet<string>? tags)
+            if (options.Tags != null)
             {
-                if (tags == null)
+                var tags = addonNode.TagsInHierarchy;
+                if (tags.Any())
                 {
-                    return _requiredTags.Count == 0;
+                    Tags = [.. tags];
                 }
-                foreach (var requiredTag in _requiredTags)
-                {
-                    if (tags.Contains(requiredTag))
-                    {
-                        return true;
-                    }
-                }
-                return false;
             }
         }
 
-        private class AndModeTagMatcher : ITagMatcher
+        public bool Match(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher, CancellationToken cancellationToken)
         {
-            private ISet<string> _requiredTags;
-
-            public AndModeTagMatcher(ISet<string> requiredTags)
+            cancellationToken.ThrowIfCancellationRequested();
+            if (Children.Length == 0)
             {
-                _requiredTags = requiredTags;
+                return OnMatch(stringMatcher, tagMatcher);
             }
 
-            public bool Match(ISet<string>? tags)
+            var queue = new Queue<SearchNode>();
+            queue.Enqueue(this);
+            while (queue.Count > 0)
             {
-                if (tags == null)
-                {
-                    return _requiredTags.Count == 0;
-                }
-                return _requiredTags.IsSubsetOf(tags);
-            }
-        }
-
-        private class NotModeTagMatcher : ITagMatcher
-        {
-            private ISet<string> _requiredTags;
-
-            public NotModeTagMatcher(ISet<string> requiredTags)
-            {
-                _requiredTags = requiredTags;
-            }
-
-            public bool Match(ISet<string>? tags)
-            {
-                if (tags == null)
+                cancellationToken.ThrowIfCancellationRequested();
+                var node = queue.Dequeue();
+                if (node.OnMatch(stringMatcher, tagMatcher))
                 {
                     return true;
                 }
-                foreach (var requiredTag in _requiredTags)
+                foreach (var childNode in node.Children)
                 {
-                    if (tags.Contains(requiredTag))
-                    {
-                        return false;
-                    }
+                    queue.Enqueue(childNode);
                 }
+            }
+
+            return false;
+        }
+
+        private bool OnMatch(IStringMatcher? stringMatcher, ITagMatcher? tagMatcher)
+        {
+            return MatchTag(tagMatcher) && MatchString(stringMatcher);
+        }
+
+        private bool MatchString(IStringMatcher? matcher)
+        {
+            if (matcher == null)
+            {
                 return true;
             }
+            if (Name != null && matcher.Match(Name))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool MatchTag(ITagMatcher? matcher)
+        {
+            if (matcher == null)
+            {
+                return true;
+            }
+            return matcher.Match(Tags);
+        }
+
+        private class BuildStackFrame
+        {
+            public SearchNode SearchNode;
+            public List<SearchNode> ChildSearchNodes = new();
+            public IEnumerator<AddonNode> AddonNodeEnumerator;
+
+            public BuildStackFrame(SearchNode searchNode, IEnumerator<AddonNode> addonNodeEnumerator)
+            {
+                SearchNode = searchNode;
+                AddonNodeEnumerator = addonNodeEnumerator;
+            }
+
+            public BuildStackFrame(AddonGroup addonGroup, AddonNodeSearchOptions options)
+            {
+                SearchNode = new SearchNode(addonGroup, options);
+                AddonNodeEnumerator = addonGroup.Children.GetEnumerator();
+            }
+        }
+
+        public static SearchNode Build(AddonNode addonNode, AddonNodeSearchOptions options)
+        {
+            var addonGroup = addonNode as AddonGroup;
+            if (addonGroup == null)
+            {
+                return new SearchNode(addonNode, options);
+            }
+
+            var stack = new List<BuildStackFrame>();
+            var firstStackFrame = new BuildStackFrame(addonGroup, options);
+            stack.Add(firstStackFrame);
+
+            while (stack.Count > 0)
+            {
+                var frame = stack[stack.Count - 1];
+                if (frame.AddonNodeEnumerator.MoveNext())
+                {
+                    var childAddonNode = frame.AddonNodeEnumerator.Current;
+                    var childSearchNode = new SearchNode(childAddonNode, options);
+                    frame.ChildSearchNodes.Add(childSearchNode);
+                    if (childAddonNode is AddonGroup childAddonGroup)
+                    {
+                        stack.Add(new BuildStackFrame(childSearchNode, childAddonGroup.Children.GetEnumerator()));
+                    }
+                }
+                else
+                {
+                    frame.SearchNode.Children = frame.ChildSearchNodes.ToArray();
+                    stack.RemoveAt(stack.Count - 1);
+                }
+            }
+
+            return firstStackFrame.SearchNode;
         }
     }
 
-    public class AddonNodeSearchOptions
+    private interface IStringMatcher
     {
-        public bool IgnoreCase { get; init; } = true;
-
-        public bool IsFlatten { get; init; } = false;
-
-        public bool IsRegex { get; init; } = false;
-
-        public bool IncludeName { get; init; } = true;
-
-        public ISet<string>? Tags { get; init; } = null;
-
-        public AddonTagFilterMode TagFilterMode { get; init; } = AddonTagFilterMode.Or;
+        bool Match(string str);
     }
 
-    public enum AddonTagFilterMode
+    private class DefaultStringMatcher : IStringMatcher
     {
-        Or,
-        And,
-        Not
+        private string _targetStr;
+        private StringComparison _stringComparison;
+
+        public DefaultStringMatcher(string targetStr, bool ignoreCase)
+        {
+            _targetStr = targetStr;
+            _stringComparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+        }
+
+        public bool Match(string str)
+        {
+            return str.Contains(_targetStr, _stringComparison);
+        }
     }
+
+    private class RegexStringMatcher : IStringMatcher
+    {
+        private Regex? _regex = null;
+        
+        public RegexStringMatcher(string pattern)
+        {
+            try
+            {
+                _regex = new(pattern);
+            }
+            catch (Exception ex)
+            {
+                Log.Information(ex, "Exception occurred during creating Regex instance (pattern: {Pattern})", pattern);
+            }
+        }
+
+        public bool Match(string str)
+        {
+            return _regex?.IsMatch(str) ?? false;
+        }
+    }
+
+    private interface ITagMatcher
+    {
+        bool Match(ISet<string>? tags);
+    }
+
+    private class OrModeTagMatcher : ITagMatcher
+    {
+        private ISet<string> _requiredTags;
+
+        public OrModeTagMatcher(ISet<string> requiredTags)
+        {
+            _requiredTags = requiredTags;
+        }
+
+        public bool Match(ISet<string>? tags)
+        {
+            if (tags == null)
+            {
+                return _requiredTags.Count == 0;
+            }
+            foreach (var requiredTag in _requiredTags)
+            {
+                if (tags.Contains(requiredTag))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private class AndModeTagMatcher : ITagMatcher
+    {
+        private ISet<string> _requiredTags;
+
+        public AndModeTagMatcher(ISet<string> requiredTags)
+        {
+            _requiredTags = requiredTags;
+        }
+
+        public bool Match(ISet<string>? tags)
+        {
+            if (tags == null)
+            {
+                return _requiredTags.Count == 0;
+            }
+            return _requiredTags.IsSubsetOf(tags);
+        }
+    }
+
+    private class NotModeTagMatcher : ITagMatcher
+    {
+        private ISet<string> _requiredTags;
+
+        public NotModeTagMatcher(ISet<string> requiredTags)
+        {
+            _requiredTags = requiredTags;
+        }
+
+        public bool Match(ISet<string>? tags)
+        {
+            if (tags == null)
+            {
+                return true;
+            }
+            foreach (var requiredTag in _requiredTags)
+            {
+                if (tags.Contains(requiredTag))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+}
+
+public class AddonNodeSearchOptions
+{
+    public bool IgnoreCase { get; init; } = true;
+
+    public bool IsFlatten { get; init; } = false;
+
+    public bool IsRegex { get; init; } = false;
+
+    public bool IncludeName { get; init; } = true;
+
+    public ISet<string>? Tags { get; init; } = null;
+
+    public AddonTagFilterMode TagFilterMode { get; init; } = AddonTagFilterMode.Or;
+}
+
+public enum AddonTagFilterMode
+{
+    Or,
+    And,
+    Not
 }

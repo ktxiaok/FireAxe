@@ -1,8 +1,7 @@
 ﻿using ReactiveUI;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class ViewModelBase : ReactiveObject
 {
-    public class ViewModelBase : ReactiveObject
-    {
-    }
 }

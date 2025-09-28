@@ -33,7 +33,7 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
         {
             var addTagWindow = new AddAddonTagWindow()
             {
-                DataContext = new AddAddonTagViewModel(viewModel.AddonNode.Root)
+                DataContext = new AddAddonTagViewModel(viewModel.Addon.Root)
             };
             addTagWindow.Input = context.Input;
             var result = await addTagWindow.ShowDialog<string>(this);

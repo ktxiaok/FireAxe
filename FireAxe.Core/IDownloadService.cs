@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IDownloadService : IDisposable
 {
-    public interface IDownloadService : IDisposable
-    {
-        IDownloadItem Download(string url, string filePath);
-    }
+    IDownloadItem Download(string url, string filePath);
 }

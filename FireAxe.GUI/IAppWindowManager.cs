@@ -2,24 +2,21 @@
 using FireAxe.Views;
 using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IAppWindowManager
 {
-    public interface IAppWindowManager
-    {
-        MainWindow? MainWindow { get; }
+    MainWindow? MainWindow { get; }
 
-        MainWindow CreateMainWindow(MainWindowViewModel viewModel);
+    MainWindow CreateMainWindow(MainWindowViewModel viewModel);
 
-        void OpenSettingsWindow();
+    void OpenSettingsWindow();
 
-        void OpenDownloadListWindow();
+    void OpenDownloadListWindow();
 
-        void OpenAboutWindow();
+    void OpenAboutWindow();
 
-        void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
+    void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
 
-        void OpenFlatVpkAddonListWindow(MainWindowViewModel mainWindowViewModel);
-
-        void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
-    }
+    void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
 }

@@ -30,7 +30,7 @@ public partial class AddonNodeCustomizeImageWindow : ReactiveWindow<AddonNodeCus
                 viewModel.SelectCustomImagePathInteraction.RegisterHandler(async (context) =>
                 {
                     var storage = StorageProvider;
-                    var addonRootDirectoryPath = viewModel.AddonNode.Root.DirectoryPath;
+                    var addonRootDirectoryPath = viewModel.Addon.Root.DirectoryPath;
                     var filePickerOptions = new FilePickerOpenOptions()
                     {
                         AllowMultiple = false,

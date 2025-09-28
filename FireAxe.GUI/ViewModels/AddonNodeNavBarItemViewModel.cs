@@ -1,27 +1,26 @@
 ﻿using System;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class AddonNodeNavBarItemViewModel : ViewModelBase
 {
-    public class AddonNodeNavBarItemViewModel : ViewModelBase
+    private AddonNodeExplorerViewModel _explorerViewModel;
+
+    private AddonGroup _addonGroup;
+
+    public AddonNodeNavBarItemViewModel(AddonNodeExplorerViewModel explorerViewModel, AddonGroup addonGroup)
     {
-        private AddonNodeExplorerViewModel _explorerViewModel;
+        ArgumentNullException.ThrowIfNull(explorerViewModel);
+        ArgumentNullException.ThrowIfNull(addonGroup);
 
-        private AddonGroup _addonGroup;
+        _explorerViewModel = explorerViewModel;
+        _addonGroup = addonGroup;
+    }
 
-        public AddonNodeNavBarItemViewModel(AddonNodeExplorerViewModel explorerViewModel, AddonGroup addonGroup)
-        {
-            ArgumentNullException.ThrowIfNull(explorerViewModel);
-            ArgumentNullException.ThrowIfNull(addonGroup);
+    public AddonGroup AddonGroup => _addonGroup;
 
-            _explorerViewModel = explorerViewModel;
-            _addonGroup = addonGroup;
-        }
-
-        public AddonGroup AddonGroup => _addonGroup;
-
-        public void Goto()
-        {
-            _explorerViewModel.GotoGroup(_addonGroup);
-        }
+    public void Goto()
+    {
+        _explorerViewModel.GotoGroup(_addonGroup);
     }
 }

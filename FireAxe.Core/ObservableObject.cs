@@ -2,31 +2,30 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace FireAxe
+namespace FireAxe;
+
+public abstract class ObservableObject : INotifyPropertyChanged
 {
-    public abstract class ObservableObject : INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged = null;
+
+    protected bool NotifyAndSetIfChanged<T>(ref T field, in T value, [CallerMemberName] string? propertyName = null)
     {
-        public event PropertyChangedEventHandler? PropertyChanged = null;
+        ArgumentNullException.ThrowIfNull(propertyName);
 
-        protected bool NotifyAndSetIfChanged<T>(ref T field, in T value, [CallerMemberName] string? propertyName = null)
+        if (EqualityComparer<T>.Default.Equals(value, field))
         {
-            ArgumentNullException.ThrowIfNull(propertyName);
-
-            if (EqualityComparer<T>.Default.Equals(value, field))
-            {
-                return false;
-            }
-
-            field = value;
-            NotifyChanged(propertyName);
-            return true;
+            return false;
         }
 
-        protected void NotifyChanged([CallerMemberName] string? propertyName = null)
-        {
-            ArgumentNullException.ThrowIfNull(propertyName);
+        field = value;
+        NotifyChanged(propertyName);
+        return true;
+    }
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    protected void NotifyChanged([CallerMemberName] string? propertyName = null)
+    {
+        ArgumentNullException.ThrowIfNull(propertyName);
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

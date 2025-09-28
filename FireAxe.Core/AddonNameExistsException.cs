@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AddonNameExistsException : Exception
 {
-    public class AddonNameExistsException : Exception
+    public AddonNameExistsException(string addonName)
     {
-        public AddonNameExistsException(string addonName)
-        {
-            ArgumentNullException.ThrowIfNull(addonName);
-            AddonName = addonName;
-        }
-        public string AddonName { get; }
+        ArgumentNullException.ThrowIfNull(addonName);
+        AddonName = addonName;
     }
+    public string AddonName { get; }
 }

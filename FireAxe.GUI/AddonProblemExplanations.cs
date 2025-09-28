@@ -1,17 +1,16 @@
 ﻿using System;
 using FireAxe.Resources;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal static class AddonProblemExplanations
 {
-    internal static class AddonProblemExplanations
+    public static void Register(ObjectExplanationManager manager)
     {
-        public static void Register(ObjectExplanationManager manager)
-        {
-            manager.Register<AddonFileNotExistProblem>((problem, arg) => string.Format(Texts.AddonFileNotExistProblemExplain, problem.FilePath));
-            manager.Register<AddonChildrenProblem>((problem, arg) => Texts.AddonChildProblemExplain);
-            manager.Register<InvalidPublishedFileIdProblem>((problem, arg) => Texts.InvalidPublishedFileIdMessage);
-            manager.Register<WorkshopVpkNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);
-            manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
-        }
+        manager.Register<AddonFileNotExistProblem>((problem, arg) => string.Format(Texts.AddonFileNotExistProblemExplain, problem.FilePath));
+        manager.Register<AddonChildrenProblem>((problem, arg) => Texts.AddonChildProblemExplain);
+        manager.Register<InvalidPublishedFileIdProblem>((problem, arg) => Texts.InvalidPublishedFileIdMessage);
+        manager.Register<WorkshopVpkNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);
+        manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
     }
 }

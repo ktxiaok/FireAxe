@@ -1,9 +1,13 @@
-- add: add the feature to check for addon conflicts
+- add: addon conflicts check
+- remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized
-- add: sort addons by tags
+- add: new addon sort methods: Sort By Tags
+- change: rename "Default Order" to "No Sort"
+- improve: improve the addon problems checking system
 - upgrade: upgrade dependent packages
+- bugfixes
 # v0.6.1
 - add: addon preview image customization (issue #11)
 - upgrade: update dependent packages

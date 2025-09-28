@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace FireAxe
-{
-    public class InvalidGamePathException : Exception
-    {
+namespace FireAxe;
 
-    }
+public class InvalidGamePathException : Exception
+{
+
 }

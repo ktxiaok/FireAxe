@@ -1,13 +1,12 @@
 ﻿using System;
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class LocalVpkAddonViewModel : VpkAddonViewModel
 {
-    public class LocalVpkAddonViewModel : VpkAddonViewModel
+    public LocalVpkAddonViewModel(LocalVpkAddon addon) : base(addon)
     {
-        public LocalVpkAddonViewModel(LocalVpkAddon addon) : base(addon)
-        {
 
-        }
-
-        public override Type AddonType => typeof(LocalVpkAddon);
     }
+
+    public override Type AddonType => typeof(LocalVpkAddon);
 }

@@ -682,15 +682,6 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Default Order.
-        /// </summary>
-        public static string Enum_AddonNodeSortMethod_Default {
-            get {
-                return ResourceManager.GetString("Enum_AddonNodeSortMethod_Default", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Sort By State.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_EnableState {
@@ -723,6 +714,15 @@ namespace FireAxe.Resources {
         public static string Enum_AddonNodeSortMethod_Name {
             get {
                 return ResourceManager.GetString("Enum_AddonNodeSortMethod_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Sort.
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_None {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_None", resourceCulture);
             }
         }
         
@@ -1843,7 +1843,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The workshop vpk file is not loaded..
+        ///   Looks up a localized string similar to The workshop vpk file is not loaded. This problem will disappear once the download is completed successfully. If the download didn&apos;t start, you can press Check button to try to start the download..
         /// </summary>
         public static string WorkshopVpkFileNotLoadProblemExplain {
             get {

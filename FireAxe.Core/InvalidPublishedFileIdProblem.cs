@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class InvalidPublishedFileIdProblem : AddonProblem
 {
-    public class InvalidPublishedFileIdProblem : AddonProblem
+    public InvalidPublishedFileIdProblem(AddonProblemSource<WorkshopVpkAddon> problemSource) : base(problemSource)
     {
-        public InvalidPublishedFileIdProblem(AddonProblemSource<WorkshopVpkAddon> problemSource) : base(problemSource)
-        {
 
-        }
-
-        public new WorkshopVpkAddon Addon => (WorkshopVpkAddon)base.Addon;
     }
+
+    public new WorkshopVpkAddon Addon => (WorkshopVpkAddon)base.Addon;
 }

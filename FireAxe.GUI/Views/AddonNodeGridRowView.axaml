@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:v="using:FireAxe.Views"
              xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:conv="using:FireAxe.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="100"
              x:DataType="vm:AddonNodeListItemViewModel"
              x:Class="FireAxe.Views.AddonNodeGridRowView">
@@ -15,19 +16,11 @@
     <Panel
       Grid.Column="0"
       Margin="5, 0, 5, 0">
-      <PathIcon
-        Data="{StaticResource icon_folder}"
-        IsVisible="{Binding ShouldShowFolderIcon}"/>
-      <PathIcon
-        Data="{StaticResource icon_question}"
-        IsVisible="{Binding ShouldShowUnknownImage}"/>
-      <Image
-        Source="{Binding Image}"
-        IsVisible="{Binding ShouldShowImage}"/>
+      <v:AddonIconView ImageSize="40" SpecialIconSize="{Binding $self.ImageSize}"/>
     </Panel>
     <TextBlock
       Grid.Column="1"
-      Text="{Binding AddonNode.Name}"
+      Text="{Binding Addon.Name}"
       VerticalAlignment="Center"
       TextWrapping="Wrap"/>
     <Panel
@@ -40,7 +33,7 @@
         </Style>
       </Panel.Styles>
       <ItemsControl
-        ItemsSource="{Binding AddonNode.TagsInHierarchy}">
+        ItemsSource="{Binding Addon.TagsInHierarchy}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
             <Panel Margin="2">
@@ -71,8 +64,8 @@
       <PathIcon
         Grid.Column="0"
         Data="{StaticResource icon_warning}"
-        IsVisible="{Binding HasProblem}"
-        Foreground="OrangeRed"
+        IsVisible="{Binding Addon.Problems.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+        Foreground="{DynamicResource brush_warning}"
         Width="20" Height="20"
         Margin="5, 0, 5, 0"/>
       <v:AddonNodeEnableButton Grid.Column="1"/>

@@ -47,4 +47,6 @@
   <sys:Double x:Key="size_addon_tile">100</sys:Double>
   <sys:Double x:Key="size_addon_tile_small">75</sys:Double>
   <sys:Double x:Key="size_addon_tile_large">150</sys:Double>
+
+  <SolidColorBrush x:Key="brush_warning">OrangeRed</SolidColorBrush>
 </ResourceDictionary>

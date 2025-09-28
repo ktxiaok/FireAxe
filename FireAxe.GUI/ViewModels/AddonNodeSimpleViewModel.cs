@@ -26,7 +26,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     private ObservableAsPropertyHelper<AddonNodeEnableState>? _enableState = null;
 
     private ObservableAsPropertyHelper<bool>? _shouldShowFolderIcon = null;
-    private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
+    private ObservableAsPropertyHelper<bool>? _shouldShowUnknownIcon = null; 
     private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
 
     private ObservableAsPropertyHelper<string?>? _fileSizeReadable = null;
@@ -97,9 +97,9 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             }).DisposeWith(disposables);
 
             var hasImageObservable = this.WhenAnyValue(x => x.Image).Select(img => img != null);
-            _shouldShowUnknownImage = addonObservable.CombineLatest(hasImageObservable)
+            _shouldShowUnknownIcon = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is not AddonGroup)
-                .ToProperty(this, nameof(ShouldShowUnknownImage));
+                .ToProperty(this, nameof(ShouldShowUnknownIcon));
             _shouldShowImage = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && args.HasImage)
                 .ToProperty(this, nameof(ShouldShowImage));
@@ -116,7 +116,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 _addonRoot.NewNodeIdRegistered -= addonRootNewNodeIdRegisteredListener;
 
                 Utils.DisposeAndSetNull(ref _addonDisposables);
-                Utils.DisposeAndSetNull(ref _shouldShowUnknownImage);
+                Utils.DisposeAndSetNull(ref _shouldShowUnknownIcon);
                 Utils.DisposeAndSetNull(ref _shouldShowImage);
                 Utils.DisposeAndSetNull(ref _shouldShowFolderIcon);
 
@@ -195,13 +195,13 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
         }
     }
 
-    public virtual int ImageDecodingWidth => 50;
+    public virtual int ImageDecodingWidth => 200;
 
     public AddonNodeEnableState EnableState => _enableState?.Value ?? AddonNodeEnableState.Disabled;
 
     public bool ShouldShowFolderIcon => _shouldShowFolderIcon?.Value ?? false;
 
-    public bool ShouldShowUnknownImage => _shouldShowUnknownImage?.Value ?? false;
+    public bool ShouldShowUnknownIcon => _shouldShowUnknownIcon?.Value ?? false;
 
     public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
 

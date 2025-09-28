@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public enum AppColorTheme
 {
-    public enum AppColorTheme
-    {
-        Default,
-        Light,
-        Dark
-    }
+    Default,
+    Light,
+    Dark
 }

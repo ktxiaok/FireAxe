@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class FileExistException : Exception
 {
-    public class FileExistException : Exception
+    public FileExistException(string filePath)
     {
-        public FileExistException(string filePath)
-        {
-            FilePath = filePath;
-        }
-        
-        public string FilePath { get; }
+        FilePath = filePath;
     }
+    
+    public string FilePath { get; }
 }

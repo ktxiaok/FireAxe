@@ -1,39 +1,38 @@
 ﻿using System;
 using System.IO.Pipes;
 
-namespace FireAxe.CrashReporter
+namespace FireAxe.CrashReporter;
+
+internal class Program
 {
-    internal class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        Console.WriteLine("====FireAxe CrashReporter====\n");
+
+        if (args.Length == 0)
         {
-            Console.WriteLine("====FireAxe CrashReporter====\n");
+            Console.WriteLine("Error: no args");
+            Console.ReadLine();
+            return;
+        }
 
-            if (args.Length == 0)
+        var pipeName = args[0];
+        try
+        {
+            using (var pipeClient = new NamedPipeClientStream(pipeName))
             {
-                Console.WriteLine("Error: no args");
-                Console.ReadLine();
-                return;
-            }
-
-            var pipeName = args[0];
-            try
-            {
-                using (var pipeClient = new NamedPipeClientStream(pipeName))
+                pipeClient.Connect();
+                using (var reader = new BinaryReader(pipeClient))
                 {
-                    pipeClient.Connect();
-                    using (var reader = new BinaryReader(pipeClient))
-                    {
-                        Console.WriteLine(reader.ReadString());
-                    }
+                    Console.WriteLine(reader.ReadString());
                 }
             }
-            catch (IOException ex) 
-            {
-                Console.WriteLine(ex);
-            }
-
-            Console.ReadLine();
         }
+        catch (IOException ex) 
+        {
+            Console.WriteLine(ex);
+        }
+
+        Console.ReadLine();
     }
 }

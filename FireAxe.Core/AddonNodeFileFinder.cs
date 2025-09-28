@@ -1,198 +1,197 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal class AddonNodeFileFinder
 {
-    internal class AddonNodeFileFinder
+    private class StackFrame
     {
-        private class StackFrame
+        public StackFrame? Up = null;
+        public StackFrame? Down = null;
+        public AddonGroup? Group = null;
+        public string? DirectoryName;
+        public IEnumerator<string> FileEnumerator;
+        public Dictionary<string, AddonNode>? FileNameToNode = null;
+
+        public StackFrame(string? directoryName, IEnumerator<string> fileEnumerator)
         {
-            public StackFrame? Up = null;
-            public StackFrame? Down = null;
-            public AddonGroup? Group = null;
-            public string? DirectoryName;
-            public IEnumerator<string> FileEnumerator;
-            public Dictionary<string, AddonNode>? FileNameToNode = null;
-
-            public StackFrame(string? directoryName, IEnumerator<string> fileEnumerator)
-            {
-                DirectoryName = directoryName;
-                FileEnumerator = fileEnumerator;
-            }
+            DirectoryName = directoryName;
+            FileEnumerator = fileEnumerator;
         }
+    }
 
-        private StackFrame _stackTop;
-        private AddonRoot _addonRoot;
-        private bool _isDirectory = false;
+    private StackFrame _stackTop;
+    private AddonRoot _addonRoot;
+    private bool _isDirectory = false;
 
-        public AddonNodeFileFinder(AddonRoot addonRoot)
+    public AddonNodeFileFinder(AddonRoot addonRoot)
+    {
+        _addonRoot = addonRoot;
+        _stackTop = new StackFrame(null, Directory.EnumerateFileSystemEntries(_addonRoot.DirectoryPath).GetEnumerator())
         {
-            _addonRoot = addonRoot;
-            _stackTop = new StackFrame(null, Directory.EnumerateFileSystemEntries(_addonRoot.DirectoryPath).GetEnumerator())
-            {
-                FileNameToNode = CreateFileNameToNodeDict(_addonRoot)
-            };
-        }
+            FileNameToNode = CreateFileNameToNodeDict(_addonRoot)
+        };
+    }
 
-        public AddonNodeFileFinder(AddonGroup addonGroup)
+    public AddonNodeFileFinder(AddonGroup addonGroup)
+    {
+        _addonRoot = addonGroup.Root;
+        _stackTop = new StackFrame(addonGroup.Name, Directory.EnumerateFileSystemEntries(addonGroup.FullFilePath).GetEnumerator())
         {
-            _addonRoot = addonGroup.Root;
-            _stackTop = new StackFrame(addonGroup.Name, Directory.EnumerateFileSystemEntries(addonGroup.FullFilePath).GetEnumerator())
-            {
-                Group = addonGroup,
-                FileNameToNode = CreateFileNameToNodeDict(addonGroup)
-            };
-        }
+            Group = addonGroup,
+            FileNameToNode = CreateFileNameToNodeDict(addonGroup)
+        };
+    }
 
-        public bool IsCurrentDirectory => _isDirectory;
+    public bool IsCurrentDirectory => _isDirectory;
 
-        public bool CurrentNodeExists
-        {
-            get
-            {
-                CheckFinished();
-                if (_stackTop.FileNameToNode != null)
-                {
-                    string fileName = Path.GetFileName(CurrentFilePath);
-                    return _stackTop.FileNameToNode.ContainsKey(fileName);
-                }
-                return false;
-            }
-        }
-
-        public string CurrentFilePath
-        {
-            get
-            {
-                CheckFinished();
-                return _stackTop.FileEnumerator.Current;
-            }
-        }
-
-        public AddonGroup? CurrentGroup
-        {
-            get
-            {
-                CheckFinished();
-                return _stackTop.Group;
-            }
-        }
-
-        public bool MoveNext(bool skipDirectory = false)
+    public bool CurrentNodeExists
+    {
+        get
         {
             CheckFinished();
-            if (_isDirectory && !skipDirectory)
+            if (_stackTop.FileNameToNode != null)
             {
-                string dirPath = _stackTop.FileEnumerator.Current;
-                string dirName = Path.GetFileName(dirPath);
-                AddonGroup? group = null;
-                bool nodeExists = false;
-                if (_stackTop.FileNameToNode != null)
+                string fileName = Path.GetFileName(CurrentFilePath);
+                return _stackTop.FileNameToNode.ContainsKey(fileName);
+            }
+            return false;
+        }
+    }
+
+    public string CurrentFilePath
+    {
+        get
+        {
+            CheckFinished();
+            return _stackTop.FileEnumerator.Current;
+        }
+    }
+
+    public AddonGroup? CurrentGroup
+    {
+        get
+        {
+            CheckFinished();
+            return _stackTop.Group;
+        }
+    }
+
+    public bool MoveNext(bool skipDirectory = false)
+    {
+        CheckFinished();
+        if (_isDirectory && !skipDirectory)
+        {
+            string dirPath = _stackTop.FileEnumerator.Current;
+            string dirName = Path.GetFileName(dirPath);
+            AddonGroup? group = null;
+            bool nodeExists = false;
+            if (_stackTop.FileNameToNode != null)
+            {
+                if (_stackTop.FileNameToNode.TryGetValue(dirName, out var node))
                 {
-                    if (_stackTop.FileNameToNode.TryGetValue(dirName, out var node))
-                    {
-                        nodeExists = true;
-                        group = node as AddonGroup;
-                    }
-                }
-                if (!nodeExists || (nodeExists && group != null))
-                {
-                    var frame = new StackFrame(dirName, Directory.EnumerateFileSystemEntries(dirPath).GetEnumerator());
-                    if (group != null)
-                    {
-                        frame.Group = group;
-                        frame.FileNameToNode = CreateFileNameToNodeDict(group);
-                    }
-                    Push(frame);
+                    nodeExists = true;
+                    group = node as AddonGroup;
                 }
             }
-            _isDirectory = false;
-            while (true)
+            if (!nodeExists || (nodeExists && group != null))
             {
-                bool hasNext = _stackTop.FileEnumerator.MoveNext();
-                if (hasNext)
+                var frame = new StackFrame(dirName, Directory.EnumerateFileSystemEntries(dirPath).GetEnumerator());
+                if (group != null)
                 {
-                    _isDirectory = Directory.Exists(_stackTop.FileEnumerator.Current);
-                    return true;
+                    frame.Group = group;
+                    frame.FileNameToNode = CreateFileNameToNodeDict(group);
                 }
-                else
+                Push(frame);
+            }
+        }
+        _isDirectory = false;
+        while (true)
+        {
+            bool hasNext = _stackTop.FileEnumerator.MoveNext();
+            if (hasNext)
+            {
+                _isDirectory = Directory.Exists(_stackTop.FileEnumerator.Current);
+                return true;
+            }
+            else
+            {
+                Pop(out bool empty);
+                if (empty)
                 {
-                    Pop(out bool empty);
-                    if (empty)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
+    }
 
-        public AddonGroup? GetOrCreateCurrentGroup()
+    public AddonGroup? GetOrCreateCurrentGroup()
+    {
+        if (_stackTop.Down == null)
         {
-            if (_stackTop.Down == null)
-            {
-                return CurrentGroup;
-            }
-            var group = CurrentGroup;
-            if (group != null)
-            {
-                return group;
-            }
-
-            StackFrame current = _stackTop;
-            while (true)
-            {
-                if (current.Down == null || current.Group != null)
-                {
-                    break;
-                }
-                current = current.Down;
-            }
-            while (true)
-            {
-                if (current.Up == null)
-                {
-                    break;
-                }
-                current.Up.Group = AddonNode.Create<AddonGroup>(_addonRoot, current.Group);
-                current.Up.Group.Name = current.Up.DirectoryName!;
-                current = current.Up;
-            }
-            
-            return current.Group;
+            return CurrentGroup;
+        }
+        var group = CurrentGroup;
+        if (group != null)
+        {
+            return group;
         }
 
-        private void Push(StackFrame frame)
+        StackFrame current = _stackTop;
+        while (true)
         {
-            frame.Down = _stackTop;
-            _stackTop.Up = frame;
-            _stackTop = frame;
-        }
-
-        private void Pop(out bool empty)
-        {
-            _stackTop = _stackTop.Down!;
-            if (_stackTop != null)
+            if (current.Down == null || current.Group != null)
             {
-                _stackTop.Up = null;
+                break;
             }
-            empty = _stackTop == null;
+            current = current.Down;
         }
-
-        private void CheckFinished()
+        while (true)
         {
-            if (_stackTop == null)
+            if (current.Up == null)
             {
-                throw new InvalidOperationException("The AddonNodeFileFinder is finished.");
+                break;
             }
+            current.Up.Group = AddonNode.Create<AddonGroup>(_addonRoot, current.Group);
+            current.Up.Group.Name = current.Up.DirectoryName!;
+            current = current.Up;
         }
         
-        private static Dictionary<string, AddonNode> CreateFileNameToNodeDict(IAddonNodeContainer container)
+        return current.Group;
+    }
+
+    private void Push(StackFrame frame)
+    {
+        frame.Down = _stackTop;
+        _stackTop.Up = frame;
+        _stackTop = frame;
+    }
+
+    private void Pop(out bool empty)
+    {
+        _stackTop = _stackTop.Down!;
+        if (_stackTop != null)
         {
-            Dictionary<string, AddonNode> dict = new();
-            foreach (var node in container.Nodes)
-            {
-                dict[node.FileName] = node;
-            }
-            return dict;
+            _stackTop.Up = null;
         }
+        empty = _stackTop == null;
+    }
+
+    private void CheckFinished()
+    {
+        if (_stackTop == null)
+        {
+            throw new InvalidOperationException("The AddonNodeFileFinder is finished.");
+        }
+    }
+    
+    private static Dictionary<string, AddonNode> CreateFileNameToNodeDict(IAddonNodeContainer container)
+    {
+        Dictionary<string, AddonNode> dict = new();
+        foreach (var node in container.Nodes)
+        {
+            dict[node.FileName] = node;
+        }
+        return dict;
     }
 }

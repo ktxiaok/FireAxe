@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class LocalVpkAddonSave : VpkAddonSave
 {
-    public class LocalVpkAddonSave : VpkAddonSave
-    {
-        public override Type TargetType => typeof(LocalVpkAddon);
-    }
+    public override Type TargetType => typeof(LocalVpkAddon);
 }

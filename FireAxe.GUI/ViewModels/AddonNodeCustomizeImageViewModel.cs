@@ -4,57 +4,56 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewModel
 {
-    public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewModel
+    private AddonNode _addon;
+
+    public AddonNodeCustomizeImageViewModel(AddonNode addon)
     {
-        private AddonNode _addonNode;
+        ArgumentNullException.ThrowIfNull(addon);
+        _addon = addon;
 
-        public AddonNodeCustomizeImageViewModel(AddonNode addonNode)
+        SelectCustomImagePathCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            ArgumentNullException.ThrowIfNull(addonNode);
-            _addonNode = addonNode;
-
-            SelectCustomImagePathCommand = ReactiveCommand.CreateFromTask(async () =>
+            var path = await SelectCustomImagePathInteraction.Handle(Unit.Default);
+            if (path == null)
             {
-                var path = await SelectCustomImagePathInteraction.Handle(Unit.Default);
-                if (path == null)
-                {
-                    return;
-                }
-                CustomImagePath = path;
-            });
+                return;
+            }
+            CustomImagePath = path;
+        });
 
-            this.WhenActivated((CompositeDisposable disposables) =>
-            {
-                _addonNode.WhenAnyValue(x => x.CustomImagePath)
-                .Subscribe(_ => this.RaisePropertyChanged(nameof(CustomImagePath)))
-                .DisposeWith(disposables);
-            });
-        }
-
-        public ViewModelActivator Activator { get; } = new();
-
-        public AddonNode AddonNode => _addonNode;
-
-        public string CustomImagePath
+        this.WhenActivated((CompositeDisposable disposables) =>
         {
-            get => _addonNode.CustomImagePath ?? "";
-            set
+            _addon.WhenAnyValue(x => x.CustomImagePath)
+            .Subscribe(_ => this.RaisePropertyChanged(nameof(CustomImagePath)))
+            .DisposeWith(disposables);
+        });
+    }
+
+    public ViewModelActivator Activator { get; } = new();
+
+    public AddonNode Addon => _addon;
+
+    public string CustomImagePath
+    {
+        get => _addon.CustomImagePath ?? "";
+        set
+        {
+            if (value.Length == 0)
             {
-                if (value.Length == 0)
-                {
-                    _addonNode.CustomImagePath = null;
-                }
-                else
-                {
-                    _addonNode.CustomImagePath = FileUtils.NormalizePath(value);
-                }
+                _addon.CustomImagePath = null;
+            }
+            else
+            {
+                _addon.CustomImagePath = FileUtils.NormalizePath(value);
             }
         }
-
-        public ReactiveCommand<Unit, Unit> SelectCustomImagePathCommand { get; }
-
-        public Interaction<Unit, string?> SelectCustomImagePathInteraction { get; } = new();
     }
+
+    public ReactiveCommand<Unit, Unit> SelectCustomImagePathCommand { get; }
+
+    public Interaction<Unit, string?> SelectCustomImagePathInteraction { get; } = new();
 }

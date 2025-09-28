@@ -19,8 +19,6 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
 
     private readonly ObservableAsPropertyHelper<string> _workshopTagsString;
 
-    private ObservableAsPropertyHelper<bool>? _isFileDownloadCompleted = null;
-
     public WorkshopVpkAddonViewModel(WorkshopVpkAddon addon) : base(addon)
     {
         _displayItemId = this.WhenAnyValue(x => x.ItemId)
@@ -91,8 +89,6 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
 
     public string WorkshopTagsString => _workshopTagsString.Value;
 
-    public bool IsFileDownloadCompleted => _isFileDownloadCompleted?.Value ?? false;
-
     public DownloadItemViewModel? DownloadItemViewModel
     {
         get => _downloadItemViewModel;
@@ -142,13 +138,9 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
             })
             .DisposeWith(disposables);
 
-        _isFileDownloadCompleted = addon.WhenAnyValue(x => x.FullVpkFilePath)
-            .Select(path => path != null)
-            .ToProperty(this, nameof(IsFileDownloadCompleted));
-
         Disposable.Create(() =>
         {
-            Utils.DisposeAndSetNull(ref _isFileDownloadCompleted);
+            
         }).DisposeWith(disposables);
     }
 

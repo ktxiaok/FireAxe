@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IHierarchyNode<T> where T : IHierarchyNode<T>
 {
-    public interface IHierarchyNode<T> where T : IHierarchyNode<T>
-    {
-        bool IsNonterminal { get; }
+    bool IsNonterminal { get; }
 
-        IEnumerable<T> Children { get; }
+    IEnumerable<T> Children { get; }
 
-        IHierarchyNode<T>? Parent { get; }
-    }
+    IHierarchyNode<T>? Parent { get; }
 }

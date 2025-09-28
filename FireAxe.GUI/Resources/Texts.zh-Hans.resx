@@ -324,8 +324,8 @@
   <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
     <value>按创建时间排序</value>
   </data>
-  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
-    <value>默认顺序</value>
+  <data name="Enum_AddonNodeSortMethod_None" xml:space="preserve">
+    <value>无排序</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
     <value>按启用状态排序</value>
@@ -712,7 +712,7 @@
     <value>创意工坊项目自动更新</value>
   </data>
   <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
-    <value>创意工坊VPK文件没有装载。</value>
+    <value>创意工坊VPK文件没有装载。此问题将在下载成功完成时消失。如果下载没有开始，你可以点击检查按钮来尝试开始下载。</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>是</value>

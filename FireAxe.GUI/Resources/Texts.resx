@@ -324,8 +324,8 @@
   <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
     <value>Sort By Creation Time</value>
   </data>
-  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
-    <value>Default Order</value>
+  <data name="Enum_AddonNodeSortMethod_None" xml:space="preserve">
+    <value>No Sort</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
     <value>Sort By State</value>
@@ -712,7 +712,7 @@
     <value>Workshop Item Auto Update</value>
   </data>
   <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
-    <value>The workshop vpk file is not loaded.</value>
+    <value>The workshop vpk file is not loaded. This problem will disappear once the download is completed successfully. If the download didn't start, you can press Check button to try to start the download.</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>

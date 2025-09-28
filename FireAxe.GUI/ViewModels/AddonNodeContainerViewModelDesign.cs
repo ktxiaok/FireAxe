@@ -4,17 +4,16 @@ using DynamicData.Binding;
 using System;
 using System.Collections.ObjectModel;
 
-namespace FireAxe.ViewModels
-{
-    public class AddonNodeContainerViewModelDesign : AddonNodeContainerViewModel
-    {
-        private AddonRoot _root;
+namespace FireAxe.ViewModels;
 
-        public AddonNodeContainerViewModelDesign()
-        {
-            _root = DesignHelper.CreateEmptyAddonRoot();
-            DesignHelper.AddTestAddonNodes(_root);
-            Nodes = _root.Nodes;
-        }
+public class AddonNodeContainerViewModelDesign : AddonNodeContainerViewModel
+{
+    private AddonRoot _root;
+
+    public AddonNodeContainerViewModelDesign()
+    {
+        _root = DesignHelper.CreateEmptyAddonRoot();
+        DesignHelper.AddTestAddonNodes(_root);
+        Nodes = _root.Nodes;
     }
 }

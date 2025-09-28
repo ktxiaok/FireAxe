@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public enum AutoUpdateStrategy
 {
-    public enum AutoUpdateStrategy
-    {
-        Default,
-        Enabled,
-        Disabled
-    }
+    Default,
+    Enabled,
+    Disabled
 }

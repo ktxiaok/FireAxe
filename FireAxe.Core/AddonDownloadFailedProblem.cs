@@ -1,18 +1,17 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AddonDownloadFailedProblem : AddonProblem
 {
-    public class AddonDownloadFailedProblem : AddonProblem
+    public AddonDownloadFailedProblem(AddonProblemSource problemSource) : base(problemSource)
     {
-        public AddonDownloadFailedProblem(AddonProblemSource problemSource) : base(problemSource)
-        {
 
-        }
-
-        public required string Url { get; init; }
-
-        public required string FilePath { get; init; }
-
-        public Exception? Exception { get; init; } = null;
     }
+
+    public required string Url { get; init; }
+
+    public required string FilePath { get; init; }
+
+    public Exception? Exception { get; init; } = null;
 }

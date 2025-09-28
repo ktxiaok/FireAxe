@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public enum AddonNodeEnableState : byte
 {
-    public enum AddonNodeEnableState : byte
-    {
-        Disabled,
-        Enabled,
-        EnabledSuppressed
-    }
+    Disabled,
+    Enabled,
+    EnabledSuppressed
 }

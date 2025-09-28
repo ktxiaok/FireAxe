@@ -22,6 +22,7 @@
     <StackPanel.Styles>
       <Style Selector="Expander">
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="IsExpanded" Value="True"/>
       </Style>
     </StackPanel.Styles>
 
@@ -33,11 +34,11 @@
       </Expander.Header>
       <Panel>
         <TextBlock
-          IsVisible="{Binding AddonNode.ConflictingAddons.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+          IsVisible="{Binding Addon.ConflictingAddonIds.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
           Classes="EmptyHint"/>
         <ItemsControl
-          IsVisible="{Binding AddonNode.ConflictingAddons.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-          ItemsSource="{Binding AddonNode.ConflictingAddons}">
+          IsVisible="{Binding Addon.ConflictingAddonIds.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          ItemsSource="{Binding Addon.ConflictingAddonIds}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <Panel Margin="2.5">
@@ -62,11 +63,11 @@
       </Expander.Header>
       <Panel>
         <TextBlock
-          IsVisible="{Binding AddonNode.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+          IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
           Classes="EmptyHint"/>
         <ItemsControl
-          IsVisible="{Binding AddonNode.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-          ItemsSource="{Binding AddonNode.ConflictingFiles}">
+          IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          ItemsSource="{Binding Addon.ConflictingFiles}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <DockPanel
@@ -94,11 +95,11 @@
       </Expander.Header>
       <Panel>
         <TextBlock
-          IsVisible="{Binding AddonNode.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+          IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
           Classes="EmptyHint"/>
         <ItemsControl
-          IsVisible="{Binding AddonNode.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-          ItemsSource="{Binding AddonNode.ConflictIgnoringFiles}">
+          IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          ItemsSource="{Binding Addon.ConflictIgnoringFiles}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <DockPanel

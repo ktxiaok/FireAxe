@@ -1,29 +1,28 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal static class DisposableUtils
 {
-    internal static class DisposableUtils
+    private class Disposable : IDisposable
     {
-        private class Disposable : IDisposable
+        private Action _dispose;
+
+        internal Disposable(Action dispose)
         {
-            private Action _dispose;
-
-            internal Disposable(Action dispose)
-            {
-                _dispose = dispose;
-            }
-
-            public void Dispose()
-            {
-                _dispose();
-            }
+            _dispose = dispose;
         }
 
-        public static IDisposable Create(Action dispose)
+        public void Dispose()
         {
-            ArgumentNullException.ThrowIfNull(dispose);
-
-            return new Disposable(dispose);
+            _dispose();
         }
+    }
+
+    public static IDisposable Create(Action dispose)
+    {
+        ArgumentNullException.ThrowIfNull(dispose);
+
+        return new Disposable(dispose);
     }
 }

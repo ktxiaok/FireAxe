@@ -3,69 +3,68 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class SaveManager
 {
-    public class SaveManager
+    public static readonly TimeSpan DefaultAutoSaveInterval = TimeSpan.FromSeconds(3);
+
+    private bool _active = false;
+    
+    private List<ISaveable> _saveables = new();
+
+    private DispatcherTimer _autoSaveTimer;
+
+    public SaveManager(App app)
     {
-        public static readonly TimeSpan DefaultAutoSaveInterval = TimeSpan.FromSeconds(3);
-
-        private bool _active = false;
-        
-        private List<ISaveable> _saveables = new();
-
-        private DispatcherTimer _autoSaveTimer;
-
-        public SaveManager(App app)
+        _autoSaveTimer = new(DefaultAutoSaveInterval, DispatcherPriority.Normal, (sender, e) =>
         {
-            _autoSaveTimer = new(DefaultAutoSaveInterval, DispatcherPriority.Normal, (sender, e) =>
-            {
-                SaveAll();
-            });
-            app.ShutdownRequested += () =>
-            {
-                SaveAll();
-            };
+            SaveAll();
+        });
+        app.ShutdownRequested += () =>
+        {
+            SaveAll();
+        };
+    }
+
+    public IEnumerable<ISaveable> Saveables => _saveables;
+
+    public TimeSpan AutoSaveInterval
+    {
+        get => _autoSaveTimer.Interval;
+        set => _autoSaveTimer.Interval = value;
+    }
+
+    public void Run()
+    {
+        if (_active)
+        {
+            return;
         }
 
-        public IEnumerable<ISaveable> Saveables => _saveables;
+        _autoSaveTimer.Start();
+        _active = true;
+    }
 
-        public TimeSpan AutoSaveInterval
-        {
-            get => _autoSaveTimer.Interval;
-            set => _autoSaveTimer.Interval = value;
-        }
+    public void Register(ISaveable saveable)
+    {
+        _saveables.Add(saveable);
+    }
 
-        public void Run()
+    public void SaveAll(bool forceSave = false)
+    {
+        foreach (var saveable in _saveables)
         {
-            if (_active)
+            if (forceSave || saveable.RequestSave)
             {
-                return;
-            }
-
-            _autoSaveTimer.Start();
-            _active = true;
-        }
-
-        public void Register(ISaveable saveable)
-        {
-            _saveables.Add(saveable);
-        }
-
-        public void SaveAll(bool forceSave = false)
-        {
-            foreach (var saveable in _saveables)
-            {
-                if (forceSave || saveable.RequestSave)
+                try
                 {
-                    try
-                    {
-                        saveable.Save();
-                        saveable.RequestSave = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Exception occurred during ISaveable.Save. (ClassName: {ClassName})", saveable.GetType().FullName);
-                    }
+                    saveable.Save();
+                    saveable.RequestSave = false;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during ISaveable.Save. (ClassName: {ClassName})", saveable.GetType().FullName);
                 }
             }
         }

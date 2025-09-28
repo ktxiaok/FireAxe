@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AddonGroupSave : AddonNodeSave
 {
-    public class AddonGroupSave : AddonNodeSave
-    {
-        public override Type TargetType => typeof(AddonGroup);
+    public override Type TargetType => typeof(AddonGroup);
 
-        public AddonNodeSave[] Children { get; set; } = [];
+    public AddonNodeSave[] Children { get; set; } = [];
 
-        public AddonGroupEnableStrategy EnableStrategy { get; set; } = AddonGroupEnableStrategy.None;
-    }
+    public AddonGroupEnableStrategy EnableStrategy { get; set; } = AddonGroupEnableStrategy.None;
 }

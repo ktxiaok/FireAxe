@@ -1,12 +1,11 @@
 using Avalonia.Controls;
 
-namespace FireAxe.Views
+namespace FireAxe.Views;
+
+public partial class AddonNodeTileView : AddonNodeListItemView
 {
-    public partial class AddonNodeTileView : AddonNodeListItemView
+    public AddonNodeTileView()
     {
-        public AddonNodeTileView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

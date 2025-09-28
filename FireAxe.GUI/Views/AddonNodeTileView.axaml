@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:FireAxe.ViewModels"
              xmlns:v="using:FireAxe.Views"
+             xmlns:conv="using:FireAxe.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
              x:Class="FireAxe.Views.AddonNodeTileView"
              x:DataType="vm:AddonNodeListItemViewModel">
@@ -20,29 +21,16 @@
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         Margin="10">
-        <PathIcon
-          Width="{Binding #image.Width}"
-          Height="{Binding $self.Width}"
-          Data="{StaticResource icon_folder}"
-          IsVisible="{Binding ShouldShowFolderIcon}"/>
-        <PathIcon
-          Width="{Binding #image.Width}"
-          Height="{Binding $self.Width}"
-          Data="{StaticResource icon_question}"
-          IsVisible="{Binding ShouldShowUnknownImage}"/>
-        <Image
-          x:Name="image"
-          Width="{Binding ContainerViewModel.TileViewSize, FallbackValue=200}"
-          Height="{Binding $self.Width}"
-          Stretch="Uniform"
-          Source="{Binding Image}"
-          IsVisible="{Binding ShouldShowImage}"/>
+        <v:AddonIconView
+          Name="iconView"
+          ImageSize="{Binding ContainerViewModel.TileViewSize, FallbackValue=200}"
+          SpecialIconSize="{Binding $self.ImageSize}"/>
       </Panel>
       <Panel Height="30">
         <TextBlock
-          Text="{Binding AddonNode.Name}"
+          Text="{Binding Addon.Name}"
           FontSize="12"
-          MaxWidth="{Binding #image.Width}"
+          MaxWidth="{Binding #iconView.ImageSize}"
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
           TextAlignment="Center"
@@ -57,8 +45,8 @@
     </v:AddonNodeEnableButton>
     <PathIcon
       Data="{StaticResource icon_warning}"
-      IsVisible="{Binding HasProblem}"
-      Foreground="OrangeRed"
+      IsVisible="{Binding Addon.Problems.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+      Foreground="{DynamicResource brush_warning}"
       Margin="5"
       Width="20" Height="20"
       HorizontalAlignment="Left"

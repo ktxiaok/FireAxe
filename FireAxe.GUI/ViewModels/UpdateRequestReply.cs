@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public enum UpdateRequestReply
 {
-    public enum UpdateRequestReply
-    {
-        None,
-        GoToDownload,
-        Ignore
-    }
+    None,
+    GoToDownload,
+    Ignore
 }

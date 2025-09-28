@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class VpkAddonSave : AddonNodeSave 
 {
-    public class VpkAddonSave : AddonNodeSave 
-    {
-        public override Type TargetType => typeof(VpkAddon);
+    public override Type TargetType => typeof(VpkAddon);
 
-        public int VpkPriority { get; set; } = 0;
+    public int VpkPriority { get; set; } = 0;
 
-        public string[] ConflictIgnoringFiles { get; set; } = [];
-    }
+    public string[] ConflictIgnoringFiles { get; set; } = [];
 }

@@ -1,32 +1,31 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class LocalVpkAddon : VpkAddon
 {
-    public class LocalVpkAddon : VpkAddon
+    protected LocalVpkAddon()
     {
-        protected LocalVpkAddon()
-        {
 
-        }
+    }
 
-        public override string? FullVpkFilePath => FullFilePath;
+    public override string? FullVpkFilePath => FullFilePath;
 
-        public override string FileExtension => ".vpk";
+    public override string FileExtension => ".vpk";
 
-        public override Type SaveType => typeof(LocalVpkAddonSave);
+    public override Type SaveType => typeof(LocalVpkAddonSave);
 
-        protected override void OnCreateSave(AddonNodeSave save)
-        {
-            base.OnCreateSave(save);
+    protected override void OnCreateSave(AddonNodeSave save)
+    {
+        base.OnCreateSave(save);
 
-            var save1 = (LocalVpkAddonSave)save;
-        }
+        var save1 = (LocalVpkAddonSave)save;
+    }
 
-        protected override void OnLoadSave(AddonNodeSave save)
-        {
-            base.OnLoadSave(save);
+    protected override void OnLoadSave(AddonNodeSave save)
+    {
+        base.OnLoadSave(save);
 
-            var save1 = (LocalVpkAddonSave)save;
-        }
+        var save1 = (LocalVpkAddonSave)save;
     }
 }
