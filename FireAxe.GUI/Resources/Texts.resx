@@ -322,25 +322,25 @@
     <value>Small Tile View</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
-    <value>Sort By Creation Time</value>
+    <value>Sort by Creation Time</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_None" xml:space="preserve">
     <value>No Sort</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
-    <value>Sort By State</value>
+    <value>Sort by State</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
-    <value>Sort By File Creation Time</value>
+    <value>Sort by File Creation Time</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
-    <value>Sort By File Size</value>
+    <value>Sort by File Size</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
-    <value>Sort By Name</value>
+    <value>Sort by Name</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_Tag" xml:space="preserve">
-    <value>Sort By Tags</value>
+    <value>Sort by Tags</value>
   </data>
   <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
     <value>And</value>
@@ -719,5 +719,14 @@
   </data>
   <data name="GlobalPriority" xml:space="preserve">
     <value>Global Priority</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_PriorityInHierarchy" xml:space="preserve">
+    <value>Sort by Global Priority</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_ProblemCount" xml:space="preserve">
+    <value>Sort by Problem Count</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Priority" xml:space="preserve">
+    <value>Sort by Priority</value>
   </data>
 </root>

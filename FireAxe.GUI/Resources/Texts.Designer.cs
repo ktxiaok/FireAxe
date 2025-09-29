@@ -673,7 +673,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By Creation Time.
+        ///   Looks up a localized string similar to Sort by Creation Time.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_CreationTime {
             get {
@@ -682,7 +682,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By State.
+        ///   Looks up a localized string similar to Sort by State.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_EnableState {
             get {
@@ -691,7 +691,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By File Creation Time.
+        ///   Looks up a localized string similar to Sort by File Creation Time.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_FileCreationTime {
             get {
@@ -700,7 +700,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By File Size.
+        ///   Looks up a localized string similar to Sort by File Size.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_FileSize {
             get {
@@ -709,7 +709,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By Name.
+        ///   Looks up a localized string similar to Sort by Name.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_Name {
             get {
@@ -727,7 +727,34 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sort By Tags.
+        ///   Looks up a localized string similar to Sort by Priority.
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_Priority {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_Priority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by Global Priority.
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_PriorityInHierarchy {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_PriorityInHierarchy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by Problem Count.
+        /// </summary>
+        public static string Enum_AddonNodeSortMethod_ProblemCount {
+            get {
+                return ResourceManager.GetString("Enum_AddonNodeSortMethod_ProblemCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort by Tags.
         /// </summary>
         public static string Enum_AddonNodeSortMethod_Tag {
             get {

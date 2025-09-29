@@ -35,9 +35,12 @@ public class AddonNodeComparer : IComparer<AddonNode>
         {
             AddonNodeSortMethod.Name => x!.Name.CompareTo(y!.Name),
             AddonNodeSortMethod.EnableState => GetEnableState(x!).CompareTo(GetEnableState(y!)),
+            AddonNodeSortMethod.Priority => x!.Priority.CompareTo(y!.Priority),
+            AddonNodeSortMethod.PriorityInHierarchy => x!.PriorityInHierarchy.CompareTo(y!.PriorityInHierarchy),
+            AddonNodeSortMethod.ProblemCount => x!.Problems.Count.CompareTo(y!.Problems.Count),
+            AddonNodeSortMethod.Tag => CompareTags(x!, y!),
             AddonNodeSortMethod.FileSize => x!.FileSize.GetValueOrDefault(0).CompareTo(y!.FileSize.GetValueOrDefault(0)),
             AddonNodeSortMethod.CreationTime => x!.CreationTime.CompareTo(y!.CreationTime),
-            AddonNodeSortMethod.Tag => CompareTags(x!, y!),
             _ => 0
         };
 

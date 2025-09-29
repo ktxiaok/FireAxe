@@ -4,7 +4,7 @@
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized
-- add: new addon sort methods: Sort By Tags
+- add: new addon sort methods: Sort by Tags, Sort by Priority, Sort by Global Priority, Sort by Problem Count
 - change: rename "Default Order" to "No Sort"
 - improve: improve the addon problems checking system
 - upgrade: upgrade dependent packages

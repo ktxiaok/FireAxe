@@ -720,4 +720,13 @@
   <data name="GlobalPriority" xml:space="preserve">
     <value>全局优先级</value>
   </data>
+  <data name="Enum_AddonNodeSortMethod_PriorityInHierarchy" xml:space="preserve">
+    <value>按全局优先级排序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_ProblemCount" xml:space="preserve">
+    <value>按问题数量排序</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Priority" xml:space="preserve">
+    <value>按优先级排序</value>
+  </data>
 </root>
