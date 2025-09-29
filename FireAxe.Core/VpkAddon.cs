@@ -19,11 +19,15 @@ public abstract class VpkAddon : AddonNode
 
     private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
+    internal readonly AddonProblemSource<VpkAddon> _vpkAddonConflictProblemSource;
+
     protected VpkAddon()
     {
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
         _conflictingFilesReadOnly = new(_conflictingFiles);
         _conflictingAddonIdsReadOnly = new(_conflictingAddonIds);
+
+        _vpkAddonConflictProblemSource = new(this);
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
@@ -115,30 +119,32 @@ public abstract class VpkAddon : AddonNode
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        bool result = _conflictIgnoringFileSet.Add(file);
-        if (!result)
+        if (!_conflictIgnoringFileSet.Add(file))
         {
             return false;
         }
         _conflictIgnoringFiles.Add(file);
+
+        _conflictingFiles.Remove(file);
+
         Root.RequestSave = true;
 
-        return result;
+        return true;
     }
 
     public bool RemoveConflictIgnoringFile(string file)
     {
         ArgumentNullException.ThrowIfNull(file);
 
-        bool result = _conflictIgnoringFileSet.Remove(file);
-        if (!result)
+        if (!_conflictIgnoringFileSet.Remove(file))
         {
             return false;
         }
         _conflictIgnoringFiles.Remove(file);
+
         Root.RequestSave = true;
 
-        return result;
+        return true;
     }
 
     public void ClearConflictIgnoringFiles()

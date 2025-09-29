@@ -12,5 +12,6 @@ internal static class AddonProblemExplanations
         manager.Register<InvalidPublishedFileIdProblem>((problem, arg) => Texts.InvalidPublishedFileIdMessage);
         manager.Register<WorkshopVpkNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);
         manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
+        manager.Register<VpkAddonConflictProblem>((problem, arg) => Texts.VpkAddonConflictProblemExplain);
     }
 }

@@ -729,4 +729,19 @@
   <data name="Enum_AddonNodeSortMethod_Priority" xml:space="preserve">
     <value>按优先级排序</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="RemoveAll" xml:space="preserve">
+    <value>移除全部</value>
+  </data>
+  <data name="ConfirmIgnoreAllConflictingFiles" xml:space="preserve">
+    <value>你确定要忽略全部的冲突文件吗？</value>
+  </data>
+  <data name="ConfirmRemoveAllConflictIgnoringFiles" xml:space="preserve">
+    <value>你确定要移除全部的冲突忽略文件吗？</value>
+  </data>
+  <data name="VpkAddonConflictProblemExplain" xml:space="preserve">
+    <value>发现VPK文件冲突。</value>
+  </data>
 </root>

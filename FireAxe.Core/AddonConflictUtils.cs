@@ -1,16 +1,17 @@
 ﻿using SteamDatabase.ValvePak;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 
 namespace FireAxe;
 
 public static class AddonConflictUtils
 {
-    private static readonly ImmutableHashSet<string> s_commonIgnoringVpkFiles = [
-        "addoninfo.txt", "addonimage.jpg", 
+    private static readonly FrozenSet<string> s_commonIgnoringVpkFiles = FrozenSet.ToFrozenSet([
+        "addoninfo.txt", "addoninfo.jpg", "addonimage.jpg", "addonimage.vtf", 
         "sound/sound.cache", 
         "scripts/vscripts/mapspawn_addon.nut", "scripts/vscripts/response_testbed_addon.nut", "scripts/vscripts/scriptedmode_addon.nut", "scripts/vscripts/director_base_addon.nut"
-    ];
+    ]);
 
     public static Task<AddonConflictResult> FindConflicts(IEnumerable<AddonNode> addons, CancellationToken cancellationToken = default)
     {
@@ -21,6 +22,11 @@ public static class AddonConflictUtils
         {
             foreach (var addon in addon1.GetSelfAndDescendantsByDfsPreorder())
             {
+                if (!addon.IsEnabledInHierarchy)
+                {
+                    continue;
+                }
+
                 if (addon is VpkAddon vpkAddon)
                 {
                     if (vpkAddon.FullVpkFilePath is { } vpkPath)

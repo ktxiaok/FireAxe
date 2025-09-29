@@ -358,11 +358,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to ignore all the conflicting files? .
+        /// </summary>
+        public static string ConfirmIgnoreAllConflictingFiles {
+            get {
+                return ResourceManager.GetString("ConfirmIgnoreAllConflictingFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Higher version of files are opening. This will cause file information loss. Are you sure you want to continue?.
         /// </summary>
         public static string ConfirmOpenHigherVersionFileMessage {
             get {
                 return ResourceManager.GetString("ConfirmOpenHigherVersionFileMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to remove all the conflict ignoring files?.
+        /// </summary>
+        public static string ConfirmRemoveAllConflictIgnoringFiles {
+            get {
+                return ResourceManager.GetString("ConfirmRemoveAllConflictIgnoringFiles", resourceCulture);
             }
         }
         
@@ -1528,6 +1546,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string Remove {
+            get {
+                return ResourceManager.GetString("Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove All.
+        /// </summary>
+        public static string RemoveAll {
+            get {
+                return ResourceManager.GetString("RemoveAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rename.
         /// </summary>
         public static string Rename {
@@ -1821,6 +1857,15 @@ namespace FireAxe.Resources {
         public static string ViewsColon {
             get {
                 return ResourceManager.GetString("ViewsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VPK file conflicts found.  .
+        /// </summary>
+        public static string VpkAddonConflictProblemExplain {
+            get {
+                return ResourceManager.GetString("VpkAddonConflictProblemExplain", resourceCulture);
             }
         }
         

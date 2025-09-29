@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
              xmlns:r="using:FireAxe.Resources"
              xmlns:conv="using:FireAxe.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="800"
@@ -61,30 +62,49 @@
         <TextBlock
           Text="{x:Static r:Texts.ConflictingFiles}"/>
       </Expander.Header>
-      <Panel>
-        <TextBlock
-          IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
-          Classes="EmptyHint"/>
-        <ItemsControl
+      <StackPanel Orientation="Vertical">
+        <Button
+          Command="{Binding IgnoreAllConflictingFilesCommand}"
+          Content="{x:Static r:Texts.IgnoreAll}"
           IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-          ItemsSource="{Binding Addon.ConflictingFiles}">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
-              <DockPanel
-                Margin="2.5">
-                <TextBlock
-                  DockPanel.Dock="Left"
-                  Text="{Binding}"/>
-              </DockPanel>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Vertical"/>
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
-      </Panel>
+          Margin="2.5"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"/>
+        <Panel>
+          <TextBlock
+            IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+            Classes="EmptyHint"/>
+          <ItemsControl
+            IsVisible="{Binding Addon.ConflictingFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+            ItemsSource="{Binding Addon.ConflictingFiles}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel
+                  LastChildFill="False"
+                  Margin="2.5">
+                  <Button
+                    DockPanel.Dock="Right"
+                    Command="{Binding $parent[v:VpkAddonConflictingDetailsView].ViewModel.IgnoreConflictingFile}"
+                    CommandParameter="{Binding}"
+                    Content="{x:Static r:Texts.Ignore}"
+                    Margin="2.5"
+                    VerticalAlignment="Center"/>
+                  <SelectableTextBlock
+                    DockPanel.Dock="Left"
+                    Text="{Binding}"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Center"/>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Panel>
+      </StackPanel>
     </Expander>
 
     <!--conflict ignoring files-->
@@ -93,30 +113,49 @@
         <TextBlock
           Text="{x:Static r:Texts.ConflictIgnoringFiles}"/>
       </Expander.Header>
-      <Panel>
-        <TextBlock
-          IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
-          Classes="EmptyHint"/>
-        <ItemsControl
+      <StackPanel Orientation="Vertical">
+        <Button
+          Command="{Binding RemoveAllConflictIgnoringFilesCommand}"
+          Content="{x:Static r:Texts.RemoveAll}"
           IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-          ItemsSource="{Binding Addon.ConflictIgnoringFiles}">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
-              <DockPanel
-                Margin="2.5">
-                <TextBlock
-                  DockPanel.Dock="Left"
-                  Text="{Binding}"/>
-              </DockPanel>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Vertical"/>
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
-      </Panel>
+          Margin="2.5"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"/>
+        <Panel>
+          <TextBlock
+            IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+            Classes="EmptyHint"/>
+          <ItemsControl
+            IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+            ItemsSource="{Binding Addon.ConflictIgnoringFiles}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel
+                  Margin="2.5"
+                  LastChildFill="False">
+                  <Button
+                    DockPanel.Dock="Right"
+                    Command="{Binding $parent[v:VpkAddonConflictingDetailsView].ViewModel.RemoveConflictIgnoringFile}"
+                    CommandParameter="{Binding}"
+                    Content="{x:Static r:Texts.Remove}"
+                    Margin="2.5"
+                    VerticalAlignment="Center"/>
+                  <SelectableTextBlock
+                    DockPanel.Dock="Left"
+                    Text="{Binding}"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Center"/>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Panel>
+      </StackPanel>
     </Expander>
   </StackPanel>
 </UserControl>

@@ -729,4 +729,19 @@
   <data name="Enum_AddonNodeSortMethod_Priority" xml:space="preserve">
     <value>Sort by Priority</value>
   </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RemoveAll" xml:space="preserve">
+    <value>Remove All</value>
+  </data>
+  <data name="ConfirmIgnoreAllConflictingFiles" xml:space="preserve">
+    <value>Are you sure you want to ignore all the conflicting files? </value>
+  </data>
+  <data name="ConfirmRemoveAllConflictIgnoringFiles" xml:space="preserve">
+    <value>Are you sure you want to remove all the conflict ignoring files?</value>
+  </data>
+  <data name="VpkAddonConflictProblemExplain" xml:space="preserve">
+    <value>VPK file conflicts found.  </value>
+  </data>
 </root>

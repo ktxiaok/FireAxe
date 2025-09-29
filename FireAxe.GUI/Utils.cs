@@ -1,4 +1,7 @@
-﻿using ReactiveUI;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.VisualTree;
+using ReactiveUI;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -73,5 +76,12 @@ internal static class Utils
             disposable.Dispose();
             disposable = null;
         }
+    }
+
+    public static Window GetRootWindow(Visual visual)
+    {
+        ArgumentNullException.ThrowIfNull(visual);
+
+        return (visual.GetVisualRoot() as Window) ?? throw new InvalidOperationException($"Failed to get the root window of {visual.GetType().FullName}");
     }
 }
