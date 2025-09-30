@@ -6,26 +6,34 @@ using System.Globalization;
 
 namespace FireAxe;
 
-public static class LanguageManager
+public sealed class LanguageManager
 {
-    private static ImmutableHashSet<string> s_supportedLanguages = ["en-US", "zh-Hans"];
+    private static ImmutableHashSet<string> s_supportedLanguages = ["en", "zh-Hans"];
 
-    private static string? s_currentLanguage = null;
+    private static readonly Lazy<LanguageManager> s_instance = new(() => new LanguageManager());
 
-    public static IEnumerable<string> SupportedLanguages => s_supportedLanguages;
+    private readonly CultureInfo _defaultCulture = CultureInfo.CurrentUICulture; 
 
-    public static string? CurrentLanguage
+    private LanguageManager()
     {
-        get => s_currentLanguage;
-        set
-        {
-            s_currentLanguage = value;
-            var culture = value == null ? null : new CultureInfo(value);
-            Texts.Culture = culture;
-            if (culture != null)
-            {
-                CultureInfo.CurrentUICulture = culture;
-            }
-        }
+
     }
+
+    public static IReadOnlySet<string> SupportedLanguages => s_supportedLanguages;
+
+    public static LanguageManager Instance => s_instance.Value;
+
+    public CultureInfo DefaultCulture => _defaultCulture;
+
+    public void SetCurrentLanguage(CultureInfo? culture)
+    {
+        culture ??= DefaultCulture;
+
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+    }
+
+    public void SetCurrentLanguage(string? language) => SetCurrentLanguage(language is null ? null : new CultureInfo(language));
 }

@@ -15,19 +15,17 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
 {
     public AddonTagEditorWindow()
     {
-        this.WhenAnyValue(x => x.ViewModel)
-            .WhereNotNull()
-            .Subscribe(viewModel => ConnectViewModel(viewModel));
-
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
 
+        this.RegisterViewModelConnection(ConnectViewModel);
+
         InitializeComponent();
     }
 
-    private void ConnectViewModel(AddonTagEditorViewModel viewModel)
+    private void ConnectViewModel(AddonTagEditorViewModel viewModel, CompositeDisposable disposables)
     {
         viewModel.AddTagInteraction.RegisterHandler(async (context) =>
         {
@@ -38,16 +36,16 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
             addTagWindow.Input = context.Input;
             var result = await addTagWindow.ShowDialog<string>(this);
             context.SetOutput(result);
-        });
+        }).DisposeWith(disposables);
         viewModel.ShowInputCannotBeEmptyInteraction.RegisterHandler(async (context) =>
         {
             await CommonMessageBoxes.ShowInfo(this, Texts.InputCannotBeEmptyMessage, Texts.Error);
             context.SetOutput(Unit.Default);
-        });
+        }).DisposeWith(disposables);
         viewModel.ShowTagExistInteraction.RegisterHandler(async (context) =>
         {
             await CommonMessageBoxes.ShowInfo(this, Texts.TagNameExistMessage, Texts.Error);
             context.SetOutput(Unit.Default);
-        });
+        }).DisposeWith(disposables);
     }
 }

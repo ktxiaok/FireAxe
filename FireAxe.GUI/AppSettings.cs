@@ -1,6 +1,7 @@
 ﻿using Avalonia.Styling;
 using FireAxe.ViewModels;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using ReactiveUI;
 using Serilog;
 using System;
@@ -10,9 +11,18 @@ using System.Reactive.Disposables;
 namespace FireAxe;
 
 [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-public class AppSettings : ObservableObject, ISaveable, IDisposable
+public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
 {
     public const string SettingsFileName = "Settings.json";
+
+    private static readonly JsonSerializerSettings s_jsonSettings = new()
+    {
+        Formatting = Formatting.Indented,
+        Converters =
+        {
+            new StringEnumConverter()
+        }
+    };
 
     private bool _disposed = false;
     private CompositeDisposable _disposables = new();
@@ -47,7 +57,6 @@ public class AppSettings : ObservableObject, ISaveable, IDisposable
             .Subscribe(_ => RequestSave = true);
 
         LoadFile();
-        LanguageManager.CurrentLanguage = Language;
     }
 
     public bool RequestSave { get; set; } = true;
@@ -120,10 +129,19 @@ public class AppSettings : ObservableObject, ISaveable, IDisposable
         get => _language;
         set
         {
-            if (NotifyAndSetIfChanged(ref _language, value))
+            if (value is not null && !LanguageManager.SupportedLanguages.Contains(value))
             {
-                RequestSave = true;
+                value = null;
             }
+            if (value == _language)
+            {
+                return;
+            }
+            
+            LanguageManager.Instance.SetCurrentLanguage(value);
+            _language = value;
+            NotifyChanged();
+            RequestSave = true;
         }
     }
 
@@ -164,17 +182,19 @@ public class AppSettings : ObservableObject, ISaveable, IDisposable
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            if (value == _gamePath)
-            {
-                return;
-            }
             if (value.Length > 0)
             {
                 if (!FileUtils.IsValidPath(value) || !Path.IsPathRooted(value))
                 {
                     throw new ArgumentException("The path is invalid.");
                 }
+                value = FileUtils.NormalizePath(value);
             }
+            if (value == _gamePath)
+            {
+                return;
+            }
+
             _gamePath = value;
             NotifyChanged();
             RequestSave = true;
@@ -239,12 +259,12 @@ public class AppSettings : ObservableObject, ISaveable, IDisposable
         {
             if (File.Exists(_settingsFilePath))
             {
-                JsonConvert.PopulateObject(File.ReadAllText(_settingsFilePath), this);
+                JsonConvert.PopulateObject(File.ReadAllText(_settingsFilePath), this, s_jsonSettings);
             }
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Exception in AppSettings.ReadFile.");
+            Log.Error(ex, "Exception occurred during AppSettings.LoadFile.");
         }
     }
 
@@ -252,11 +272,11 @@ public class AppSettings : ObservableObject, ISaveable, IDisposable
     {
         try
         {
-            File.WriteAllText(_settingsFilePath, JsonConvert.SerializeObject(this, Formatting.Indented));
+            File.WriteAllText(_settingsFilePath, JsonConvert.SerializeObject(this, s_jsonSettings));
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Exception in AppSettings.WriteFile.");
+            Log.Error(ex, "Exception occurred during AppSettings.Save.");
         }
     }
 

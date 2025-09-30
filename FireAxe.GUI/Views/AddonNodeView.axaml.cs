@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+using Avalonia.Interactivity;
 using FireAxe.ViewModels;
 using FireAxe.Resources;
 using ReactiveUI;
@@ -15,36 +16,36 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             this.WhenAnyValue(x => x.ViewModel)
-            .Subscribe(viewModel =>
-            {
-                ClearSectionViews();
-                if (viewModel != null)
+                .Subscribe(viewModel =>
                 {
-                    if (viewModel is AddonGroupViewModel addonGroupViewModel)
+                    ClearSectionViews();
+                    if (viewModel != null)
                     {
-                        AddSectionView(new AddonGroupSectionView()
+                        if (viewModel is AddonGroupViewModel addonGroupViewModel)
                         {
-                            ViewModel = addonGroupViewModel
-                        });
-                    }
-                    else if (viewModel is VpkAddonViewModel vpkAddonViewModel)
-                    {
-                        AddSectionView(new VpkAddonSectionView()
-                        {
-                            ViewModel = vpkAddonViewModel
-                        });
-                        
-                        if (viewModel is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
-                        {
-                            AddSectionView(new WorkshopVpkAddonSectionView()
+                            AddSectionView(new AddonGroupSectionView()
                             {
-                                ViewModel = workshopVpkAddonViewModel
+                                ViewModel = addonGroupViewModel
                             });
                         }
+                        else if (viewModel is VpkAddonViewModel vpkAddonViewModel)
+                        {
+                            AddSectionView(new VpkAddonSectionView()
+                            {
+                                ViewModel = vpkAddonViewModel
+                            });
+                        
+                            if (viewModel is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
+                            {
+                                AddSectionView(new WorkshopVpkAddonSectionView()
+                                {
+                                    ViewModel = workshopVpkAddonViewModel
+                                });
+                            }
+                        }
                     }
-                }
-            })
-            .DisposeWith(disposables);
+                })
+                .DisposeWith(disposables);
         });
 
         InitializeComponent();
@@ -54,7 +55,7 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
         customizeImageButton.Click += CustomizeImageButton_Click;
     }
 
-    private void AutoSetNameButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void AutoSetNameButton_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext != null)
         {
@@ -71,9 +72,9 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
 
             if (DataContext is VpkAddonViewModel vpkAddonViewModel)
             {
-                if (vpkAddonViewModel.Info is var info && info != null)
+                if (vpkAddonViewModel.Info is { } info && info.Title is { } title)
                 {
-                    if (TrySetName(info.Title))
+                    if (TrySetName(title))
                     {
                         return;
                     }
@@ -101,44 +102,44 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
         }
     }
 
-    private void EditTagButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void EditTagButton_Click(object? sender, RoutedEventArgs e)
     {
-        var window = FindWindow();
-        if (window == null)
+        var viewModel = ViewModel;
+        if (viewModel is null)
         {
             return;
         }
-        var viewModel = ViewModel;
-        if (viewModel == null)
+        var addon = viewModel.Addon;
+        if (addon is null)
         {
             return;
         }
 
-        var tagEditorWindow = new AddonTagEditorWindow()
+        var tagEditorWindow = new AddonTagEditorWindow
         {
-            DataContext = new AddonTagEditorViewModel(viewModel.Addon)
+            DataContext = new AddonTagEditorViewModel(addon)
         };
-        tagEditorWindow.ShowDialog(window);
+        tagEditorWindow.ShowDialog(this.GetRootWindow());
     }
 
-    private void CustomizeImageButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void CustomizeImageButton_Click(object? sender, RoutedEventArgs e)
     {
         var viewModel = ViewModel;
-        if (viewModel == null)
+        if (viewModel is null)
         {
             return;
         }
-        var window = FindWindow();
-        if (window == null)
+        var addon = viewModel.Addon;
+        if (addon is null)
         {
             return;
         }
 
         var customizeImageWindow = new AddonNodeCustomizeImageWindow()
         {
-            DataContext = new AddonNodeCustomizeImageViewModel(viewModel.Addon)
+            DataContext = new AddonNodeCustomizeImageViewModel(addon)
         };
-        customizeImageWindow.ShowDialog(window);
+        customizeImageWindow.ShowDialog(this.GetRootWindow());
     }
 
     private void ClearSectionViews()
@@ -149,10 +150,5 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
     private void AddSectionView(Control control)
     {
         sectionViewContainerControl.Children.Add(new AddonNodeSectionViewDecorator(control));
-    }
-
-    private Window? FindWindow()
-    {
-        return VisualRoot as Window;
     }
 }

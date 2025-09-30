@@ -15,8 +15,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
     private CancellationTokenSource _destructionCancellationTokenSource = new();
 
     private bool _isEnabled = false;
-
     private bool _allowEnabledInHierarchy = true;
+    private bool _isBusySettingEnabled = false;
 
     private int _blockMove = 0;
 
@@ -59,7 +59,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
 
         _fileNotExistProblemSource = new(this);
     }
-
+ 
     public virtual Type SaveType => typeof(AddonNodeSave);
 
     public bool IsValid => _isValid;
@@ -73,15 +73,24 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
             {
                 return;
             }
+            if (_isBusySettingEnabled)
+            {
+                return;
+            }
+
+            _isBusySettingEnabled = true;
+
             _isEnabled = value;
             NotifyChanged();
             UpdateEnabledInHierarchy();
-            if (Group != null)
+            if (Group is { } group)
             {
-                Group.NotifyChildEnableOrDisable(this);
+                group.NotifyChildEnableOrDisable(this);
             }
             //AutoCheck();
             Root.RequestSave = true;
+
+            _isBusySettingEnabled = false;
         }
     }
 
@@ -219,17 +228,18 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
         set
         {
             ArgumentNullException.ThrowIfNull(value);
+            value = value.Trim(' ', '.');
             if (value.Length == 0)
             {
-                throw new ArgumentException("The value is empty.");
+                throw new ArgumentException("Cannot set the name to a empty string.");
+            }
+            if (value == NullName)
+            {
+                throw new ArgumentException($"Cannot set the name to \"{NullName}\" because it's a reserved name.");
             }
             if (value == _name)
             {
                 return;
-            }
-            if (value == NullName)
-            {
-                throw new ArgumentException($"Couldn't set the name to \"{NullName}\" because it's a reserved name.");
             }
 
             ThrowIfMoveDenied();

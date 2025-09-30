@@ -98,10 +98,7 @@ public abstract class VpkAddon : AddonNode
                 using (pak)
                 {
                     addonInfo = VpkUtils.GetAddonInfo(pak);
-                    if (addonInfo != null)
-                    {
-                        _addonInfo.SetTarget(addonInfo);
-                    }
+                    _addonInfo.SetTarget(addonInfo);
                 }
             }
         }

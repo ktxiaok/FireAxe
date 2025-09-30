@@ -718,7 +718,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             IEnumerable<AddonNode> addonNodes = CurrentGroup?.Children ?? Root.Nodes;
             var resultNodes = new ObservableCollection<AddonNode>();
             SearchResultNodes = new ReadOnlyObservableCollection<AddonNode>(resultNodes);
-            Action<AddonNode> consumer = (addonNode) => Dispatcher.UIThread.Invoke(() => resultNodes.Add(addonNode));
+            Action<AddonNode> consumer = (addonNode) => Dispatcher.UIThread.Invoke(() => resultNodes.Add(addonNode), DispatcherPriority.Background);
             try
             {
                 await AddonNodeSearchUtils.SearchAsync(addonNodes, SearchText, SearchOptions, consumer, _searchCts.Token);

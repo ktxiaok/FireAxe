@@ -11,47 +11,23 @@ namespace FireAxe.Views;
 
 public partial class AppSettingsWindow : ReactiveWindow<AppSettingsViewModel> 
 {
-    private CompositeDisposable? _viewModelConnection = null;
-
     public AppSettingsWindow()
     {
-        InitializeComponent();
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            this.WhenAnyValue(x => x.ViewModel)
-            .Subscribe((viewModel) =>
-            {
-                ConnectViewModel(viewModel);
-            }).DisposeWith(disposables);
-
-            Disposable.Create(() =>
-            {
-                DisconnectViewModel();
-            }).DisposeWith(disposables);
+            
         });
+
+        this.RegisterViewModelConnection(ConnectViewModel);
+
+        InitializeComponent();
     }
 
-    private void ConnectViewModel(AppSettingsViewModel? viewModel)
+    private void ConnectViewModel(AppSettingsViewModel viewModel, CompositeDisposable disposables)
     {
-        DisconnectViewModel();
-        if (viewModel == null)
-        {
-            return;
-        }
-        _viewModelConnection = new();
-
         viewModel.ChooseDirectoryInteraction.RegisterHandler(async (context) =>
         {
             context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
-        }).DisposeWith(_viewModelConnection);
-    }
-
-    private void DisconnectViewModel()
-    {
-        if (_viewModelConnection != null)
-        {
-            _viewModelConnection.Dispose();
-            _viewModelConnection = null;
-        }
+        }).DisposeWith(disposables);
     }
 }

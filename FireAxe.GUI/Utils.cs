@@ -5,6 +5,7 @@ using ReactiveUI;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Runtime.InteropServices;
 
 namespace FireAxe;
@@ -78,10 +79,38 @@ internal static class Utils
         }
     }
 
-    public static Window GetRootWindow(Visual visual)
+    public static Window GetRootWindow(this Visual visual)
     {
         ArgumentNullException.ThrowIfNull(visual);
 
         return (visual.GetVisualRoot() as Window) ?? throw new InvalidOperationException($"Failed to get the root window of {visual.GetType().FullName}");
+    }
+
+    public static void RegisterViewModelConnection<TViewModel>(this IViewFor<TViewModel> view, Action<TViewModel, CompositeDisposable> connect) where TViewModel : class
+    {
+        ArgumentNullException.ThrowIfNull(view);
+        ArgumentNullException.ThrowIfNull(connect);
+
+        view.WhenActivated((CompositeDisposable disposables) =>
+        {
+            CompositeDisposable? connectionDisposable = null;
+
+            void Disconnect() => Utils.DisposeAndSetNull(ref connectionDisposable);
+
+            view.WhenAnyValue(x => x.ViewModel)
+                .Subscribe(viewModel =>
+                {
+                    Disconnect();
+                    if (viewModel is null)
+                    {
+                        return;
+                    }
+                    connectionDisposable = new();
+                    connect(viewModel, connectionDisposable);
+                })
+                .DisposeWith(disposables);
+
+            Disposable.Create(Disconnect).DisposeWith(disposables);
+        });
     }
 }

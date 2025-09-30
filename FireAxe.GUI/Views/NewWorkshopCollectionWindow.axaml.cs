@@ -15,29 +15,28 @@ public partial class NewWorkshopCollectionWindow : ReactiveWindow<NewWorkshopCol
 {
     public NewWorkshopCollectionWindow()
     {
-        InitializeComponent();
+        this.WhenActivated((CompositeDisposable disposables) =>
+        {
 
-        this.WhenAnyValue(x => x.ViewModel)
-            .WhereNotNull()
-            .Subscribe(viewModel =>
+        });
+
+        this.RegisterViewModelConnection((viewModel, disposables) =>
             {
                 viewModel.Close += Close;
+                Disposable.Create(() => viewModel.Close -= Close).DisposeWith(disposables);
 
                 viewModel.ShowInvalidCollectionIdInteraction.RegisterHandler(async (context) =>
                 {
                     await CommonMessageBoxes.ShowInfo(this, Texts.InvalidCollectionIdMessage, Texts.Error);
                     context.SetOutput(Unit.Default);
-                });
+                }).DisposeWith(disposables);
                 viewModel.ShowCreateFailedInteraction.RegisterHandler(async (context) =>
                 {
                     await CommonMessageBoxes.ShowInfo(this, Texts.CreateCollectionFailedMessage, Texts.Error);
                     context.SetOutput(Unit.Default);
-                });
+                }).DisposeWith(disposables);
             });
 
-        this.WhenActivated((CompositeDisposable disposables) =>
-        {
-            
-        });
+        InitializeComponent();
     }
 }

@@ -15,33 +15,22 @@ namespace FireAxe.Views;
 
 public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplorerViewModel>
 {
-    private IDisposable? _viewModelDisposable = null;
-
     public AddonNodeExplorerView()
     {
         InitializeComponent();
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            this.WhenAnyValue(x => x.ViewModel)
-            .WhereNotNull()
-            .Subscribe((viewModel) =>
-            {
-                ConnectViewModel(viewModel);
-            })
-            .DisposeWith(disposables);
-
             var topLevel = TopLevel.GetTopLevel(this)!;
             topLevel.KeyDown += HandleKeyDown;
 
             Disposable.Create(() =>
             {
-                DisconnectViewModel();
-
                 topLevel.KeyDown -= HandleKeyDown;
-            })
-            .DisposeWith(disposables);
+            }).DisposeWith(disposables);
         });
+
+        this.RegisterViewModelConnection(ConnectViewModel);
 
         DoubleTapped += AddonNodeExplorerView_DoubleTapped;
         AddHandler(ListBox.SelectionChangedEvent, AddonNodeExplorerView_SelectionChanged);
@@ -53,12 +42,8 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         };
     }
 
-    private void ConnectViewModel(AddonNodeExplorerViewModel viewModel)
+    private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
     {
-        DisconnectViewModel();
-        var disposables = new CompositeDisposable();
-        _viewModelDisposable = disposables;
-
         var setSelection = (IEnumerable<AddonNode> nodes) =>
         {
             var listBox = FindActiveListBox();
@@ -80,7 +65,7 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
 
         viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
         {
-            await CommonMessageBoxes.ShowException(FindWindow(), context.Input);
+            await CommonMessageBoxes.ShowException(this.GetRootWindow(), context.Input);
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
 
@@ -92,21 +77,21 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             {
                 message += '\n' + Texts.RetainFileMessage;
             }
-            bool result = await CommonMessageBoxes.Confirm(FindWindow(), message, Texts.ConfirmDelete);
+            bool result = await CommonMessageBoxes.Confirm(this.GetRootWindow(), message, Texts.ConfirmDelete);
             context.SetOutput(result);
         }).DisposeWith(disposables);
 
         viewModel.ReportInvalidMoveInteraction.RegisterHandler(async (context) =>
         {
             string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.InvalidMoveMessage;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
             context.SetOutput(reply);
         }).DisposeWith(disposables);
 
         viewModel.ReportNameExistsForMoveInteraction.RegisterHandler(async (context) =>
         {
             string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.ItemNameExists;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
             context.SetOutput(reply);
         }).DisposeWith(disposables);
 
@@ -117,7 +102,7 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             Exception ex = input.Item2;
             string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
             string message = string.Format(Texts.CantMoveItemWithName, name) + '\n' + exceptionMessage;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
             context.SetOutput(reply);
         }).DisposeWith(disposables);
 
@@ -125,25 +110,6 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         {
             viewModel.SetSelection -= setSelection;
         }).DisposeWith(disposables);
-    }
-
-    private void DisconnectViewModel()
-    {
-        if (_viewModelDisposable != null)
-        {
-            _viewModelDisposable.Dispose();
-            _viewModelDisposable = null;
-        }
-    }
-
-    private Window FindWindow()
-    {
-        var visualRoot = VisualRoot;
-        if (visualRoot == null)
-        {
-            throw new Exception("VisualRoot is null.");
-        }
-        return (Window)visualRoot;
     }
 
     private ListBox? FindActiveListBox()

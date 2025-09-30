@@ -2,9 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform.Storage;
 using FireAxe.ViewModels;
-using FireAxe.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
@@ -27,7 +25,7 @@ public partial class App : Application
         Directory.CreateDirectory(_documentDirectoryPath);
 
         var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", "8.0"));
+        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", null));
 
         Services = new ServiceCollection()
             .AddSingleton(this)

@@ -7,9 +7,9 @@ namespace FireAxe;
 
 internal static class VpkUtils
 {
-    public static VpkAddonInfo GetAddonInfo(Package pak)
+    public static VpkAddonInfo? GetAddonInfo(Package pak)
     {
-        var addonInfo = new VpkAddonInfo();
+        VpkAddonInfo? addonInfo = null;
 
         try
         {
@@ -21,34 +21,28 @@ internal static class VpkUtils
                 var stream = new MemoryStream(data);
                 var document = kv.Deserialize(stream);
 
-                var version = document["addonversion"];
-                if (version != null)
-                {
-                    addonInfo.Version = ((string)version).Trim();
-                }
+                var version = document.TryGetChildValueIgnoreCase("addonversion");
+                var title = document.TryGetChildValueIgnoreCase("addontitle");
+                var author = document.TryGetChildValueIgnoreCase("addonauthor");
+                var desc = document.TryGetChildValueIgnoreCase("addondescription");
 
-                var title = document["addontitle"];
-                if (title != null)
-                {
-                    addonInfo.Title = ((string)title).Trim();
-                }
+                string? versionStr = version?.ToString();
+                string? titleStr = title?.ToString();
+                string? authorStr = author?.ToString();
+                string? descStr = desc?.ToString();
 
-                var author = document["addonauthor"];
-                if (author != null)
+                addonInfo = new VpkAddonInfo
                 {
-                    addonInfo.Author = ((string)author).Trim();
-                }
-
-                var desc = document["addonDescription"];
-                if (desc != null)
-                {
-                    addonInfo.Description = (string)desc;
-                }
+                    Version = versionStr,
+                    Title = titleStr,
+                    Author = authorStr,
+                    Description = descStr
+                };
             }
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Exception in VpkUtils.GetAddonInfo.");
+            Log.Warning(ex, "Exception occurred during VpkUtils.GetAddonInfo.");
         }
 
         return addonInfo;

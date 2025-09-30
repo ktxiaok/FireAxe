@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 
@@ -125,8 +126,8 @@ public static class FileUtils
         }
     }
 
-    private static ImmutableHashSet<char> s_fileNameReservedChars = ['/', '?', '<', '>', '\\', ':', '*', '|', '"'];
-    private static ImmutableHashSet<string> s_fileNameReserved = ["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"];
+    private static readonly FrozenSet<char> s_reservedFileNameChars = FrozenSet.ToFrozenSet(['/', '?', '<', '>', '\\', ':', '*', '|', '"']);
+    private static readonly FrozenSet<string> s_reservedUppercaseFileNames = FrozenSet.ToFrozenSet(["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"]);
 
     // may return empty string
     public static string SanitizeFileName(string name)
@@ -161,7 +162,7 @@ public static class FileUtils
             }
             
             // reserved characters
-            if (s_fileNameReservedChars.Contains(c))
+            if (s_reservedFileNameChars.Contains(c))
             {
                 continue;
             }
@@ -186,7 +187,7 @@ public static class FileUtils
 
         string result = new string(chars.AsSpan(0, writePos));
         // reserved file name
-        if (s_fileNameReserved.Contains(result))
+        if (s_reservedUppercaseFileNames.Contains(result.ToUpperInvariant()))
         {
             result = "";
         }

@@ -13,43 +13,22 @@ namespace FireAxe.Views;
 
 public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
-    private CompositeDisposable? _viewModelConnection = null;
-
     private WindowReference<CheckingUpdateWindow>? _checkingUpdateWindow = null;
 
     public MainWindow()
     {
-        InitializeComponent();
-
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            this.WhenAnyValue(x => x.ViewModel)
-            .Subscribe((viewModel) =>
-            {
-                ConnectViewModel(viewModel);
-            })
-            .DisposeWith(disposables);
-
-            Disposable.Create(() =>
-            {
-                DisconnectViewModel();
-            })
-            .DisposeWith(disposables);
-
             ViewModel?.InitIfNot();
         });
+
+        this.RegisterViewModelConnection(ConnectViewModel);
+
+        InitializeComponent();
     }
 
-    private void ConnectViewModel(MainWindowViewModel? viewModel)
+    private void ConnectViewModel(MainWindowViewModel viewModel, CompositeDisposable disposables)
     {
-        DisconnectViewModel();
-        if (viewModel == null)
-        {
-            return;
-        }
-        var disposables = new CompositeDisposable();
-        _viewModelConnection = disposables;
-
         viewModel.ChooseDirectoryInteraction.RegisterHandler(async (context) =>
         {
             context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
@@ -173,14 +152,5 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             context.SetOutput(confirm);
         })
         .DisposeWith(disposables);
-    }
-
-    private void DisconnectViewModel()
-    {
-        if (_viewModelConnection != null)
-        {
-            _viewModelConnection.Dispose();
-            _viewModelConnection = null;
-        }
     }
 }
