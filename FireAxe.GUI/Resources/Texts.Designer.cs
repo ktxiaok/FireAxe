@@ -1249,6 +1249,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Missing Addon.
+        /// </summary>
+        public static string MissingAddon {
+            get {
+                return ResourceManager.GetString("MissingAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More.
         /// </summary>
         public static string More {

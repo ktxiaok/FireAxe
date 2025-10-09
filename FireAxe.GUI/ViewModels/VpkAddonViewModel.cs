@@ -13,34 +13,13 @@ public abstract class VpkAddonViewModel : AddonNodeViewModel
 {
     private VpkAddonInfo? _info = null;
 
+    private readonly ObservableAsPropertyHelper<VpkAddonConflictingDetailsViewModel?> _conflictingDetailsViewModel;
+
     public VpkAddonViewModel(VpkAddon addon) : base(addon)
     {
-        IgnoreAllConflictingFilesCommand = ReactiveCommand.CreateFromTask(async () =>
-        {
-            bool confirm = await ConfirmIgnoreAllConflictingFilesInteraction.Handle(Unit.Default);
-            if (!confirm)
-            {
-                return;
-            }
-
-            IgnoreAllConflictingFiles();
-        });
-        RemoveAllConflictIgnoringFilesCommand = ReactiveCommand.CreateFromTask(async () =>
-        {
-            bool confirm = await ConfirmRemoveAllConflictIgnoringFilesInteraction.Handle(Unit.Default);
-            if (!confirm)
-            {
-                return;
-            }
-
-            var addon = Addon;
-            if (addon is null)
-            {
-                return;
-            }
-
-            addon.ClearConflictIgnoringFiles();
-        });
+        _conflictingDetailsViewModel = this.WhenAnyValue(x => x.Addon)
+            .Select(addon => addon is null ? null : new VpkAddonConflictingDetailsViewModel(addon))
+            .ToProperty(this, nameof(ConflictingDetailsViewModel), deferSubscription: true);
     }
 
     public new VpkAddon? Addon => (VpkAddon?)base.Addon;
@@ -53,60 +32,7 @@ public abstract class VpkAddonViewModel : AddonNodeViewModel
         private set => this.RaiseAndSetIfChanged(ref _info, value);
     }
 
-    public ReactiveCommand<Unit, Unit> IgnoreAllConflictingFilesCommand { get; }
-
-    public ReactiveCommand<Unit, Unit> RemoveAllConflictIgnoringFilesCommand { get; }
-
-    public Interaction<Unit, bool> ConfirmIgnoreAllConflictingFilesInteraction { get; } = new();
-
-    public Interaction<Unit, bool> ConfirmRemoveAllConflictIgnoringFilesInteraction { get; } = new();
-
-    public void IgnoreConflictingFile(string? file)
-    {
-        if (file is null)
-        {
-            return;
-        }
-
-        var addon = Addon;
-        if (addon is null)
-        {
-            return;
-        }
-
-        addon.AddConflictIgnoringFile(file);
-    }
-
-    public void RemoveConflictIgnoringFile(string? file)
-    {
-        if (file is null)
-        {
-            return;
-        }
-
-        var addon = Addon;
-        if (addon is null)
-        {
-            return;
-        }
-
-        addon.RemoveConflictIgnoringFile(file);
-    }
-
-    public void IgnoreAllConflictingFiles()
-    {
-        var addon = Addon;
-        if (addon is null)
-        {
-            return;
-        }
-
-        string[] files = [.. addon.ConflictingFiles];
-        foreach (var file in files)
-        {
-            addon.AddConflictIgnoringFile(file);
-        }
-    }
+    public VpkAddonConflictingDetailsViewModel? ConflictingDetailsViewModel => _conflictingDetailsViewModel.Value;
 
     protected override void OnRefresh(CancellationToken cancellationToken)
     {

@@ -35,12 +35,36 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     private CancellationTokenSource? _refreshCts = null;
 
     public AddonNodeSimpleViewModel(AddonNode addon)
+        : this(addon ?? throw new ArgumentNullException(nameof(addon)), null, default)
     {
-        ArgumentNullException.ThrowIfNull(addon);
-        _addonRoot = addon.Root;
-        Addon = addon;
 
-        ToggleEnabledCommand = ReactiveCommand.Create(() => 
+    }
+
+    public AddonNodeSimpleViewModel(AddonRoot addonRoot, Guid addonId)
+        : this(null, addonRoot, addonId)
+    {
+
+    }
+
+    public AddonNodeSimpleViewModel(AddonNode? addon, AddonRoot? addonRoot, Guid addonId)
+    {
+        if (addon is null)
+        {
+            ArgumentNullException.ThrowIfNull(addonRoot);
+            _addonRoot = addonRoot;
+            LastAddonId = addonId;
+            if (_addonRoot.TryGetDescendantNodeById(addonId, out var node))
+            {
+                Addon = node;
+            }
+        }
+        else
+        {
+            _addonRoot = addon.Root;
+            Addon = addon;
+        }
+
+        ToggleEnabledCommand = ReactiveCommand.Create(() =>
         {
             if (_addon == null)
             {

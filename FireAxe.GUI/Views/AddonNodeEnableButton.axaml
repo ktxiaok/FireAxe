@@ -7,8 +7,9 @@
              x:Class="FireAxe.Views.AddonNodeEnableButton"
              x:DataType="vm:AddonNodeSimpleViewModel">
   <Design.DataContext>
-    <vm:AddonNodeSimpleViewModelDesign/>
+    <vm:AddonNodeViewModelDesign/>
   </Design.DataContext>
+  
   <Button
     Name="button"
     Command="{Binding ToggleEnabledCommand}"

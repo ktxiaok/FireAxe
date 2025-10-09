@@ -63,6 +63,9 @@ public static class IHierarchyNodeExtensions
         }
     }
 
+    public static IEnumerable<T> GetDescendants<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        => node.GetDescendantsByDfsPreorder();
+
     public static IEnumerable<T> GetDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
     {
         return new EnumerableWrapper<T>(() => GetDescendantsEnumeratorByDfsPreorder(node));

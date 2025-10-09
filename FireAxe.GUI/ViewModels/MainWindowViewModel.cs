@@ -419,7 +419,7 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
     {
         if (_addonRoot != null)
         {
-            foreach (var addonNode in _addonRoot.GetDescendantNodes())
+            foreach (var addonNode in _addonRoot.GetDescendants())
             {
                 addonNode.ClearCaches();
             }
@@ -430,7 +430,7 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
     {
         if (_addonRoot != null)
         {
-            foreach (var addonNode in _addonRoot.GetDescendantNodes())
+            foreach (var addonNode in _addonRoot.GetDescendants())
             {
                 if (addonNode is AddonGroup addonGroup)
                 {
@@ -594,7 +594,7 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
             return;
         }
 
-        foreach (var addonNode in _addonRoot.GetDescendantNodes())
+        foreach (var addonNode in _addonRoot.GetDescendants())
         {
             if (addonNode is WorkshopVpkAddon workshopVpkAddon)
             {

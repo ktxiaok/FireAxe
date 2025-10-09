@@ -63,7 +63,8 @@
           Text="{x:Static r:Texts.ConflictingDetails}"
           Classes="Heading1"/>
       </Expander.Header>
-      <v:VpkAddonConflictingDetailsView/>
+      <v:VpkAddonConflictingDetailsView
+        DataContext="{Binding ConflictingDetailsViewModel}"/>
     </Expander>
   </StackPanel>
 </UserControl>

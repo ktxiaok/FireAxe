@@ -6,7 +6,7 @@ using System.Collections.Specialized;
  
 namespace FireAxe;
 
-public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
+public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 {
     public const string NullName = "__null__";
 
@@ -911,7 +911,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>
             Id = save.Id;
         }
         IsEnabled = save.IsEnabled;
-        Name = save.Name;
+        try
+        {
+            Name = save.Name;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Exception occurred during setting AddonNode.Name at AddonNode.OnLoadSave.");
+        }
         Priority = save.Priority;
         if (save.CreationTime != default)
         {

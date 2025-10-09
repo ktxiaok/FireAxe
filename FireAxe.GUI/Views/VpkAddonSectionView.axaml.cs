@@ -16,23 +16,9 @@ public partial class VpkAddonSectionView : ReactiveUserControl<VpkAddonViewModel
     {
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            
+
         });
 
-        this.RegisterViewModelConnection(ConnectViewModel);
-
         InitializeComponent();
-    }
-
-    private void ConnectViewModel(VpkAddonViewModel viewModel, CompositeDisposable disposables)
-    {
-        viewModel.ConfirmIgnoreAllConflictingFilesInteraction.RegisterHandler(async context =>
-        {
-            context.SetOutput(await CommonMessageBoxes.Confirm(this.GetRootWindow(), Texts.ConfirmIgnoreAllConflictingFiles, Texts.Warning));
-        }).DisposeWith(disposables);
-        viewModel.ConfirmRemoveAllConflictIgnoringFilesInteraction.RegisterHandler(async context =>
-        {
-            context.SetOutput(await CommonMessageBoxes.Confirm(this.GetRootWindow(), Texts.ConfirmRemoveAllConflictIgnoringFiles, Texts.Warning));
-        }).DisposeWith(disposables);
     }
 }

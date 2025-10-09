@@ -744,4 +744,7 @@
   <data name="VpkAddonConflictProblemExplain" xml:space="preserve">
     <value>VPK file conflicts found.  </value>
   </data>
+  <data name="MissingAddon" xml:space="preserve">
+    <value>Missing Addon</value>
+  </data>
 </root>

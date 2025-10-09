@@ -13,26 +13,18 @@ public static class AddonConflictUtils
         "scripts/vscripts/mapspawn_addon.nut", "scripts/vscripts/response_testbed_addon.nut", "scripts/vscripts/scriptedmode_addon.nut", "scripts/vscripts/director_base_addon.nut"
     ]);
 
-    public static Task<AddonConflictResult> FindConflicts(IEnumerable<AddonNode> addons, CancellationToken cancellationToken = default)
+    public static Task<VpkAddonConflictResult> FindVpkConflicts(IEnumerable<AddonNode> addons, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(addons);
 
         var vpkItems = new List<VpkItem>();
-        foreach (var addon1 in addons)
+        foreach (var addon in addons.SelectMany(addon => addon.GetAllNodesEnabledInHierarchy()))
         {
-            foreach (var addon in addon1.GetSelfAndDescendantsByDfsPreorder())
+            if (addon is VpkAddon vpkAddon)
             {
-                if (!addon.IsEnabledInHierarchy)
+                if (vpkAddon.FullVpkFilePath is { } vpkPath)
                 {
-                    continue;
-                }
-
-                if (addon is VpkAddon vpkAddon)
-                {
-                    if (vpkAddon.FullVpkFilePath is { } vpkPath)
-                    {
-                        vpkItems.Add(new VpkItem(vpkAddon, vpkPath));
-                    }
+                    vpkItems.Add(new VpkItem(vpkAddon, vpkPath));
                 }
             }
         }
@@ -40,19 +32,24 @@ public static class AddonConflictUtils
         return Task.Run(
             () =>
             {
-                var vpkPriorityGroups = new Dictionary<int, (Dictionary<string, HashSet<VpkAddon>> FileToAddons, Dictionary<VpkAddon, HashSet<string>> AddonToFiles)>();
+                var priorityGroups = new Dictionary<int, (Dictionary<string, HashSet<VpkAddon>> FileToAddons, Dictionary<VpkAddon, HashSet<string>> AddonToFiles)>();
 
                 foreach (var vpkItem in vpkItems)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    var vpkPath = vpkItem.VpkPath;
+                    if (!File.Exists(vpkPath))
+                    {
+                        continue;
+                    }
                     using var pak = new Package();
-                    pak.Read(vpkItem.VpkPath);
+                    pak.Read(vpkPath);
                     var addon = vpkItem.Addon;
-                    var priority = addon.PriorityInHierarchy;
-                    if (!vpkPriorityGroups.TryGetValue(priority, out var priorityGroup))
+                    var priority = vpkItem.Priority;
+                    if (!priorityGroups.TryGetValue(priority, out var priorityGroup))
                     {
                         priorityGroup = (new(), new());
-                        vpkPriorityGroups[priority] = priorityGroup;
+                        priorityGroups[priority] = priorityGroup;
                     }
                     var (fileToAddons, addonToFiles) = priorityGroup;
                     foreach (var pakEntries in pak.Entries.Values)
@@ -87,10 +84,10 @@ public static class AddonConflictUtils
                     }
                 }
 
-                var resultVpkFileToAddons = new Dictionary<string, HashSet<VpkAddon>>();
-                var resultVpkAddonToFiles = new Dictionary<VpkAddon, HashSet<string>>();
+                var resultFileToAddons = new Dictionary<string, HashSet<VpkAddon>>();
+                var resultAddonToFiles = new Dictionary<VpkAddon, HashSet<string>>();
 
-                foreach (var (fileToAddons, addonToFiles) in vpkPriorityGroups.Values)
+                foreach (var (fileToAddons, addonToFiles) in priorityGroups.Values)
                 {
                     foreach (var (file, addons) in fileToAddons)
                     {
@@ -98,27 +95,27 @@ public static class AddonConflictUtils
                         {
                             continue;
                         }
-                        if (!resultVpkFileToAddons.TryGetValue(file, out var resultAddons))
+                        if (!resultFileToAddons.TryGetValue(file, out var resultAddons))
                         {
                             resultAddons = new();
-                            resultVpkFileToAddons[file] = resultAddons;
+                            resultFileToAddons[file] = resultAddons;
                         }
                         resultAddons.UnionWith(addons);
                     }
                     foreach (var (addon, files) in addonToFiles)
                     {
-                        if (!resultVpkAddonToFiles.TryGetValue(addon, out var resultFiles))
+                        if (!resultAddonToFiles.TryGetValue(addon, out var resultFiles))
                         {
                             resultFiles = new();
-                            resultVpkAddonToFiles[addon] = resultFiles;
+                            resultAddonToFiles[addon] = resultFiles;
                         }
                         resultFiles.UnionWith(files);
                     }
                 }
 
-                return new AddonConflictResult(
-                    resultVpkFileToAddons.Select(kvp => (kvp.Key, (IEnumerable<VpkAddon>)kvp.Value.ToArray())).ToDictionary(),
-                    resultVpkAddonToFiles.Select(kvp => (kvp.Key, (IEnumerable<string>)kvp.Value.ToArray())).ToDictionary()
+                return new VpkAddonConflictResult(
+                    resultFileToAddons.Select(kvp => (kvp.Key, (IEnumerable<VpkAddon>)kvp.Value.ToArray())).ToDictionary(),
+                    resultAddonToFiles.Select(kvp => (kvp.Key, (IEnumerable<string>)kvp.Value.ToArray())).ToDictionary()
                 );
             },
             cancellationToken
@@ -129,33 +126,59 @@ public static class AddonConflictUtils
     {
         public readonly VpkAddon Addon;
         public readonly string VpkPath;
+        public readonly int Priority;
         public readonly IReadOnlySet<string> IgnoredFiles;
 
         public VpkItem(VpkAddon addon, string vpkPath)
         {
             Addon = addon;
             VpkPath = vpkPath;
+            Priority = addon.PriorityInHierarchy;
             IgnoredFiles = addon.ConflictIgnoringFiles.ToImmutableHashSet();
         }
     }
 }
 
-public class AddonConflictResult
+public class VpkAddonConflictResult
 {
-    internal AddonConflictResult(IReadOnlyDictionary<string, IEnumerable<VpkAddon>> vpkFileToAddons, IReadOnlyDictionary<VpkAddon, IEnumerable<string>> vpkAddonToFiles)
+    private readonly IReadOnlyDictionary<string, IEnumerable<VpkAddon>> _fileToAddons;
+    private readonly IReadOnlyDictionary<VpkAddon, IEnumerable<string>> _addonToFiles;
+
+    internal VpkAddonConflictResult(IReadOnlyDictionary<string, IEnumerable<VpkAddon>> fileToAddons, IReadOnlyDictionary<VpkAddon, IEnumerable<string>> addonToFiles)
     {
-        ConflictingVpkFileToAddons = vpkFileToAddons;
-        ConflictingVpkAddonToFiles = vpkAddonToFiles;
-        HasConflict = vpkFileToAddons.Count > 0 || vpkAddonToFiles.Count > 0;
+        _fileToAddons = fileToAddons;
+        _addonToFiles = addonToFiles;
     }
 
-    public bool HasConflict { get; }
+    public bool HasConflict => _addonToFiles.Count > 0;
 
-    public IEnumerable<VpkAddon> ConflictingVpkAddons => ConflictingVpkAddonToFiles.Keys;
+    public IEnumerable<VpkAddon> ConflictingAddons => _addonToFiles.Keys;
 
-    public IReadOnlyDictionary<string, IEnumerable<VpkAddon>> ConflictingVpkFileToAddons { get; }
+    public IEnumerable<string> ConflictingFiles => _fileToAddons.Keys;
 
-    public IReadOnlyDictionary<VpkAddon, IEnumerable<string>> ConflictingVpkAddonToFiles { get; }
+    public IEnumerable<VpkAddon> GetConflictingAddons(string file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+
+        if (_fileToAddons.TryGetValue(file, out var addons))
+        {
+            return addons;
+        }
+
+        return [];
+    }
+
+    public IEnumerable<string> GetConflictingFiles(VpkAddon addon)
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+
+        if (_addonToFiles.TryGetValue(addon, out var files))
+        {
+            return files;
+        }
+
+        return [];
+    }
 
     public IEnumerable<VpkAddon> GetConflictingAddons(VpkAddon addon)
     {
@@ -163,11 +186,11 @@ public class AddonConflictResult
 
         IEnumerable<VpkAddon> GetRaw()
         {
-            if (ConflictingVpkAddonToFiles.TryGetValue(addon, out var files))
+            if (_addonToFiles.TryGetValue(addon, out var files))
             {
                 foreach (var file in files)
                 {
-                    if (ConflictingVpkFileToAddons.TryGetValue(file, out var addons))
+                    if (_fileToAddons.TryGetValue(file, out var addons))
                     {
                         foreach (var addon2 in addons)
                         {
@@ -182,5 +205,41 @@ public class AddonConflictResult
         }
 
         return GetRaw().Distinct();
+    }
+
+    public IEnumerable<string> GetConflictingFiles(VpkAddon addon1, VpkAddon addon2)
+    {
+        ArgumentNullException.ThrowIfNull(addon1);
+        ArgumentNullException.ThrowIfNull(addon2);
+
+        if (addon1.PriorityInHierarchy != addon2.PriorityInHierarchy)
+        {
+            return [];
+        }
+
+        return GetConflictingFiles(addon1).Intersect(GetConflictingFiles(addon2));
+    }
+
+    public IEnumerable<VpkAddon> GetConflictingAddons(VpkAddon addon, string file)
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+        ArgumentNullException.ThrowIfNull(file);
+
+        var priority = addon.PriorityInHierarchy;
+        return GetConflictingAddons(file).Where(addon0 => addon0 != addon && addon0.PriorityInHierarchy == priority);
+    }
+
+    public IEnumerable<(VpkAddon Addon, IEnumerable<string> Files)> GetConflictingAddonsWithFiles(VpkAddon addon)
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+
+        return GetConflictingAddons(addon).Select(addon0 => (addon0, (IEnumerable<string>)(GetConflictingFiles(addon0, addon).ToArray())));
+    }
+
+    public IEnumerable<(string File, IEnumerable<VpkAddon> Addons)> GetConflictingFilesWithAddons(VpkAddon addon)
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+
+        return GetConflictingFiles(addon).Select(file => (file, (IEnumerable<VpkAddon>)(GetConflictingAddons(addon, file).ToArray())));
     }
 }

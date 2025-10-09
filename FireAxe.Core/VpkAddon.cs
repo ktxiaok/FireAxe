@@ -12,10 +12,10 @@ public abstract class VpkAddon : AddonNode
     private readonly ReadOnlyObservableCollection<string> _conflictIgnoringFilesReadOnly;
     private readonly HashSet<string> _conflictIgnoringFileSet = new HashSet<string>();
 
-    internal readonly ObservableCollection<string> _conflictingFiles = new();
-    private readonly ReadOnlyObservableCollection<string> _conflictingFilesReadOnly;
-    internal readonly ObservableCollection<Guid> _conflictingAddonIds = new();
-    private readonly ReadOnlyObservableCollection<Guid> _conflictingAddonIdsReadOnly;
+    internal readonly ObservableCollection<(string File, IEnumerable<Guid> AddonIds)> _conflictingFilesWithAddonIds = new();
+    private readonly ReadOnlyObservableCollection<(string File, IEnumerable<Guid> AddonIds)> _conflictingFilesWithAddonIdsReadOnly;
+    internal readonly ObservableCollection<(Guid AddonId, IEnumerable<string> Files)> _conflictingAddonIdsWithFiles = new();
+    private readonly ReadOnlyObservableCollection<(Guid AddonId, IEnumerable<string> Files)> _conflictingAddonIdsWithFilesReadOnly;
 
     private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
@@ -24,17 +24,17 @@ public abstract class VpkAddon : AddonNode
     protected VpkAddon()
     {
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
-        _conflictingFilesReadOnly = new(_conflictingFiles);
-        _conflictingAddonIdsReadOnly = new(_conflictingAddonIds);
+        _conflictingFilesWithAddonIdsReadOnly = new(_conflictingFilesWithAddonIds);
+        _conflictingAddonIdsWithFilesReadOnly = new(_conflictingAddonIdsWithFiles);
 
         _vpkAddonConflictProblemSource = new(this);
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
 
-    public ReadOnlyObservableCollection<string> ConflictingFiles => _conflictingFilesReadOnly;
+    public ReadOnlyObservableCollection<(string File, IEnumerable<Guid> AddonIds)> ConflictingFilesWithAddonIds => _conflictingFilesWithAddonIdsReadOnly;
 
-    public ReadOnlyObservableCollection<Guid> ConflictingAddonIds => _conflictingAddonIdsReadOnly;
+    public ReadOnlyObservableCollection<(Guid AddonId, IEnumerable<string> Files)> ConflictingAddonIdsWithFiles => _conflictingAddonIdsWithFilesReadOnly;
 
     public abstract string? FullVpkFilePath
     {
@@ -122,7 +122,14 @@ public abstract class VpkAddon : AddonNode
         }
         _conflictIgnoringFiles.Add(file);
 
-        _conflictingFiles.Remove(file);
+        for (int i = 0, len = _conflictingFilesWithAddonIds.Count; i < len; i++)
+        {
+            if (_conflictingFilesWithAddonIds[i].File == file)
+            {
+                _conflictingFilesWithAddonIds.RemoveAt(i);
+                break;
+            }
+        }
 
         Root.RequestSave = true;
 
