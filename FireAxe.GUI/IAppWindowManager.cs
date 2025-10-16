@@ -19,4 +19,6 @@ public interface IAppWindowManager
     void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
 
     void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
+
+    void OpenVpkConflictListWindow(AddonRoot addonRoot);
 }

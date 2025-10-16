@@ -747,4 +747,13 @@
   <data name="MissingAddon" xml:space="preserve">
     <value>Missing Addon</value>
   </data>
+  <data name="CancelRefreshing" xml:space="preserve">
+    <value>Cancel Refreshing</value>
+  </data>
+  <data name="VpkConflictList" xml:space="preserve">
+    <value>VPK Conflict List</value>
+  </data>
+  <data name="RefreshingHint" xml:space="preserve">
+    <value>Refreshing...</value>
+  </data>
 </root>

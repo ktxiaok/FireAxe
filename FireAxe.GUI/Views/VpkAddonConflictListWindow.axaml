@@ -1,0 +1,139 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:FireAxe.ViewModels"
+  xmlns:v="using:FireAxe.Views"
+  xmlns:r="using:FireAxe.Resources"
+  xmlns:conv="using:FireAxe.ValueConverters"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  x:Class="FireAxe.Views.VpkAddonConflictListWindow"
+  x:DataType="vm:VpkAddonConflictListViewModel"
+  Title="{x:Static r:Texts.VpkConflictList}"
+  Width="800" Height="800"
+  WindowStartupLocation="CenterScreen">
+  <Window.Styles>
+    <Style Selector="TextBlock.EmptyHint">
+      <Setter Property="Text" Value="{x:Static r:Texts.Empty}"/>
+      <Setter Property="Margin" Value="10"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="VerticalAlignment" Value="Top"/>
+    </Style>
+  </Window.Styles>
+  
+  <DockPanel
+    Margin="5">
+    <DockPanel
+      DockPanel.Dock="Top">
+      <StackPanel
+        DockPanel.Dock="Right"
+        Orientation="Horizontal">
+        <TextBlock
+          Text="{x:Static r:Texts.RefreshingHint}"
+          IsVisible="{Binding IsRefreshing}"
+          Margin="5"
+          VerticalAlignment="Center"/>
+        <Button
+          Command="{Binding RefreshCommand}"
+          Content="{x:Static r:Texts.Refresh}"
+          IsVisible="{Binding !IsRefreshing}"
+          Margin="5"/>
+        <Button
+          Command="{Binding CancelRefreshCommand}"
+          Content="{x:Static r:Texts.CancelRefreshing}"
+          IsVisible="{Binding IsRefreshing}"
+          Margin="5"/>
+      </StackPanel>
+      <TabStrip
+        DockPanel.Dock="Left"
+        Margin="5">
+        <TabStripItem
+          Name="conflictingAddonsTab"
+          Content="{x:Static r:Texts.ConflictingAddons}"/>
+        <TabStripItem
+          Name="conflictingFilesTab"
+          Content="{x:Static r:Texts.ConflictingFiles}"/>
+      </TabStrip>
+    </DockPanel>
+    <ScrollViewer
+      DockPanel.Dock="Top"
+      Margin="5">
+      <Panel>
+        <Panel.Styles>
+          <Style Selector="Expander">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+          </Style>
+        </Panel.Styles>
+        <!--conflicting addons-->
+        <Panel
+          IsVisible="{Binding #conflictingAddonsTab.IsSelected}">
+          <ItemsControl
+            ItemsSource="{Binding VpkConflictingDetailsViewModels}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Expander
+                  IsExpanded="False">
+                  <Expander.Header>
+                    <v:AddonRefView DataContext="{Binding Addon, Converter={x:Static conv:AddonNodeConverters.ToSimpleViewModel}}"/>
+                  </Expander.Header>
+                  <v:VpkAddonConflictingDetailsView/>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock
+            Classes="EmptyHint"
+            IsVisible="{Binding VpkConflictingDetailsViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}}"/>
+        </Panel>
+        <!--conflicting files-->
+        <Panel
+          IsVisible="{Binding #conflictingFilesTab.IsSelected}">
+          <ItemsControl
+            ItemsSource="{Binding ConflictingFileWithAddonsViewModels}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Expander
+                  IsExpanded="False">
+                  <Expander.Header>
+                    <SelectableTextBlock
+                      Text="{Binding File}"
+                      TextTrimming="CharacterEllipsis"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"/>
+                  </Expander.Header>
+                  <ItemsControl
+                    ItemsSource="{Binding AddonViewModels}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <v:AddonRefView/>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock
+            Classes="EmptyHint"
+            IsVisible="{Binding ConflictingFileWithAddonsViewModels, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}}"/>
+        </Panel>
+      </Panel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

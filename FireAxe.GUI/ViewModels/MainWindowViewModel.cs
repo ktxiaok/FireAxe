@@ -92,6 +92,14 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
         OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
         OpenTagManagerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenTagManagerWindow(this));
+        OpenVpkConflictListWindowCommand = ReactiveCommand.Create(() =>
+        {
+            if (_addonRoot is null)
+            {
+                return;
+            }
+            _windowManager.OpenVpkConflictListWindow(_addonRoot);
+        }, _addonRootNotNull);
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
         ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
@@ -258,6 +266,8 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
     public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenTagManagerWindowCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenVpkConflictListWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 

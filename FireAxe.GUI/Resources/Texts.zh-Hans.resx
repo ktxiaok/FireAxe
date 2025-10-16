@@ -747,4 +747,13 @@
   <data name="MissingAddon" xml:space="preserve">
     <value>丢失的模组</value>
   </data>
+  <data name="CancelRefreshing" xml:space="preserve">
+    <value>取消刷新</value>
+  </data>
+  <data name="VpkConflictList" xml:space="preserve">
+    <value>VPK冲突列表</value>
+  </data>
+  <data name="RefreshingHint" xml:space="preserve">
+    <value>刷新中...</value>
+  </data>
 </root>

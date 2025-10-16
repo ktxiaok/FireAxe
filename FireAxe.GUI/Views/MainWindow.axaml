@@ -25,6 +25,7 @@
       <MenuItem Header="{x:Static r:Texts.Tools}">
         <MenuItem Header="{x:Static r:Texts.TagManager}" Command="{Binding OpenTagManagerWindowCommand}"/>
         <MenuItem Header="{x:Static r:Texts.DownloadList}" Command="{Binding OpenDownloadListWindowCommand}"/>
+        <MenuItem Header="{x:Static r:Texts.VpkConflictList}" Command="{Binding OpenVpkConflictListWindowCommand}"/>
       </MenuItem>
       
       <MenuItem Header="{x:Static r:Texts.Operations}">

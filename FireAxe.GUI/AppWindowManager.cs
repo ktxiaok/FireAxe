@@ -17,6 +17,7 @@ public class AppWindowManager : IAppWindowManager
     private WindowReference<DownloadItemListWindow>? _downloadItemListWindowRef = null;
     private WindowReference<AboutWindow>? _aboutWindowRef = null;
     private WindowReference<AddonTagManagerWindow>? _tagManagerWindowRef = null;
+    private WindowReference<VpkAddonConflictListWindow>? _vpkConflictListWindowRef = null;
 
     public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
     {
@@ -74,6 +75,16 @@ public class AppWindowManager : IAppWindowManager
         OpenWindow(ref _tagManagerWindowRef, () => new AddonTagManagerWindow()
         {
             DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
+        });
+    }
+
+    public void OpenVpkConflictListWindow(AddonRoot addonRoot)
+    {
+        ArgumentNullException.ThrowIfNull(addonRoot);
+
+        OpenWindow(ref _vpkConflictListWindowRef, () => new VpkAddonConflictListWindow
+        {
+            DataContext = new VpkAddonConflictListViewModel(addonRoot)
         });
     }
 

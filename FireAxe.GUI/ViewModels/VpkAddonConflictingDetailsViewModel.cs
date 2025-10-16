@@ -12,8 +12,10 @@ using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableViewModel
+public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
+    private bool _isValid = true;
+
     private ReadOnlyObservableCollection<ConflictingVpkAddonWithFilesViewModel> _conflictingAddonWithFilesViewModels = ReadOnlyObservableCollection<ConflictingVpkAddonWithFilesViewModel>.Empty;
     private ReadOnlyObservableCollection<ConflictingVpkFileWithAddonsViewModel> _conflictingFileWithAddonsViewModels = ReadOnlyObservableCollection<ConflictingVpkFileWithAddonsViewModel>.Empty;
 
@@ -26,6 +28,8 @@ public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableVi
         {
             var addon = Addon;
             var addonRoot = addon.Root;
+
+            addon.RegisterInvalidHandler(() => IsValid = false).DisposeWith(disposables);
 
             addon.ConflictingAddonIdsWithFiles
                 .ToObservableChangeSet()
@@ -79,6 +83,12 @@ public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableVi
     }
 
     public ViewModelActivator Activator { get; } = new();
+
+    public bool IsValid
+    {
+        get => _isValid;
+        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
+    }
 
     public VpkAddon Addon { get; }
 
@@ -148,37 +158,4 @@ public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableVi
             addon.AddConflictIgnoringFile(file);
         }
     }
-}
-
-public class ConflictingVpkAddonWithFilesViewModel : ViewModelBase
-{
-    public ConflictingVpkAddonWithFilesViewModel(AddonRoot addonRoot, Guid addonId, IEnumerable<string> files)
-    {
-        ArgumentNullException.ThrowIfNull(addonRoot);
-        ArgumentNullException.ThrowIfNull(files);
-
-        AddonViewModel = new AddonNodeSimpleViewModel(addonRoot, addonId);
-        Files = files;
-    }
-
-    public AddonNodeSimpleViewModel AddonViewModel { get; }
-
-    public IEnumerable<string> Files { get; }
-}
-
-public class ConflictingVpkFileWithAddonsViewModel : ViewModelBase
-{
-    public ConflictingVpkFileWithAddonsViewModel(string file, AddonRoot addonRoot, IEnumerable<Guid> addonIds)
-    {
-        ArgumentNullException.ThrowIfNull(file);
-        ArgumentNullException.ThrowIfNull(addonRoot);
-        ArgumentNullException.ThrowIfNull(addonIds);
-
-        File = file;
-        AddonViewModels = addonIds.Select(id => new AddonNodeSimpleViewModel(addonRoot, id)).ToArray();
-    }
-
-    public string File { get; }
-
-    public IEnumerable<AddonNodeSimpleViewModel> AddonViewModels { get; }
 }

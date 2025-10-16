@@ -10,7 +10,7 @@ using ValveKeyValue;
 
 namespace FireAxe;
 
-public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable, IValidity
+public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeContainer, IAddonNodeContainerInternal, ISaveable, IValidity
 {
     public const string SaveFileName = ".addonroot";
     public const string VersionFileName = ".addonrootversion";
@@ -37,8 +37,8 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
 
     private readonly Dictionary<Guid, AddonNode> _idToNode = new();
 
-    private Task<VpkAddonConflictResult>? _checkVpkConflictsTask = null;
     private CancellationTokenSource? _checkVpkConflictsCts = null;
+    private Task<VpkAddonConflictResult>? _checkVpkConflictsTask = null;
 
     private TaskScheduler? _taskScheduler = null;
 
@@ -149,6 +149,18 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
     public bool IsAutoCheckEnabled => _blockAutoCheck == 0;
 
     public bool IsAutoUpdateWorkshopItem { get; set; } = true;
+
+    public bool IsCheckingVpkConflicts => CheckVpkConflictsTask is not null;
+
+    private Task<VpkAddonConflictResult>? CheckVpkConflictsTask
+    {
+        get => _checkVpkConflictsTask;
+        set
+        {
+            _checkVpkConflictsTask = value;
+            NotifyChanged(nameof(IsCheckingVpkConflicts));
+        }
+    }
 
     IAddonNodeContainer? IAddonNodeContainer.Parent => null;
 
@@ -279,10 +291,15 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
 
     public Task<VpkAddonConflictResult> CheckVpkConflictsAsync()
     {
-        CancelCheckVpkConflicts();
-        _checkVpkConflictsCts ??= new();
+        if (CheckVpkConflictsTask is { } task)
+        {
+            return task;
+        }
 
-        _checkVpkConflictsTask = AddonConflictUtils.FindVpkConflicts(Nodes, _checkVpkConflictsCts.Token);
+        _checkVpkConflictsCts ??= new();
+        var cancellationToken = _checkVpkConflictsCts.Token;
+
+        var rawTask = AddonConflictUtils.FindVpkConflicts(Nodes, cancellationToken);
 
         foreach (var addon in this.GetDescendants())
         {
@@ -294,29 +311,19 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
             }
         }
 
-        _checkVpkConflictsTask.ContinueWith(
-            task => 
+        var addonRootTaskScheduler = TaskScheduler;
+
+        CheckVpkConflictsTask = Task.Run(async () =>
+        {
+            var conflictResult = await rawTask.ConfigureAwait(false);
+            var endingTask = new Task(() =>
             {
-                if (_checkVpkConflictsTask != task)
-                {
-                    return;
-                }
-                _checkVpkConflictsTask = null;
-                
+                cancellationToken.ThrowIfCancellationRequested();
                 if (!IsValid)
                 {
                     return;
                 }
-                if (!task.IsCompletedSuccessfully)
-                {
-                    if (task.Exception is { } ex)
-                    {
-                        Log.Error(ex, "Exception occurred during the task of checking VPK conflicts.");
-                    }
-                    return;
-                }
-                
-                var conflictResult = task.Result;
+
                 if (conflictResult.HasConflict)
                 {
                     foreach (var vpkAddon in conflictResult.ConflictingAddons)
@@ -336,17 +343,24 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
                         }
                     }
                 }
-                
-            }, 
-            TaskScheduler
-        );
-
-        return _checkVpkConflictsTask;
+            }, cancellationToken);
+            endingTask.Start(addonRootTaskScheduler);
+            await endingTask.ConfigureAwait(false);
+            return conflictResult;
+        }, cancellationToken);
+        CheckVpkConflictsTask.ContinueWith(task =>
+        {
+            if (CheckVpkConflictsTask == task)
+            {
+                CheckVpkConflictsTask = null;
+            }
+        }, addonRootTaskScheduler);
+        return CheckVpkConflictsTask;
     }
 
     public void CancelCheckVpkConflicts()
     {
-        _checkVpkConflictsTask = null;
+        CheckVpkConflictsTask = null;
         if (_checkVpkConflictsCts is not null)
         {
             _checkVpkConflictsCts.Cancel();
@@ -739,6 +753,8 @@ public sealed class AddonRoot : IAsyncDisposable, IAddonNodeContainer, IAddonNod
         if (!_disposed)
         {
             _disposed = true;
+            NotifyChanged(nameof(IsValid));
+
             CancelCheckVpkConflicts();
             var tasks = new List<Task>();
             foreach (var node in Nodes)

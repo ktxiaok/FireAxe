@@ -3,11 +3,11 @@ using System.Collections;
 
 namespace FireAxe;
 
-public class ValidCollection<T> : IEnumerable<T> where T : class, IValidity
+public class ValidRefCollection<T> : IEnumerable<T> where T : class, IValidity
 {
     private readonly List<ValidRef<T>> _list;
 
-    public ValidCollection()
+    public ValidRefCollection()
     {
         _list = new();
     }

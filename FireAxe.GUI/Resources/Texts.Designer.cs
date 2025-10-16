@@ -241,6 +241,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel Refreshing.
+        /// </summary>
+        public static string CancelRefreshing {
+            get {
+                return ResourceManager.GetString("CancelRefreshing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Couldn&apos;t move the item &quot;{0}&quot;!.
         /// </summary>
         public static string CantMoveItemWithName {
@@ -1555,6 +1564,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refreshing....
+        /// </summary>
+        public static string RefreshingHint {
+            get {
+                return ResourceManager.GetString("RefreshingHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove.
         /// </summary>
         public static string Remove {
@@ -1875,6 +1893,15 @@ namespace FireAxe.Resources {
         public static string VpkAddonConflictProblemExplain {
             get {
                 return ResourceManager.GetString("VpkAddonConflictProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VPK Conflict List.
+        /// </summary>
+        public static string VpkConflictList {
+            get {
+                return ResourceManager.GetString("VpkConflictList", resourceCulture);
             }
         }
         
