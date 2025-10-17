@@ -756,4 +756,7 @@
   <data name="RefreshingHint" xml:space="preserve">
     <value>Refreshing...</value>
   </data>
+  <data name="CrashReporterMessageHeader" xml:space="preserve">
+    <value>FireAxe crashed due to an unhandled exception. The following is the details of the exception:</value>
+  </data>
 </root>

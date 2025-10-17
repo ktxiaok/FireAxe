@@ -430,6 +430,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to FireAxe crashed due to an unhandled exception. The following is the details of the exception:.
+        /// </summary>
+        public static string CrashReporterMessageHeader {
+            get {
+                return ResourceManager.GetString("CrashReporterMessageHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         public static string Create {

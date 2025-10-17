@@ -756,4 +756,7 @@
   <data name="RefreshingHint" xml:space="preserve">
     <value>刷新中...</value>
   </data>
+  <data name="CrashReporterMessageHeader" xml:space="preserve">
+    <value>FireAxe因一个未处理的异常而崩溃，以下是该异常的详情：</value>
+  </data>
 </root>

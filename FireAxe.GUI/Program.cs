@@ -31,14 +31,7 @@ internal sealed class Program
         catch (Exception ex)
         {
             Log.Fatal(ex, "Unhandled Exception");
-            try
-            {
-                OpenCrashReporter(ex);
-            }
-            catch (Exception ex2)
-            {
-                Log.Error(ex2, "Exception occurred during Program.OpenCrashReporter.");
-            }
+            CrashReporter.Run(ex);
             throw;
         }
         finally
@@ -59,43 +52,13 @@ internal sealed class Program
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.File("Logs/Log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 31)
+            .WriteTo.File("Logs/Log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .CreateLogger();
     }
 
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         Log.Error(e.Exception, "Unobserved task exception occurred");
-    }
-
-    private static void OpenCrashReporter(Exception ex)
-    {
-        string pipeName = Guid.NewGuid().ToString();
-        using var crashReporterProcess = new Process();
-        crashReporterProcess.StartInfo.FileName = "FireAxe.CrashReporter.exe";
-        crashReporterProcess.StartInfo.UseShellExecute = true;
-        crashReporterProcess.StartInfo.Arguments = pipeName;
-        crashReporterProcess.Start();
-
-        try
-        {
-            using (var pipeServer = new NamedPipeServerStream(pipeName))
-            {
-                pipeServer.WaitForConnection();
-                
-                string message = "FireAxe crashed due to an unhandled exception. The following is the details of the exception.\n" + ex.ToString();
-                using (var writer = new BinaryWriter(pipeServer))
-                {
-                    writer.Write(message);
-                }
-            }
-        }
-        catch (IOException ioEx)
-        {
-            Log.Warning(ioEx, "IOException occurred during Program.OpenCrashReporter.");
-        }
-
-        crashReporterProcess.WaitForExit();
     }
 
     private static void RegisterObjectExplanations()

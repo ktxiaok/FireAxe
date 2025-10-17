@@ -42,7 +42,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FireAxe.Core\FireAxe.Core.csproj" />
-    <ProjectReference Include="..\FireAxe.CrashReporter\FireAxe.CrashReporter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
