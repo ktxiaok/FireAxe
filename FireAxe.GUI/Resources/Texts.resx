@@ -759,4 +759,16 @@
   <data name="CrashReporterMessageHeader" xml:space="preserve">
     <value>FireAxe crashed due to an unhandled exception. The following is the details of the exception:</value>
   </data>
+  <data name="Find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="GamePathNotFoundMessage" xml:space="preserve">
+    <value>Failed to find the game path. Please set it manually. </value>
+  </data>
+  <data name="ConfirmFoundGamePathMessage" xml:space="preserve">
+    <value>Game path "{0}" found. Are you sure you want to use this path?</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
 </root>

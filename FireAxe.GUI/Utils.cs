@@ -38,7 +38,7 @@ internal static class Utils
 
         try
         {
-            Process.Start(new ProcessStartInfo(url)
+            using var process = Process.Start(new ProcessStartInfo(url)
             {
                 UseShellExecute = true
             });
@@ -57,7 +57,7 @@ internal static class Utils
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                Process.Start(new ProcessStartInfo()
+                using var process = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "explorer.exe",
                     Arguments = $" /select, {path}"
@@ -112,5 +112,24 @@ internal static class Utils
 
             Disposable.Create(Disconnect).DisposeWith(disposables);
         });
+    }
+
+    public static string FormatNoThrow(this string? str, params object?[] args)
+    {
+        if (str is null)
+        {
+            return "";
+        }
+        
+        try
+        {
+            return string.Format(str, args);
+        }
+        catch (FormatException ex)
+        {
+            Log.Error(ex, "FormatException ocurred during Utils.FormatNoThrow.");
+        }
+
+        return str;
     }
 }

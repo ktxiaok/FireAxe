@@ -340,6 +340,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm.
+        /// </summary>
+        public static string Confirm {
+            get {
+                return ResourceManager.GetString("Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm Delete.
         /// </summary>
         public static string ConfirmDelete {
@@ -363,6 +372,15 @@ namespace FireAxe.Resources {
         public static string ConfirmDeleteTagCompletely {
             get {
                 return ResourceManager.GetString("ConfirmDeleteTagCompletely", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game path &quot;{0}&quot; found. Are you sure you want to use this path?.
+        /// </summary>
+        public static string ConfirmFoundGamePathMessage {
+            get {
+                return ResourceManager.GetString("ConfirmFoundGamePathMessage", resourceCulture);
             }
         }
         
@@ -961,6 +979,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Find.
+        /// </summary>
+        public static string Find {
+            get {
+                return ResourceManager.GetString("Find", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flatten.
         /// </summary>
         public static string Flatten {
@@ -984,6 +1011,15 @@ namespace FireAxe.Resources {
         public static string GamePath {
             get {
                 return ResourceManager.GetString("GamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to find the game path. Please set it manually. .
+        /// </summary>
+        public static string GamePathNotFoundMessage {
+            get {
+                return ResourceManager.GetString("GamePathNotFoundMessage", resourceCulture);
             }
         }
         

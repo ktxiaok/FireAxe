@@ -12,99 +12,104 @@
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
-        SizeToContent="WidthAndHeight"
+        Width="600" Height="400"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
   </Window.DataTemplates>
   <ScrollViewer>
-    <Grid
-      RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
-      ColumnDefinitions="Auto, 50, *"
+    <StackPanel
+      Orientation="Vertical"
       Margin="10">
       <!--language-->
-      <StackPanel
-        Grid.Row="0" Grid.Column="0"
-        Orientation="Horizontal">
-        <TextBlock
-          Classes="PropertyName"
-          Text="{x:Static r:Texts.Language}"/>
-        <TextBlock
-          Classes="PropertyName"
-          Text="{x:Static r:Texts.NeedRestartHint}"/>
-      </StackPanel>
-      <ComboBox
-        Grid.Row="0" Grid.Column="2"
-        Classes="PropertyValue"
-        ItemsSource="{Binding LanguageItemsSource}"
-        SelectedItem="{Binding Settings.Language}">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{ReflectionBinding Converter={x:Static conv:LanguageNativeNameConverter.Instance}}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+      <DockPanel>
+        <StackPanel
+          DockPanel.Dock="Left"
+          Orientation="Horizontal">
+          <TextBlock
+            Classes="PropertyName"
+            Text="{x:Static r:Texts.Language}"/>
+          <TextBlock
+            Classes="PropertyName"
+            Text="{x:Static r:Texts.NeedRestartHint}"/>
+        </StackPanel>
+        <ComboBox
+          Classes="PropertyValue"
+          ItemsSource="{Binding LanguageItemsSource}"
+          SelectedItem="{Binding Settings.Language}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{ReflectionBinding Converter={x:Static conv:LanguageNativeNameConverter.Instance}}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </DockPanel>
 
       <!--color theme-->
-      <TextBlock
-        Grid.Row="1" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.ColorTheme}"/>
-      <ComboBox
-        Grid.Row="1" Grid.Column="2"
-        Classes="EnumComboBox PropertyValue"
-        ItemsSource="{Binding Source={me:EnumValues {x:Type local:AppColorTheme}}}"
-        SelectedItem="{Binding Settings.ColorTheme}"/>
-
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.ColorTheme}"/>
+        <ComboBox
+          Classes="EnumComboBox PropertyValue"
+          ItemsSource="{Binding Source={me:EnumValues {x:Type local:AppColorTheme}}}"
+          SelectedItem="{Binding Settings.ColorTheme}"/>
+      </DockPanel>
+        
       <!--game path-->
       <TextBlock
-        Grid.Row="2" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.GamePath}"/>
       <StackPanel
-        Grid.Row="2" Grid.Column="2"
         Orientation="Horizontal"
-        HorizontalAlignment="Right">
+        HorizontalAlignment="Left">
         <TextBox
           Text="{Binding Settings.GamePath}"
-          Width="250" 
-          Margin="5"/>
+          Width="350" 
+          Margin="0, 5, 5, 5"/>
         <Button
           Command="{Binding SelectGamePathCommand}"
           Content="{x:Static r:Texts.Select}"
           Margin="5"/>
+        <Button
+          Command="{Binding FindGamePathCommand}"
+          Content="{x:Static r:Texts.Find}"
+          Margin="5"/>
       </StackPanel>
 
       <!--workshop item auto update-->
-      <TextBlock
-        Grid.Row="3" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
-      <CheckBox
-        Grid.Row="3" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+      </DockPanel>
 
       <!--auto detect workshop item link in clipboard-->
-      <TextBlock
-        Grid.Row="4" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
-      <CheckBox
-        Grid.Row="4" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
+      </DockPanel>
 
       <!--auto redownload-->
-      <TextBlock
-        Grid.Row="5" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.AutoRedownload}"/>
-      <CheckBox
-        Grid.Row="5" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoRedownload}"/>
-    </Grid>
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.AutoRedownload}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoRedownload}"/>
+      </DockPanel>
+    </StackPanel>
   </ScrollViewer>
-  
 </Window>

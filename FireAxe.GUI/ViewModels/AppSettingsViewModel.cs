@@ -33,6 +33,21 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
                 _settings.GamePath = path;
             }
         });
+        FindGamePathCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var gamePath = GamePathUtils.TryFind();
+            if (gamePath is null)
+            {
+                await ReportGamePathNotFoundInteraction.Handle(Unit.Default);
+                return;
+            }
+            bool confirm = await ConfirmFoundGamePathInteraction.Handle(gamePath);
+            if (!confirm)
+            {
+                return;
+            }
+            Settings.GamePath = gamePath;
+        });
     }
 
     public ViewModelActivator Activator { get; } = new();
@@ -43,5 +58,11 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
 
     public ReactiveCommand<Unit, Unit> SelectGamePathCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> FindGamePathCommand { get; }
+
     public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
+
+    public Interaction<string, bool> ConfirmFoundGamePathInteraction { get; } = new();
+
+    public Interaction<Unit, Unit> ReportGamePathNotFoundInteraction { get; } = new();
 }

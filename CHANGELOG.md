@@ -1,12 +1,13 @@
-- add: addon conflicts check
-- improve: move the addon priority setting to the AddonNode view and support addon global priority  
+- add: VPK conflict checking system
+- improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
 - remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized
 - add: new addon sort methods: Sort by Tags, Sort by Priority, Sort by Global Priority, Sort by Problem Count
+- add: game path auto finding
 - change: rename "Default Order" to "No Sort"
-- improve: improve the addon problems checking system
+- improve: improve the addon problem checking system
 - upgrade: upgrade dependent packages
 - bugfixes
 # v0.6.1

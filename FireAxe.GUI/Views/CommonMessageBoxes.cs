@@ -32,11 +32,11 @@ public static class CommonMessageBoxes
         return FileUtils.NormalizePath(path.LocalPath);
     }
 
-    public static async Task<bool> Confirm(Window ownerWindow, string message, string title)
+    public static async Task<bool> Confirm(Window ownerWindow, string message, string? title = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
         ArgumentNullException.ThrowIfNull(message);
-        ArgumentNullException.ThrowIfNull(title);
+        title ??= Texts.Confirm;  
 
         var result = await MessageBoxManager.GetMessageBoxStandard(new MessageBoxStandardParams()
         {
@@ -45,8 +45,7 @@ public static class CommonMessageBoxes
             ButtonDefinitions = ButtonEnum.YesNo,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             EnterDefaultButton = ClickEnum.Yes
-        })
-            .ShowWindowDialogAsync(ownerWindow);
+        }).ShowWindowDialogAsync(ownerWindow);
         return result == ButtonResult.Yes;
     }
 
@@ -117,11 +116,11 @@ public static class CommonMessageBoxes
         }).ShowWindowDialogAsync(ownerWindow);
     }
 
-    public static Task ShowInfo(Window ownerWindow, string message, string title)
+    public static Task ShowInfo(Window ownerWindow, string message, string? title = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
         ArgumentNullException.ThrowIfNull(message);
-        ArgumentNullException.ThrowIfNull(title);
+        title ??= "";
 
         return MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
         {
