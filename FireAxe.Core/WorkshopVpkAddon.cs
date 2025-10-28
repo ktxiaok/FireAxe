@@ -243,29 +243,43 @@ public class WorkshopVpkAddon : VpkAddon
     {
         internal static readonly DeleteRedundantVpkFilesReport Empty = new([]);
 
+        private long _totalFileSize = -1;
+
         internal DeleteRedundantVpkFilesReport(IReadOnlyCollection<string> files)
         {
             Files = files;
-            long totalFileSize = 0;
-            foreach (string file in files)
-            {
-                try
-                {
-                    totalFileSize += new FileInfo(file).Length;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Exception occurred during getting the size of the file {FilePath}", file);
-                }
-            }
-            TotalFileSize = totalFileSize;
         }
 
         public bool IsEmpty => Files.Count == 0;
 
         public IReadOnlyCollection<string> Files { get; }
 
-        public long TotalFileSize { get; }
+        public long TotalFileSize 
+        {
+            get
+            {
+                if (_totalFileSize <= 0)
+                {
+                    _totalFileSize = 0;
+                    foreach (string file in Files)
+                    {
+                        try
+                        {
+                            if (File.Exists(file))
+                            {
+                                _totalFileSize += new FileInfo(file).Length;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Exception occurred during getting the size of the file {FilePath}", file);
+                        }
+                    }
+                }
+
+                return _totalFileSize;
+            }
+        }
 
         public static DeleteRedundantVpkFilesReport Combine(IEnumerable<DeleteRedundantVpkFilesReport> reports)
         {
