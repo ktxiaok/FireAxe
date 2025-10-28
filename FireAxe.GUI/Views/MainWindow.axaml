@@ -33,6 +33,15 @@
         <MenuItem Header="{x:Static r:Texts.Check}" Command="{Binding CheckCommand}" ToolTip.Tip="{x:Static r:Texts.CheckAllTip}"/>
         <MenuItem Header="{x:Static r:Texts.ClearCaches}" Command="{Binding ClearCachesCommand}" ToolTip.Tip="{x:Static r:Texts.ClearAllCachesTip}"/>
         <MenuItem Header="{x:Static r:Texts.RandomlySelect}" Command="{Binding RandomlySelectCommand}" ToolTip.Tip="{x:Static r:Texts.RandomlySelectTip}"/>
+        <MenuItem Header="{x:Static r:Texts.DeleteRedundantVpkFiles}" Command="{Binding DeleteRedundantVpkFilesCommand}"/>
+        <MenuItem Command="{Binding DeleteRedundantVpkFilesForSelectedItemsCommand}">
+          <MenuItem.Header>
+            <MultiBinding StringFormat="{}{0} {1}">
+              <Binding Source="{x:Static r:Texts.DeleteRedundantVpkFiles}"/>
+              <Binding Source="{x:Static r:Texts.HintSelectedItems}"/>
+            </MultiBinding>
+          </MenuItem.Header>
+        </MenuItem>
         <MenuItem Header="Crash?">
           <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
         </MenuItem>

@@ -59,6 +59,30 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
             addon.RequestApplyTagsFromWorkshop = true;
             addon.Check();
         });
+        DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var addon = Addon;
+            if (addon is null)
+            {
+                return;
+            }
+
+            try
+            {
+                var report = addon.RequestDeleteRedundantVpkFiles();
+                bool confirm = await ConfirmDeleteRedundantVpkFilesInteraction.Handle(report);
+                if (report.IsEmpty || !confirm)
+                {
+                    return;
+                }
+                report.Execute();
+                await ShowDeleteRedundantVpkFilesSuccessInteraction.Handle(report);
+            }
+            catch (Exception ex)
+            {
+                await ShowExceptionInteraction.Handle(ex);
+            }
+        });
     }
 
     public new WorkshopVpkAddon? Addon => (WorkshopVpkAddon?)((AddonNodeViewModel)this).Addon;
@@ -102,6 +126,14 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
     }
 
     public ReactiveCommand<Unit, Unit> ApplyTagsFromWorkshopCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesCommand { get; }
+
+    public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, bool> ConfirmDeleteRedundantVpkFilesInteraction { get; } = new();
+
+    public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, Unit> ShowDeleteRedundantVpkFilesSuccessInteraction { get; } = new();
+
+    public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
 
     public void OpenWorkshopPage()
     {

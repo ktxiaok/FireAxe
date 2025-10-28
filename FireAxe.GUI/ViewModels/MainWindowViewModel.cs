@@ -2,7 +2,10 @@
 using ReactiveUI;
 using Serilog;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -12,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace FireAxe.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
+public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
 {
     private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
     private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(15);
@@ -24,18 +27,20 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
 
     private bool _inited = false;
 
-    private AppSettings _settings;
-    private IAppWindowManager _windowManager;
-    private IDownloadService _downloadService;
-    private HttpClient _httpClient;
-    private DownloadItemListViewModel _downloadItemListViewModel;
+    private readonly AppSettings _settings;
+    private readonly IAppWindowManager _windowManager;
+    private readonly IDownloadService _downloadService;
+    private readonly HttpClient _httpClient;
+    private readonly DownloadItemListViewModel _downloadItemListViewModel;
 
     private AddonRoot? _addonRoot = null;
-    private IObservable<bool> _addonRootNotNull;
+    private readonly IObservable<bool> _addonRootNotNullObservable;
 
     private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
     private readonly ObservableAsPropertyHelper<string> _titleExtraInfo;
+
+    private readonly ObservableAsPropertyHelper<bool> _hasSelection;
 
     private bool _isCheckingUpdate = false;
     private object? _checkUpdateActivity = null;
@@ -60,7 +65,7 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
         _httpClient = httpClient;
         _downloadItemListViewModel = downloadItemListViewModel;
 
-        _addonRootNotNull = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
+        _addonRootNotNullObservable = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
 
         _titleExtraInfo = this.WhenAnyValue(x => x.AddonRoot)
             .Select((addonRoot) =>
@@ -72,6 +77,11 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
                 return " - " + addonRoot.DirectoryPath;
             })
             .ToProperty(this, nameof(TitleExtraInfo));
+
+        _hasSelection =
+            this.WhenAnyValue(x => x.AddonNodeExplorerViewModel, x => x.AddonNodeExplorerViewModel!.SelectionCount, (explorerViewModel, selectionCount) => explorerViewModel?.SelectionCount ?? 0)
+            .Select(count => count > 0)
+            .ToProperty(this, nameof(HasSelection));
 
         OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -85,10 +95,11 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
                 await ShowDontOpenGameAddonsDirectoryInteraction.Handle(Unit.Default);
                 return;
             }
-            await OpenDirectory(path);               
+            await OpenDirectory(path);
         });
-        CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNull);
-        ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNull);
+        CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNullObservable);
+        ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNullObservable);
+
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
         OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
         OpenTagManagerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenTagManagerWindow(this));
@@ -99,11 +110,15 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
                 return;
             }
             _windowManager.OpenVpkConflictListWindow(_addonRoot);
-        }, _addonRootNotNull);
-        PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNull);
-        CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNull);
-        ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNull);
-        RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNull);
+        }, _addonRootNotNullObservable);
+
+        PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
+        CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
+        ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNullObservable);
+        RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNullObservable);
+        DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(), _addonRootNotNullObservable);
+        DeleteRedundantVpkFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(true), this.WhenAnyValue(x => x.HasSelection));
+
         OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
         CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
@@ -255,6 +270,8 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
 
     public string TitleExtraInfo => _titleExtraInfo.Value;
 
+    public bool HasSelection => _hasSelection.Value;
+
     public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
 
     public ReactiveCommand<Unit, Unit> CloseDirectoryCommand { get; }
@@ -276,6 +293,10 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
     public ReactiveCommand<Unit, Unit> ClearCachesCommand { get; } 
 
     public ReactiveCommand<Unit, Unit> RandomlySelectCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesForSelectedItemsCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
@@ -304,6 +325,12 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
     public Interaction<string, bool> ShowAutoDetectWorkshopItemLinkDialogInteraction { get; } = new();
 
     public Interaction<string, bool> ConfirmOpenHigherVersionFileInteraction { get; } = new();
+
+    public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, bool> ConfirmDeleteRedundantVpkFilesInteraction { get; } = new();
+
+    public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, Unit> ShowDeleteRedundantVpkFilesSuccessInteraction { get; } = new();
+
+    public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
 
     public async void InitIfNot()
     {
@@ -634,6 +661,40 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveab
         AddonRoot = null;
         _checkClipboardTimer.Dispose();
         _autoRedownloadTimer.Dispose();
+    }
+
+    private async Task DeleteRedundantVpkFiles(bool selectedItems = false)
+    {
+        var addonRoot = AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
+
+        IEnumerable<AddonNode>? targetAddons = selectedItems ?
+            AddonNodeExplorerViewModel?.SelectedNodes?.SelectMany(addon => addon.GetSelfAndDescendants()) :
+            addonRoot.GetDescendants();
+        if (targetAddons is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var report = WorkshopVpkAddon.DeleteRedundantVpkFilesReport.Combine(
+                targetAddons.OfType<WorkshopVpkAddon>().Select(addon => addon.RequestDeleteRedundantVpkFiles()));
+            bool confirm = await ConfirmDeleteRedundantVpkFilesInteraction.Handle(report);
+            if (!confirm)
+            {
+                return;
+            }
+            report.Execute();
+            await ShowDeleteRedundantVpkFilesSuccessInteraction.Handle(report);
+        }
+        catch (Exception ex)
+        {
+            await ShowExceptionInteraction.Handle(ex);
+        }
     }
 
     private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)

@@ -771,4 +771,19 @@
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage" xml:space="preserve">
+    <value>{0} redundant VPK file(s) with a total size of {1} were found. Each addon's directory will retain only the latest VPK file. Are you sure you want to proceed? </value>
+  </data>
+  <data name="DeleteRedundantVpkFiles" xml:space="preserve">
+    <value>Delete Redundant VPK files</value>
+  </data>
+  <data name="HintSelectedItems" xml:space="preserve">
+    <value>(selected items)</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage" xml:space="preserve">
+    <value>No redundant VPK files were found.</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage" xml:space="preserve">
+    <value>{0} redundant VPK file(s) with a total size of {1} have been deleted.</value>
+  </data>
 </root>

@@ -34,6 +34,9 @@
       <Button
         Content="{x:Static r:Texts.ApplyTagsFromWorkshop}"
         Command="{Binding ApplyTagsFromWorkshopCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.DeleteRedundantVpkFiles}"
+        Command="{Binding DeleteRedundantVpkFilesCommand}"/>
     </StackPanel>
 
     <!--item id-->

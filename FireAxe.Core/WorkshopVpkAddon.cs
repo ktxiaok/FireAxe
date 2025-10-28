@@ -15,7 +15,7 @@ public class WorkshopVpkAddon : VpkAddon
         Formatting = Formatting.Indented,
     };
 
-    private static Regex _publishedFileIdLinkRegex = new(@"steamcommunity\.com/(?:sharedfiles|workshop)/filedetails/\?.*id=(\d+)"); 
+    private static readonly Regex s_publishedFileIdLinkRegex = new(@"steamcommunity\.com/(?:sharedfiles|workshop)/filedetails/\?.*id=(\d+)"); 
 
     private ulong? _publishedFileId = null;
 
@@ -165,7 +165,7 @@ public class WorkshopVpkAddon : VpkAddon
     {
         id = 0;
 
-        var match = _publishedFileIdLinkRegex.Match(input);
+        var match = s_publishedFileIdLinkRegex.Match(input);
         if (match.Success)
         {
             if (ulong.TryParse(match.Groups[1].ValueSpan, out id))
@@ -237,6 +237,118 @@ public class WorkshopVpkAddon : VpkAddon
         {
             Log.Error(ex, "Exception occurred during deleting the image cache file: {FilePath}", imagePath);
         }
+    }
+
+    public class DeleteRedundantVpkFilesReport
+    {
+        internal static readonly DeleteRedundantVpkFilesReport Empty = new([]);
+
+        internal DeleteRedundantVpkFilesReport(IReadOnlyCollection<string> files)
+        {
+            Files = files;
+            long totalFileSize = 0;
+            foreach (string file in files)
+            {
+                try
+                {
+                    totalFileSize += new FileInfo(file).Length;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during getting the size of the file {FilePath}", file);
+                }
+            }
+            TotalFileSize = totalFileSize;
+        }
+
+        public bool IsEmpty => Files.Count == 0;
+
+        public IReadOnlyCollection<string> Files { get; }
+
+        public long TotalFileSize { get; }
+
+        public static DeleteRedundantVpkFilesReport Combine(IEnumerable<DeleteRedundantVpkFilesReport> reports)
+        {
+            ArgumentNullException.ThrowIfNull(reports);
+
+            return new DeleteRedundantVpkFilesReport(reports.SelectMany(report => report.Files).ToArray());
+        }
+
+        public void Execute()
+        {
+            foreach (string file in Files)
+            {
+                if (File.Exists(file))
+                {
+                    FileUtils.MoveToRecycleBin(file);
+                }
+            }
+        }
+    }
+
+    public DeleteRedundantVpkFilesReport RequestDeleteRedundantVpkFiles()
+    {
+        string dirPath = FullFilePath;
+        if (!Directory.Exists(dirPath))
+        {
+            return DeleteRedundantVpkFilesReport.Empty;
+        }
+
+        var vpks = new List<string>(Directory.EnumerateFiles(dirPath, "*.vpk"));
+        if (vpks.Count == 0)
+        {
+            return DeleteRedundantVpkFilesReport.Empty;
+        }
+
+        WorkshopVpkMetaInfo? metaInfo = null;
+        string metaInfoPath = Path.Join(dirPath, MetaInfoFileName);
+        if (File.Exists(metaInfoPath))
+        {
+            string metaInfoJson = File.ReadAllText(metaInfoPath);
+            try
+            {
+                metaInfo = JsonConvert.DeserializeObject<WorkshopVpkMetaInfo>(metaInfoJson, s_metaInfoJsonSettings);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during deserializing json file {FilePath}", metaInfoPath);
+            }
+        }
+        bool currentVpkPresent = false;
+        if (metaInfo?.CurrentFile is { } currentVpk)
+        {
+            for (int i = 0, len = vpks.Count; i < len; i++)
+            {
+                if (Path.GetFileName(vpks[i]) == currentVpk)
+                {
+                    vpks.RemoveAt(i);
+                    currentVpkPresent = true;
+                    break;
+                }
+            }
+        }
+
+        if (!currentVpkPresent)
+        {
+            int latestVpkIndex = -1;
+            long maxTicks = 0;
+            for (int i = 0, len = vpks.Count; i < len; i++)
+            {
+                long ticks = File.GetCreationTime(vpks[i]).Ticks;
+                if (latestVpkIndex < 0 || ticks > maxTicks)
+                {
+                    latestVpkIndex = i;
+                    maxTicks = ticks;
+                }
+            }
+
+            if (latestVpkIndex >= 0)
+            {
+                vpks.RemoveAt(latestVpkIndex);
+            }
+        }
+
+        return new DeleteRedundantVpkFilesReport(vpks);
     }
 
     public void CheckDownload()

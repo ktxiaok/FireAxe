@@ -71,6 +71,9 @@ public static class IHierarchyNodeExtensions
         return new EnumerableWrapper<T>(() => GetDescendantsEnumeratorByDfsPreorder(node));
     }
 
+    public static IEnumerable<T> GetSelfAndDescendants<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        => node.GetSelfAndDescendantsByDfsPreorder();
+
     public static IEnumerable<T> GetSelfAndDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
     {
         return new EnumerableWrapper<T>(() => GetSelfAndDescendantsEnumeratorByDfsPreorder(node));

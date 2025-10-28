@@ -61,6 +61,35 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
 
+        viewModel.ConfirmDeleteRedundantVpkFilesInteraction.RegisterHandler(async context =>
+        {
+            var report = context.Input;
+            if (report.IsEmpty)
+            {
+                await CommonMessageBoxes.ShowInfo(this, Texts.WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage);
+                context.SetOutput(false);
+                return;
+            }
+            var count = report.Files.Count;
+            var totalFileSize = Utils.GetReadableBytes(report.TotalFileSize);
+            bool confirm = await CommonMessageBoxes.Confirm(this, Texts.WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage.FormatNoThrow(count, totalFileSize));
+            context.SetOutput(confirm);
+        }).DisposeWith(disposables);
+        viewModel.ShowDeleteRedundantVpkFilesSuccessInteraction.RegisterHandler(async context =>
+        {
+            var report = context.Input;
+            var count = report.Files.Count;
+            var totalFileSize = Utils.GetReadableBytes(report.TotalFileSize);
+            await CommonMessageBoxes.ShowInfo(this, Texts.WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage.FormatNoThrow(count, totalFileSize));
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
+        viewModel.ShowExceptionInteraction.RegisterHandler(async context =>
+        {
+            await CommonMessageBoxes.ShowException(this, context.Input);
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
         var showCheckingUpdateWindow = () =>
         {
             if (_checkingUpdateWindow == null || _checkingUpdateWindow.Get() == null)

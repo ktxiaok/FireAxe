@@ -771,4 +771,19 @@
   <data name="Confirm" xml:space="preserve">
     <value>确认</value>
   </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage" xml:space="preserve">
+    <value>发现了总大小为{1}的{0}个多余的VPK文件。每个模组的目录只会保留一个最新的VPK文件。你确定要继续吗？</value>
+  </data>
+  <data name="DeleteRedundantVpkFiles" xml:space="preserve">
+    <value>删除多余的VPK文件</value>
+  </data>
+  <data name="HintSelectedItems" xml:space="preserve">
+    <value>(选中的项目)</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage" xml:space="preserve">
+    <value>未发现多余的VPK文件。</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage" xml:space="preserve">
+    <value>已删除总大小为{1}的{0}个多余的VPK文件。</value>
+  </data>
 </root>

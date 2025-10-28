@@ -538,6 +538,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete Redundant VPK files.
+        /// </summary>
+        public static string DeleteRedundantVpkFiles {
+            get {
+                return ResourceManager.GetString("DeleteRedundantVpkFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (Include tags in all addons).
         /// </summary>
         public static string DeleteTagCompletelyTip {
@@ -1065,6 +1074,15 @@ namespace FireAxe.Resources {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (selected items).
+        /// </summary>
+        public static string HintSelectedItems {
+            get {
+                return ResourceManager.GetString("HintSelectedItems", resourceCulture);
             }
         }
         
@@ -2001,6 +2019,33 @@ namespace FireAxe.Resources {
         public static string WorkshopItemAutoUpdate {
             get {
                 return ResourceManager.GetString("WorkshopItemAutoUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} redundant VPK file(s) with a total size of {1} were found. Each addon&apos;s directory will retain only the latest VPK file. Are you sure you want to proceed? .
+        /// </summary>
+        public static string WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage {
+            get {
+                return ResourceManager.GetString("WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No redundant VPK files were found..
+        /// </summary>
+        public static string WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage {
+            get {
+                return ResourceManager.GetString("WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} redundant VPK file(s) with a total size of {1} have been deleted..
+        /// </summary>
+        public static string WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage {
+            get {
+                return ResourceManager.GetString("WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage", resourceCulture);
             }
         }
         
