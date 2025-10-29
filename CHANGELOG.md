@@ -1,5 +1,6 @@
 - add: VPK conflict checking system
 - add: feature to delete redundant VPK files for WorkshopVpkAddons
+- improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
 - remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes

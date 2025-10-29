@@ -6,11 +6,8 @@ using System;
 
 namespace FireAxe;
 
-public class DownloadService : IDownloadService
+public sealed class DownloadService : IDownloadService
 {
-    public const string DownloadingFileExtension = ".downloading";
-    public const string DownloadInfoFileExtension = ".downloadinfo";
-
     private const int SaveDownloadProgressIntervalMs = 1000;
 
     private static readonly JsonSerializerSettings s_downloadInfoJsonSettings = new()
@@ -60,8 +57,8 @@ public class DownloadService : IDownloadService
                 try
                 {
                     DownloadPackage? downloadPackage = null;
-                    string downloadInfoFilePath = filePath + DownloadInfoFileExtension;
-                    string downloadingFilePath = filePath + DownloadingFileExtension;
+                    string downloadInfoFilePath = filePath + IDownloadService.DownloadInfoFileExtension;
+                    string downloadingFilePath = filePath + IDownloadService.DownloadingFileExtension;
                     if (File.Exists(downloadInfoFilePath))
                     {
                         try
@@ -76,7 +73,7 @@ public class DownloadService : IDownloadService
                         }
                         catch (Exception ex)
                         {
-                            Log.Error(ex, "Exception occurred during reading .downloadinfo file: {FilePath}", downloadInfoFilePath);
+                            Log.Error(ex, $"Exception occurred during reading the {IDownloadService.DownloadInfoFileExtension} file: {FilePath}", downloadInfoFilePath);
                         }
                         if (downloadPackage != null)
                         {
@@ -312,8 +309,8 @@ public class DownloadService : IDownloadService
             }
             else
             {
-                string downloadingPath = _filePath + DownloadingFileExtension;
-                string downloadInfoPath = _filePath + DownloadInfoFileExtension;
+                string downloadingPath = _filePath + IDownloadService.DownloadingFileExtension;
+                string downloadInfoPath = _filePath + IDownloadService.DownloadInfoFileExtension;
                 try
                 {
                     if (File.Exists(_filePath))
@@ -330,7 +327,7 @@ public class DownloadService : IDownloadService
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Exception occurred during deleting .downloadinfo file: {FilePath}", downloadInfoPath);
+                        Log.Error(ex, "Exception occurred during deleting the file: {FilePath}", downloadInfoPath);
                     }
                     lock (_downloadLock)
                     {
@@ -377,14 +374,14 @@ public class DownloadService : IDownloadService
             }
             if (needSave)
             {
-                string savePath = _filePath + DownloadInfoFileExtension;
+                string savePath = _filePath + IDownloadService.DownloadInfoFileExtension;
                 try
                 {
                     File.WriteAllText(savePath, JsonConvert.SerializeObject(_download!.Package, s_downloadInfoJsonSettings));
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Exception occurred during writing .downloadinfo file: {FilePath}", savePath);
+                    Log.Error(ex, $"Exception occurred during writing {IDownloadService.DownloadInfoFileExtension} file: {FilePath}", savePath);
                 }
             }
         }
