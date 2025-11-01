@@ -13,14 +13,14 @@ public partial class VpkAddonConflictingDetailsView : ReactiveUserControl<VpkAdd
 {
     public VpkAddonConflictingDetailsView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
 
         this.RegisterViewModelConnection(ConnectViewModel);
-
-        InitializeComponent();
     }
 
     private void ConnectViewModel(VpkAddonConflictingDetailsViewModel viewModel, CompositeDisposable disposables)

@@ -5,7 +5,8 @@
   xmlns:local="using:FireAxe"
   xmlns:conv="using:FireAxe.ValueConverters"
   xmlns:dt="using:FireAxe.DataTemplates"
-  xmlns:r="using:FireAxe.Resources">
+  xmlns:r="using:FireAxe.Resources"
+  xmlns:sys="using:System">
 
   <Application.DataTemplates>
     <dt:ViewLocator/>
@@ -93,6 +94,8 @@
 
     <Thickness x:Key="ExpanderHeaderPadding">5</Thickness>
     <Thickness x:Key="ExpanderContentPadding">5</Thickness>
+
+    <sys:Double x:Key="AddonTileSize">75</sys:Double>
   </Application.Resources>
   
 </Application>

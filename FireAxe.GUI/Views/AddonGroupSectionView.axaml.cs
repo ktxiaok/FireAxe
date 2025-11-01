@@ -12,10 +12,11 @@ public partial class AddonGroupSectionView : ReactiveUserControl<AddonGroupViewM
 {
     public AddonGroupSectionView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
-        InitializeComponent();
     }
 }

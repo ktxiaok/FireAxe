@@ -13,6 +13,8 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
 {
     public AddonNodeView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             this.WhenAnyValue(x => x.ViewModel)
@@ -47,8 +49,6 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
                 })
                 .DisposeWith(disposables);
         });
-
-        InitializeComponent();
 
         autoSetNameButton.Click += AutoSetNameButton_Click;
         editTagButton.Click += EditTagButton_Click;

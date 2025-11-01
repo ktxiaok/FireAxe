@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
@@ -15,6 +16,9 @@ namespace FireAxe.Views;
 
 public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplorerViewModel>
 {
+    public static readonly StyledProperty<bool> IsAddonNodeViewEnabledProperty =
+        AvaloniaProperty.Register<AddonNodeExplorerView, bool>(nameof(IsAddonNodeViewEnabled), defaultValue: true);
+
     public AddonNodeExplorerView()
     {
         InitializeComponent();
@@ -33,7 +37,6 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         this.RegisterViewModelConnection(ConnectViewModel);
 
         DoubleTapped += AddonNodeExplorerView_DoubleTapped;
-        AddHandler(ListBox.SelectionChangedEvent, AddonNodeExplorerView_SelectionChanged);
         PointerReleased += AddonNodeExplorerView_PointerReleased;
 
         searchOptionsButton.Click += (sender, e) =>
@@ -42,26 +45,20 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         };
     }
 
+    public bool IsAddonNodeViewEnabled
+    {
+        get => GetValue(IsAddonNodeViewEnabledProperty);
+        set => SetValue(IsAddonNodeViewEnabledProperty, value);
+    }
+
     private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
     {
-        var setSelection = (IEnumerable<AddonNode> nodes) =>
-        {
-            var listBox = FindActiveListBox();
-            if (listBox == null)
+        viewModel.WhenAnyValue(x => x.TileViewSize)
+            .Subscribe(size =>
             {
-                return;
-            }
-            var selection = listBox.Selection;
-            SelectionModelHelper.Select(selection, nodes, (obj) =>
-            {
-                if (obj is AddonNodeSimpleViewModel viewModel)
-                {
-                    return viewModel.Addon;
-                }
-                return null;
-            });
-        };
-        viewModel.SetSelection += setSelection;
+                Resources["AddonTileSize"] = size;
+            })
+            .DisposeWith(disposables);
 
         viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
         {
@@ -105,36 +102,6 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
             context.SetOutput(reply);
         }).DisposeWith(disposables);
-
-        Disposable.Create(() =>
-        {
-            viewModel.SetSelection -= setSelection;
-        }).DisposeWith(disposables);
-    }
-
-    private ListBox? FindActiveListBox()
-    {
-        return Find(this);
-        
-        ListBox? Find(ILogical current)
-        {
-            if (current is ListBox listBox)
-            {
-                if (listBox.IsVisible)
-                {
-                    return listBox;
-                }
-            }
-            foreach (var child in current.LogicalChildren)
-            {
-                var result = Find(child);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-            return null;
-        }
     }
 
     private void AddonNodeExplorerView_DoubleTapped(object? sender, TappedEventArgs e)
@@ -152,21 +119,6 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
                         e.Handled = true;
                     }
                 }
-            }
-        }
-    }
-
-    private void AddonNodeExplorerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var viewModel = ViewModel;
-        if (viewModel != null)
-        {
-            if (e.Source is ListBox listBox)
-            {
-                viewModel.Selection = listBox.Selection.SelectedItems
-                    .Select(item => item as AddonNodeListItemViewModel)
-                    .Where(x => x != null)
-                    .ToArray()!;
             }
         }
     }

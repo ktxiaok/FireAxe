@@ -13,6 +13,8 @@ public partial class VpkAddonConflictListWindow : ReactiveWindow<VpkAddonConflic
 {
     public VpkAddonConflictListWindow()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
@@ -31,7 +33,5 @@ public partial class VpkAddonConflictListWindow : ReactiveWindow<VpkAddonConflic
                 context.SetOutput(Unit.Default);
             }).DisposeWith(disposables);
         });
-
-        InitializeComponent();
     }
 }

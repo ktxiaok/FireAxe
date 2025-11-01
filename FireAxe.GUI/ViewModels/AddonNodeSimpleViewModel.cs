@@ -321,7 +321,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             .ToProperty(this, nameof(FileSizeReadable));
         addon.WhenAnyValue(x => x.CustomImagePath)
             .Skip(1)
-            .Throttle(TimeSpan.FromSeconds(0.5))
+            .Throttle(TimeSpan.FromSeconds(0.5), RxApp.MainThreadScheduler)
             .Subscribe(_ => Refresh())
             .DisposeWith(disposables);
         if (addon is VpkAddon vpkAddon)

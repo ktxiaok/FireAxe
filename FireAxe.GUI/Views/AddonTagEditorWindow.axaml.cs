@@ -15,14 +15,14 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
 {
     public AddonTagEditorWindow()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
 
         this.RegisterViewModelConnection(ConnectViewModel);
-
-        InitializeComponent();
     }
 
     private void ConnectViewModel(AddonTagEditorViewModel viewModel, CompositeDisposable disposables)

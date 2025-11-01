@@ -4,7 +4,7 @@ namespace FireAxe.ViewModels;
 
 public class AddonNodeListItemViewModelDesign : AddonNodeListItemViewModel
 {
-    public AddonNodeListItemViewModelDesign() : base(DesignHelper.CreateTestAddonNode(), null)
+    public AddonNodeListItemViewModelDesign() : base(DesignHelper.CreateTestAddonNode())
     {
 
     }

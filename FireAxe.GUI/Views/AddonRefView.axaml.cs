@@ -14,12 +14,12 @@ public partial class AddonRefView : ReactiveUserControl<AddonNodeSimpleViewModel
 {
     public AddonRefView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
-
-        InitializeComponent();
 
         jumpButton.Click += JumpButton_Click;
     }

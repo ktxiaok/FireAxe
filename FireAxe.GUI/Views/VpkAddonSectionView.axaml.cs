@@ -14,11 +14,11 @@ public partial class VpkAddonSectionView : ReactiveUserControl<VpkAddonViewModel
 {
     public VpkAddonSectionView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
-
-        InitializeComponent();
     }
 }

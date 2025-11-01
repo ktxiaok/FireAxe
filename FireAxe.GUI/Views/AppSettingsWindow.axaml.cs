@@ -15,14 +15,14 @@ public partial class AppSettingsWindow : ReactiveWindow<AppSettingsViewModel>
 {
     public AppSettingsWindow()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             
         });
 
         this.RegisterViewModelConnection(ConnectViewModel);
-
-        InitializeComponent();
     }
 
     private void ConnectViewModel(AppSettingsViewModel viewModel, CompositeDisposable disposables)

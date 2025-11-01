@@ -23,7 +23,7 @@
         Margin="10">
         <v:AddonIconView
           Name="iconView"
-          ImageSize="{Binding ContainerViewModel.TileViewSize, FallbackValue=200}"
+          ImageSize="{DynamicResource AddonTileSize}"
           SpecialIconSize="{Binding $self.ImageSize}"/>
       </Panel>
       <Panel Height="30">

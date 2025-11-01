@@ -79,8 +79,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             .ToProperty(this, nameof(TitleExtraInfo));
 
         _hasSelection =
-            this.WhenAnyValue(x => x.AddonNodeExplorerViewModel, x => x.AddonNodeExplorerViewModel!.SelectionCount, (explorerViewModel, selectionCount) => explorerViewModel?.SelectionCount ?? 0)
-            .Select(count => count > 0)
+            this.WhenAnyValue(x => x.AddonNodeExplorerViewModel, x => x.AddonNodeExplorerViewModel!.HasSelection, (viewModel, _) => viewModel?.HasSelection ?? false)
             .ToProperty(this, nameof(HasSelection));
 
         OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -156,25 +155,25 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 var disposables = _addonNodeExplorerViewModelDisposables;
                 explorerViewModel.SortMethod = _settings.AddonNodeSortMethod;
                 explorerViewModel.IsAscendingOrder = _settings.IsAddonNodeAscendingOrder;
-                explorerViewModel.ContainerViewModel.ListItemViewKind = _settings.AddonNodeListItemViewKind;
+                explorerViewModel.ListItemViewKind = _settings.AddonNodeListItemViewKind;
                 explorerViewModel.WhenAnyValue(x => x.SortMethod)
-                .BindTo(_settings, x => x.AddonNodeSortMethod)
-                .DisposeWith(disposables);
+                    .BindTo(_settings, x => x.AddonNodeSortMethod)
+                    .DisposeWith(disposables);
                 explorerViewModel.WhenAnyValue(x => x.IsAscendingOrder)
-                .BindTo(_settings, x => x.IsAddonNodeAscendingOrder)
-                .DisposeWith(disposables);
-                explorerViewModel.WhenAnyValue(x => x.ContainerViewModel.ListItemViewKind)
-                .BindTo(_settings, x => x.AddonNodeListItemViewKind)
-                .DisposeWith(disposables);
+                    .BindTo(_settings, x => x.IsAddonNodeAscendingOrder)
+                    .DisposeWith(disposables);
+                explorerViewModel.WhenAnyValue(x => x.ListItemViewKind)
+                    .BindTo(_settings, x => x.AddonNodeListItemViewKind)
+                    .DisposeWith(disposables);
                 _settings.WhenAnyValue(x => x.AddonNodeSortMethod)
-                .BindTo(explorerViewModel, x => x.SortMethod)
-                .DisposeWith(disposables);
+                    .BindTo(explorerViewModel, x => x.SortMethod)
+                    .DisposeWith(disposables);
                 _settings.WhenAnyValue(x => x.IsAddonNodeAscendingOrder)
-                .BindTo(explorerViewModel, x => x.IsAscendingOrder)
-                .DisposeWith(disposables);
+                    .BindTo(explorerViewModel, x => x.IsAscendingOrder)
+                    .DisposeWith(disposables);
                 _settings.WhenAnyValue(x => x.AddonNodeListItemViewKind)
-                .BindTo(explorerViewModel, x => x.ContainerViewModel.ListItemViewKind)
-                .DisposeWith(disposables);
+                    .BindTo(explorerViewModel, x => x.ListItemViewKind)
+                    .DisposeWith(disposables);
             });
 
         this.WhenActivated((CompositeDisposable disposables) =>

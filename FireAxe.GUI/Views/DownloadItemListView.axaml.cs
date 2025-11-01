@@ -14,6 +14,8 @@ public partial class DownloadItemListView : ReactiveUserControl<DownloadItemList
 {
     public DownloadItemListView()
     {
+        InitializeComponent();
+
         AddHandler(ListBox.SelectionChangedEvent, DownloadItemListView_SelectionChanged);
 
         this.WhenActivated((CompositeDisposable disposables) =>
@@ -24,8 +26,6 @@ public partial class DownloadItemListView : ReactiveUserControl<DownloadItemList
             })
             .DisposeWith(disposables);
         });
-
-        InitializeComponent();
     }
 
     private ListBox? FindListBox()

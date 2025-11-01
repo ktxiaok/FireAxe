@@ -17,14 +17,14 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     public MainWindow()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             ViewModel?.InitIfNot();
         });
 
         this.RegisterViewModelConnection(ConnectViewModel);
-
-        InitializeComponent();
     }
 
     private void ConnectViewModel(MainWindowViewModel viewModel, CompositeDisposable disposables)

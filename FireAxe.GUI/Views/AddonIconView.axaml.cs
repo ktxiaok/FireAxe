@@ -18,12 +18,12 @@ public partial class AddonIconView : ReactiveUserControl<AddonNodeSimpleViewMode
 
     public AddonIconView()
     {
+        InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
         });
-
-        InitializeComponent();
 
         var imageSizeObservable = this.WhenAnyValue(x => x.ImageSize);
         imageSizeObservable.BindTo(image, x => x.Width);
