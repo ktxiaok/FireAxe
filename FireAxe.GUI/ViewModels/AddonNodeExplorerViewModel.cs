@@ -654,13 +654,14 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
     public void GotoGroup(AddonGroup? group)
     {
-        if (group != null)
+        if (group is not null)
         {
-            if (!group.IsValid || group.Root != _addonRoot)
+            if (!group.IsValid || group.Root != AddonRoot)
             {
                 return;
             }
         }
+
         CurrentGroup = group;
     }
 
@@ -671,6 +672,18 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             return;
         }
         GotoGroup(_currentGroup.Group);
+    }
+
+    public void GotoNode(AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+        if (!node.IsValid || node.Root != AddonRoot)
+        {
+            return;
+        }
+
+        CurrentGroup = node.Group;
+        SelectNode(node);
     }
 
     public void ToggleOrderDirection()

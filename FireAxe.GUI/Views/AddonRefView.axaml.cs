@@ -26,6 +26,12 @@ public partial class AddonRefView : ReactiveUserControl<AddonNodeSimpleViewModel
 
     private void JumpButton_Click(object? sender, RoutedEventArgs e)
     {
-        
+        var addon = ViewModel?.Addon;
+        if (addon is null)
+        {
+            return;
+        }
+
+        MessageBus.Current.SendMessage(new AddonNodeJumpMessage(addon));
     }
 }

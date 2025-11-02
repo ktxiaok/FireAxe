@@ -192,6 +192,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             AutoRedownload();
             return true;
         }, AutoRedownloadInterval);
+
+        MessageBus.Current.Listen<AddonNodeJumpMessage>()
+            .Subscribe(msg =>
+            {
+                var explorerViewModel = AddonNodeExplorerViewModel;
+                if (explorerViewModel is null)
+                {
+                    return;
+                }
+
+                explorerViewModel.GotoNode(msg.Target);
+                _windowManager.MainWindow?.Activate();
+            })
+            .DisposeWith(_disposables);
     }
 
     public event Action? ShowCheckingUpdateWindow = null;
