@@ -217,31 +217,27 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         Selection.ObserveCollectionChanges()
             .Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedNodes)));
 
+        UpdateFilterTags();
         this.WhenAnyValue(x => x.SelectedTags, x => x.IsFilterEnabled)
-            .Throttle(TimeSpan.FromSeconds(0.1), RxApp.MainThreadScheduler)
-            .Subscribe(_ =>
-            {
-                if (IsFilterEnabled)
-                {
-                    FilterTags = new HashSet<string>(SelectedTags);
-                }
-                else
-                {
-                    FilterTags = null;
-                }
-            });
+            .Skip(1)
+            .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
+            .Subscribe(_ => UpdateFilterTags());
+        UpdateSearchOptions();
         this.WhenAnyValue(x => x.SearchIgnoreCase,
             x => x.IsSearchFlatten,
             x => x.IsSearchRegex, 
             x => x.TagFilterMode, 
             x => x.FilterTags)
+            .Skip(1)
             .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
             .Subscribe(_ => UpdateSearchOptions());
 
         this.WhenAnyValue(x => x.SearchText)
+            .Skip(1)
             .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
             .Subscribe(_ => RefreshNodes());
         this.WhenAnyValue(x => x.CurrentGroup, x => x.SortMethod, x => x.IsAscendingOrder, x => x.SearchOptions)
+            .Skip(1)
             .Subscribe(_ => RefreshNodes());
 
         this.WhenActivated((CompositeDisposable disposables) =>
@@ -249,10 +245,10 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             _nodeMovedSubject.Subscribe(_ => RefreshNodes())
                 .DisposeWith(disposables);
 
+            UpdateExistingTags();
             AddonRoot.CustomTags.ObserveCollectionChanges()
                 .Subscribe(_ => UpdateExistingTags())
                 .DisposeWith(disposables);
-            UpdateExistingTags();
 
             var nodeMovedListener = (AddonNode node) =>
             {
@@ -266,6 +262,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
                 AddonRoot.DescendantNodeMoved -= nodeMovedListener;
             }).DisposeWith(disposables);
+
+            Refresh();
         });
     }
 
@@ -810,5 +808,17 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     {
         string[] tags = [.. _addonRoot.CustomTags, .. AddonTags.BuiltInTags];
         ExistingTags = tags;
+    }
+
+    private void UpdateFilterTags()
+    {
+        if (IsFilterEnabled)
+        {
+            FilterTags = new HashSet<string>(SelectedTags);
+        }
+        else
+        {
+            FilterTags = null;
+        }
     }
 }
