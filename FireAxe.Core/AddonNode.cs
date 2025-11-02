@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -54,12 +55,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         _tagsReadOnly = new(_tags);
         _problemsReadOnly = new(_problems);
 
+        _fileNotExistProblemSource = new(this);
+
+        PropertyChanged += OnPropertyChanged;
+
         ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
         ((INotifyCollectionChanged)_problems).CollectionChanged += OnProblemCollectionChanged;
-
-        _fileNotExistProblemSource = new(this);
     }
- 
+
     public virtual Type SaveType => typeof(AddonNodeSave);
 
     public bool IsValid => _isValid;
@@ -937,6 +940,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     protected virtual void OnAncestorsChanged()
     {
+        NotifyChanged(nameof(FullName));
+        NotifyChanged(nameof(FilePath));
         NotifyChanged(nameof(PriorityInHierarchy));
         NotifyChanged(nameof(TagsInHierarchy));
     }
@@ -967,6 +972,24 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     internal string GetFullFilePath(string path)
     {
         return Path.Join(Root.DirectoryPath, path);
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var name = e.PropertyName;
+        if (name == nameof(Name))
+        {
+            NotifyChanged(nameof(FileName));
+            foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
+            {
+                node.NotifyChanged(nameof(FullName));
+                node.NotifyChanged(nameof(FilePath));
+            }
+        }
+        else if (name == nameof(FilePath))
+        {
+            NotifyChanged(nameof(FullFilePath));
+        }
     }
 
     private void OnTagCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
