@@ -792,4 +792,19 @@
   <data name="ParentGroupColon" xml:space="preserve">
     <value>Parent Group: </value>
   </data>
+  <data name="WorkshopVpkFinder" xml:space="preserve">
+    <value>Workshop VPK Finder </value>
+  </data>
+  <data name="OpenWebsite" xml:space="preserve">
+    <value>Open Website</value>
+  </data>
+  <data name="FindFromDirectory" xml:space="preserve">
+    <value>Find from Directory</value>
+  </data>
+  <data name="HintGettingTitle" xml:space="preserve">
+    <value>(Getting the title...)</value>
+  </data>
+  <data name="HintFailedGetTitle" xml:space="preserve">
+    <value>(Failed to get the title)</value>
+  </data>
 </root>

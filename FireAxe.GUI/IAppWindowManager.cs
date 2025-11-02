@@ -21,4 +21,6 @@ public interface IAppWindowManager
     void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
 
     void OpenVpkConflictListWindow(AddonRoot addonRoot);
+
+    void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel);
 }

@@ -1,0 +1,102 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:conv="using:FireAxe.ValueConverters"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+        x:Class="FireAxe.Views.WorkshopVpkFinderWindow"
+        x:DataType="vm:WorkshopVpkFinderViewModel"
+        Title="{x:Static r:Texts.WorkshopVpkFinder}"
+        Width="600" Height="600"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel
+    Margin="5">
+    <DockPanel
+      DockPanel.Dock="Bottom"
+      LastChildFill="False">
+      <Button
+        DockPanel.Dock="Left"
+        Command="{Binding FindFromDirectoryCommand}"
+        Content="{x:Static r:Texts.FindFromDirectory}"
+        Margin="5"/>
+
+      <Button
+        DockPanel.Dock="Right"
+        Command="{Binding CreateCommand}"
+        Content="{x:Static r:Texts.Create}"
+        Margin="5"/>
+    </DockPanel>
+    <Border
+      Margin="0, 5, 0, 5"
+      Padding="5"
+      BorderBrush="Gray"
+      BorderThickness="2">
+      <ScrollViewer>
+        <Panel>
+          <ItemsControl
+            ItemsSource="{Binding StagedItems}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel
+                  LastChildFill="False">
+                  <StackPanel
+                    DockPanel.Dock="Left"
+                    Orientation="Horizontal">
+                    <SelectableTextBlock
+                      Text="{Binding PublishedFileId}"
+                      VerticalAlignment="Center"
+                      Margin="2.5"/>
+                    <Panel
+                      IsVisible="{Binding IsGetTitleFailed}">
+                      <TextBlock
+                        Text="{x:Static r:Texts.HintFailedGetTitle}"
+                        Foreground="{StaticResource brush_warning}"
+                        VerticalAlignment="Center"
+                        Margin="2.5"/>
+                    </Panel>
+                    <Panel
+                      IsVisible="{Binding !IsGetTitleFailed}">
+                      <SelectableTextBlock
+                        Text="{Binding Title, TargetNullValue={x:Static r:Texts.HintGettingTitle}}"
+                        TextWrapping="Wrap"
+                        VerticalAlignment="Center"
+                        Margin="2.5"/>
+                    </Panel>
+                  </StackPanel>
+
+                  <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal">
+                    <Button
+                      Command="{Binding OpenWebsite}"
+                      Content="{x:Static r:Texts.OpenWebsite}"
+                      Margin="2.5"/>
+                    <Button
+                      Command="{Binding Remove}"
+                      Content="{x:Static r:Texts.Remove}"
+                      Margin="2.5"/>
+                  </StackPanel>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+
+          <TextBlock
+            IsVisible="{Binding StagedItems.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}}"
+            Text="{x:Static r:Texts.Empty}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="10"/>
+        </Panel>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

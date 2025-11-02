@@ -110,6 +110,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
             _windowManager.OpenVpkConflictListWindow(_addonRoot);
         }, _addonRootNotNullObservable);
+        OpenWorkshopVpkFinderWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenWorkshopVpkFinderWindow(this));
 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
@@ -298,6 +299,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public ReactiveCommand<Unit, Unit> OpenTagManagerWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenVpkConflictListWindowCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenWorkshopVpkFinderWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 

@@ -792,4 +792,19 @@
   <data name="ParentGroupColon" xml:space="preserve">
     <value>上级组：</value>
   </data>
+  <data name="WorkshopVpkFinder" xml:space="preserve">
+    <value>创意工坊VPK查找器</value>
+  </data>
+  <data name="OpenWebsite" xml:space="preserve">
+    <value>打开网站</value>
+  </data>
+  <data name="FindFromDirectory" xml:space="preserve">
+    <value>从目录中查找</value>
+  </data>
+  <data name="HintGettingTitle" xml:space="preserve">
+    <value>(正在获取标题...)</value>
+  </data>
+  <data name="HintFailedGetTitle" xml:space="preserve">
+    <value>(无法获取标题)</value>
+  </data>
 </root>

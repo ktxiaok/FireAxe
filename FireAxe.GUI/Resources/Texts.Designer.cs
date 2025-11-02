@@ -997,6 +997,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Find from Directory.
+        /// </summary>
+        public static string FindFromDirectory {
+            get {
+                return ResourceManager.GetString("FindFromDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flatten.
         /// </summary>
         public static string Flatten {
@@ -1074,6 +1083,24 @@ namespace FireAxe.Resources {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (Failed to get the title).
+        /// </summary>
+        public static string HintFailedGetTitle {
+            get {
+                return ResourceManager.GetString("HintFailedGetTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (Getting the title...).
+        /// </summary>
+        public static string HintGettingTitle {
+            get {
+                return ResourceManager.GetString("HintGettingTitle", resourceCulture);
             }
         }
         
@@ -1497,6 +1524,15 @@ namespace FireAxe.Resources {
         public static string OpenDirectoryTip {
             get {
                 return ResourceManager.GetString("OpenDirectoryTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Website.
+        /// </summary>
+        public static string OpenWebsite {
+            get {
+                return ResourceManager.GetString("OpenWebsite", resourceCulture);
             }
         }
         
@@ -2073,6 +2109,15 @@ namespace FireAxe.Resources {
         public static string WorkshopVpkFileNotLoadProblemExplain {
             get {
                 return ResourceManager.GetString("WorkshopVpkFileNotLoadProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Workshop VPK Finder .
+        /// </summary>
+        public static string WorkshopVpkFinder {
+            get {
+                return ResourceManager.GetString("WorkshopVpkFinder", resourceCulture);
             }
         }
         

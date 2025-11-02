@@ -88,6 +88,17 @@ public class AppWindowManager : IAppWindowManager
         });
     }
 
+    public void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel)
+    {
+        ArgumentNullException.ThrowIfNull(mainWindowViewModel);
+
+        var window = new WorkshopVpkFinderWindow
+        {
+            DataContext = new WorkshopVpkFinderViewModel(mainWindowViewModel, _httpClient)
+        };
+        window.Show();
+    }
+
     private static void OpenWindow<T>(ref WindowReference<T>? windowRef, Func<T> windowFactory) where T : Window
     {
         if (windowRef is null || windowRef.Get() is null)

@@ -7,17 +7,42 @@ using MsBox.Avalonia.Models;
 using MsBox.Avalonia.Enums;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using System.IO;
+using Serilog;
 
 namespace FireAxe.Views;
 
 public static class CommonMessageBoxes
 {
-    public static async Task<string?> ChooseDirectory(Window ownerWindow)
+    public static async Task<string?> ChooseDirectory(Window ownerWindow, string? startDir = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
 
         var storage = ownerWindow.StorageProvider;
-        var options = new FolderPickerOpenOptions() { AllowMultiple = false };
+        IStorageFolder? startStorageFolder = null;
+        if (startDir is not null)
+        {
+            bool startDirExists = false;
+            try
+            {
+                if (Directory.Exists(startDir))
+                {
+                    startDirExists = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during calling Directory.Exists(\"{DirectoryPath}\")", startDir);
+            }
+            if (startDirExists)
+            {
+                startStorageFolder = await storage.TryGetFolderFromPathAsync(startDir);
+            }
+        }
+        var options = new FolderPickerOpenOptions 
+        {
+            AllowMultiple = false, SuggestedStartLocation = startStorageFolder 
+        };
         var folders = await storage.OpenFolderPickerAsync(options);
         if (folders.Count != 1)
         {

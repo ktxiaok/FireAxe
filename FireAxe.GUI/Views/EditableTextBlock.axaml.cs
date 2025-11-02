@@ -28,8 +28,8 @@ public class EditableTextBlock : TemplatedControl
     public const string TemplatePartName_DisplayView = "PART_DisplayView";
     public const string TemplatePartName_EditView = "PART_EditView";
 
-    public static readonly StyledProperty<string> ValueProperty = 
-        AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Value), defaultValue: "", defaultBindingMode: BindingMode.TwoWay, coerce: CoerceValue, enableDataValidation: true);
+    public static readonly StyledProperty<string?> ValueProperty = 
+        AvaloniaProperty.Register<EditableTextBlock, string?>(nameof(Value), defaultValue: null, defaultBindingMode: BindingMode.TwoWay, enableDataValidation: true);
     public static readonly StyledProperty<string?> DisplayProperty =
         AvaloniaProperty.Register<EditableTextBlock, string?>(nameof(Display), defaultValue: null);
     public static readonly StyledProperty<string> WatermarkProperty =
@@ -69,7 +69,7 @@ public class EditableTextBlock : TemplatedControl
 
     public TextBox? TextBox => _textBox;
 
-    public string Value
+    public string? Value
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
@@ -220,15 +220,6 @@ public class EditableTextBlock : TemplatedControl
                 DataValidationErrors.SetError(_textBox, null);
             }
         }
-    }
-
-    private static string CoerceValue(AvaloniaObject sender, string? value)
-    {
-        if (value == null)
-        {
-            return "";
-        }
-        return value;
     }
 
     private static string CoerceWatermark(AvaloniaObject sender, string? value)
