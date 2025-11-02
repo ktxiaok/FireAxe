@@ -786,4 +786,10 @@
   <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage" xml:space="preserve">
     <value>已删除总大小为{1}的{0}个多余的VPK文件。</value>
   </data>
+  <data name="PathColon" xml:space="preserve">
+    <value>路径：</value>
+  </data>
+  <data name="ParentGroupColon" xml:space="preserve">
+    <value>上级组：</value>
+  </data>
 </root>

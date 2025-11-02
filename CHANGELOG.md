@@ -3,6 +3,7 @@
 - improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
 - remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 
+- add: Path and Parent Group to AddonNodeView
 - add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
 - add: app color theme settings (supporting Light and Dark)
 - add: addon sort method and addon view kind will be memorized

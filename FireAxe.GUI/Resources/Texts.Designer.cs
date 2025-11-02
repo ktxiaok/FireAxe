@@ -1519,6 +1519,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parent Group: .
+        /// </summary>
+        public static string ParentGroupColon {
+            get {
+                return ResourceManager.GetString("ParentGroupColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path: .
+        /// </summary>
+        public static string PathColon {
+            get {
+                return ResourceManager.GetString("PathColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause.
         /// </summary>
         public static string Pause {

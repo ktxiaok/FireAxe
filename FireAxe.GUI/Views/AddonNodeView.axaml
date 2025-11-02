@@ -68,6 +68,36 @@
       <v:AddonNodeEnableButton/>
     </StackPanel>
 
+    <!--path-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding Addon.Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.PathColon}"/>
+      <TextBlock
+        DockPanel.Dock="Right"
+        Classes="PropertyValue"
+        Text="{Binding Addon.FullName}"
+        TextWrapping="Wrap"/>
+    </DockPanel>
+
+    <!--parent group-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding Addon.Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.ParentGroupColon}"/>
+      <v:AddonRefView
+        DockPanel.Dock="Right"
+        DataContext="{Binding Addon.Group, Converter={x:Static conv:AddonNodeConverters.ToSimpleViewModel}}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"/>
+    </DockPanel>
+
     <!--priority-->
     <DockPanel Classes="PropertyRow">
       <TextBlock

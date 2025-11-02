@@ -786,4 +786,10 @@
   <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage" xml:space="preserve">
     <value>{0} redundant VPK file(s) with a total size of {1} have been deleted.</value>
   </data>
+  <data name="PathColon" xml:space="preserve">
+    <value>Path: </value>
+  </data>
+  <data name="ParentGroupColon" xml:space="preserve">
+    <value>Parent Group: </value>
+  </data>
 </root>
