@@ -9,52 +9,125 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using System.IO;
 using Serilog;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FireAxe.Views;
 
 public static class CommonMessageBoxes
 {
-    public static async Task<string?> ChooseDirectory(Window ownerWindow, string? startDir = null)
+    public static Task<IReadOnlyList<string>> ChooseDirectories(Window ownerWindow, ChooseDirectoryOptions options)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(options);
+
+        return ChooseDirectories(ownerWindow, options, true);
+    }
+
+    public static async Task<string?> ChooseDirectory(Window ownerWindow, ChooseDirectoryOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var result = await ChooseDirectories(ownerWindow, options, false);
+        if (result.Count == 1)
+        {
+            return result[0];
+        }
+        return null;
+    }
+
+    private static async Task<IReadOnlyList<string>> ChooseDirectories(Window ownerWindow, ChooseDirectoryOptions options, bool allowMultiple)
+    {
+        var storage = ownerWindow.StorageProvider;
+        var result = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = options.Title,
+            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedFileName = options.SuggestedFileName,
+            AllowMultiple = allowMultiple
+        });
+        return GetPath(result);
+    }
+
+    public static Task<IReadOnlyList<string>> ChooseFiles(Window ownerWindow, ChooseFileOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(options);
+
+        return ChooseFiles(ownerWindow, options, true);
+    }
+
+    public static async Task<string?> ChooseFile(Window ownerWindow, ChooseFileOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var result = await ChooseFiles(ownerWindow, options, false);
+        if (result.Count == 1)
+        {
+            return result[0];
+        }
+        return null;
+    }
+
+    private static async Task<IReadOnlyList<string>> ChooseFiles(Window ownerWindow, ChooseFileOptions options, bool allowMultiple)
+    {
+        var storage = ownerWindow.StorageProvider;
+        var result = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = options.Title,
+            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedFileName = options.SuggestedFileName,
+            AllowMultiple = allowMultiple,
+            FileTypeFilter = options.FilePatterns?.Select(pattern => new FilePickerFileType(null) { Patterns = [pattern] }).ToArray() 
+        });
+        return GetPath(result);
+    }
+
+    public static async Task<string?> SaveFile(Window ownerWindow, SaveFileOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(options);
 
         var storage = ownerWindow.StorageProvider;
-        IStorageFolder? startStorageFolder = null;
-        if (startDir is not null)
+        var result = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            bool startDirExists = false;
-            try
+            Title = options.Title,
+            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedFileName = options.SuggestedFileName,
+            FileTypeChoices = options.FilePatterns?.Select(pattern => new FilePickerFileType(null) { Patterns = [pattern] }).ToArray(),
+            DefaultExtension = options.DefaultFileExtension,
+            ShowOverwritePrompt = true
+        });
+        if (result is not null && result.Path.IsFile)
+        {
+            return result.Path.LocalPath;
+        }
+        return null;
+    }
+
+    private static IReadOnlyList<string> GetPath(IEnumerable<IStorageItem> storageItems)
+    {
+        return storageItems.Where(storageFolder => storageFolder.Path.IsFile)
+            .Select(storageFolder => storageFolder.Path.LocalPath)
+            .ToArray();
+    }
+
+    private static async Task<IStorageFolder?> TryGetExistingStorageFolderAsync(string path, IStorageProvider storage)
+    {
+        try
+        {
+            if (Directory.Exists(path))
             {
-                if (Directory.Exists(startDir))
-                {
-                    startDirExists = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception occurred during calling Directory.Exists(\"{DirectoryPath}\")", startDir);
-            }
-            if (startDirExists)
-            {
-                startStorageFolder = await storage.TryGetFolderFromPathAsync(startDir);
+                return await storage.TryGetFolderFromPathAsync(path);
             }
         }
-        var options = new FolderPickerOpenOptions 
+        catch (Exception ex)
         {
-            AllowMultiple = false, SuggestedStartLocation = startStorageFolder 
-        };
-        var folders = await storage.OpenFolderPickerAsync(options);
-        if (folders.Count != 1)
-        {
-            return null;
+            Log.Error(ex, $"Exception occurred during {nameof(CommonMessageBoxes)}.{nameof(TryGetExistingStorageFolderAsync)}.");
         }
-        var folder = folders[0];
-        var path = folder.Path;
-        if (!path.IsFile)
-        {
-            return null;
-        }
-        return FileUtils.NormalizePath(path.LocalPath);
+        return null;
     }
 
     public static async Task<bool> Confirm(Window ownerWindow, string message, string? title = null)
@@ -189,4 +262,30 @@ public static class CommonMessageBoxes
             return null;
         }
     }
+}
+
+public abstract class FileSystemPickerOptions
+{
+    public string? Title { get; set; } = null;
+
+    public string? StartDirectoryPath { get; set; } = null;
+
+    public string? SuggestedFileName { get; set; } = null;
+}
+
+public class ChooseDirectoryOptions : FileSystemPickerOptions
+{
+
+}
+
+public class ChooseFileOptions : FileSystemPickerOptions
+{
+    public IReadOnlyList<string>? FilePatterns { get; set; } = null; 
+}
+
+public class SaveFileOptions : FileSystemPickerOptions
+{
+    public IReadOnlyList<string>? FilePatterns { get; set; } = null;
+
+    public string? DefaultFileExtension { get; set; } = null;
 }

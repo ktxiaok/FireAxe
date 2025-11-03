@@ -27,7 +27,7 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
 
         SelectGamePathCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
+            var path = await ChooseGamePathDirectoryInteraction.Handle(Unit.Default);
             if (path != null)
             {
                 _settings.GamePath = path;
@@ -60,7 +60,7 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
 
     public ReactiveCommand<Unit, Unit> FindGamePathCommand { get; }
 
-    public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
+    public Interaction<Unit, string?> ChooseGamePathDirectoryInteraction { get; } = new();
 
     public Interaction<string, bool> ConfirmFoundGamePathInteraction { get; } = new();
 

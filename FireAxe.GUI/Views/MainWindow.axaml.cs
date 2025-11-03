@@ -29,9 +29,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void ConnectViewModel(MainWindowViewModel viewModel, CompositeDisposable disposables)
     {
-        viewModel.ChooseDirectoryInteraction.RegisterHandler(async (context) =>
+        viewModel.ChooseOpenDirectoryInteraction.RegisterHandler(async (context) =>
         {
-            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
+            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this, new ChooseDirectoryOptions { Title = Texts.OpenDirectory }));
         }).DisposeWith(disposables);
 
         viewModel.ShowImportSuccessInteraction.RegisterHandler(async (context) =>

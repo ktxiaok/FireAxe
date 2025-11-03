@@ -84,7 +84,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
         OpenDirectoryCommand = ReactiveCommand.CreateFromTask(async () =>
         {
-            var path = await ChooseDirectoryInteraction.Handle(Unit.Default);
+            var path = await ChooseOpenDirectoryInteraction.Handle(Unit.Default);
             if (path == null)
             {
                 return;
@@ -318,7 +318,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
 
-    public Interaction<Unit, string?> ChooseDirectoryInteraction { get; } = new();
+    public Interaction<Unit, string?> ChooseOpenDirectoryInteraction { get; } = new();
 
     public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
 

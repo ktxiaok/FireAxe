@@ -1780,6 +1780,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Game Path.
+        /// </summary>
+        public static string SelectGamePath {
+            get {
+                return ResourceManager.GetString("SelectGamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set the auto update strategy to Default recursively.
         /// </summary>
         public static string SetAutoUpdateStrategyToDefaultRecursively {

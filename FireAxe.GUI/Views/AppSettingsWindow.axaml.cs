@@ -27,9 +27,9 @@ public partial class AppSettingsWindow : ReactiveWindow<AppSettingsViewModel>
 
     private void ConnectViewModel(AppSettingsViewModel viewModel, CompositeDisposable disposables)
     {
-        viewModel.ChooseDirectoryInteraction.RegisterHandler(async context =>
+        viewModel.ChooseGamePathDirectoryInteraction.RegisterHandler(async context =>
         {
-            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
+            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this, new ChooseDirectoryOptions { Title = Texts.SelectGamePath }));
         }).DisposeWith(disposables);
         viewModel.ConfirmFoundGamePathInteraction.RegisterHandler(async context =>
         {

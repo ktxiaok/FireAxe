@@ -807,4 +807,7 @@
   <data name="HintFailedGetTitle" xml:space="preserve">
     <value>(无法获取标题)</value>
   </data>
+  <data name="SelectGamePath" xml:space="preserve">
+    <value>选择游戏路径</value>
+  </data>
 </root>

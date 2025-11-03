@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using FireAxe.Resources;
 using FireAxe.ViewModels;
 using ReactiveUI;
 
@@ -31,7 +32,11 @@ public partial class WorkshopVpkFinderWindow : ReactiveWindow<WorkshopVpkFinderV
             viewModel.ChooseDirectoryInteraction.RegisterHandler(async context =>
             {
                 string? startDir = context.Input;
-                var dir = await CommonMessageBoxes.ChooseDirectory(this, startDir);
+                var dir = await CommonMessageBoxes.ChooseDirectory(this, new ChooseDirectoryOptions
+                {
+                    Title = Texts.FindFromDirectory,
+                    StartDirectoryPath = startDir
+                });
                 context.SetOutput(dir);
             }).DisposeWith(disposables);
         });
