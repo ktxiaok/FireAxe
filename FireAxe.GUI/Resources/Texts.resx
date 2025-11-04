@@ -810,4 +810,19 @@
   <data name="SelectGamePath" xml:space="preserve">
     <value>Select Game Path</value>
   </data>
+  <data name="ExportSelectedItemsAsAddonRootFile" xml:space="preserve">
+    <value>Export Selected Items as an .addonroot File</value>
+  </data>
+  <data name="SaveAddonRootFile" xml:space="preserve">
+    <value>Save .addonroot File</value>
+  </data>
+  <data name="ImportAddonRootFile" xml:space="preserve">
+    <value>Import .addonroot File</value>
+  </data>
+  <data name="ImportedGroup" xml:space="preserve">
+    <value>Imported Group</value>
+  </data>
+  <data name="SaveAddonRootFileSuccess" xml:space="preserve">
+    <value>The .addonroot file "{0}" saved successfully.</value>
+  </data>
 </root>

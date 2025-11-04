@@ -33,6 +33,23 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this, new ChooseDirectoryOptions { Title = Texts.OpenDirectory }));
         }).DisposeWith(disposables);
+        viewModel.ChooseAddonRootFileToImportInteraction.RegisterHandler(async context =>
+        {
+            context.SetOutput(await CommonMessageBoxes.ChooseFile(this, new ChooseFileOptions
+            {
+                Title = Texts.ImportAddonRootFile,
+                FilePatterns = ["*.addonroot"]
+            }));
+        }).DisposeWith(disposables);
+        viewModel.SaveAddonRootFileInteraction.RegisterHandler(async context =>
+        {
+            context.SetOutput(await CommonMessageBoxes.SaveFile(this, new SaveFileOptions
+            {
+                Title = Texts.SaveAddonRootFile,
+                FilePatterns = ["*.addonroot"],
+                DefaultFileExtension = ".addonroot"
+            }));
+        }).DisposeWith(disposables);
 
         viewModel.ShowImportSuccessInteraction.RegisterHandler(async (context) =>
         {
@@ -181,5 +198,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             context.SetOutput(confirm);
         })
         .DisposeWith(disposables);
+
+        viewModel.ShowSaveAddonRootFileSuccessInteraction.RegisterHandler(async context =>
+        {
+            var filePath = context.Input;
+            await CommonMessageBoxes.ShowInfo(this, Texts.SaveAddonRootFileSuccess.FormatNoThrow(filePath));
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
     }
 }

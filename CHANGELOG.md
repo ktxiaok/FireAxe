@@ -1,6 +1,7 @@
 - add: VPK conflict checking system
 - add: feature to delete redundant VPK files for WorkshopVpkAddons
 - add: Workshop VPK Finder
+- add: support import and export for .addonroot files
 - improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
 - remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 

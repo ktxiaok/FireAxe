@@ -176,9 +176,14 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public event Action<AddonNode>? NewNodeIdRegistered = null;
 
-    public bool TryGetDescendantNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
+    public bool TryGetNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
     {
         return _idToNode.TryGetValue(id, out node);
+    }
+
+    public bool ContainsNodeId(Guid id)
+    {
+        return _idToNode.ContainsKey(id);
     }
 
     public bool AddCustomTag(string tag)
@@ -668,7 +673,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void LoadFile()
     {
-        var save = LoadFile(DirectoryPath);
+        var save = LoadFileFromDirectory(DirectoryPath);
         if (save == null)
         {
             return;
@@ -678,24 +683,24 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void Save()
     {
-        SaveFile(DirectoryPath, CreateSave());
+        SaveFileToDirectory(DirectoryPath, CreateSave());
     }
 
-    public static void SaveFile(string dirPath, AddonRootSave save)
+    public static void SaveFileToDirectory(string dirPath, AddonRootSave save)
     {
         ArgumentNullException.ThrowIfNull(dirPath);
         ArgumentNullException.ThrowIfNull(save);
 
         string path = Path.Join(dirPath, SaveFileName);
-        string json = JsonConvert.SerializeObject(save, s_jsonSettings);
-        File.WriteAllText(path, json);
+        string content = Serialize(save); 
+        File.WriteAllText(path, content);
 
         string versionPath = Path.Join(dirPath, VersionFileName);
         string version = typeof(AddonRoot).Assembly.GetName().Version!.ToString(3);
         File.WriteAllText(versionPath, version);
     }
 
-    public static AddonRootSave? LoadFile(string dirPath)
+    public static AddonRootSave? LoadFileFromDirectory(string dirPath)
     {
         ArgumentNullException.ThrowIfNull(dirPath);
 
@@ -704,8 +709,31 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         {
             return null;
         }
-        string json = File.ReadAllText(path);
-        var jobj = JObject.Parse(json);
+
+        string content = File.ReadAllText(path);
+        return Deserialize(content);
+    }
+
+    public static string Serialize(AddonRootSave save)
+    {
+        ArgumentNullException.ThrowIfNull(save);
+
+        return JsonConvert.SerializeObject(save, s_jsonSettings);
+    }
+
+    public static AddonRootSave Deserialize(string str)
+    {
+        ArgumentNullException.ThrowIfNull(str);
+
+        JObject jobj;
+        try
+        {
+            jobj = JObject.Parse(str);
+        }
+        catch (Exception ex)
+        {
+            throw new AddonRootSerializationException("Exception occurred during parsing the JSON text.", ex);
+        }
 
         // handle old version content
         foreach (var jtoken in jobj.Descendants())
@@ -719,7 +747,20 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             }
         }
 
-        return jobj.ToObject<AddonRootSave>(JsonSerializer.Create(s_jsonSettings));
+        AddonRootSave? save;
+        try
+        {
+            save = jobj.ToObject<AddonRootSave>(JsonSerializer.Create(s_jsonSettings));
+        }
+        catch (Exception ex)
+        {
+            throw new AddonRootSerializationException($"Exception occurred during converting {nameof(JObject)} to {nameof(AddonRootSave)}.", ex);
+        }
+        if (save is null)
+        {
+            throw new AddonRootSerializationException($"The result {nameof(AddonRootSave)} is null.");
+        }
+        return save;
     }
 
     public AddonRootSave CreateSave()

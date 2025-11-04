@@ -12,6 +12,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FireAxe.Resources;
 
 namespace FireAxe.ViewModels;
 
@@ -98,6 +99,41 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         });
         CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNullObservable);
         ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNullObservable);
+        ImportAddonRootFileCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var filePath = await ChooseAddonRootFileToImportInteraction.Handle(Unit.Default);
+            if (filePath is null)
+            {
+                return;
+            }
+
+            var explorerViewModel = AddonNodeExplorerViewModel;
+            if (explorerViewModel is null)
+            {
+                return;
+            }
+            var addonRoot = explorerViewModel.AddonRoot;
+
+            IEnumerable<AddonNodeSave> nodeSaves;
+            try
+            {
+                nodeSaves = AddonRoot.Deserialize(File.ReadAllText(filePath)).Nodes;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception ocurred during importing .addonroot file: {FilePath}", filePath);
+                await ShowExceptionInteraction.Handle(ex);
+                return;
+            }
+
+            var importedGroup = AddonNode.Create<AddonGroup>(addonRoot, explorerViewModel.CurrentGroup);
+            importedGroup.Name = importedGroup.Parent.GetUniqueNodeName(Texts.ImportedGroup);
+            explorerViewModel.SelectNode(importedGroup);
+            foreach (var nodeSave in nodeSaves)
+            {
+                AddonNode.LoadSave(nodeSave, addonRoot, importedGroup);
+            }
+        }, _addonRootNotNullObservable);
 
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
         OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
@@ -118,6 +154,37 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNullObservable);
         DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(), _addonRootNotNullObservable);
         DeleteRedundantVpkFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(true), this.WhenAnyValue(x => x.HasSelection));
+        ExportSelectedItemsAsAddonRootFile = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var filePath = await SaveAddonRootFileInteraction.Handle(Unit.Default);
+            if (filePath is null)
+            {
+                return;
+            }
+
+            try
+            {
+                var explorerViewModel = AddonNodeExplorerViewModel;
+                if (explorerViewModel is null)
+                {
+                    return;
+                }
+
+                var save = new AddonRootSave
+                {
+                    Nodes = [.. explorerViewModel.SelectedNodes.Select(node => node.CreateSave())]
+                };
+                await Task.Run(() => File.WriteAllText(filePath, AddonRoot.Serialize(save)));
+
+                await ShowSaveAddonRootFileSuccessInteraction.Handle(filePath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during exporting .addonroot file: {FilePath}", filePath);
+                await ShowExceptionInteraction.Handle(ex);
+                return;
+            }
+        }, this.WhenAnyValue(x => x.HasSelection));
 
         OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
         CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
@@ -292,6 +359,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> ImportCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> ImportAddonRootFileCommand { get; }
+
     public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
@@ -314,11 +383,19 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesForSelectedItemsCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> ExportSelectedItemsAsAddonRootFile { get; }
+
     public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
 
+    public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
+
     public Interaction<Unit, string?> ChooseOpenDirectoryInteraction { get; } = new();
+
+    public Interaction<Unit, string?> ChooseAddonRootFileToImportInteraction { get; } = new();
+
+    public Interaction<Unit, string?> SaveAddonRootFileInteraction { get; } = new();
 
     public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
 
@@ -346,7 +423,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, Unit> ShowDeleteRedundantVpkFilesSuccessInteraction { get; } = new();
 
-    public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
+    public Interaction<string, Unit> ShowSaveAddonRootFileSuccessInteraction { get; } = new();
 
     public async void InitIfNot()
     {

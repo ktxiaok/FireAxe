@@ -53,7 +53,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             ArgumentNullException.ThrowIfNull(addonRoot);
             _addonRoot = addonRoot;
             LastAddonId = addonId;
-            if (_addonRoot.TryGetDescendantNodeById(addonId, out var node))
+            if (_addonRoot.TryGetNodeById(addonId, out var node))
             {
                 Addon = node;
             }
@@ -82,7 +82,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 var addon = Addon;
                 if (addon == null)
                 {
-                    if (_addonRoot.TryGetDescendantNodeById(LastAddonId, out addon))
+                    if (_addonRoot.TryGetNodeById(LastAddonId, out addon))
                     {
                         Addon = addon;
                     }

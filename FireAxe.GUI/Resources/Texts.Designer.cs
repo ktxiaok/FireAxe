@@ -925,6 +925,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export Selected Items as an .addonroot File.
+        /// </summary>
+        public static string ExportSelectedItemsAsAddonRootFile {
+            get {
+                return ResourceManager.GetString("ExportSelectedItemsAsAddonRootFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the latest version..
         /// </summary>
         public static string FailedToGetLatestVersion {
@@ -1155,6 +1164,24 @@ namespace FireAxe.Resources {
         public static string Import {
             get {
                 return ResourceManager.GetString("Import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import .addonroot File.
+        /// </summary>
+        public static string ImportAddonRootFile {
+            get {
+                return ResourceManager.GetString("ImportAddonRootFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Imported Group.
+        /// </summary>
+        public static string ImportedGroup {
+            get {
+                return ResourceManager.GetString("ImportedGroup", resourceCulture);
             }
         }
         
@@ -1749,6 +1776,24 @@ namespace FireAxe.Resources {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save .addonroot File.
+        /// </summary>
+        public static string SaveAddonRootFile {
+            get {
+                return ResourceManager.GetString("SaveAddonRootFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The .addonroot file &quot;{0}&quot; saved successfully..
+        /// </summary>
+        public static string SaveAddonRootFileSuccess {
+            get {
+                return ResourceManager.GetString("SaveAddonRootFileSuccess", resourceCulture);
             }
         }
         

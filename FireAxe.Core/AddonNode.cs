@@ -740,8 +740,18 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public static AddonNode LoadSave(AddonNodeSave save, AddonRoot root)
+    public static AddonNode LoadSave(AddonNodeSave save, AddonRoot root, AddonGroup? parentGroup = null)
     {
+        ArgumentNullException.ThrowIfNull(save);
+        ArgumentNullException.ThrowIfNull(root);
+        if (parentGroup is not null)
+        {
+            if (parentGroup.Root != root)
+            {
+                ThrowDifferentRootException();
+            }
+        }
+
         var node = NewNode(save, null);
         node.OnLoadSave(save);
         var groupSave = save as AddonGroupSave;
@@ -776,6 +786,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         AddonNode NewNode(AddonNodeSave save, AddonGroup? group)
         {
+            group ??= parentGroup;
             return AddonNode.Create(save.TargetType, root, group);
         }
     }
@@ -911,7 +922,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         if (save.Id != Guid.Empty)
         {
-            Id = save.Id;
+            if (Root.ContainsNodeId(save.Id))
+            {
+                Log.Warning("Existing ID({Id}) found and ignored during loading AddonNodeSave.", save.Id);
+            }
+            else
+            {
+                Id = save.Id;
+            } 
         }
         IsEnabled = save.IsEnabled;
         try

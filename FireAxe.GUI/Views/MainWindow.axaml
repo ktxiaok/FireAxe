@@ -17,7 +17,9 @@
       <MenuItem Header="{x:Static r:Texts.File}">
         <MenuItem Header="{x:Static r:Texts.OpenDirectory}" Command="{Binding OpenDirectoryCommand}" ToolTip.Tip="{x:Static r:Texts.OpenDirectoryTip}"/>
         <MenuItem Header="{x:Static r:Texts.CloseDirectory}" Command="{Binding CloseDirectoryCommand}"/>
+        <Separator/>
         <MenuItem Header="{x:Static r:Texts.Import}" Command="{Binding ImportCommand}" ToolTip.Tip="{x:Static r:Texts.ImportTip}"/>
+        <MenuItem Header="{x:Static r:Texts.ImportAddonRootFile}" Command="{Binding ImportAddonRootFileCommand}"/>
         <Separator/>
         <MenuItem Header="{x:Static r:Texts.Settings}" Command="{Binding OpenSettingsWindowCommand}"/>
       </MenuItem>
@@ -43,6 +45,7 @@
             </MultiBinding>
           </MenuItem.Header>
         </MenuItem>
+        <MenuItem Header="{x:Static r:Texts.ExportSelectedItemsAsAddonRootFile}" Command="{Binding ExportSelectedItemsAsAddonRootFile}"/>
         <MenuItem Header="Crash?">
           <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
         </MenuItem>

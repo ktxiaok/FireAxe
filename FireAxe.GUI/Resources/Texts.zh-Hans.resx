@@ -810,4 +810,19 @@
   <data name="SelectGamePath" xml:space="preserve">
     <value>选择游戏路径</value>
   </data>
+  <data name="ExportSelectedItemsAsAddonRootFile" xml:space="preserve">
+    <value>导出选中的项目为.addonroot文件</value>
+  </data>
+  <data name="SaveAddonRootFile" xml:space="preserve">
+    <value>保存.addonroot文件</value>
+  </data>
+  <data name="ImportAddonRootFile" xml:space="preserve">
+    <value>导入.addonroot文件</value>
+  </data>
+  <data name="ImportedGroup" xml:space="preserve">
+    <value>导入的组</value>
+  </data>
+  <data name="SaveAddonRootFileSuccess" xml:space="preserve">
+    <value>已成功保存.addonroot文件“{0}”。</value>
+  </data>
 </root>
