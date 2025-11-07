@@ -10,7 +10,7 @@ public static class GamePathUtils
     {
         ArgumentNullException.ThrowIfNull(gamePath);
 
-        if (!FileUtils.IsValidPath(gamePath) || !Path.IsPathRooted(gamePath))
+        if (!FileSystemUtils.IsValidPath(gamePath) || !Path.IsPathRooted(gamePath))
         {
             return false;
         }
@@ -41,7 +41,7 @@ public static class GamePathUtils
                 using var steamRegistry = localMachineRegistry.OpenSubKey(@"SOFTWARE\WOW6432Node\Valve\Steam") ?? localMachineRegistry.OpenSubKey(@"SOFTWARE\Valve\Steam");
                 if (steamRegistry is not null)
                 {
-                    if (steamRegistry.GetValue("InstallPath")?.ToString() is { } steamInstallPath && FileUtils.IsValidPath(steamInstallPath))
+                    if (steamRegistry.GetValue("InstallPath")?.ToString() is { } steamInstallPath && FileSystemUtils.IsValidPath(steamInstallPath))
                     {
                         string gamePath = Path.Join(steamInstallPath, "steamapps", "common", "Left 4 Dead 2");
                         if (CheckValidity(gamePath))

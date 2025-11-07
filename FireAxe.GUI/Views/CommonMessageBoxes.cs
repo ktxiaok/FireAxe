@@ -40,10 +40,11 @@ public static class CommonMessageBoxes
     private static async Task<IReadOnlyList<string>> ChooseDirectories(Window ownerWindow, ChooseDirectoryOptions options, bool allowMultiple)
     {
         var storage = ownerWindow.StorageProvider;
+        using var startStorageFolder = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage);
         var result = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             Title = options.Title,
-            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedStartLocation = startStorageFolder,
             SuggestedFileName = options.SuggestedFileName,
             AllowMultiple = allowMultiple
         });
@@ -74,10 +75,11 @@ public static class CommonMessageBoxes
     private static async Task<IReadOnlyList<string>> ChooseFiles(Window ownerWindow, ChooseFileOptions options, bool allowMultiple)
     {
         var storage = ownerWindow.StorageProvider;
+        using var startStorageFolder = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage);
         var result = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = options.Title,
-            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedStartLocation = startStorageFolder,
             SuggestedFileName = options.SuggestedFileName,
             AllowMultiple = allowMultiple,
             FileTypeFilter = options.FilePatterns?.Select(pattern => new FilePickerFileType(null) { Patterns = [pattern] }).ToArray() 
@@ -91,10 +93,11 @@ public static class CommonMessageBoxes
         ArgumentNullException.ThrowIfNull(options);
 
         var storage = ownerWindow.StorageProvider;
+        using var startStorageFolder = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage);
         var result = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = options.Title,
-            SuggestedStartLocation = options.StartDirectoryPath is null ? null : await TryGetExistingStorageFolderAsync(options.StartDirectoryPath, storage),
+            SuggestedStartLocation = startStorageFolder,
             SuggestedFileName = options.SuggestedFileName,
             FileTypeChoices = options.FilePatterns?.Select(pattern => new FilePickerFileType(null) { Patterns = [pattern] }).ToArray(),
             DefaultExtension = options.DefaultFileExtension,

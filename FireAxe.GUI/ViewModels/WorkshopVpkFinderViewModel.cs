@@ -201,7 +201,7 @@ public class WorkshopVpkFinderViewModel : ViewModelBase, IActivatableViewModel, 
             var addon = AddonNode.Create<WorkshopVpkAddon>(addonRoot, addonGroup);
             if (stagedItem.Title is { } title)
             {
-                var name = FileUtils.SanitizeFileName(title);
+                var name = FileSystemUtils.SanitizeFileName(title);
                 if (name.Length == 0)
                 {
                     name = "UNNAMED";

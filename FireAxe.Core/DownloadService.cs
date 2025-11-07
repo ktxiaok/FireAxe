@@ -15,24 +15,25 @@ public sealed class DownloadService : IDownloadService
         Formatting = Formatting.Indented
     };
 
-    private class DownloadItem : IDownloadItem
+    private sealed class DownloadItem : IDownloadItem
     {
+        private bool _disposed = false;
+
         private readonly DownloadService _service;
         private readonly string _url;
         private readonly string _filePath;
 
         private long _downloadedBytes = 0;
-        private readonly object _downloadedBytesLock = new();
 
         private double _speed = 0;
 
         private long _lastSaveTimeMs = Environment.TickCount64;
 
         private long _totalBytes = 0;
-        private readonly object _totalBytesLock = new();
 
         private Exception? _exception = null;
 
+        // NOTE: The field _status is always Running when the downloader is in state Running or Paused.
         private DownloadStatus _status = DownloadStatus.Preparing;
 
         private Downloader.DownloadService? _download = null;
@@ -49,7 +50,7 @@ public sealed class DownloadService : IDownloadService
             _url = url;
             _filePath = filePath;
 
-            Task.Run(() => Prepare());
+            Task.Run(Prepare);
             async void Prepare()
             {
                 bool downloadCreated = false;
@@ -153,35 +154,20 @@ public sealed class DownloadService : IDownloadService
 
         public long DownloadedBytes
         {
-            get
-            {
-                lock (_downloadedBytesLock)
-                {
-                    return _downloadedBytes;
-                }
-            }
+            get => Volatile.Read(ref _downloadedBytes);
+            private set => Volatile.Write(ref _downloadedBytes, value);
         }
 
         public long TotalBytes
         {
-            get
-            {
-                lock (_totalBytesLock)
-                {
-                    return _totalBytes;
-                }
-            }
+            get => Volatile.Read(ref _totalBytes);
+            private set => Volatile.Write(ref _totalBytes, value);
         }
 
         public double BytesPerSecondSpeed
         {
-            get
-            {
-                lock (_downloadedBytesLock)
-                {
-                    return _speed;
-                }
-            }
+            get => Volatile.Read(ref _speed);
+            private set => Volatile.Write(ref _speed, value);
         }
 
         public Exception Exception
@@ -203,6 +189,24 @@ public sealed class DownloadService : IDownloadService
         {
             get
             {
+                Downloader.DownloadService download;
+                lock (_downloadLock)
+                {
+                    if (_download is null)
+                    {
+                        return _status;
+                    }
+                    download = _download;
+                }
+
+                switch (download.Status)
+                {
+                    case Downloader.DownloadStatus.Running:
+                        return DownloadStatus.Running;
+                    case Downloader.DownloadStatus.Paused:
+                        return DownloadStatus.Paused;
+                }
+
                 lock (_downloadLock)
                 {
                     return _status;
@@ -212,46 +216,50 @@ public sealed class DownloadService : IDownloadService
 
         public void Pause()
         {
+            Downloader.DownloadService? download;
             lock (_downloadLock)
             {
-                if (_status == DownloadStatus.Running)
-                {
-                    _download!.Pause();
-                    _status = DownloadStatus.Paused;
-                }
-                else if (_status == DownloadStatus.Preparing)
+                if (_status == DownloadStatus.Preparing)
                 {
                     _status = DownloadStatus.PreparingAndPaused;
                 }
+                download = _download;
             }
+            download?.Pause();
         }
 
         public void Resume()
         {
+            Downloader.DownloadService? download;
             lock (_downloadLock)
             {
-                if (_status == DownloadStatus.Paused)
-                {
-                    _download!.Resume();
-                    _status = DownloadStatus.Running;
-                }
-                else if (_status == DownloadStatus.PreparingAndPaused)
+                if (_status == DownloadStatus.PreparingAndPaused)
                 {
                     _status = DownloadStatus.Preparing;
                 }
+                download = _download;
             }
+            download?.Resume();
         }
 
         public void Cancel()
         {
+            Downloader.DownloadService? downloadToCancel = null;
             lock (_downloadLock)
             {
-                if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
+                if (_download is null)
                 {
-                    _download?.CancelAsync();
-                    _status = DownloadStatus.Cancelled;
+                    if (_status is DownloadStatus.Preparing or DownloadStatus.PreparingAndPaused)
+                    {
+                        _status = DownloadStatus.Cancelled;
+                    }
+                }
+                else
+                {
+                    downloadToCancel = _download;
                 }
             }
+            downloadToCancel?.CancelAsync();
         }
 
         public void Wait()
@@ -276,15 +284,26 @@ public sealed class DownloadService : IDownloadService
             Downloader.DownloadService? downloadToDispose = null;
             lock (_downloadLock)
             {
-                downloadToDispose = _download;
-                _download = null;
-
-                if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused || _status == DownloadStatus.Running || _status == DownloadStatus.Paused)
+                if (_disposed)
                 {
-                    _status = DownloadStatus.Cancelled;
+                    return;
+                }
+
+                _disposed = true;
+
+                if (_download is null)
+                {
+                    if (_status is DownloadStatus.Preparing or DownloadStatus.PreparingAndPaused)
+                    {
+                        _status = DownloadStatus.Cancelled;
+                    }
+                }
+                else
+                {
+                    downloadToDispose = _download;
                 }
             }
-            if (downloadToDispose != null)
+            if (downloadToDispose is not null)
             {
                 DisposeDownload(downloadToDispose);
             }
@@ -344,34 +363,22 @@ public sealed class DownloadService : IDownloadService
                 }
             }
 
-            //Downloader.DownloadService? downloadToDispose = null;
-            //lock (_downloadLock)
-            //{
-            //    downloadToDispose = _download;
-            //    _download = null;
-            //}
-            //if (downloadToDispose != null)
-            //{
-            //    DisposeDownload(downloadToDispose);
-            //}
-
             OnCompleted();
         }
 
         private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
         {
+            DownloadedBytes = e.ReceivedBytesSize;
+            BytesPerSecondSpeed = e.BytesPerSecondSpeed;
+
             bool needSave = false;
-            lock (_downloadedBytesLock)
+            long currentTime = Environment.TickCount64;
+            if (currentTime - _lastSaveTimeMs > SaveDownloadProgressIntervalMs)
             {
-                _downloadedBytes = e.ReceivedBytesSize;
-                _speed = e.BytesPerSecondSpeed;
-                long currentTime = Environment.TickCount64;
-                if (currentTime - _lastSaveTimeMs > SaveDownloadProgressIntervalMs)
-                {
-                    needSave = true;
-                    _lastSaveTimeMs = currentTime;
-                }
+                needSave = true;
+                _lastSaveTimeMs = currentTime;
             }
+            
             if (needSave)
             {
                 string savePath = _filePath + IDownloadService.DownloadInfoFileExtension;
@@ -388,22 +395,18 @@ public sealed class DownloadService : IDownloadService
 
         private void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
         {
-            lock (_totalBytesLock)
-            {
-                _totalBytes = e.TotalBytesToReceive;
-            }
+            TotalBytes = e.TotalBytesToReceive;
+
+            Downloader.DownloadService? downloadToPause = null;
             lock (_downloadLock)
             {
-                if (_status == DownloadStatus.Preparing)
+                if (_status is DownloadStatus.PreparingAndPaused)
                 {
-                    _status = DownloadStatus.Running;
+                    downloadToPause = _download;
                 }
-                else if (_status == DownloadStatus.PreparingAndPaused)
-                {
-                    _download?.Pause();
-                    _status = DownloadStatus.Paused;
-                }
+                _status = DownloadStatus.Running;
             }
+            downloadToPause?.Pause();
         }
 
         private void OnCompleted()
@@ -423,7 +426,7 @@ public sealed class DownloadService : IDownloadService
         }
 
         private static void DisposeDownload(Downloader.DownloadService download)
-        {  
+        {
             try
             {
                 download.Dispose();
@@ -448,13 +451,15 @@ public sealed class DownloadService : IDownloadService
         }
     }
 
+    private bool _disposed = false;
+
     private DownloadConfiguration _config = new()
     {
         ChunkCount = 4,
         ParallelDownload = true
     };
 
-    private SemaphoreSlim _availableDownloads = new(5);
+    private readonly SemaphoreSlim _availableDownloads = new(5);
 
     public DownloadService()
     {
@@ -471,6 +476,11 @@ public sealed class DownloadService : IDownloadService
 
     public void Dispose()
     {
-        _availableDownloads.Dispose();
+        if (!_disposed)
+        {
+            _availableDownloads.Dispose();
+
+            _disposed = true;
+        }
     }
 }

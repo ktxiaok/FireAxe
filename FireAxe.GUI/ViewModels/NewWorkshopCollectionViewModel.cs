@@ -123,7 +123,7 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
         }
 
         var collectionGroup = AddonNode.Create<AddonGroup>(_addonRoot, _addonGroup);
-        var collectionName = collectionGroup.Parent.GetUniqueNodeName(FileUtils.SanitizeFileName(collectionDetails.Title));
+        var collectionName = collectionGroup.Parent.GetUniqueNodeName(FileSystemUtils.SanitizeFileName(collectionDetails.Title));
         collectionGroup.Name = collectionName;
         foreach (var itemId in itemIds)
         {

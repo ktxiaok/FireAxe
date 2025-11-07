@@ -166,6 +166,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     AddonRoot IAddonNodeContainer.Root => this;
 
+    internal bool IsUnstable { get; set; } = false;
+
     public event Action<AddonNode>? DescendantNodeMoved = null;
 
     public event Action<AddonNode>? DescendantNodeCreated = null;
@@ -837,6 +839,42 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         ArgumentNullException.ThrowIfNull(downloadItem);
 
         NewDownloadItem?.Invoke(downloadItem);
+    }
+
+    internal void RunUnstable(Action action)
+    {
+        ThrowIfUnstable();
+        IsUnstable = true;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            IsUnstable = false;
+        }
+    }
+
+    internal async Task RunUnstableAsync(Func<Task> action)
+    {
+        ThrowIfUnstable();
+        IsUnstable = true;
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            IsUnstable = false;
+        }
+    }
+
+    internal void ThrowIfUnstable()
+    {
+        if (IsUnstable)
+        {
+            throw new InvalidOperationException($"The {nameof(AddonRoot)} instance is unstable now.");
+        }
     }
     
     internal void AddNode(AddonNode node)

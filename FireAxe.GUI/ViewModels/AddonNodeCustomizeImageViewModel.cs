@@ -48,7 +48,7 @@ public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewM
             }
             else
             {
-                _addon.CustomImagePath = FileUtils.NormalizePath(value);
+                _addon.CustomImagePath = FileSystemUtils.NormalizePath(value);
             }
         }
     }

@@ -322,7 +322,7 @@ public class WorkshopVpkAddon : VpkAddon
             {
                 if (File.Exists(file))
                 {
-                    FileUtils.MoveToRecycleBin(file);
+                    FileSystemUtils.MoveToRecycleBin(file);
                 }
             }
         }
@@ -541,7 +541,7 @@ public class WorkshopVpkAddon : VpkAddon
                     {
                         blockMove.Dispose();
 
-                        var name = FileUtils.SanitizeFileName(details.Title);
+                        var name = FileSystemUtils.SanitizeFileName(details.Title);
                         if (name.Length == 0)
                         {
                             name = "UNNAMED";
@@ -634,19 +634,19 @@ public class WorkshopVpkAddon : VpkAddon
                 if (needDownload)
                 {
                     string downloadFileName = $"{details.Title}-time_updated-{details.TimeUpdated}.vpk";
-                    downloadFileName = FileUtils.SanitizeFileName(downloadFileName);
+                    downloadFileName = FileSystemUtils.SanitizeFileName(downloadFileName);
                     if (downloadFileName == "")
                     {
                         downloadFileName = "UNNAMED.vpk";
                     }
-                    downloadFileName = FileUtils.GetUniqueFileName(downloadFileName, dirPath);
+                    downloadFileName = FileSystemUtils.GetUniqueFileName(downloadFileName, dirPath);
                     string downloadFilePath = Path.Join(dirPath, downloadFileName);
                     string url = details.FileUrl;
 
                     using (var download = downloadService.Download(url, downloadFilePath))
                     {
                         await addonRootTaskFactory.StartNew(() => DownloadItem = download).ConfigureAwait(false);
-                        await download.WaitAsync().ConfigureAwait(false);
+                        await download.WaitAsync().WaitAsync(cancellationToken).ConfigureAwait(false);
                         await addonRootTaskFactory.StartNew(() => DownloadItem = null).ConfigureAwait(false);
                         var status = download.Status;
                         if (status == DownloadStatus.Succeeded)
@@ -775,6 +775,7 @@ public class WorkshopVpkAddon : VpkAddon
     {
         var tasks = new List<Task>();
 
+        _download?.Cancel();
         if (_downloadCheckTask != null)
         {
             tasks.Add(_downloadCheckTask);
@@ -785,16 +786,10 @@ public class WorkshopVpkAddon : VpkAddon
             tasks.Add(_getPublishedFileDetailsTask);
         }
 
-        var download = _download;
-        if (download != null)
-        {
-            tasks.Add(Task.Run(download.Dispose));
-        }
-
         var baseTask = base.OnDestroyAsync();
         tasks.Add(baseTask);
 
-        return Task.WhenAll(tasks);
+        return TaskUtils.WhenAllIgnoreCanceled(tasks);
     }
 
     protected override void OnCreateSave(AddonNodeSave save)

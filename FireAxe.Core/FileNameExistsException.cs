@@ -2,9 +2,9 @@
 
 namespace FireAxe;
 
-public class FileExistException : Exception
+public class FileNameExistsException : IOException
 {
-    public FileExistException(string filePath)
+    public FileNameExistsException(string filePath)
     {
         FilePath = filePath;
     }

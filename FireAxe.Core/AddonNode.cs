@@ -82,18 +82,22 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             }
 
             _isBusySettingEnabled = true;
-
-            _isEnabled = value;
-            NotifyChanged();
-            UpdateEnabledInHierarchy();
-            if (Group is { } group)
+            try
             {
-                group.NotifyChildEnableOrDisable(this);
+                _isEnabled = value;
+                NotifyChanged();
+                UpdateEnabledInHierarchy();
+                if (Group is { } group)
+                {
+                    group.NotifyChildEnableOrDisable(this);
+                }
+                //AutoCheck();
+                Root.RequestSave = true;
             }
-            //AutoCheck();
-            Root.RequestSave = true;
-
-            _isBusySettingEnabled = false;
+            finally
+            {
+                _isBusySettingEnabled = false;
+            }
         }
     }
 
@@ -245,27 +249,32 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 return;
             }
 
-            ThrowIfMoveDenied();
-
-            var parentInternal = (IAddonNodeContainerInternal)Parent;
-            parentInternal.ThrowIfNodeNameInvalid(value);
-
-            // Try to move the file.
-            if (MayHaveFile)
+            Root.RunUnstable(() =>
             {
-                string sourcePath = BuildFilePath(Group, FileName);
-                string fullSourcePath = GetFullFilePath(sourcePath);
-                if (FileUtils.Exists(fullSourcePath))
-                {
-                    string targetPath = Path.Join(Path.GetDirectoryName(sourcePath) ?? "", value + FileExtension);
-                    string fullTargetPath = GetFullFilePath(targetPath);
-                    FileUtils.Move(fullSourcePath, fullTargetPath);
-                }
-            }
+                ThrowIfMoveDenied();
 
-            parentInternal.ChangeNameUnchecked(_name, value, this);
+                var parentInternal = (IAddonNodeContainerInternal)Parent;
+                parentInternal.ThrowIfNodeNameInvalid(value);
+
+                // Try to move the file.
+                if (MayHaveFile)
+                {
+                    string sourcePath = BuildFilePath(Group, FileName);
+                    string fullSourcePath = GetFullFilePath(sourcePath);
+                    if (FileSystemUtils.Exists(fullSourcePath))
+                    {
+                        string targetPath = Path.Join(Path.GetDirectoryName(sourcePath) ?? "", value + FileExtension);
+                        string fullTargetPath = GetFullFilePath(targetPath);
+                        FileSystemUtils.Move(fullSourcePath, fullTargetPath);
+                    }
+                }
+
+                parentInternal.ChangeNameUnchecked(_name, value, this);
+            });
+
             _name = value;
             NotifyChanged();
+
             Root.RequestSave = true;
         }
     }
@@ -321,7 +330,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         get => _customImagePath;
         set
         {
-            if (value != null && !FileUtils.IsValidPath(value))
+            if (value != null && !FileSystemUtils.IsValidPath(value))
             {
                 throw new ArgumentException($"invalid path: {value}");
             }
@@ -374,23 +383,26 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         var node = (AddonNode)Activator.CreateInstance(addonType, true)!;
 
-        node._root = root;
-
-        node.SetNewId();
-
-        if (group == null)
+        root.RunUnstable(() =>
         {
-            node.UpdateEnabledInHierarchy();
-            node.Create();
-            root.AddNode(node);
-        }
-        else
-        {
-            node.Group = group;
-            node.UpdateEnabledInHierarchy();
-            node.Create();
-            group.AddChild(node);
-        }
+            node._root = root;
+
+            node.SetNewId();
+
+            if (group == null)
+            {
+                node.UpdateEnabledInHierarchy();
+                node.Create();
+                root.AddNode(node);
+            }
+            else
+            {
+                node.Group = group;
+                node.UpdateEnabledInHierarchy();
+                node.Create();
+                group.AddChild(node);
+            }
+        });
 
         return node;
     }
@@ -556,83 +568,90 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             return;
         }
 
-        ThrowIfMoveDenied();
-
-        var containerInternal = targetGroup == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)targetGroup;
-        containerInternal.ThrowIfNodeNameInvalid(Name);
-
-        // Try to move the file.
-        if (MayHaveFile)
+        Root.RunUnstable(() =>
         {
-            string fileName = FileName;
-            string sourcePath = BuildFilePath(Group, fileName);
-            string fullSourcePath = GetFullFilePath(sourcePath);
-            if (FileUtils.Exists(fullSourcePath))
+            ThrowIfMoveDenied();
+
+            var containerInternal = targetGroup == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)targetGroup;
+            containerInternal.ThrowIfNodeNameInvalid(Name);
+
+            // Try to move the file.
+            if (MayHaveFile)
             {
-                string targetPath = BuildFilePath(targetGroup, fileName);
-                string fullTargetPath = GetFullFilePath(targetPath);
-                FileUtils.Move(fullSourcePath, fullTargetPath);
+                string fileName = FileName;
+                string sourcePath = BuildFilePath(Group, fileName);
+                string fullSourcePath = GetFullFilePath(sourcePath);
+                if (FileSystemUtils.Exists(fullSourcePath))
+                {
+                    string targetPath = BuildFilePath(targetGroup, fileName);
+                    string fullTargetPath = GetFullFilePath(targetPath);
+                    FileSystemUtils.Move(fullSourcePath, fullTargetPath);
+                }
             }
-        }
 
-        if (targetGroup == null)
-        {
-            Group!.RemoveChild(this);
-            Group = null;
-            UpdateEnabledInHierarchy();
-            Root.AddNode(this);
-        }
-        else
-        {
-            if (Group == null)
+            if (targetGroup == null)
             {
-                Root.RemoveNode(this);
+                Group!.RemoveChild(this);
+                Group = null;
+                UpdateEnabledInHierarchy();
+                Root.AddNode(this);
             }
             else
             {
-                Group.RemoveChild(this);
+                if (Group == null)
+                {
+                    Root.RemoveNode(this);
+                }
+                else
+                {
+                    Group.RemoveChild(this);
+                }
+                Group = targetGroup;
+                UpdateEnabledInHierarchy();
+                targetGroup.AddChild(this);
             }
-            Group = targetGroup;
-            UpdateEnabledInHierarchy();
-            targetGroup.AddChild(this);
-        }
+        });
     }
 
     public Task DestroyAsync()
     {
-        if (!IsValid)
+        Task resultTask = null!;
+        Root.RunUnstable(() =>
         {
-            return Task.CompletedTask;
-        }
+            if (!IsValid)
+            {
+                resultTask = Task.CompletedTask;
+                return;
+            }
 
-        var tasks = new List<Task>();
-        foreach (var node in this.GetSelfAndDescendantsByDfsPostorder())
-        {
-            tasks.Add(node.OnDestroyAsync());
-        }
+            var tasks = new List<Task>();
+            foreach (var node in this.GetSelfAndDescendantsByDfsPostorder())
+            {
+                tasks.Add(node.OnDestroyAsync());
+            }
 
-        var group = Group;
-        var root = Root;
+            var group = Group;
+            var root = Root;
 
-        if (group == null)
-        {
-            root.RemoveNode(this);
-        }
-        else
-        {
-            group.RemoveChild(this);
-        }
+            if (group == null)
+            {
+                root.RemoveNode(this);
+            }
+            else
+            {
+                group.RemoveChild(this);
+            }
 
-        var rootTaskScheduler = root.TaskScheduler;
+            var rootTaskScheduler = root.TaskScheduler;
 
-        root.NotifyDescendantNodeDestructionStarted(this);
+            root.NotifyDescendantNodeDestructionStarted(this);
 
-        var resultTask = Task.WhenAll(tasks);
-        resultTask.ContinueWith(task =>
-        {
-            root.NotifyDescendantNodeDestroyed(this);
-        }, rootTaskScheduler);
-        
+            resultTask = Task.WhenAll(tasks);
+            resultTask.ContinueWith(task =>
+            {
+                root.NotifyDescendantNodeDestroyed(this);
+            }, rootTaskScheduler);
+        });
         return resultTask;
     }
 
@@ -656,7 +675,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             try
             {
-                FileUtils.MoveToRecycleBin(pathToDelete);
+                if (FileSystemUtils.Exists(pathToDelete))
+                {
+                    FileSystemUtils.MoveToRecycleBin(pathToDelete);
+                }
             }
             catch (Exception ex)
             {
@@ -823,15 +845,16 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         Root.UnregisterNodeId(_id);
 
-        var task = Task.CompletedTask;
+        var tasks = new List<Task>();
         _destructionCancellationTokenSource.Cancel();
         _destructionCancellationTokenSource.Dispose();
+
         if (_getImageTask != null)
         {
-            task = Task.WhenAll(task, _getImageTask);
+            tasks.Add(_getImageTask);
         }
 
-        return task;
+        return TaskUtils.WhenAllIgnoreCanceled(tasks);
     }
 
     public void Check()
@@ -842,9 +865,15 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
 
         _isBusyChecking = true;
-        OnCheck();
-        OnPostCheck();
-        _isBusyChecking = false;
+        try
+        {
+            OnCheck();
+            OnPostCheck();
+        }
+        finally
+        {
+            _isBusyChecking = false;
+        }
     }
 
     protected void AutoCheck()
@@ -876,7 +905,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
             try
             {
-                if (!FileUtils.Exists(fullFilePath))
+                if (!FileSystemUtils.Exists(fullFilePath))
                 {
                     new AddonFileNotExistProblem(_fileNotExistProblemSource).Submit();
                 }

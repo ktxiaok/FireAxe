@@ -825,4 +825,7 @@
   <data name="SaveAddonRootFileSuccess" xml:space="preserve">
     <value>The .addonroot file "{0}" saved successfully.</value>
   </data>
+  <data name="FileNameExists" xml:space="preserve">
+    <value>A file with the same name already exists.</value>
+  </data>
 </root>

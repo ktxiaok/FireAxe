@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Frozen;
-using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 
 namespace FireAxe;
 
-public static class FileUtils
+public static class FileSystemUtils
 {
     private const int FO_DELETE = 0x0003;
     private const int FOF_ALLOWUNDO = 0x0040;           // Preserve undo information, if possible. 
@@ -34,13 +33,17 @@ public static class FileUtils
     {
         ArgumentNullException.ThrowIfNull(path);
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
         {
-            SHFILEOPSTRUCT fileop = new SHFILEOPSTRUCT();
+            var fileop = new SHFILEOPSTRUCT();
             fileop.wFunc = FO_DELETE;
             fileop.pFrom = path + '\0' + '\0';
             fileop.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION;
-            SHFileOperation(ref fileop);
+            var result = SHFileOperation(ref fileop);
+            if (result != 0)
+            {
+                throw new IOException($"Failed to move the file \"{path}\" to Recycle Bin. Error code: {result}");
+            }
         }
         else
         {
@@ -67,14 +70,12 @@ public static class FileUtils
         ArgumentNullException.ThrowIfNull(sourcePath);
         ArgumentNullException.ThrowIfNull(targetPath);
 
-        try
+        if (Exists(targetPath))
         {
-            Directory.Move(sourcePath, targetPath);
+            throw new FileNameExistsException(targetPath);
         }
-        catch (Exception ex)
-        {
-            throw new MoveFileException(sourcePath, targetPath, ex);
-        }
+        
+        Directory.Move(sourcePath, targetPath);
     }
 
     public static bool Exists(string path)

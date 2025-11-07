@@ -970,6 +970,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A file with the same name already exists..
+        /// </summary>
+        public static string FileNameExists {
+            get {
+                return ResourceManager.GetString("FileNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Size: .
         /// </summary>
         public static string FileSizeColon {

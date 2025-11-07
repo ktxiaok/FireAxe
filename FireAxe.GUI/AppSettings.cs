@@ -112,7 +112,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             }
             if (value != null)
             {
-                if (!FileUtils.IsValidPath(value) || !Path.IsPathRooted(value))
+                if (!FileSystemUtils.IsValidPath(value) || !Path.IsPathRooted(value))
                 {
                     throw new ArgumentException("The path is invalid.");
                 }
@@ -184,11 +184,11 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             ArgumentNullException.ThrowIfNull(value);
             if (value.Length > 0)
             {
-                if (!FileUtils.IsValidPath(value) || !Path.IsPathRooted(value))
+                if (!FileSystemUtils.IsValidPath(value) || !Path.IsPathRooted(value))
                 {
                     throw new ArgumentException("The path is invalid.");
                 }
-                value = FileUtils.NormalizePath(value);
+                value = FileSystemUtils.NormalizePath(value);
             }
             if (value == _gamePath)
             {

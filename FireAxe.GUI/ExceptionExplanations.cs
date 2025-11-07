@@ -19,6 +19,7 @@ internal static class ExceptionExplanations
             return Texts.ExceptionOccurMessage + '\n' + exception.ToString();
         });
         manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
+        manager.Register<FileNameExistsException>((exception, arg) => Texts.FileNameExists);
         manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.FullName));
     }
 }

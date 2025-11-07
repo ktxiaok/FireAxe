@@ -45,7 +45,7 @@ public partial class AddonNodeCustomizeImageWindow : ReactiveWindow<AddonNodeCus
                         var pickedPath = pickedUri.LocalPath;
                         try
                         {
-                            result = FileUtils.NormalizePath(Path.GetRelativePath(addonRootDirectoryPath, pickedPath));
+                            result = FileSystemUtils.NormalizePath(Path.GetRelativePath(addonRootDirectoryPath, pickedPath));
                         }
                         catch (Exception ex)
                         {

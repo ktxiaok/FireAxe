@@ -825,4 +825,7 @@
   <data name="SaveAddonRootFileSuccess" xml:space="preserve">
     <value>已成功保存.addonroot文件“{0}”。</value>
   </data>
+  <data name="FileNameExists" xml:space="preserve">
+    <value>已存在相同名称的文件。</value>
+  </data>
 </root>
