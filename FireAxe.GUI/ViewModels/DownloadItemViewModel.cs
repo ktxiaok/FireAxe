@@ -10,7 +10,7 @@ namespace FireAxe.ViewModels;
 
 public class DownloadItemViewModel : ViewModelBase, IActivatableViewModel
 {
-    private static readonly TimeSpan RefreshInterval = TimeSpan.FromSeconds(0.5);
+    private static readonly TimeSpan RefreshInterval = TimeSpan.FromMilliseconds(250);
 
     private const string UnknownEtaString = "??h:??m:??s";
 

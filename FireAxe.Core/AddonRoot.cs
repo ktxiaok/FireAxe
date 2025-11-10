@@ -131,6 +131,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
     }
 
+    string IAddonNodeContainer.FileSystemPath => DirectoryPath;
+
     public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir", "caches");
 
     public string GamePath
@@ -808,7 +810,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
     }
 
-    public bool ShouldUpdateWorkshopItem(AutoUpdateStrategy strategy)
+    public bool ShouldAutoUpdateWorkshopItem(AutoUpdateStrategy strategy)
     {
         if (strategy == AutoUpdateStrategy.Default)
         {

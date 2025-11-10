@@ -91,6 +91,8 @@ public abstract class VpkAddon : AddonNode
 
     public VpkAddonInfo? RetrieveInfo()
     {
+        this.ThrowIfInvalid();
+
         if (!_addonInfo.TryGetTarget(out var addonInfo))
         {
             if (TryCreatePackage(FullVpkFilePath, out var pak))
@@ -105,9 +107,9 @@ public abstract class VpkAddon : AddonNode
         return addonInfo;
     }
 
-    public override void ClearCaches()
+    protected override void OnClearCaches()
     {
-        base.ClearCaches();
+        base.OnClearCaches();
 
         _addonInfo.SetTarget(null);
     }
@@ -115,6 +117,8 @@ public abstract class VpkAddon : AddonNode
     public bool AddConflictIgnoringFile(string file)
     {
         ArgumentNullException.ThrowIfNull(file);
+
+        this.ThrowIfInvalid();
 
         if (!_conflictIgnoringFileSet.Add(file))
         {
@@ -140,6 +144,8 @@ public abstract class VpkAddon : AddonNode
     {
         ArgumentNullException.ThrowIfNull(file);
 
+        this.ThrowIfInvalid();
+
         if (!_conflictIgnoringFileSet.Remove(file))
         {
             return false;
@@ -153,6 +159,8 @@ public abstract class VpkAddon : AddonNode
 
     public void ClearConflictIgnoringFiles()
     {
+        this.ThrowIfInvalid();
+
         _conflictIgnoringFileSet.Clear();
         _conflictIgnoringFiles.Clear();
         Root.RequestSave = true;

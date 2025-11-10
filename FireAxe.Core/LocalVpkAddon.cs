@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace FireAxe;
 
@@ -6,7 +7,7 @@ public class LocalVpkAddon : VpkAddon
 {
     protected LocalVpkAddon()
     {
-
+        PropertyChanged += OnPropertyChanged;
     }
 
     public override string? FullVpkFilePath => FullFilePath;
@@ -27,5 +28,14 @@ public class LocalVpkAddon : VpkAddon
         base.OnLoadSave(save);
 
         var save1 = (LocalVpkAddonSave)save;
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var name = e.PropertyName;
+        if (name == nameof(FullFilePath))
+        {
+            NotifyChanged(nameof(FullVpkFilePath));
+        }
     }
 }

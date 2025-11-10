@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Serilog;
 
 namespace FireAxe;
 
@@ -59,7 +60,23 @@ internal class AddonNodeContainerService
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (!NameExists(name))
+        var fileSystemEntries = new HashSet<string>();
+
+        try
+        {
+            foreach (var path in Directory.EnumerateFileSystemEntries(_container.FileSystemPath))
+            {
+                fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", _container.FileSystemPath);
+        }
+
+        bool Exists(string name) => NameExists(name) || fileSystemEntries.Contains(name);
+
+        if (!Exists(name))
         {
             return name;
         }
@@ -67,11 +84,14 @@ internal class AddonNodeContainerService
         while (true)
         {
             string nameTry = name + $"({i})";
-            if (!NameExists(nameTry))
+            if (!Exists(nameTry))
             {
                 return nameTry;
             }
-            i++;
+            checked
+            {
+                i++;
+            }
         }
     }
 

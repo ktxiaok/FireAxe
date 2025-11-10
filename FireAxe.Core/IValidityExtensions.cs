@@ -52,4 +52,14 @@ public static class IValidityExtensions
         }
         return collection;
     }
+
+    public static void ThrowIfInvalid<T>(this T obj) where T : IValidity
+    {
+        ArgumentNullException.ThrowIfNull(obj);
+
+        if (!obj.IsValid)
+        {
+            throw new InvalidOperationException($"The object {obj.GetType().Name} is invalid now.");
+        }
+    }
 }

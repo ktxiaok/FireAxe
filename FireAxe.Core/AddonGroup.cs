@@ -135,10 +135,13 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         get => _enableStrategy;
         set
         {
+            this.ThrowIfInvalid();
+
             if (value == _enableStrategy)
             {
                 return;
             }
+
             _enableStrategy = value;
             NotifyChanged();
             Root.RequestSave = true;
@@ -157,32 +160,42 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
     IAddonNodeContainer? IAddonNodeContainer.Parent => Group;
 
+    string IAddonNodeContainer.FileSystemPath => FullFilePath;
+
     public event Action<AddonNode>? DescendantNodeMoved = null;
 
     public string GetUniqueNodeName(string name)
     {
+        this.ThrowIfInvalid();
+
         return _containerService.GetUniqueName(name);
     }
 
-    public void EnableOneChildRandomlyIfSingleRandom()
+    public bool EnableOneChildRandomlyIfSingleRandom()
     {
+        this.ThrowIfInvalid();
+
         if (_enableStrategy != AddonGroupEnableStrategy.SingleRandom)
         {
-            return;
+            return false;
         }
 
         var children = Children;
         int count = children.Count;
         if (count == 0)
         {
-            return;
+            return false;
         }
 
         children[Random.Shared.Next(count)].IsEnabled = true;
+
+        return true;
     }
 
     public void CheckChildrenProblems()
     {
+        this.ThrowIfInvalid();
+
         _childrenProblemSource.Clear();
         foreach (var child in Children)
         {
@@ -196,6 +209,8 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
     public void CheckEnableStrategy()
     {
+        this.ThrowIfInvalid();
+
         _enableStrategyProblemSource.Clear();
         EnableStrategyProblem.TryCreate(_enableStrategyProblemSource)?.Submit();
     }

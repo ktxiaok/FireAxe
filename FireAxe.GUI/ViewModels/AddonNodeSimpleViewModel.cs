@@ -18,7 +18,6 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
     private AddonNode? _addon = null;
     private CompositeDisposable? _addonDisposables = null;
-    private Guid _lastAddonId = Guid.Empty;
 
     private Bitmap? _image = null;
     private byte[]? _rawImage = null;
@@ -52,7 +51,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
         {
             ArgumentNullException.ThrowIfNull(addonRoot);
             _addonRoot = addonRoot;
-            LastAddonId = addonId;
+            AddonId = addonId;
             if (_addonRoot.TryGetNodeById(addonId, out var node))
             {
                 Addon = node;
@@ -61,6 +60,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
         else
         {
             _addonRoot = addon.Root;
+            AddonId = addon.Id;
             Addon = addon;
         }
 
@@ -82,7 +82,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 var addon = Addon;
                 if (addon == null)
                 {
-                    if (_addonRoot.TryGetNodeById(LastAddonId, out addon))
+                    if (_addonRoot.TryGetNodeById(AddonId, out addon))
                     {
                         Addon = addon;
                     }
@@ -96,7 +96,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                     return;
                 }
 
-                if (addon.Id == LastAddonId)
+                if (addon.Id == AddonId)
                 {
                     Addon = addon;
                 }
@@ -195,11 +195,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
     public virtual Type AddonType => typeof(AddonNode);
 
-    public Guid LastAddonId
-    {
-        get => _lastAddonId;
-        private set => this.RaiseAndSetIfChanged(ref _lastAddonId, value);
-    }
+    public Guid AddonId { get; }
 
     public Bitmap? Image
     {
@@ -284,9 +280,6 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
     protected virtual void OnNewAddon(AddonNode addon, CompositeDisposable disposables)
     {
-        addon.WhenAnyValue(x => x.Id)
-            .Subscribe(id => LastAddonId = id)
-            .DisposeWith(disposables);
         addon.WhenAnyValue(x => x.IsValid)
             .Subscribe(isValid =>
             {

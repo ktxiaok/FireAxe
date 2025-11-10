@@ -56,6 +56,8 @@ public class WorkshopVpkAddon : VpkAddon
     {
         get
         {
+            this.ThrowIfInvalid();
+
             var currentFile = CurrentVpkFileName;
             if (currentFile is null)
             {
@@ -72,6 +74,9 @@ public class WorkshopVpkAddon : VpkAddon
         set
         {
             ArgumentNullException.ThrowIfNull(value);
+
+            this.ThrowIfInvalid();
+
             if (value == _publishedFileId)
             {
                 return;
@@ -93,6 +98,8 @@ public class WorkshopVpkAddon : VpkAddon
         get => _autoUpdateStrategy;
         set
         {
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _autoUpdateStrategy, value))
             {
                 Root.RequestSave = true;
@@ -100,7 +107,15 @@ public class WorkshopVpkAddon : VpkAddon
         }
     }
 
-    public bool IsAutoUpdate => Root.ShouldUpdateWorkshopItem(AutoUpdateStrategy);
+    public bool IsAutoUpdate
+    {
+        get
+        {
+            this.ThrowIfInvalid();
+
+            return Root.ShouldAutoUpdateWorkshopItem(AutoUpdateStrategy);
+        }
+    }
 
     public PublishedFileDetails? PublishedFileDetailsCache
     {
@@ -122,7 +137,7 @@ public class WorkshopVpkAddon : VpkAddon
     public IDownloadItem? DownloadItem
     {
         get => _download;
-        set 
+        private set 
         { 
             if (NotifyAndSetIfChanged(ref _download, value))
             {
@@ -139,6 +154,8 @@ public class WorkshopVpkAddon : VpkAddon
         get => _requestAutoSetName;
         set
         {
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _requestAutoSetName, value))
             {
                 Root.RequestSave = true;
@@ -151,6 +168,8 @@ public class WorkshopVpkAddon : VpkAddon
         get => _requestApplyTagsFromWorkshop;
         set
         {
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _requestApplyTagsFromWorkshop, value))
             {
                 Root.RequestSave = true;
@@ -207,6 +226,8 @@ public class WorkshopVpkAddon : VpkAddon
 
     public Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         var task = _getPublishedFileDetailsTask;
         if (task == null)
         {
@@ -227,8 +248,10 @@ public class WorkshopVpkAddon : VpkAddon
         return task.WaitAsync(cancellationToken);
     }
 
-    public async Task<PublishedFileDetails?> GetPublishedFileDetailsAllowCacheAsync(CancellationToken cancellationToken)
+    public async Task<PublishedFileDetails?> GetPublishedFileDetailsAllowCacheAsync(CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         var cache = PublishedFileDetailsCache;
         if (cache != null)
         {
@@ -242,16 +265,16 @@ public class WorkshopVpkAddon : VpkAddon
         return null;
     }
 
-    public override void ClearCaches()
+    protected override void OnClearCaches()
     {
-        base.ClearCaches();
+        base.OnClearCaches();
 
         PublishedFileDetailsCache = null;
     }
 
-    public override void ClearCacheFiles()
+    protected override void OnClearCacheFiles()
     {
-        base.ClearCacheFiles();
+        base.OnClearCacheFiles();
 
         string imagePath = GetImageCacheFilePath();
         try
@@ -330,6 +353,8 @@ public class WorkshopVpkAddon : VpkAddon
 
     public DeleteRedundantVpkFilesReport RequestDeleteRedundantVpkFiles()
     {
+        this.ThrowIfInvalid();
+
         string dirPath = FullFilePath;
         if (!Directory.Exists(dirPath))
         {
@@ -395,6 +420,8 @@ public class WorkshopVpkAddon : VpkAddon
 
     public void CheckDownload()
     {
+        this.ThrowIfInvalid();
+
         _vpkNotLoadProblemSource.Clear();
 
         if (_publishedFileId.HasValue)

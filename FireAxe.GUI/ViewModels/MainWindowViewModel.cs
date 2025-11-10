@@ -113,6 +113,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 return;
             }
             var addonRoot = explorerViewModel.AddonRoot;
+            using var blockAutoCheck = addonRoot.BlockAutoCheck();
 
             IEnumerable<AddonNodeSave> nodeSaves;
             try
@@ -133,6 +134,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 AddonNode.LoadSave(nodeSave, addonRoot, importedGroup);
             }
+            addonRoot.Check();
         }, _addonRootNotNullObservable);
 
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());

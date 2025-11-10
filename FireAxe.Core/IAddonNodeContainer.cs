@@ -17,6 +17,8 @@ public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
 
     AddonRoot Root { get; }
 
+    string FileSystemPath { get; }
+
     event Action<AddonNode>? DescendantNodeMoved;
 
     string GetUniqueNodeName(string name);

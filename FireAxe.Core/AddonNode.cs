@@ -72,15 +72,17 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         get => _isEnabled;
         set
         {
+            this.ThrowIfInvalid();
+
             if (value == _isEnabled)
             {
                 return;
             }
+
             if (_isBusySettingEnabled)
             {
                 return;
             }
-
             _isBusySettingEnabled = true;
             try
             {
@@ -112,6 +114,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             {
                 throw new ArgumentException("Cannot set Id to Guid.Empty");
             }
+
+            this.ThrowIfInvalid();
+
             if (value == _id)
             {
                 return;
@@ -130,6 +135,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         get => _priority;
         set
         {
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _priority, value))
             {
                 NotifyChanged(nameof(PriorityInHierarchy));
@@ -142,6 +149,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         get
         {
+            this.ThrowIfInvalid();
+
             int result = 0;
             foreach (var selfOrAncestor in this.GetSelfAndAncestors())
             {
@@ -192,6 +201,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         get
         {
+            this.ThrowIfInvalid();
+
             return GetRawTags().Distinct();
 
             IEnumerable<string> GetRawTags()
@@ -244,6 +255,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             {
                 throw new ArgumentException($"Cannot set the name to \"{NullName}\" because it's a reserved name.");
             }
+
+            this.ThrowIfInvalid();
+
             if (value == _name)
             {
                 return;
@@ -283,6 +297,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         get 
         {
+            this.ThrowIfInvalid();
+
             return BuildFilePath(Group, Name); 
         }
     }
@@ -299,11 +315,21 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         get 
         {
+            this.ThrowIfInvalid();
+
             return BuildFilePath(Group, FileName); 
         }
     }
 
-    public string FullFilePath => GetFullFilePath(FilePath);
+    public string FullFilePath 
+    {
+        get
+        {
+            this.ThrowIfInvalid();
+
+            return GetFullFilePath(FilePath);
+        }
+    }
 
     public virtual string FileExtension => "";
 
@@ -318,6 +344,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         get => _creationTime;
         set
         {
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _creationTime, value))
             {
                 Root.RequestSave = true;
@@ -334,6 +362,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             {
                 throw new ArgumentException($"invalid path: {value}");
             }
+
+            this.ThrowIfInvalid();
+
             if (NotifyAndSetIfChanged(ref _customImagePath, value))
             {
                 Root.RequestSave = true;
@@ -345,6 +376,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         get
         {
+            this.ThrowIfInvalid();
+
             var path = CustomImagePath;
             if (path == null)
             {
@@ -376,9 +409,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             throw new ArgumentException($"{nameof(addonType)} must be a subtype of {nameof(AddonNode)}");
         }
         ArgumentNullException.ThrowIfNull(root);
-        if (group != null && group.Root != root)
+        root.ThrowIfInvalid();
+        if (group is not null)
         {
-            ThrowDifferentRootException();
+            group.ThrowIfInvalid();
+            if (group.Root != root)
+            {
+                ThrowDifferentRootException();
+            }
         }
 
         var node = (AddonNode)Activator.CreateInstance(addonType, true)!;
@@ -414,12 +452,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public void SetNewId()
     {
+        this.ThrowIfInvalid();
+
         while (true)
         {
             try
             {
                 Id = Guid.NewGuid();
-                return;
+                break;
             }
             catch (AddonNodeIdExistsException) { }
         }
@@ -433,6 +473,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             throw new ArgumentException("empty tag string");
         }
 
+        this.ThrowIfInvalid();
+
         if (!_tagSet.Add(tag))
         {
             return false;
@@ -444,6 +486,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     public bool RemoveTag(string tag)
     {
         ArgumentNullException.ThrowIfNull(tag);
+
+        this.ThrowIfInvalid();
 
         bool result = _tagSet.Remove(tag);
         if (result)
@@ -461,6 +505,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             throw new ArgumentException("empty tag string");
         }
+
+        this.ThrowIfInvalid();
+
         if (oldTag == newTag)
         {
             return;
@@ -480,6 +527,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public void MoveTag(int oldIndex, int newIndex)
     {
+        this.ThrowIfInvalid();
+
         _tags.Move(oldIndex, newIndex);
     }
 
@@ -492,6 +541,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         var task = _getImageTask;
         if (task == null)
         {
@@ -515,6 +566,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public Task<byte[]?> GetImageAllowCacheAsync(CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         var cache = ImageCache;
         if (cache != null)
         {
@@ -530,6 +583,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public bool CanMoveTo(AddonGroup? group)
     {
+        this.ThrowIfInvalid();
+
         if (group == null)
         {
             return true;
@@ -563,6 +618,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             ThrowMoveGroupToItselfException();
         }
+
+        this.ThrowIfInvalid();
+
         if (targetGroup == Group)
         {
             return;
@@ -687,13 +745,27 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public virtual void ClearCaches()
+    public void ClearCaches()
+    {
+        this.ThrowIfInvalid();
+
+        OnClearCaches();
+    }
+
+    protected virtual void OnClearCaches()
     {
         ClearCacheFiles();
         ImageCache = null;
     }
 
-    public virtual void ClearCacheFiles()
+    public void ClearCacheFiles()
+    {
+        this.ThrowIfInvalid();
+
+        OnClearCacheFiles();
+    }
+
+    protected virtual void OnClearCacheFiles()
     {
 
     }
@@ -713,6 +785,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public AddonNodeSave CreateSave()
     {
+        this.ThrowIfInvalid();
+
         var save = NewSave(this);
         OnCreateSave(save);
         if (!HasChildren)
@@ -766,8 +840,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         ArgumentNullException.ThrowIfNull(save);
         ArgumentNullException.ThrowIfNull(root);
+        root.ThrowIfInvalid();
         if (parentGroup is not null)
         {
+            parentGroup.ThrowIfInvalid();
             if (parentGroup.Root != root)
             {
                 ThrowDifferentRootException();
@@ -813,8 +889,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    protected IDisposable BlockMove()
+    public IDisposable BlockMove()
     {
+        this.ThrowIfInvalid();
+
         _blockMove++;
         bool disposed = false;
         return DisposableUtils.Create(() =>
@@ -859,6 +937,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public void Check()
     {
+        this.ThrowIfInvalid();
+
         if (_isBusyChecking)
         {
             return;
@@ -896,6 +976,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public void CheckFiles()
     {
+        this.ThrowIfInvalid();
+
         FileSize = GetFileSize();
 
         _fileNotExistProblemSource.Clear();
