@@ -53,7 +53,7 @@ public static class IValidityExtensions
         return collection;
     }
 
-    public static void ThrowIfInvalid<T>(this T obj) where T : IValidity
+    public static void ThrowIfInvalid(this IValidity obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
 

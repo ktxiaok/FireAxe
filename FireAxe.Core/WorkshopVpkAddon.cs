@@ -429,12 +429,12 @@ public class WorkshopVpkAddon : VpkAddon
         IDisposable blockMove = BlockMove();
         string dirPath = null!;
         string metaInfoPath = null!;
-        void UpdatePaths()
+        void UpdatePaths(WorkshopVpkAddon self)
         {
-            dirPath = FullFilePath;
+            dirPath = self.FullFilePath;
             metaInfoPath = Path.Join(dirPath, MetaInfoFileName);
         }
-        UpdatePaths();
+        UpdatePaths(this);
 
         string imageCacheFilePath = GetImageCacheFilePath();
         var httpClient = Root.HttpClient;
@@ -482,7 +482,7 @@ public class WorkshopVpkAddon : VpkAddon
                 invalid = await addonTaskCreator.StartNew(self =>
                 {
                     blockMove = self.BlockMove();
-                    UpdatePaths();
+                    UpdatePaths(self);
                 }).ConfigureAwait(false);
                 if (invalid)
                 {
@@ -573,7 +573,7 @@ public class WorkshopVpkAddon : VpkAddon
                         }
 
                         blockMove = self.BlockMove();
-                        UpdatePaths();
+                        UpdatePaths(self);
                     }
 
                     if (self.RequestApplyTagsFromWorkshop)
@@ -620,7 +620,7 @@ public class WorkshopVpkAddon : VpkAddon
                         invalid = await addonTaskCreator.StartNew(self =>
                         {
                             blockMove = self.BlockMove();
-                            UpdatePaths();
+                            UpdatePaths(self);
                         }).ConfigureAwait(false);
                     }
                 }
