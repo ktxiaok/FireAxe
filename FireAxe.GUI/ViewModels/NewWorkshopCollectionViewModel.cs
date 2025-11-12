@@ -78,7 +78,7 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             return;
         }
         ulong collectionId;
-        if (!WorkshopVpkAddon.TryParsePublishedFileId(CollectionId, out collectionId))
+        if (!PublishedFileUtils.TryParsePublishedFileId(CollectionId, out collectionId))
         {
             await ShowInvalidCollectionIdInteraction.Handle(Unit.Default);
             return;
@@ -90,7 +90,7 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
         try
         {
             var itemIdsTask = WorkshopCollectionUtils.GetWorkshopCollectionContentAsync(collectionId, _includeLinkedCollections, _httpClient, _createCts.Token);
-            var collectionDetailsTask = PublishedFileDetailsUtils.GetPublishedFileDetailsAsync(collectionId, _httpClient, _createCts.Token);
+            var collectionDetailsTask = PublishedFileUtils.GetPublishedFileDetailsAsync(collectionId, _httpClient, _createCts.Token);
             itemIds = await itemIdsTask;
             var getCollectionDetailsResult = await collectionDetailsTask;
             if (getCollectionDetailsResult.IsSucceeded)

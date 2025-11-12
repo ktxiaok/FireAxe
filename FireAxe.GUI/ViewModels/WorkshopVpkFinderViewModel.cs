@@ -62,7 +62,7 @@ public class WorkshopVpkFinderViewModel : ViewModelBase, IActivatableViewModel, 
         {
             try
             {
-                var result = await PublishedFileDetailsUtils.GetPublishedFileDetailsAsync(PublishedFileId, _finder._httpClient, _cancellationTokenSource.Token);
+                var result = await PublishedFileUtils.GetPublishedFileDetailsAsync(PublishedFileId, _finder._httpClient, _cancellationTokenSource.Token);
                 if (result.IsSucceeded)
                 {
                     Title = result.Content.Title;
@@ -231,7 +231,7 @@ public class WorkshopVpkFinderViewModel : ViewModelBase, IActivatableViewModel, 
                 foreach (string file in Directory.EnumerateFiles(path, "*.vpk", SearchOption.AllDirectories))
                 {
                     string name = Path.GetFileNameWithoutExtension(file);
-                    if (WorkshopVpkAddon.TryParsePublishedFileId(name, out var id) && !ContainsPublishedFileId(id))
+                    if (PublishedFileUtils.TryParsePublishedFileId(name, out var id) && !ContainsPublishedFileId(id))
                     {
                         _stagedItems.Add(new StagedItem(id, this));
                         count++;

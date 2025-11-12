@@ -30,8 +30,8 @@
       </StackPanel>
       <SelectableTextBlock
         DockPanel.Dock="Left"
-        Text="{Binding LastAddonId, StringFormat='(ID: {0})'}"
-        TextTrimming="CharacterEllipsis"
+        Text="{Binding AddonId, StringFormat='(ID: {0})'}"
+        TextWrapping="Wrap"
         VerticalAlignment="Center"/>
     </DockPanel>
     

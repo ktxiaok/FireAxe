@@ -94,7 +94,7 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
         get => Addon?.PublishedFileId?.ToString() ?? "";
         set
         {
-            if (!WorkshopVpkAddon.TryParsePublishedFileId(value, out var id))
+            if (!PublishedFileUtils.TryParsePublishedFileId(value, out var id))
             {
                 throw new ArgumentException("Invalid published file id."); 
             }

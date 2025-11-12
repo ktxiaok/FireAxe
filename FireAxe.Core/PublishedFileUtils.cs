@@ -1,13 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using System;
-using System.Text;
 
 namespace FireAxe;
 
-public static class PublishedFileDetailsUtils
+public static class PublishedFileUtils
 {
+    private static readonly Regex s_publishedFileIdLinkRegex = new(@"steamcommunity\.com/(?:sharedfiles|workshop)/filedetails/\?.*id=(\d+)");
+
     public static async Task<GetPublishedFileDetailsResult> GetPublishedFileDetailsAsync(ulong publishedFileId, HttpClient httpClient, CancellationToken cancellationToken)
     {
         PublishedFileDetails? content = null;
@@ -59,7 +62,7 @@ public static class PublishedFileDetailsUtils
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Exception occurred during the task of PublishedFileDetailsUtils.GetPublishedFileDetailsAsync.");
+            Log.Warning(ex, $"Exception occurred during {nameof(PublishedFileUtils)}.{nameof(GetPublishedFileDetailsAsync)}.");
         }
 
         if (content != null)
@@ -67,6 +70,41 @@ public static class PublishedFileDetailsUtils
             status = GetPublishedFileDetailsResultStatus.Succeeded;
         }
         return new GetPublishedFileDetailsResult(content, status);
+    }
+
+    public static bool TryParsePublishedFileId(string input, out ulong id)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+
+        if (ulong.TryParse(input, out id))
+        {
+            return true;
+        }
+
+        if (TryParsePublishedFileIdLink(input, out id))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool TryParsePublishedFileIdLink(string input, out ulong id)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+
+        id = 0;
+
+        var match = s_publishedFileIdLinkRegex.Match(input);
+        if (match.Success)
+        {
+            if (ulong.TryParse(match.Groups[1].ValueSpan, out id))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

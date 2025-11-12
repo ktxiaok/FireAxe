@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Frozen;
 
 namespace FireAxe;
 
 public static class AddonTags
 {
     #region Built-in Tags
-    private static readonly HashSet<string> s_builtInTags =
-        [
+    private static readonly FrozenSet<string> s_builtInTags = FrozenSet.ToFrozenSet([
         "Survivors",
         "Bill",
         "Francis",
@@ -62,8 +62,8 @@ public static class AddonTags
         "Medkit",
         "Pills",
         "Other"
-        ];
+    ]);
     #endregion
 
-    public static ISet<string> BuiltInTags => s_builtInTags;
+    public static IReadOnlySet<string> BuiltInTags => s_builtInTags;
 }

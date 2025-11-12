@@ -681,7 +681,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 if (clipboardText != null)
                 {
-                    if (WorkshopVpkAddon.TryParsePublishedFileIdLink(clipboardText, out var id))
+                    if (PublishedFileUtils.TryParsePublishedFileIdLink(clipboardText, out var id))
                     {
                         bool confirm = await ShowAutoDetectWorkshopItemLinkDialogInteraction.Handle(clipboardText);
                         if (confirm)

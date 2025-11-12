@@ -546,20 +546,24 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         var task = _getImageTask;
         if (task == null)
         {
-            var rootTaskScheduler = Root.TaskScheduler;
+            var addonTaskCreator = this.GetValidTaskCreator();
             var destructionCancellationToken = DestructionCancellationToken;
             var rawGetImageTask = DoGetImageAsync(destructionCancellationToken);
             async Task<byte[]?> RunGetImageTask()
             {
                 var image = await rawGetImageTask.ConfigureAwait(false);
-                var endingTask = new Task(() => ImageCache = image);
-                endingTask.Start(rootTaskScheduler);
-                await endingTask.ConfigureAwait(false);
+                await addonTaskCreator.StartNew(self => self.ImageCache = image);
                 return image;
             }
             task = RunGetImageTask();
             _getImageTask = task;
-            _getImageTask.ContinueWith(_ => _getImageTask = null, rootTaskScheduler);
+            _getImageTask.ContinueWith(_ => addonTaskCreator.StartNew(self =>
+            {
+                if (self._getImageTask == task)
+                {
+                    self._getImageTask = null;
+                }
+            }));
         }
         return task.WaitAsync(cancellationToken);
     }
@@ -705,8 +709,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             root.NotifyDescendantNodeDestructionStarted(this);
 
             resultTask = Task.WhenAll(tasks);
-            resultTask.ContinueWith(task =>
+            resultTask.ContinueWith(_ =>
             {
+                if (!root.IsValid)
+                {
+                    return;
+                }
                 root.NotifyDescendantNodeDestroyed(this);
             }, rootTaskScheduler);
         });

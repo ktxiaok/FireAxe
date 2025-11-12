@@ -22,4 +22,11 @@ public static class AddonNodeExtensions
             }
         }
     }
+
+    public static ValidTaskCreator<T> GetValidTaskCreator<T>(this T addon) where T : AddonNode
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+
+        return new ValidTaskCreator<T>(addon, new TaskFactory(addon.Root.TaskScheduler));
+    }
 }
