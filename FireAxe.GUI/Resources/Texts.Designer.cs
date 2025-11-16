@@ -520,7 +520,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Delete And Retain Files.
+        ///   Looks up a localized string similar to Delete and Retain Files.
         /// </summary>
         public static string DeleteAndRetainFile {
             get {
@@ -556,6 +556,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deleting Addons.
+        /// </summary>
+        public static string DeletingAddons {
+            get {
+                return ResourceManager.GetString("DeletingAddons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Descending.
         /// </summary>
         public static string Descending {
@@ -570,6 +579,15 @@ namespace FireAxe.Resources {
         public static string DescriptionColon {
             get {
                 return ResourceManager.GetString("DescriptionColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
             }
         }
         
@@ -1582,11 +1600,74 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The operation was canceled..
+        /// </summary>
+        public static string OperationCanceled {
+            get {
+                return ResourceManager.GetString("OperationCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operations.
         /// </summary>
         public static string Operations {
             get {
                 return ResourceManager.GetString("Operations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Done. {0} items have been deleted..
+        /// </summary>
+        public static string OperationsProgress_Deletion_Done {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Done. {0} items have been deleted and {1} items failed..
+        /// </summary>
+        public static string OperationsProgress_Deletion_DoneWithFailure {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_DoneWithFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to delete &quot;{0}&quot;: {1}.
+        /// </summary>
+        public static string OperationsProgress_Deletion_OperationFailed {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_OperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; deleted..
+        /// </summary>
+        public static string OperationsProgress_Deletion_OperationSucceeded {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_OperationSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting... ({0} / {1}).
+        /// </summary>
+        public static string OperationsProgress_Deletion_Progress {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_Progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting... ({0} / {1}, {2} failures).
+        /// </summary>
+        public static string OperationsProgress_Deletion_ProgressWithFailure {
+            get {
+                return ResourceManager.GetString("OperationsProgress_Deletion_ProgressWithFailure", resourceCulture);
             }
         }
         

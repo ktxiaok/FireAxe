@@ -253,7 +253,7 @@
     <value>Delete</value>
   </data>
   <data name="DeleteAndRetainFile" xml:space="preserve">
-    <value>Delete And Retain Files</value>
+    <value>Delete and Retain Files</value>
   </data>
   <data name="DeleteCompletely" xml:space="preserve">
     <value>Delete Completely</value>
@@ -827,5 +827,32 @@
   </data>
   <data name="FileNameExists" xml:space="preserve">
     <value>A file with the same name already exists.</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="DeletingAddons" xml:space="preserve">
+    <value>Deleting Addons</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Progress" xml:space="preserve">
+    <value>Deleting... ({0} / {1})</value>
+  </data>
+  <data name="OperationsProgress_Deletion_ProgressWithFailure" xml:space="preserve">
+    <value>Deleting... ({0} / {1}, {2} failures)</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Done" xml:space="preserve">
+    <value>Done. {0} items have been deleted.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_DoneWithFailure" xml:space="preserve">
+    <value>Done. {0} items have been deleted and {1} items failed.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationSucceeded" xml:space="preserve">
+    <value>"{0}" deleted.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationFailed" xml:space="preserve">
+    <value>Failed to delete "{0}": {1}</value>
+  </data>
+  <data name="OperationCanceled" xml:space="preserve">
+    <value>The operation was canceled.</value>
   </data>
 </root>

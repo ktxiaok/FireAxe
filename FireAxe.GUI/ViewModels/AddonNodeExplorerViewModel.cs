@@ -8,6 +8,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -468,6 +469,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
     public Interaction<(string, Exception), ErrorOperationReply> ReportExceptionForMoveInteraction { get; } = new();
 
+    public Interaction<IEnumerable<(Task, string)>, Unit> ShowDeletionProgressInteraction { get; } = new();
+
 
     public ViewModelActivator Activator { get; }
 
@@ -540,18 +543,26 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             return;
         }
         var selectedNodes = SelectedNodes.ToArray();
-        foreach (var node in selectedNodes)
+        int count = selectedNodes.Length;
+        if (count == 0)
         {
-            // TODO
+            return;
+        }
+        var operations = new (Task, string)[count];
+        for (int i = 0; i < count; i++)
+        {
+            var node = selectedNodes[i];
+            var nodeName = node.FullName;
             if (retainFile)
             {
-                _ = node.DestroyAsync();
+                operations[i] = (node.DestroyAsync(), nodeName);
             }
             else
             {
-                _ = node.DestroyWithFileAsync();
+                operations[i] = (node.DestroyWithFileAsync(), nodeName);
             }
         }
+        await ShowDeletionProgressInteraction.Handle(operations);
     }
 
     public void Move()

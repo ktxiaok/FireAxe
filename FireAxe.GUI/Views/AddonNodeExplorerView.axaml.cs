@@ -102,6 +102,28 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
             context.SetOutput(reply);
         }).DisposeWith(disposables);
+
+        viewModel.ShowDeletionProgressInteraction.RegisterHandler(context =>
+        {
+            var operations = context.Input;
+            var progressViewModel = new OperationsProgressViewModel();
+
+            var window = new OperationsProgressWindow
+            {
+                DataContext = progressViewModel,
+                Title = Texts.DeletingAddons,
+                OperationsProgressView =
+                {
+                    MessageTemplate = OperationsProgressViewMessageTemplates.Deletion
+                }
+            };
+            window.Show();
+            window.Activate();
+
+            new TaskOperationsProgressNotifier(operations, false, progressViewModel);
+
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
     }
 
     private void AddonNodeExplorerView_DoubleTapped(object? sender, TappedEventArgs e)

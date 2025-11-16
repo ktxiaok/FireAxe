@@ -828,4 +828,31 @@
   <data name="FileNameExists" xml:space="preserve">
     <value>已存在相同名称的文件。</value>
   </data>
+  <data name="Details" xml:space="preserve">
+    <value>详情</value>
+  </data>
+  <data name="DeletingAddons" xml:space="preserve">
+    <value>删除模组</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Progress" xml:space="preserve">
+    <value>删除中... ({0} / {1})</value>
+  </data>
+  <data name="OperationsProgress_Deletion_ProgressWithFailure" xml:space="preserve">
+    <value>删除中... ({0} / {1}, {2}项失败)</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Done" xml:space="preserve">
+    <value>已完成。{0}个项目已被删除。</value>
+  </data>
+  <data name="OperationsProgress_Deletion_DoneWithFailure" xml:space="preserve">
+    <value>已完成。{0}个项目已被删除，{1}个项目删除失败。</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationSucceeded" xml:space="preserve">
+    <value>已删除“{0}”。</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationFailed" xml:space="preserve">
+    <value>“{0}”删除失败：{1}</value>
+  </data>
+  <data name="OperationCanceled" xml:space="preserve">
+    <value>操作已被取消。</value>
+  </data>
 </root>

@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="200"
+             x:Class="FireAxe.Views.OperationsProgressView"
+             x:DataType="vm:OperationsProgressViewModel">
+  <DockPanel>
+    <StackPanel
+      DockPanel.Dock="Top"
+      Orientation="Horizontal"
+      Margin="0, 15, 0, 15">
+      <PathIcon
+        IsVisible="{Binding HasFailedOperation, FallbackValue=False}"
+        Data="{StaticResource icon_warning}"
+        Foreground="{DynamicResource brush_warning}"
+        Margin="2.5"/>
+      <TextBlock
+        Text="{Binding $parent[v:OperationsProgressView].Message}"
+        VerticalAlignment="Center"
+        Margin="2.5"/>
+    </StackPanel>
+    
+    <Expander
+      Header="{x:Static r:Texts.Details}"
+      IsExpanded="False"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch">
+      <ScrollViewer>
+        <ItemsControl
+          ItemsSource="{Binding $parent[v:OperationsProgressView].DetailedMessages}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <SelectableTextBlock
+                Text="{Binding}"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="2.5"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+       </ScrollViewer>
+    </Expander>
+  </DockPanel>
+</UserControl>

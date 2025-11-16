@@ -2,6 +2,7 @@
 - add: feature to delete redundant VPK files for WorkshopVpkAddons
 - add: Workshop VPK Finder
 - add: support import and export for .addonroot files
+- add: addon deletion progress window
 - fix: deletion of addons doesn't delete the corresponding files in some cases
 - improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
