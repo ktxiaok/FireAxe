@@ -106,7 +106,7 @@ public static class FileSystemUtils
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(dirPath);
 
-        if (!File.Exists(Path.Join(dirPath, name)))
+        if (!Exists(Path.Join(dirPath, name)))
         {
             return name;
         }
@@ -116,7 +116,7 @@ public static class FileSystemUtils
         while (true)
         {
             string nameTry = nameNoExt + $"({i})" + extension;
-            if (!File.Exists(Path.Join(dirPath, nameTry)))
+            if (!Exists(Path.Join(dirPath, nameTry)))
             {
                 return nameTry;
             }
