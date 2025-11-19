@@ -6,7 +6,7 @@ using Serilog;
 using System;
 using System.Diagnostics;
 using System.Reactive.Disposables;
-using System.Runtime.InteropServices;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe;
 
@@ -49,14 +49,15 @@ internal static class Utils
         }
     }
 
-    public static void ShowFileInExplorer(string path)
+    public static void ShowInFileExplorer(string path)
     {
         ArgumentNullException.ThrowIfNull(path);
 
         try
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (OperatingSystem.IsWindows())
             {
+                path = path.Replace('/', '\\');
                 using var process = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "explorer.exe",
@@ -66,7 +67,7 @@ internal static class Utils
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Exception occurred during Utils.ShowFileInExplorer");
+            Log.Error(ex, $"Exception occurred during {nameof(Utils)}.{nameof(ShowInFileExplorer)}.");
         }
     }
 

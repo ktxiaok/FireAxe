@@ -1,11 +1,12 @@
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace FireAxe.Views;
 

@@ -13,13 +13,13 @@ internal static class ExceptionExplanations
             {
                 if (scene == ExceptionExplanationScene.Input)
                 {
-                    return Texts.InvalidInputMessage;
+                    return $"{Texts.InvalidInputMessage} ({exception.GetType().Name})";
                 }
             }
             return Texts.ExceptionOccurMessage + '\n' + exception.ToString();
         });
         manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
         manager.Register<FileNameExistsException>((exception, arg) => Texts.FileNameExists);
-        manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.FullName));
+        manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.NodePath));
     }
 }

@@ -12,7 +12,7 @@
         Width="600" Height="600"
         WindowStartupLocation="CenterScreen">
   <DockPanel
-    Margin="5">
+    Margin="10">
     <DockPanel
       DockPanel.Dock="Bottom"
       LastChildFill="False">

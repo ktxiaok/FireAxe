@@ -6,13 +6,16 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 
 namespace FireAxe.ViewModels;
 
-public class AddonTagEditorViewModel : ViewModelBase, IActivatableViewModel
+public class AddonTagEditorViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
     private readonly AddonNode _addon;
+
+    private bool _isValid = true;
 
     private readonly ObservableCollection<string> _selectedTags = new();
     private bool _hasSelection = false;
@@ -109,15 +112,22 @@ public class AddonTagEditorViewModel : ViewModelBase, IActivatableViewModel
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
+            var addon = Addon;
 
+            addon.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
         });
     }
-
-    public event Action? Close = null;
 
     public ViewModelActivator Activator { get; } = new();
 
     public AddonNode Addon => _addon;
+
+    public bool IsValid
+    {
+        get => _isValid;
+        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
+    }
 
     public ObservableCollection<string> SelectedTags => _selectedTags;
 

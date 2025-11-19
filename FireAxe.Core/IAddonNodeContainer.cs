@@ -17,16 +17,20 @@ public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
 
     AddonRoot Root { get; }
 
-    string FileSystemPath { get; }
+    string? FileSystemPath { get; }
 
     event Action<AddonNode>? DescendantNodeMoved;
 
     string GetUniqueNodeName(string name);
+
+    AddonNode? TryGetNodeByName(string name);
+
+    AddonNode? TryGetNodeByPath(string path);
 }
 
 internal interface IAddonNodeContainerInternal
 {
-    void ThrowIfNodeNameInvalid(string name);
+    void ThrowIfNodeNameInvalid(string name, AddonNode node);
 
     void ChangeNameUnchecked(string? oldName, string newName, AddonNode node);
 

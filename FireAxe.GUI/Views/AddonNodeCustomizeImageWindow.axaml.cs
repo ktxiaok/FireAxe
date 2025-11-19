@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using ReactiveUI;
 using System.Reactive.Disposables;
@@ -9,6 +8,8 @@ using System;
 using Avalonia.Platform.Storage;
 using System.IO;
 using Serilog;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 

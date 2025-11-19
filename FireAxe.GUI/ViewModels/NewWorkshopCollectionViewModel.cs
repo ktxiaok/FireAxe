@@ -7,14 +7,14 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FireAxe.Resources;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.ViewModels;
 
-public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewModel
+public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
-    private AddonRoot _addonRoot;
-    private AddonGroup? _addonGroup;
-    private HttpClient _httpClient;
+    private readonly AddonRoot _addonRoot;
+    private readonly ValidRef<AddonGroup>? _addonGroupRef = null;
 
     private string _collectionId = "";
     private bool _includeLinkedCollections = true;
@@ -25,13 +25,16 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
 
     private bool _active = false;
 
-    public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup, HttpClient httpClient)
+    private bool _isValid = true;
+
+    public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup)
     {
         ArgumentNullException.ThrowIfNull(addonRoot);
-        ArgumentNullException.ThrowIfNull(httpClient);
         _addonRoot = addonRoot;
-        _addonGroup = addonGroup;
-        _httpClient = httpClient;
+        if (addonGroup is not null)
+        {
+            _addonGroupRef = new(addonGroup);
+        }
 
         CreateCommand = ReactiveCommand.CreateFromTask(Create);
 
@@ -39,19 +42,28 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
         {
             _active = true;
 
+            _addonRoot.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
+
             Disposable.Create(() =>
             {
                 _active = false;
 
-                _createCts?.Cancel();
+                CancelCreate();
             })
             .DisposeWith(disposables);
         });
     }
 
-    public event Action? Close = null;
+    public event Action? CloseRequested = null;
 
     public ViewModelActivator Activator { get; } = new();
+
+    public bool IsValid
+    {
+        get => _isValid;
+        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
+    }
 
     public string CollectionId
     {
@@ -71,12 +83,23 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
 
     public Interaction<Unit, Unit> ShowCreateFailedInteraction { get; } = new();
 
-    public async Task Create()
+    public void CancelCreate()
+    {
+        if (_createCts is not null)
+        {
+            _createCts.Cancel();
+            _createCts.Dispose();
+            _createCts = null;
+        }
+    }
+
+    private async Task Create()
     {
         if (_created)
         {
             return;
         }
+
         ulong collectionId;
         if (!PublishedFileUtils.TryParsePublishedFileId(CollectionId, out collectionId))
         {
@@ -84,13 +107,15 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             return;
         }
 
-        _createCts = new();
+        _createCts ??= new();
+
         ulong[]? itemIds = null;
         PublishedFileDetails? collectionDetails = null;
+        var httpClient = _addonRoot.HttpClient;
         try
         {
-            var itemIdsTask = WorkshopCollectionUtils.GetWorkshopCollectionContentAsync(collectionId, _includeLinkedCollections, _httpClient, _createCts.Token);
-            var collectionDetailsTask = PublishedFileUtils.GetPublishedFileDetailsAsync(collectionId, _httpClient, _createCts.Token);
+            var itemIdsTask = WorkshopCollectionUtils.GetWorkshopCollectionContentAsync(collectionId, _includeLinkedCollections, httpClient, _createCts.Token);
+            var collectionDetailsTask = PublishedFileUtils.GetPublishedFileDetailsAsync(collectionId, httpClient, _createCts.Token);
             itemIds = await itemIdsTask;
             var getCollectionDetailsResult = await collectionDetailsTask;
             if (getCollectionDetailsResult.IsSucceeded)
@@ -99,9 +124,6 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             }
         }
         catch (OperationCanceledException) { }
-
-        _createCts.Dispose();
-        _createCts = null;
 
         if (itemIds == null || collectionDetails == null)
         {
@@ -112,17 +134,14 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             return;
         }
 
-        Close?.Invoke();
+        CloseRequested?.Invoke();
+
         if (!_addonRoot.IsValid)
         {
             return;
         }
-        if (_addonGroup != null && !_addonGroup.IsValid)
-        {
-            _addonGroup = null;
-        }
 
-        var collectionGroup = AddonNode.Create<AddonGroup>(_addonRoot, _addonGroup);
+        var collectionGroup = AddonNode.Create<AddonGroup>(_addonRoot, _addonGroupRef?.TryGet());
         var collectionName = collectionGroup.Parent.GetUniqueNodeName(FileSystemUtils.SanitizeFileName(collectionDetails.Title));
         collectionGroup.Name = collectionName;
         foreach (var itemId in itemIds)
@@ -132,6 +151,7 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             addon.RequestAutoSetName = true;
             addon.PublishedFileId = itemId;
         }
+
         _created = true;
     }
 }

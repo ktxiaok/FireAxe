@@ -13,6 +13,8 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FireAxe.Resources;
+using System.Reactive.Disposables.Fluent;
+using Avalonia.Input.Platform;
 
 namespace FireAxe.ViewModels;
 
@@ -149,6 +151,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             _windowManager.OpenVpkConflictListWindow(_addonRoot);
         }, _addonRootNotNullObservable);
         OpenWorkshopVpkFinderWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenWorkshopVpkFinderWindow(this));
+        OpenFileCleanerWindowCommand = ReactiveCommand.Create(() =>
+        {
+            var addonRoot = AddonRoot;
+            if (addonRoot is null)
+            {
+                return;
+            }
+            _windowManager.OpenFileCleanerWindow(addonRoot);
+        }, _addonRootNotNullObservable);
 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
@@ -192,20 +203,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
         _settings.WhenAnyValue(x => x.GamePath)
-            .Subscribe(gamePath =>
+            .CombineLatest(this.WhenAnyValue(x => x.AddonRoot))
+            .Subscribe(args =>
             {
-                if (_addonRoot != null)
+                var (gamePath, addonRoot) = args;
+                if (addonRoot is not null)
                 {
-                    _addonRoot.GamePath = gamePath;
+                    addonRoot.GamePath = gamePath;
                 }
             })
             .DisposeWith(_disposables);
         _settings.WhenAnyValue(x => x.IsAutoUpdateWorkshopItem)
-            .Subscribe(isAutoUpdateWorkshopItem =>
+            .CombineLatest(this.WhenAnyValue(x => x.AddonRoot))
+            .Subscribe(args =>
             {
-                if (_addonRoot != null)
+                var (isAutoUpdateWorkshopItem, addonRoot) = args;
+                if (addonRoot is not null)
                 {
-                    _addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
+                    addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
                 }
             })
             .DisposeWith(_disposables);
@@ -331,17 +346,20 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             else
             {
                 using var blockAutoCheck = _addonRoot.BlockAutoCheck();
+
                 _addonRoot.NewDownloadItem += OnAddonRootNewDownloadItem;
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
                 _addonRoot.HttpClient = _httpClient;
-                _addonRoot.GamePath = _settings.GamePath;
-                _addonRoot.IsAutoUpdateWorkshopItem = _settings.IsAutoUpdateWorkshopItem;
+                
                 _addonRoot.LoadFile();
-                _addonRoot.Check();
-                AddonNodeExplorerViewModel = new(_addonRoot, _windowManager);
+                
+                AddonNodeExplorerViewModel = new(_addonRoot);
             }
+
             this.RaisePropertyChanged();
+
+            _addonRoot?.Check();
         }
     }
 
@@ -372,6 +390,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public ReactiveCommand<Unit, Unit> OpenVpkConflictListWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenWorkshopVpkFinderWindowCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenFileCleanerWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
@@ -702,7 +722,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
             try
             {
-                return await clipboard.GetTextAsync();
+                return await clipboard.TryGetTextAsync();
             }
             catch (Exception ex)
             {

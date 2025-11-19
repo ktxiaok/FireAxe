@@ -27,7 +27,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     private bool _disposed = false;
 
-    private DirectoryInfo? _directoryPath = null;
+    private DirectoryInfo? _directory = null;
 
     private string _gamePath = "";
 
@@ -63,53 +63,51 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public bool IsValid => !_disposed;
 
-    [AllowNull]
     public TaskScheduler TaskScheduler
     {
         get
         {
-            if (_taskScheduler == null)
-            {
-                throw new InvalidOperationException("TaskScheduler not set");
-            }
-            return _taskScheduler;
+            return _taskScheduler ?? throw new InvalidOperationException($"{nameof(TaskScheduler)} is not set.");
         }
         set
         {
+            ArgumentNullException.ThrowIfNull(value);
+            this.ThrowIfInvalid();
+            if (_taskScheduler is not null)
+            {
+                throw new InvalidOperationException($"{nameof(TaskScheduler)} is already set.");
+            }
+
             _taskScheduler = value;
         }
     }
 
-    [AllowNull]
     public IDownloadService DownloadService
     {
         get
         {
-            if (_downloadService == null)
-            {
-                throw new InvalidOperationException("DownloadService not set");
-            }
-            return _downloadService;
+            return _downloadService ?? throw new InvalidOperationException($"{nameof(DownloadService)} is not set.");
         }
         set
         {
+            ArgumentNullException.ThrowIfNull(value);
+            this.ThrowIfInvalid();
+
             _downloadService = value;
         }
     }
 
-    [AllowNull]
     public HttpClient HttpClient
     {
         get
         {
-            if (_httpClient == null)
-            {
-                throw new InvalidOperationException("HttpClient not set");
-            }
-            return _httpClient;
+            return _httpClient ?? throw new InvalidOperationException($"{nameof(HttpClient)} is not set.");
         }
         set
         {
+            ArgumentNullException.ThrowIfNull(value);
+            this.ThrowIfInvalid();
+
             _httpClient = value;
         }
     }
@@ -120,18 +118,27 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public string DirectoryPath
     {
-        get => _directoryPath?.FullName ?? throw new InvalidOperationException("DirectoryPath is not set");
+        get => _directory?.FullName ?? throw new InvalidOperationException($"{nameof(DirectoryPath)} is not set.");
         set
         {
-            _directoryPath = new(value);
-            _directoryPath.Create();
+            ArgumentNullException.ThrowIfNull(value);
+            this.ThrowIfInvalid();
+            if (_directory is not null)
+            {
+                throw new InvalidOperationException($"{nameof(DirectoryPath)} is already set.");
+            }
+
+            _directory = new(value);
+            _directory.Create();
             RequestSave = true;
 
             Directory.CreateDirectory(CacheDirectoryPath);
         }
     }
 
-    string IAddonNodeContainer.FileSystemPath => DirectoryPath;
+    public bool IsDirectoryPathSet => _directory is not null;
+
+    string? IAddonNodeContainer.FileSystemPath => IsDirectoryPathSet ? DirectoryPath : null;
 
     public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir", "caches");
 
@@ -182,12 +189,42 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public bool TryGetNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
     {
+        this.ThrowIfInvalid();
+
         return _idToNode.TryGetValue(id, out node);
     }
 
     public bool ContainsNodeId(Guid id)
     {
+        this.ThrowIfInvalid();
+
         return _idToNode.ContainsKey(id);
+    }
+
+    public AddonNode? TryGetNodeByName(string name)
+    {
+        this.ThrowIfInvalid();
+
+        return _containerService.TryGetByName(name);
+    }
+
+    public AddonNode? TryGetNodeByPath(string path)
+    {
+        this.ThrowIfInvalid();
+
+        return _containerService.TryGetByPath(path);
+    }
+
+    public string ConvertFilePathToNodePath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        this.ThrowIfInvalid();
+
+        path = Path.ChangeExtension(path, null);
+        path = Path.GetRelativePath(DirectoryPath, path);
+        path = FileSystemUtils.NormalizePath(path);
+        return path;
     }
 
     public bool AddCustomTag(string tag)
@@ -197,6 +234,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         {
             throw new ArgumentException("empty tag string");
         }
+
+        this.ThrowIfInvalid();
 
         if (AddonTags.BuiltInTags.Contains(tag))
         {
@@ -215,6 +254,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     {
         ArgumentNullException.ThrowIfNull(tag);
 
+        this.ThrowIfInvalid();
+
         bool result = _customTagSet.Remove(tag);
         if (result)
         {
@@ -226,6 +267,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     public bool RemoveCustomTagCompletely(string tag)
     {
         ArgumentNullException.ThrowIfNull(tag);
+
+        this.ThrowIfInvalid();
 
         if (RemoveCustomTag(tag))
         {
@@ -243,11 +286,15 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void MoveCustomTag(int oldIndex, int newIndex)
     {
+        this.ThrowIfInvalid();
+
         _customTags.Move(oldIndex, newIndex);
     }
 
     public void RefreshCustomTags()
     {
+        this.ThrowIfInvalid();
+
         foreach (var node in this.GetDescendants())
         {
             foreach (var tag in node.Tags)
@@ -265,6 +312,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         {
             throw new ArgumentException("empty tag string");
         }
+
+        this.ThrowIfInvalid();
+
         if (oldTag == newTag)
         {
             return;
@@ -289,17 +339,23 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public string GetUniqueNodeName(string name)
     {
+        this.ThrowIfInvalid();
+
         return _containerService.GetUniqueName(name);
     }
 
     public void Check()
     {
+        this.ThrowIfInvalid();
+
         this.CheckDescendants();
         CheckVpkConflictsAsync();
     }
 
     public Task<VpkAddonConflictResult> CheckVpkConflictsAsync()
     {
+        this.ThrowIfInvalid();
+
         if (CheckVpkConflictsTask is { } task)
         {
             return task;
@@ -425,6 +481,17 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void Import(AddonGroup? group = null)
     {
+        this.ThrowIfInvalid();
+
+        if (group is not null)
+        {
+            group.ThrowIfInvalid();
+            if (group.Root != this)
+            {
+                throw new InvalidOperationException($"different {nameof(AddonRoot)}");
+            }
+        }
+
         var fileFinder = group == null ? new AddonNodeFileFinder(this) : new AddonNodeFileFinder(group);
         var imports = new List<ImportItem>();
         bool skipDir = false;
@@ -478,6 +545,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void Push()
     {
+        this.ThrowIfInvalid();
+
         var gamePath = EnsureValidGamePath();
         string addonsPath = GamePathUtils.GetAddonsPath(gamePath);
 
@@ -677,6 +746,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void LoadFile()
     {
+        this.ThrowIfInvalid();
+
         var save = LoadFileFromDirectory(DirectoryPath);
         if (save == null)
         {
@@ -687,6 +758,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public void Save()
     {
+        this.ThrowIfInvalid();
+
         SaveFileToDirectory(DirectoryPath, CreateSave());
     }
 
@@ -769,6 +842,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public AddonRootSave CreateSave()
     {
+        this.ThrowIfInvalid();
+
         var save = new AddonRootSave();
         save.Nodes = Nodes.Select(node => node.CreateSave()).ToArray();
         save.CustomTags = [.. CustomTags];
@@ -778,6 +853,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     public void LoadSave(AddonRootSave save)
     {
         ArgumentNullException.ThrowIfNull(save);
+
+        this.ThrowIfInvalid();
 
         foreach (var nodeSave in save.Nodes)
         {
@@ -797,15 +874,19 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     {
         if (!_disposed)
         {
-            _disposed = true;
-            NotifyChanged(nameof(IsValid));
+            BlockAutoCheck();
 
             CancelCheckVpkConflicts();
+
             var tasks = new List<Task>();
             foreach (var node in Nodes)
             {
                 tasks.Add(node.DestroyAsync());
             }
+
+            _disposed = true;
+            NotifyChanged(nameof(IsValid));
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
@@ -824,6 +905,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public IDisposable BlockAutoCheck()
     {
+        this.ThrowIfInvalid();
+
         _blockAutoCheck++;
         bool disposed = false;
         return DisposableUtils.Create(() =>
@@ -839,6 +922,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     public void NotifyDownloadItem(IDownloadItem downloadItem)
     {
         ArgumentNullException.ThrowIfNull(downloadItem);
+
+        this.ThrowIfInvalid();
 
         NewDownloadItem?.Invoke(downloadItem);
     }
@@ -889,9 +974,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         _containerService.Remove(node);
     }
 
-    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name)
+    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name, AddonNode node)
     {
-        _containerService.ThrowIfNameInvalid(name);
+        _containerService.ThrowIfNameInvalid(name, node);
     }
 
     void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)

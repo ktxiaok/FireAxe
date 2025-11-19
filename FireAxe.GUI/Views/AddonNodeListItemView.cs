@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System;
 using System.Reactive.Disposables;
 

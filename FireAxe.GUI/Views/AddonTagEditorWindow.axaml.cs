@@ -1,13 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
 using System.Reactive;
 using FireAxe.Resources;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 
@@ -27,6 +28,9 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
 
     private void ConnectViewModel(AddonTagEditorViewModel viewModel, CompositeDisposable disposables)
     {
+        viewModel.RegisterInvalidHandler(Close)
+            .DisposeWith(disposables);
+
         viewModel.AddTagInteraction.RegisterHandler(async (context) =>
         {
             var addTagWindow = new AddAddonTagWindow()

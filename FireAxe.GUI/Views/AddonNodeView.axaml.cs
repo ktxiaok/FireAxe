@@ -1,11 +1,12 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
 using Avalonia.Interactivity;
 using FireAxe.ViewModels;
 using FireAxe.Resources;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 

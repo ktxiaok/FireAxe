@@ -472,7 +472,7 @@
     <value>游戏路径“{0}”无效。</value>
   </data>
   <data name="InvalidInputMessage" xml:space="preserve">
-    <value>无效输入。</value>
+    <value>无效输入</value>
   </data>
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>目标组是源组的子组。</value>
@@ -854,5 +854,53 @@
   </data>
   <data name="OperationCanceled" xml:space="preserve">
     <value>操作已被取消。</value>
+  </data>
+  <data name="FileCleaner" xml:space="preserve">
+    <value>文件清理器</value>
+  </data>
+  <data name="Retain" xml:space="preserve">
+    <value>保留</value>
+  </data>
+  <data name="Deleting" xml:space="preserve">
+    <value>删除中...</value>
+  </data>
+  <data name="DeletionFailed" xml:space="preserve">
+    <value>删除失败</value>
+  </data>
+  <data name="RetainAll" xml:space="preserve">
+    <value>保留全部</value>
+  </data>
+  <data name="TotalFileSizeColon" xml:space="preserve">
+    <value>总文件大小：</value>
+  </data>
+  <data name="GlobalSearch" xml:space="preserve">
+    <value>全局搜索</value>
+  </data>
+  <data name="SearchSources" xml:space="preserve">
+    <value>搜索源</value>
+  </data>
+  <data name="FindAllCleanable" xml:space="preserve">
+    <value>查找所有可清理项</value>
+  </data>
+  <data name="FindRedundantVpkFiles" xml:space="preserve">
+    <value>查找多余的VPK文件</value>
+  </data>
+  <data name="FindEmptyDirectories" xml:space="preserve">
+    <value>查找空目录</value>
+  </data>
+  <data name="FindDownloadTempFiles" xml:space="preserve">
+    <value>查找下载临时文件</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>删除全部</value>
+  </data>
+  <data name="AddSearchSource" xml:space="preserve">
+    <value>添加搜索源</value>
+  </data>
+  <data name="ItemsFoundWithCount" xml:space="preserve">
+    <value>已找到{0}项。</value>
+  </data>
+  <data name="ConfirmDeleteAll" xml:space="preserve">
+    <value>你确定要删除全部项吗？</value>
   </data>
 </root>

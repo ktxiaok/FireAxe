@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:v="using:FireAxe.Views"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="900"
+        x:Class="FireAxe.Views.AddonNodePickerWindow"
+        x:DataType="vm:AddonNodePickerViewModel"
+        Width="900" Height="900"
+        WindowStartupLocation="CenterOwner">
+  <DockPanel Margin="10">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Center"
+      Margin="5">
+      <Button
+        Command="{Binding ConfirmCommand}"
+        Content="{x:Static r:Texts.Confirm}"
+        Margin="2.5"/>
+    </StackPanel>
+
+    <v:AddonNodeExplorerView
+      Name="explorerView"
+      DataContext="{Binding ExplorerViewModel}"/>
+  </DockPanel>
+</Window>

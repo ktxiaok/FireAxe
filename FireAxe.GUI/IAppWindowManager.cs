@@ -16,11 +16,11 @@ public interface IAppWindowManager
 
     void OpenAboutWindow();
 
-    void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup);
-
     void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
 
     void OpenVpkConflictListWindow(AddonRoot addonRoot);
 
     void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel);
+
+    void OpenFileCleanerWindow(AddonRoot addonRoot);
 }

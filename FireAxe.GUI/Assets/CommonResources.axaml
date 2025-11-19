@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="using:System">
+                    xmlns:sys="using:System"
+                    xmlns:conv="using:FireAxe.ValueConverters">
   <Design.PreviewWith>
     <Border Width="500" Height="500" BorderBrush="Black" BorderThickness="10">
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -49,4 +50,6 @@
   <sys:Double x:Key="size_addon_tile_large">150</sys:Double>
 
   <SolidColorBrush x:Key="brush_warning">OrangeRed</SolidColorBrush>
+
+  <conv:ReadableBytesConverter x:Key="converter_readable_bytes"/>
 </ResourceDictionary>

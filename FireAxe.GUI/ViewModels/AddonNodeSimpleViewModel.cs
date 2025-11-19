@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Threading;
 
@@ -275,7 +276,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             return;
         }
 
-        Utils.ShowFileInExplorer(addon.FullFilePath);
+        Utils.ShowInFileExplorer(addon.FullFilePath);
     }
 
     protected virtual void OnNewAddon(AddonNode addon, CompositeDisposable disposables)

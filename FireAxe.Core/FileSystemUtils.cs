@@ -69,11 +69,6 @@ public static class FileSystemUtils
     {
         ArgumentNullException.ThrowIfNull(sourcePath);
         ArgumentNullException.ThrowIfNull(targetPath);
-
-        if (Exists(targetPath))
-        {
-            throw new FileNameExistsException(targetPath);
-        }
         
         Directory.Move(sourcePath, targetPath);
     }
@@ -201,5 +196,39 @@ public static class FileSystemUtils
         ArgumentNullException.ThrowIfNull(path);
 
         return path.Replace('\\', '/');
+    }
+
+    public static string GetFullAndNormalizedPath(string path) => NormalizePath(Path.GetFullPath(path));
+
+    public static bool IsDirectoryEmpty(string dirPath)
+    {
+        ArgumentNullException.ThrowIfNull(dirPath);
+
+        return !Directory.EnumerateFileSystemEntries(dirPath).Any();
+    }
+
+    public static IEnumerable<string> FindEmptyDirectories(string dirPath)
+    {
+        ArgumentNullException.ThrowIfNull(dirPath);
+
+        var dirQueue = new Queue<string>();
+        foreach (string subDir in Directory.EnumerateDirectories(dirPath))
+        {
+            dirQueue.Enqueue(subDir);
+        }
+
+        while (dirQueue.Count > 0)
+        {
+            string subDir = dirQueue.Dequeue();
+            if (IsDirectoryEmpty(subDir))
+            {
+                yield return subDir;
+                continue;
+            }
+            foreach (string subDir2 in Directory.EnumerateDirectories(subDir))
+            {
+                dirQueue.Enqueue(subDir2);
+            }
+        }
     }
 }

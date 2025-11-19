@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using FireAxe.Resources;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System;
 using System.Reactive.Disposables;
 

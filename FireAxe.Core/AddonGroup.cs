@@ -160,7 +160,7 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
     IAddonNodeContainer? IAddonNodeContainer.Parent => Group;
 
-    string IAddonNodeContainer.FileSystemPath => FullFilePath;
+    string? IAddonNodeContainer.FileSystemPath => Root.IsDirectoryPathSet ? FullFilePath : null;
 
     public event Action<AddonNode>? DescendantNodeMoved = null;
 
@@ -169,6 +169,20 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         this.ThrowIfInvalid();
 
         return _containerService.GetUniqueName(name);
+    }
+
+    public AddonNode? TryGetNodeByName(string name)
+    {
+        this.ThrowIfInvalid();
+
+        return _containerService.TryGetByName(name);
+    }
+
+    public AddonNode? TryGetNodeByPath(string path)
+    {
+        this.ThrowIfInvalid();
+
+        return _containerService.TryGetByPath(path);
     }
 
     public bool EnableOneChildRandomlyIfSingleRandom()
@@ -298,9 +312,9 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         _isBusyHandlingChildEnableOrDisable = false;
     }
 
-    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name)
+    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name, AddonNode node)
     {
-        _containerService.ThrowIfNameInvalid(name);
+        _containerService.ThrowIfNameInvalid(name, node);
     }
 
     void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)

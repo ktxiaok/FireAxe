@@ -472,7 +472,7 @@
     <value>The game path "{0}" is invalid.</value>
   </data>
   <data name="InvalidInputMessage" xml:space="preserve">
-    <value>Invalid input.</value>
+    <value>Invalid Input</value>
   </data>
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>The target group is the subgroup of the source group.</value>
@@ -854,5 +854,53 @@
   </data>
   <data name="OperationCanceled" xml:space="preserve">
     <value>The operation was canceled.</value>
+  </data>
+  <data name="FileCleaner" xml:space="preserve">
+    <value>File Cleaner</value>
+  </data>
+  <data name="Retain" xml:space="preserve">
+    <value>Retain</value>
+  </data>
+  <data name="Deleting" xml:space="preserve">
+    <value>Deleting...</value>
+  </data>
+  <data name="DeletionFailed" xml:space="preserve">
+    <value>Deletion Failed</value>
+  </data>
+  <data name="RetainAll" xml:space="preserve">
+    <value>Retain All</value>
+  </data>
+  <data name="TotalFileSizeColon" xml:space="preserve">
+    <value>Total File Size: </value>
+  </data>
+  <data name="GlobalSearch" xml:space="preserve">
+    <value>Global Search</value>
+  </data>
+  <data name="SearchSources" xml:space="preserve">
+    <value>Sources of Searching</value>
+  </data>
+  <data name="FindAllCleanable" xml:space="preserve">
+    <value>Find All Cleanable</value>
+  </data>
+  <data name="FindRedundantVpkFiles" xml:space="preserve">
+    <value>Find Redundant VPK Files</value>
+  </data>
+  <data name="FindEmptyDirectories" xml:space="preserve">
+    <value>Find Empty Directories</value>
+  </data>
+  <data name="FindDownloadTempFiles" xml:space="preserve">
+    <value>Find Download Temp Files</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>Delete All</value>
+  </data>
+  <data name="AddSearchSource" xml:space="preserve">
+    <value>Add Sources of Searching</value>
+  </data>
+  <data name="ItemsFoundWithCount" xml:space="preserve">
+    <value>{0} items found.</value>
+  </data>
+  <data name="ConfirmDeleteAll" xml:space="preserve">
+    <value>Are you sure you want to delete all the items?</value>
   </data>
 </root>

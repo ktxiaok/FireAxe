@@ -8,10 +8,10 @@ internal class AddonNodeContainerService
 {
     private readonly IAddonNodeContainer _container;
 
-    private ObservableCollection<AddonNode> _nodes;
-    private ReadOnlyObservableCollection<AddonNode> _nodesReadOnly;
+    private readonly ObservableCollection<AddonNode> _nodes;
+    private readonly ReadOnlyObservableCollection<AddonNode> _nodesReadOnly;
 
-    private Dictionary<string, AddonNode> _nodeNames = new();
+    private readonly Dictionary<string, AddonNode> _nameToNode = new(StringComparer.InvariantCultureIgnoreCase);
 
     public AddonNodeContainerService(IAddonNodeContainer container)
     {
@@ -47,7 +47,7 @@ internal class AddonNodeContainerService
         var name = node.Name;
         if (name != AddonNode.NullName)
         {
-            _nodeNames.Remove(name);
+            _nameToNode.Remove(name);
         }
         _nodes.Remove(node);
         foreach (var containerOrAncestor in _container.GetSelfAndAncestors())
@@ -60,18 +60,22 @@ internal class AddonNodeContainerService
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        var fileSystemEntries = new HashSet<string>();
+        var fileSystemEntries = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
-        try
+        var fileSystemPath = _container.FileSystemPath;
+        if (fileSystemPath is not null)
         {
-            foreach (var path in Directory.EnumerateFileSystemEntries(_container.FileSystemPath))
+            try
             {
-                fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
+                foreach (var path in Directory.EnumerateFileSystemEntries(fileSystemPath))
+                {
+                    fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", _container.FileSystemPath);
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", fileSystemPath);
+            }
         }
 
         bool Exists(string name) => NameExists(name) || fileSystemEntries.Contains(name);
@@ -95,11 +99,51 @@ internal class AddonNodeContainerService
         }
     }
 
-    public void ThrowIfNameInvalid(string name)
+    public AddonNode? TryGetByName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (NameExists(name))
+        if (_nameToNode.TryGetValue(name, out var node))
+        {
+            return node;
+        }
+        return null;
+    }
+
+    public AddonNode? TryGetByPath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        var names = path.Split('/');
+        int i = 0;
+        IAddonNodeContainer parent = _container;
+        while (true)
+        {
+            var node = parent.TryGetNodeByName(names[i]);
+            if (node is null)
+            {
+                return null;
+            }
+            if (i == names.Length - 1)
+            {
+                return node;
+            }
+            var container = node as IAddonNodeContainer;
+            if (container is null)
+            {
+                return null;
+            }
+            parent = container;
+            i++;
+        }
+    }
+
+    public void ThrowIfNameInvalid(string name, AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(node);
+
+        if (_nameToNode.TryGetValue(name, out var existingNode) && existingNode != node)
         {
             throw new AddonNameExistsException(name);
         }
@@ -109,7 +153,7 @@ internal class AddonNodeContainerService
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        return _nodeNames.ContainsKey(name);
+        return _nameToNode.ContainsKey(name);
     }
 
     public void ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
@@ -119,11 +163,11 @@ internal class AddonNodeContainerService
 
         if (oldName != null && oldName != AddonNode.NullName)
         {
-            _nodeNames.Remove(oldName);
+            _nameToNode.Remove(oldName);
         }
         if (newName != AddonNode.NullName)
         {
-            _nodeNames[newName] = node;
+            _nameToNode[newName] = node;
         }
     }
 }

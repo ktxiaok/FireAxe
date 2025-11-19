@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.ViewModels;
 

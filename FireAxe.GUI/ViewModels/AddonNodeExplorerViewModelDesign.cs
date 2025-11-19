@@ -8,7 +8,7 @@ namespace FireAxe.ViewModels;
 
 public class AddonNodeExplorerViewModelDesign : AddonNodeExplorerViewModel
 {
-    public AddonNodeExplorerViewModelDesign() : base(DesignHelper.CreateTestAddonRoot(), null!)
+    public AddonNodeExplorerViewModelDesign() : base(DesignHelper.CreateTestAddonRoot())
     {
 
     }

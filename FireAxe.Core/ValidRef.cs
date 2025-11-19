@@ -6,7 +6,7 @@ public class ValidRef<T> where T : class, IValidity
 {
     private readonly WeakReference<T?> _weakRef = new(null);
 
-    public ValidRef(T? target)
+    public ValidRef(T? target = null)
     {
         Set(target);
     }

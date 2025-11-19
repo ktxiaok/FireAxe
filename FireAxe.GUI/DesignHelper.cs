@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FireAxe;
@@ -68,5 +69,36 @@ internal static class DesignHelper
             var node = AddonNode.Create<AddonNode>(root);
             node.Name = "node_" + i;
         }
+    }
+
+    private static readonly char[] s_randomCharSource = [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+        '随','机','生','成','汉','字','列','表','示','例','代','码','编','写','测','试','功','能','开','发','需','求','实','现','逻','辑','验','证','结','果',
+    ];
+
+    public static string GenerateRandomString(int length)
+    {
+        if (length < 1)
+        {
+            length = 1;
+        }
+        var builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++)
+        {
+            builder.Append(s_randomCharSource[Random.Shared.Next(s_randomCharSource.Length)]);
+        }
+        return builder.ToString();
+    }
+
+    public static string GenerateRandomString(int minLength, int maxLength)
+    {
+        if (minLength < 1 || maxLength < 1 || minLength > maxLength)
+        {
+            return GenerateRandomString(1);
+        }
+
+        return GenerateRandomString(Random.Shared.Next(minLength, maxLength + 1));
     }
 }

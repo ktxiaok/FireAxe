@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Serilog;
 using System;
 using System.Diagnostics;

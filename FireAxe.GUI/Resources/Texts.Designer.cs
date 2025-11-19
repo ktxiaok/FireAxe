@@ -124,6 +124,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Sources of Searching.
+        /// </summary>
+        public static string AddSearchSource {
+            get {
+                return ResourceManager.GetString("AddSearchSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Tag.
         /// </summary>
         public static string AddTag {
@@ -358,6 +367,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete all the items?.
+        /// </summary>
+        public static string ConfirmDeleteAll {
+            get {
+                return ResourceManager.GetString("ConfirmDeleteAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete the selected items? This cannot be undone. .
         /// </summary>
         public static string ConfirmDeleteMessage {
@@ -520,6 +538,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete All.
+        /// </summary>
+        public static string DeleteAll {
+            get {
+                return ResourceManager.GetString("DeleteAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete and Retain Files.
         /// </summary>
         public static string DeleteAndRetainFile {
@@ -556,11 +583,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deleting....
+        /// </summary>
+        public static string Deleting {
+            get {
+                return ResourceManager.GetString("Deleting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deleting Addons.
         /// </summary>
         public static string DeletingAddons {
             get {
                 return ResourceManager.GetString("DeletingAddons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deletion Failed.
+        /// </summary>
+        public static string DeletionFailed {
+            get {
+                return ResourceManager.GetString("DeletionFailed", resourceCulture);
             }
         }
         
@@ -979,6 +1024,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Cleaner.
+        /// </summary>
+        public static string FileCleaner {
+            get {
+                return ResourceManager.GetString("FileCleaner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The file download is uncompleted!.
         /// </summary>
         public static string FileDownloadUncompleted {
@@ -1033,11 +1087,47 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Find All Cleanable.
+        /// </summary>
+        public static string FindAllCleanable {
+            get {
+                return ResourceManager.GetString("FindAllCleanable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find Download Temp Files.
+        /// </summary>
+        public static string FindDownloadTempFiles {
+            get {
+                return ResourceManager.GetString("FindDownloadTempFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find Empty Directories.
+        /// </summary>
+        public static string FindEmptyDirectories {
+            get {
+                return ResourceManager.GetString("FindEmptyDirectories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Find from Directory.
         /// </summary>
         public static string FindFromDirectory {
             get {
                 return ResourceManager.GetString("FindFromDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find Redundant VPK Files.
+        /// </summary>
+        public static string FindRedundantVpkFiles {
+            get {
+                return ResourceManager.GetString("FindRedundantVpkFiles", resourceCulture);
             }
         }
         
@@ -1092,6 +1182,15 @@ namespace FireAxe.Resources {
         public static string GlobalPriority {
             get {
                 return ResourceManager.GetString("GlobalPriority", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global Search.
+        /// </summary>
+        public static string GlobalSearch {
+            get {
+                return ResourceManager.GetString("GlobalSearch", resourceCulture);
             }
         }
         
@@ -1330,7 +1429,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid input..
+        ///   Looks up a localized string similar to Invalid Input.
         /// </summary>
         public static string InvalidInputMessage {
             get {
@@ -1371,6 +1470,15 @@ namespace FireAxe.Resources {
         public static string ItemNameExists {
             get {
                 return ResourceManager.GetString("ItemNameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} items found..
+        /// </summary>
+        public static string ItemsFoundWithCount {
+            get {
+                return ResourceManager.GetString("ItemsFoundWithCount", resourceCulture);
             }
         }
         
@@ -1852,6 +1960,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Retain.
+        /// </summary>
+        public static string Retain {
+            get {
+                return ResourceManager.GetString("Retain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retain All.
+        /// </summary>
+        public static string RetainAll {
+            get {
+                return ResourceManager.GetString("RetainAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If you do this, files will be retained..
         /// </summary>
         public static string RetainFileMessage {
@@ -1902,6 +2028,15 @@ namespace FireAxe.Resources {
         public static string SearchingMessage {
             get {
                 return ResourceManager.GetString("SearchingMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sources of Searching.
+        /// </summary>
+        public static string SearchSources {
+            get {
+                return ResourceManager.GetString("SearchSources", resourceCulture);
             }
         }
         
@@ -2091,6 +2226,15 @@ namespace FireAxe.Resources {
         public static string Tools {
             get {
                 return ResourceManager.GetString("Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total File Size: .
+        /// </summary>
+        public static string TotalFileSizeColon {
+            get {
+                return ResourceManager.GetString("TotalFileSizeColon", resourceCulture);
             }
         }
         

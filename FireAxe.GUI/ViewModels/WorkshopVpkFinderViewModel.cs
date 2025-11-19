@@ -11,6 +11,7 @@ using System.Threading;
 using ReactiveUI;
 using Serilog;
 using FireAxe.Resources;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.ViewModels;
 

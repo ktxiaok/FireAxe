@@ -1,5 +1,5 @@
 - add: VPK conflict checking system
-- add: feature to delete redundant VPK files for WorkshopVpkAddons
+- add: File Cleaner (supports deleting redundant VPK files for workshop items, download temp files and empty directories)
 - add: Workshop VPK Finder
 - add: support import and export for .addonroot files
 - add: addon deletion progress window

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using FireAxe.Resources;
 using ReactiveUI;
@@ -8,6 +7,8 @@ using System.Reactive.Disposables;
 using System.Reactive;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Models;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 

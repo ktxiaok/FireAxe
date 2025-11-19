@@ -1,15 +1,16 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using DynamicData;
 using DynamicData.Binding;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace FireAxe.Views;
 

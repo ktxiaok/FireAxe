@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 
 namespace FireAxe.ViewModels;

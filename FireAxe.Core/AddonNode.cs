@@ -268,7 +268,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 ThrowIfMoveDenied();
 
                 var parentInternal = (IAddonNodeContainerInternal)Parent;
-                parentInternal.ThrowIfNodeNameInvalid(value);
+                parentInternal.ThrowIfNodeNameInvalid(value, this);
 
                 // Try to move the file.
                 if (MayHaveFile)
@@ -293,13 +293,13 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public string FullName 
+    public string NodePath 
     {
         get 
         {
             this.ThrowIfInvalid();
 
-            return BuildFilePath(Group, Name); 
+            return FileSystemUtils.NormalizePath(BuildFilePath(Group, Name)); 
         }
     }
 
@@ -635,7 +635,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             ThrowIfMoveDenied();
 
             var containerInternal = targetGroup == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)targetGroup;
-            containerInternal.ThrowIfNodeNameInvalid(Name);
+            containerInternal.ThrowIfNodeNameInvalid(Name, this);
 
             // Try to move the file.
             if (MayHaveFile)
@@ -1077,7 +1077,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     protected virtual void OnAncestorsChanged()
     {
-        NotifyChanged(nameof(FullName));
+        NotifyChanged(nameof(NodePath));
         NotifyChanged(nameof(FilePath));
         NotifyChanged(nameof(PriorityInHierarchy));
         NotifyChanged(nameof(TagsInHierarchy));
@@ -1119,7 +1119,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             NotifyChanged(nameof(FileName));
             foreach (var node in this.GetSelfAndDescendantsByDfsPreorder())
             {
-                node.NotifyChanged(nameof(FullName));
+                node.NotifyChanged(nameof(NodePath));
                 node.NotifyChanged(nameof(FilePath));
             }
         }

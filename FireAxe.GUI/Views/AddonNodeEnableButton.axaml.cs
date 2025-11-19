@@ -2,11 +2,12 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 
@@ -24,33 +25,33 @@ public partial class AddonNodeEnableButton : ReactiveUserControl<AddonNodeSimple
         var iconDisabled = (Geometry?)app.FindResource("icon_disabled");
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            this.WhenAnyValue(x => x.ViewModel.EnableState)
-            .Subscribe(enableState =>
-            {
-                Geometry? iconData;
-                Color color;
-                if (enableState == AddonNodeEnableState.Enabled)
+            this.WhenAnyValue(x => x.ViewModel!.EnableState)
+                .Subscribe(enableState =>
                 {
-                    iconData = iconEnabled;
-                    color = Colors.Green;
-                }
-                else if (enableState == AddonNodeEnableState.EnabledSuppressed)
-                {
-                    iconData = iconEnabledSuppressed;
-                    color = Colors.Orange;
-                }
-                else
-                {
-                    iconData = iconDisabled;
-                    color = Colors.Red;
-                }
-                if (iconData != null)
-                {
-                    icon.Data = iconData;
-                }
-                icon.Foreground = new SolidColorBrush(color);
-            })
-            .DisposeWith(disposables);
+                    Geometry? iconData;
+                    Color color;
+                    if (enableState == AddonNodeEnableState.Enabled)
+                    {
+                        iconData = iconEnabled;
+                        color = Colors.Green;
+                    }
+                    else if (enableState == AddonNodeEnableState.EnabledSuppressed)
+                    {
+                        iconData = iconEnabledSuppressed;
+                        color = Colors.Orange;
+                    }
+                    else
+                    {
+                        iconData = iconDisabled;
+                        color = Colors.Red;
+                    }
+                    if (iconData != null)
+                    {
+                        icon.Data = iconData;
+                    }
+                    icon.Foreground = new SolidColorBrush(color);
+                })
+                .DisposeWith(disposables);
         });
     }
 

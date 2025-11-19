@@ -2,26 +2,39 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.ReactiveUI;
 using FireAxe.Resources;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 
 namespace FireAxe.Views;
 
 public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplorerViewModel>
 {
-    public static readonly StyledProperty<bool> IsAddonNodeViewEnabledProperty =
-        AvaloniaProperty.Register<AddonNodeExplorerView, bool>(nameof(IsAddonNodeViewEnabled), defaultValue: true);
+    public static readonly StyledProperty<bool> IsSingleSelectionEnabledProperty =
+        AvaloniaProperty.Register<AddonNodeExplorerView, bool>(nameof(IsSingleSelectionEnabled), defaultValue: false);
+
+    public static readonly DirectProperty<AddonNodeExplorerView, SelectionMode> ExpectedSelectionModeProperty =
+        AvaloniaProperty.RegisterDirect<AddonNodeExplorerView, SelectionMode>(nameof(ExpectedSelectionMode), t => t.ExpectedSelectionMode);
+
+    private const int AddonNodeViewColumnIndex = 2;
+
+    private SelectionMode _expectedSelectionMode = SelectionMode.Multiple;
 
     public AddonNodeExplorerView()
     {
         InitializeComponent();
+
+        this.WhenAnyValue(x => x.IsSingleSelectionEnabled)
+            .Select(singleSelection => singleSelection ? SelectionMode.Single : SelectionMode.Multiple)
+            .Subscribe(selectionMode => ExpectedSelectionMode = selectionMode);
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -45,14 +58,34 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         };
     }
 
-    public bool IsAddonNodeViewEnabled
+    public bool IsSingleSelectionEnabled
     {
-        get => GetValue(IsAddonNodeViewEnabledProperty);
-        set => SetValue(IsAddonNodeViewEnabledProperty, value);
+        get => GetValue(IsSingleSelectionEnabledProperty);
+        set => SetValue(IsSingleSelectionEnabledProperty, value);
+    }
+
+    public SelectionMode ExpectedSelectionMode
+    {
+        get => _expectedSelectionMode;
+        private set => SetAndRaise(ExpectedSelectionModeProperty, ref _expectedSelectionMode, value);
     }
 
     private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
     {
+        viewModel.WhenAnyValue(x => x.IsAddonNodeViewEnabled)
+            .Subscribe(isAddonNodeViewEnabled =>
+            {
+                if (isAddonNodeViewEnabled)
+                {
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = double.PositiveInfinity;
+                }
+                else
+                {
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = 0;
+                }
+            })
+            .DisposeWith(disposables);
+
         viewModel.WhenAnyValue(x => x.TileViewSize)
             .Subscribe(size =>
             {
@@ -121,6 +154,19 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             window.Activate();
 
             new TaskOperationsProgressNotifier(operations, false, progressViewModel);
+
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
+        viewModel.ShowNewWorkshopCollectionWindowInteraction.RegisterHandler(context =>
+        {
+            var (addonRoot, addonGroup) = context.Input;
+            var window = new NewWorkshopCollectionWindow
+            {
+                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup)
+            };
+            window.Show();
+            window.Activate();
 
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);

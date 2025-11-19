@@ -61,15 +61,6 @@ public class AppWindowManager : IAppWindowManager
         OpenWindow(ref _aboutWindowRef, () => new AboutWindow());
     }
 
-    public void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup)
-    {
-        var window = new NewWorkshopCollectionWindow()
-        {
-            DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup, _httpClient)
-        };
-        window.Show();
-    }
-
     public void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel)
     {
         OpenWindow(ref _tagManagerWindowRef, () => new AddonTagManagerWindow()
@@ -95,6 +86,17 @@ public class AppWindowManager : IAppWindowManager
         var window = new WorkshopVpkFinderWindow
         {
             DataContext = new WorkshopVpkFinderViewModel(mainWindowViewModel, _httpClient)
+        };
+        window.Show();
+    }
+
+    public void OpenFileCleanerWindow(AddonRoot addonRoot)
+    {
+        ArgumentNullException.ThrowIfNull(addonRoot);
+
+        var window = new FileCleanerWindow
+        {
+            DataContext = new FileCleanerViewModel(addonRoot)
         };
         window.Show();
     }

@@ -16,6 +16,7 @@
   </Design.DataContext>
   
   <Grid
+    Name="rootGrid"
     RowDefinitions="Auto, Auto, *"
     ColumnDefinitions="*, 4, 400">
     <Grid
@@ -275,7 +276,7 @@
               IsVisible="{Binding IsTileView, FallbackValue=False}"
               ItemsSource="{Binding NodeViewModels}"
               SelectedItems="{Binding Selection}"
-              SelectionMode="Multiple">
+              SelectionMode="{Binding $parent[v:AddonNodeExplorerView].ExpectedSelectionMode}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <Border Classes="NodeBorder">
@@ -295,7 +296,7 @@
               IsVisible="{Binding IsGridView, FallbackValue=False}"
               ItemsSource="{Binding NodeViewModels}"
               SelectedItems="{Binding Selection}"
-              SelectionMode="Multiple">
+              SelectionMode="{Binding $parent[v:AddonNodeExplorerView].ExpectedSelectionMode}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <Border Classes="NodeBorder">
@@ -365,14 +366,16 @@
       Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
       ResizeDirection="Columns"/>
     
-    <!--AddonNodeView Panel-->
+    <!--addon node parent view-->
     <Border
       Grid.Row="0"
       Grid.Column="2"
       Grid.RowSpan="3"
-      IsVisible="{Binding $parent[v:AddonNodeExplorerView].IsAddonNodeViewEnabled}"
+      IsVisible="{Binding IsAddonNodeViewEnabled}"
       BorderThickness="2"
-      BorderBrush="Gray">
+      BorderBrush="Gray"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch">
       <ScrollViewer>
         <Panel>
           <StackPanel
@@ -393,7 +396,7 @@
           <Panel
             IsVisible="{Binding IsSingleSelection, FallbackValue=False}"
             Margin="10">
-            <v:AddonNodeView DataContext="{Binding SingleSelection, TargetNullValue={x:Null}}"/>
+            <v:AddonNodeView DataContext="{Binding ActiveAddonNodeViewModel}"/>
           </Panel>
         </Panel>
       </ScrollViewer>

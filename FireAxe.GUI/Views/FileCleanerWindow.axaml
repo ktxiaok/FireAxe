@@ -1,0 +1,218 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:datatemplates="using:FireAxe.DataTemplates"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:v="using:FireAxe.Views"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:conv="using:FireAxe.ValueConverters"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="700"
+        x:Class="FireAxe.Views.FileCleanerWindow"
+        x:DataType="vm:FileCleanerViewModel"
+        Title="{x:Static r:Texts.FileCleaner}"
+        Width="700" Height="700"
+        WindowStartupLocation="CenterScreen">
+  <Design.DataContext>
+    <vm:FileCleanerViewModelDesign/>
+  </Design.DataContext>
+  <DockPanel Margin="10">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Vertical">
+      <DockPanel
+        Margin="0, 5, 0, 5"
+        LastChildFill="False">
+        <StackPanel
+          DockPanel.Dock="Left"
+          Orientation="Horizontal">
+          <TextBlock
+           Text="{x:Static r:Texts.TotalFileSizeColon}"
+           VerticalAlignment="Center"/>
+          <Control Width="5"/>
+          <TextBlock
+            Text="{Binding TotalFileSize, Converter={StaticResource converter_readable_bytes}, FallbackValue=0}"
+            VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel
+          DockPanel.Dock="Right"
+          Orientation="Horizontal">
+          <Button
+            Command="{Binding RetainAllCommand}"
+            Content="{x:Static r:Texts.RetainAll}"/>
+          <Control Width="10"/>
+          <Button
+            Command="{Binding DeleteAllCommand}"
+            Content="{x:Static r:Texts.DeleteAll}"/>
+        </StackPanel>
+      </DockPanel>
+
+      <!--global search-->
+      <StackPanel
+        Orientation="Horizontal"
+        Margin="0, 5, 0, 5">
+        <TextBlock
+          Text="{x:Static r:Texts.GlobalSearch}"
+          VerticalAlignment="Center"/>
+        <Control Width="5"/>
+        <CheckBox IsChecked="{Binding IsGlobalSearch}"/>
+      </StackPanel>
+
+      <!--sources-->
+      <StackPanel
+        Orientation="Vertical"
+        IsVisible="{Binding !IsGlobalSearch}"
+        Margin="0, 5, 0, 5">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock
+            Text="{x:Static r:Texts.SearchSources}"
+            VerticalAlignment="Center"/>
+          <Control Width="10"/>
+          <Button
+            Name="addSourceButton"
+            Content="{x:Static r:Texts.Add}"/>
+        </StackPanel>
+
+        <Control Height="10"/>
+
+        <Border
+          BorderBrush="Gray"
+          BorderThickness="2"
+          MinHeight="75" MaxHeight="150">
+          <ScrollViewer>
+            <ItemsControl
+              ItemsSource="{Binding SourceAddonViewModels}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="15"
+                    Padding="3"
+                    Margin="5">
+                    <StackPanel
+                      Orientation="Horizontal"
+                      Margin="5">
+                      <StackPanel.Styles>
+                        <Style Selector="v|AddonNodeEnableButton">
+                          <Setter Property="IsVisible" Value="False"/>
+                        </Style>
+                      </StackPanel.Styles>
+
+                      <v:AddonRefView/>
+                      <Button
+                        Command="{Binding Remove}"
+                        Background="Transparent">
+                        <PathIcon Data="{StaticResource icon_dismiss}"/>
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </ScrollViewer>
+        </Border>
+      </StackPanel>
+
+      <!--finding commands-->
+      <WrapPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"
+        Margin="0, 5, 0, 5">
+        <WrapPanel.Styles>
+          <Style Selector="Button">
+            <Setter Property="Margin" Value="0, 5, 5, 5"/>
+          </Style>
+        </WrapPanel.Styles>
+        <Button
+          Content="{x:Static r:Texts.FindAllCleanable}"
+          Command="{Binding FindAllCleanableCommand}"/>
+        <Button
+          Content="{x:Static r:Texts.FindRedundantVpkFiles}"
+          Command="{Binding FindRedundantVpkFilesCommand}"/>
+        <Button
+          Content="{x:Static r:Texts.FindDownloadTempFiles}"
+          Command="{Binding FindDownloadTempFilesCommand}"/>
+        <Button
+          Content="{x:Static r:Texts.FindEmptyDirectories}"
+          Command="{Binding FindEmptyDirectoriesCommand}"/>
+      </WrapPanel>
+    </StackPanel>
+
+    <!--staged items-->
+    <Border
+      BorderBrush="Gray"
+      BorderThickness="2"
+      Margin="0, 0, 0, 5">
+      <ScrollViewer>
+        <ItemsControl
+          ItemsSource="{Binding StagedItems}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="5"
+                Margin="5"
+                Padding="2.5">
+                <DockPanel>
+                  <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal">
+                    <TextBlock
+                      Text="{x:Static r:Texts.Deleting}"
+                      IsVisible="{Binding IsDeleting}"
+                      VerticalAlignment="Center"/>
+                    <TextBlock
+                      Text="{x:Static r:Texts.DeletionFailed}"
+                      IsVisible="{Binding DeletionException, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      Foreground="{DynamicResource brush_warning}"
+                      VerticalAlignment="Center"/>
+                    <Control Width="5"/>
+                    <TextBlock
+                      Text="{Binding FileSize, Converter={StaticResource converter_readable_bytes}}"
+                      VerticalAlignment="Center"/>
+                    <Control Width="5"/>
+                    <Button
+                      Command="{Binding ShowInFileExplorerCommand}"
+                      Background="Transparent"
+                      ToolTip.Tip="{x:Static r:Texts.ShowInFileExplorer}">
+                      <PathIcon Data="{StaticResource icon_folder}"/>
+                    </Button>
+                    <Control Width="5"/>
+                    <Button
+                      Command="{Binding RetainCommand}"
+                      Content="{x:Static r:Texts.Retain}"/>
+                    <Control Width="5"/>
+                    <Button
+                      Command="{Binding DeleteCommand}"
+                      Content="{x:Static r:Texts.Delete}"/>
+                  </StackPanel>
+
+                  <SelectableTextBlock
+                    Text="{Binding RelativePath}"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center"/>
+                </DockPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

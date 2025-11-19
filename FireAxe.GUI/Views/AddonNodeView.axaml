@@ -79,7 +79,7 @@
       <TextBlock
         DockPanel.Dock="Right"
         Classes="PropertyValue"
-        Text="{Binding Addon.FullName}"
+        Text="{Binding Addon.NodePath}"
         TextWrapping="Wrap"/>
     </DockPanel>
 
