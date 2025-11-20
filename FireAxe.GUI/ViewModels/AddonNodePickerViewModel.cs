@@ -10,6 +10,8 @@ namespace FireAxe.ViewModels;
 
 public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
+    private static readonly ValidRef<AddonGroup> s_lastAccessedGroupRef = new();
+
     private bool _isValid = true;
 
     public AddonNodePickerViewModel(AddonRoot addonRoot)
@@ -23,6 +25,10 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
             IsAddonNodeViewEnabled = false
         };
 
+        ExplorerViewModel.GotoGroup(LastAccessedGroup);
+        ExplorerViewModel.WhenAnyValue(x => x.CurrentGroup)
+            .Subscribe(currentGroup => LastAccessedGroup = currentGroup);
+
         ConfirmCommand = ReactiveCommand.Create(() => CloseRequested?.Invoke(), ExplorerViewModel.WhenAnyValue(x => x.HasSelection));
 
         this.WhenActivated((CompositeDisposable disposables) =>
@@ -32,6 +38,12 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
             addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
         });
+    }
+
+    public static AddonGroup? LastAccessedGroup
+    {
+        get => s_lastAccessedGroupRef.TryGet();
+        private set => s_lastAccessedGroupRef.Set(value);
     }
 
     public ViewModelActivator Activator { get; } = new();
