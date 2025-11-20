@@ -88,11 +88,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Dependencies.
+        /// </summary>
+        public static string AddDependencies {
+            get {
+                return ResourceManager.GetString("AddDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There&apos;re problems in subitems..
         /// </summary>
         public static string AddonChildProblemExplain {
             get {
                 return ResourceManager.GetString("AddonChildProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are dependencies that are not enabled..
+        /// </summary>
+        public static string AddonDependenciesProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonDependenciesProblemExplain", resourceCulture);
             }
         }
         
@@ -655,6 +673,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dependencies.
+        /// </summary>
+        public static string Dependencies {
+            get {
+                return ResourceManager.GetString("Dependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Descending.
         /// </summary>
         public static string Descending {
@@ -741,6 +768,15 @@ namespace FireAxe.Resources {
         public static string Enable {
             get {
                 return ResourceManager.GetString("Enable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable All.
+        /// </summary>
+        public static string EnableAll {
+            get {
+                return ResourceManager.GetString("EnableAll", resourceCulture);
             }
         }
         

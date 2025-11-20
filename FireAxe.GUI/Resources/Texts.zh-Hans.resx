@@ -945,4 +945,16 @@
   <data name="AlternativeCustomizeAddonPreviewImageNote" xml:space="preserve">
     <value>注意：你也可以通过在模组的文件旁放置一个相同名称的图像文件来自定义预览图像（此方式优先级更高）。</value>
   </data>
+  <data name="AddonDependenciesProblemExplain" xml:space="preserve">
+    <value>存在依赖项未启用。</value>
+  </data>
+  <data name="Dependencies" xml:space="preserve">
+    <value>依赖项</value>
+  </data>
+  <data name="AddDependencies" xml:space="preserve">
+    <value>添加依赖项</value>
+  </data>
+  <data name="EnableAll" xml:space="preserve">
+    <value>启用全部</value>
+  </data>
 </root>

@@ -45,7 +45,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
     private bool _isBusyChecking = false;
 
+    private readonly ObservableCollection<Guid> _dependentAddonIds = new();
+    private readonly ReadOnlyObservableCollection<Guid> _dependentAddonIdsReadOnly;
+    private readonly HashSet<Guid> _dependentAddonIdSet = new();
+
     private readonly AddonProblemSource _fileNotExistProblemSource;
+    private readonly AddonProblemSource _dependenciesProblemSource;
 
     private readonly WeakReference<byte[]?> _imageCache = new(null);
     private Task<byte[]?>? _getImageTask = null;
@@ -56,13 +61,16 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         _tagsReadOnly = new(_tags);
         _problemsReadOnly = new(_problems);
+        _dependentAddonIdsReadOnly = new(_dependentAddonIds);
 
         _fileNotExistProblemSource = new(this);
+        _dependenciesProblemSource = new(this);
 
         PropertyChanged += OnPropertyChanged;
 
         ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
         ((INotifyCollectionChanged)_problems).CollectionChanged += OnProblemCollectionChanged;
+        ((INotifyCollectionChanged)_dependentAddonIds).CollectionChanged += OnDependentAddonIdsCollectionChanged;
     }
 
     public virtual Type SaveType => typeof(AddonNodeSave);
@@ -222,6 +230,38 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     }
 
     public ReadOnlyObservableCollection<AddonProblem> Problems => _problemsReadOnly;
+
+    public ReadOnlyObservableCollection<Guid> DependentAddonIds => _dependentAddonIdsReadOnly;
+
+    public IEnumerable<AddonNode> DependentAddons
+    {
+        get
+        {
+            var root = Root;
+            foreach (var id in _dependentAddonIds)
+            {
+                if (root.TryGetNodeById(id, out var addon))
+                {
+                    yield return addon;
+                }
+            }
+        }
+    }
+
+    public bool IsDependenciesAllEnabled
+    {
+        get
+        {
+            foreach (var addon in DependentAddons)
+            {
+                if (!addon.IsEnabledInHierarchy)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 
     public byte[]? ImageCache
     {
@@ -577,9 +617,69 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return _tagSet.Contains(tag);
     }
 
+    public bool AddDependentAddon(Guid id)
+    {
+        this.ThrowIfInvalid();
+
+        if (id == Id)
+        {
+            return false;
+        }
+
+        if (!_dependentAddonIdSet.Add(id))
+        {
+            return false;
+        }
+        _dependentAddonIds.Add(id);
+        return true;
+    }
+
+    public bool RemoveDependentAddon(Guid id)
+    {
+        this.ThrowIfInvalid();
+
+        if (!_dependentAddonIdSet.Remove(id))
+        {
+            return false;
+        }
+        _dependentAddonIds.Remove(id);
+        return true;
+    }
+
+    public bool ContainsDependentAddon(Guid id)
+    {
+        return _dependentAddonIdSet.Contains(id);
+    }
+
+    public void EnableAllDependencies()
+    {
+        foreach (var addon in DependentAddons)
+        {
+            addon.IsEnabled = true;
+        }
+    }
+
+    public void CheckDependencies()
+    {
+        _dependenciesProblemSource.Clear();
+        if (!IsEnabledInHierarchy)
+        {
+            return;
+        }
+        if (!IsDependenciesAllEnabled)
+        {
+            new AddonDependenciesProblem(_dependenciesProblemSource).Submit();
+        }
+    }
+
     public string? TryGetLinkedImageFilePath()
     {
         this.ThrowIfInvalid();
+
+        if (!Root.IsDirectoryPathSet)
+        {
+            return null;
+        }
 
         var path = FullFilePath;
         try
@@ -1067,7 +1167,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     protected virtual void OnCheck()
     {
-        
+        CheckDependencies();
     }
 
     protected virtual void OnPostCheck()
@@ -1127,6 +1227,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         save.Priority = Priority;
         save.CreationTime = CreationTime;
         save.Tags = [.. Tags];
+        save.DependentAddonIds = [.. DependentAddonIds];
         save.CustomImagePath = CustomImagePath;
     }
 
@@ -1143,7 +1244,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 Id = save.Id;
             } 
         }
+
         IsEnabled = save.IsEnabled;
+
         try
         {
             Name = save.Name;
@@ -1152,11 +1255,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             Log.Error(ex, "Exception occurred during setting AddonNode.Name at AddonNode.OnLoadSave.");
         }
+
         Priority = save.Priority;
+
         if (save.CreationTime != default)
         {
             CreationTime = save.CreationTime;
         }
+
         foreach (var tag in save.Tags)
         {
             if (string.IsNullOrEmpty(tag))
@@ -1165,6 +1271,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             }
             AddTag(tag);
         }
+
+        foreach (var id in save.DependentAddonIds)
+        {
+            AddDependentAddon(id);
+        }
+
         CustomImagePath = save.CustomImagePath;
     }
 
@@ -1220,6 +1332,13 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             NotifyChanged(nameof(FullFilePath));
         }
+        else if (name == nameof(IsEnabled))
+        {
+            if (IsAutoCheckEnabled)
+            {
+                CheckDependencies();
+            }
+        }
     }
 
     private void OnTagCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -1238,6 +1357,11 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             Group?.Check();
         }
+    }
+
+    private void OnDependentAddonIdsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Root.RequestSave = true;
     }
 
     private void UpdateEnabledInHierarchy()

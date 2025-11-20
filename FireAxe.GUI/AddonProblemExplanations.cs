@@ -13,5 +13,6 @@ internal static class AddonProblemExplanations
         manager.Register<WorkshopVpkNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);
         manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
         manager.Register<VpkAddonConflictProblem>((problem, arg) => Texts.VpkAddonConflictProblemExplain);
+        manager.Register<AddonDependenciesProblem>((problem, arg) => Texts.AddonDependenciesProblemExplain);
     }
 }

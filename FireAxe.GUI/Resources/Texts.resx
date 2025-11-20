@@ -945,4 +945,16 @@
   <data name="AlternativeCustomizeAddonPreviewImageNote" xml:space="preserve">
     <value>NOTE: You can also place an image file with the same name next to the addon's file to customize the preview image (this method takes higher priority).</value>
   </data>
+  <data name="AddonDependenciesProblemExplain" xml:space="preserve">
+    <value>There are dependencies that are not enabled.</value>
+  </data>
+  <data name="Dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="AddDependencies" xml:space="preserve">
+    <value>Add Dependencies</value>
+  </data>
+  <data name="EnableAll" xml:space="preserve">
+    <value>Enable All</value>
+  </data>
 </root>

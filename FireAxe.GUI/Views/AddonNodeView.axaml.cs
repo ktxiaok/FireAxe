@@ -7,6 +7,7 @@ using System;
 using System.Reactive.Disposables;
 using ReactiveUI.Avalonia;
 using System.Reactive.Disposables.Fluent;
+using System.Collections.Generic;
 
 namespace FireAxe.Views;
 

@@ -7,7 +7,7 @@
              xmlns:dt="using:FireAxe.DataTemplates"
              xmlns:r="using:FireAxe.Resources"
              xmlns:conv="using:FireAxe.ValueConverters"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="1600"
              x:Class="FireAxe.Views.AddonNodeView"
              x:DataType="vm:AddonNodeViewModel">
   <Design.DataContext>
@@ -165,6 +165,20 @@
         </Panel>
       </StackPanel>
     </Border>
+
+    <!--dependencies-->
+    <Expander
+      IsExpanded="False"
+      HorizontalAlignment="Stretch"
+      Margin="0, 5, 0, 5">
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.Dependencies}"
+          Classes="Heading1"
+          VerticalAlignment="Center"/>
+      </Expander.Header>
+      <v:AddonNodeDependenciesView DataContext="{Binding DependenciesViewModel}"/>
+    </Expander>
 
     <!--file size-->
     <DockPanel

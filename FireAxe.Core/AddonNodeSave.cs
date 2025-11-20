@@ -20,5 +20,7 @@ public class AddonNodeSave
 
     public string[] Tags { get; set; } = [];
 
+    public Guid[] DependentAddonIds { get; set; } = [];
+
     public string? CustomImagePath { get; set; } = null;
 }

@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
 public class AddonNodeViewModel : AddonNodeSimpleViewModel
 {
+    private readonly ObservableAsPropertyHelper<AddonNodeDependenciesViewModel?> _dependenciesViewModel;
+
     public AddonNodeViewModel(AddonNode addon) : base(addon)
     {
-
+        _dependenciesViewModel = this.WhenAnyValue(x => x.Addon)
+            .Select(addon => addon is null ? null : new AddonNodeDependenciesViewModel(addon))
+            .ToProperty(this, nameof(DependenciesViewModel), deferSubscription: true);
     }
 
     public string? Priority
@@ -31,6 +36,8 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
             addon.Priority = priority;
         }
     }
+
+    public AddonNodeDependenciesViewModel? DependenciesViewModel => _dependenciesViewModel.Value;
 
     public static AddonNodeViewModel Create(AddonNode addonNode)
     {
