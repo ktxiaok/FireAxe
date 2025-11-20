@@ -11,17 +11,19 @@
         Width="900" Height="900"
         WindowStartupLocation="CenterOwner">
   <DockPanel Margin="10">
-    <StackPanel
+    <Panel
       DockPanel.Dock="Bottom"
-      Orientation="Horizontal"
-      HorizontalAlignment="Right"
+      HorizontalAlignment="Stretch"
       VerticalAlignment="Center"
       Margin="5">
       <Button
         Command="{Binding ConfirmCommand}"
         Content="{x:Static r:Texts.Confirm}"
+        HorizontalAlignment="Stretch"
+        HorizontalContentAlignment="Center"
+        FontSize="20"
         Margin="2.5"/>
-    </StackPanel>
+    </Panel>
 
     <v:AddonNodeExplorerView
       Name="explorerView"

@@ -23,4 +23,6 @@ public interface IAppWindowManager
     void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel);
 
     void OpenFileCleanerWindow(AddonRoot addonRoot);
+
+    void OpenAddonNameAutoSetterWindow(AddonRoot addonRoot);
 }

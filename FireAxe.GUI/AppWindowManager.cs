@@ -101,6 +101,17 @@ public class AppWindowManager : IAppWindowManager
         window.Show();
     }
 
+    public void OpenAddonNameAutoSetterWindow(AddonRoot addonRoot)
+    {
+        ArgumentNullException.ThrowIfNull(addonRoot);
+
+        var window = new AddonNameAutoSetterWindow
+        {
+            DataContext = new AddonNameAutoSetterViewModel(addonRoot)
+        };
+        window.Show();
+    }
+
     private static void OpenWindow<T>(ref WindowReference<T>? windowRef, Func<T> windowFactory) where T : Window
     {
         if (windowRef is null || windowRef.Get() is null)

@@ -903,4 +903,43 @@
   <data name="ConfirmDeleteAll" xml:space="preserve">
     <value>你确定要删除全部项吗？</value>
   </data>
+  <data name="AddonNameAutoSetter" xml:space="preserve">
+    <value>模组名称自动设置器</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
+  <data name="GettingName" xml:space="preserve">
+    <value>获取名称中...</value>
+  </data>
+  <data name="FailedToGetName" xml:space="preserve">
+    <value>获取名称失败。</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>开始</value>
+  </data>
+  <data name="ApplyAll" xml:space="preserve">
+    <value>应用全部</value>
+  </data>
+  <data name="RetryAll" xml:space="preserve">
+    <value>重试全部</value>
+  </data>
+  <data name="ForceUseWorkshopTitle" xml:space="preserve">
+    <value>强制使用创意工坊标题</value>
+  </data>
+  <data name="Targets" xml:space="preserve">
+    <value>目标</value>
+  </data>
+  <data name="NoItemsToStart" xml:space="preserve">
+    <value>没有可开始的项。</value>
+  </data>
+  <data name="FailedToApplyNameWithCount" xml:space="preserve">
+    <value>{0}个项目应用名称失败。</value>
+  </data>
+  <data name="AddTargets" xml:space="preserve">
+    <value>添加目标</value>
+  </data>
 </root>

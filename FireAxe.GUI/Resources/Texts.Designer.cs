@@ -124,6 +124,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Addon Name Auto Setter.
+        /// </summary>
+        public static string AddonNameAutoSetter {
+            get {
+                return ResourceManager.GetString("AddonNameAutoSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Sources of Searching.
         /// </summary>
         public static string AddSearchSource {
@@ -142,6 +151,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Targets.
+        /// </summary>
+        public static string AddTargets {
+            get {
+                return ResourceManager.GetString("AddTargets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All.
         /// </summary>
         public static string All {
@@ -156,6 +174,24 @@ namespace FireAxe.Resources {
         public static string AppDescription {
             get {
                 return ResourceManager.GetString("AppDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Apply {
+            get {
+                return ResourceManager.GetString("Apply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Apply All.
+        /// </summary>
+        public static string ApplyAll {
+            get {
+                return ResourceManager.GetString("ApplyAll", resourceCulture);
             }
         }
         
@@ -997,11 +1033,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to apply names for {0} items..
+        /// </summary>
+        public static string FailedToApplyNameWithCount {
+            get {
+                return ResourceManager.GetString("FailedToApplyNameWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the latest version..
         /// </summary>
         public static string FailedToGetLatestVersion {
             get {
                 return ResourceManager.GetString("FailedToGetLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get the name..
+        /// </summary>
+        public static string FailedToGetName {
+            get {
+                return ResourceManager.GetString("FailedToGetName", resourceCulture);
             }
         }
         
@@ -1150,6 +1204,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Force to use workshop item&apos;s title..
+        /// </summary>
+        public static string ForceUseWorkshopTitle {
+            get {
+                return ResourceManager.GetString("ForceUseWorkshopTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game Path.
         /// </summary>
         public static string GamePath {
@@ -1173,6 +1236,15 @@ namespace FireAxe.Resources {
         public static string GetPublishedFileDetailsProblemExplain {
             get {
                 return ResourceManager.GetString("GetPublishedFileDetailsProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Getting Name....
+        /// </summary>
+        public static string GettingName {
+            get {
+                return ResourceManager.GetString("GettingName", resourceCulture);
             }
         }
         
@@ -1636,6 +1708,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are no items to start..
+        /// </summary>
+        public static string NoItemsToStart {
+            get {
+                return ResourceManager.GetString("NoItemsToStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to None.
         /// </summary>
         public static string None {
@@ -1987,6 +2068,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Retry.
+        /// </summary>
+        public static string Retry {
+            get {
+                return ResourceManager.GetString("Retry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retry All.
+        /// </summary>
+        public static string RetryAll {
+            get {
+                return ResourceManager.GetString("RetryAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         public static string Save {
@@ -2122,6 +2221,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Start.
+        /// </summary>
+        public static string Start {
+            get {
+                return ResourceManager.GetString("Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Subscriptions: .
         /// </summary>
         public static string SubscriptionsColon {
@@ -2199,6 +2307,15 @@ namespace FireAxe.Resources {
         public static string TagsOf {
             get {
                 return ResourceManager.GetString("TagsOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targets.
+        /// </summary>
+        public static string Targets {
+            get {
+                return ResourceManager.GetString("Targets", resourceCulture);
             }
         }
         

@@ -17,7 +17,7 @@ public abstract class VpkAddon : AddonNode
     internal readonly ObservableCollection<(Guid AddonId, IEnumerable<string> Files)> _conflictingAddonIdsWithFiles = new();
     private readonly ReadOnlyObservableCollection<(Guid AddonId, IEnumerable<string> Files)> _conflictingAddonIdsWithFilesReadOnly;
 
-    private WeakReference<VpkAddonInfo?> _addonInfo = new(null);
+    private readonly WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
     internal readonly AddonProblemSource<VpkAddon> _vpkAddonConflictProblemSource;
 
@@ -45,49 +45,7 @@ public abstract class VpkAddon : AddonNode
 
     public override bool RequireFile => true;
 
-    protected override long? GetFileSize()
-    {
-        var path = FullVpkFilePath;
-        if (path == null)
-        {
-            return null;
-        }
-
-        try
-        {
-            if (File.Exists(path))
-            {
-                return new FileInfo(path).Length;
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Exception occurred during VpkAddon.GetFileSize.");
-        }
-
-        return null;
-    }
-
-    protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
-    {
-        string? vpkPath = FullVpkFilePath;
-        if (vpkPath == null)
-        {
-            return Task.FromResult<byte[]?>(null);
-        }
-        return Task.Run(() =>
-        {
-            if (TryCreatePackage(vpkPath, out var pak))
-            {
-                using (pak)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    return VpkUtils.GetAddonImage(pak);
-                }
-            }
-            return null;
-        }, cancellationToken);
-    }
+    public override bool CanGetSuggestedName => true;
 
     public VpkAddonInfo? RetrieveInfo()
     {
@@ -105,13 +63,6 @@ public abstract class VpkAddon : AddonNode
             }
         }
         return addonInfo;
-    }
-
-    protected override void OnClearCaches()
-    {
-        base.OnClearCaches();
-
-        _addonInfo.SetTarget(null);
     }
 
     public bool AddConflictIgnoringFile(string file)
@@ -171,6 +122,75 @@ public abstract class VpkAddon : AddonNode
         ArgumentNullException.ThrowIfNull(file);
 
         return _conflictIgnoringFileSet.Contains(file);
+    }
+
+    public override Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
+    {
+        if (RetrieveInfo()?.Title is { } title)
+        {
+            title = title.Trim();
+            if (title.Length > 0)
+            {
+                title = FileSystemUtils.SanitizeFileName(title);
+                if (title.Length > 0)
+                {
+                    return Task.FromResult<string?>(title);
+                }
+            }
+        }
+
+        return Task.FromResult<string?>(null);
+    }
+
+    protected override long? GetFileSize()
+    {
+        var path = FullVpkFilePath;
+        if (path == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if (File.Exists(path))
+            {
+                return new FileInfo(path).Length;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Exception occurred during VpkAddon.GetFileSize.");
+        }
+
+        return null;
+    }
+
+    protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
+    {
+        string? vpkPath = FullVpkFilePath;
+        if (vpkPath == null)
+        {
+            return Task.FromResult<byte[]?>(null);
+        }
+        return Task.Run(() =>
+        {
+            if (TryCreatePackage(vpkPath, out var pak))
+            {
+                using (pak)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return VpkUtils.GetAddonImage(pak);
+                }
+            }
+            return null;
+        }, cancellationToken);
+    }
+
+    protected override void OnClearCaches()
+    {
+        base.OnClearCaches();
+
+        _addonInfo.SetTarget(null);
     }
 
     protected override void OnCreateSave(AddonNodeSave save)

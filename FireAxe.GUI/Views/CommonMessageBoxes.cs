@@ -190,6 +190,25 @@ public static class CommonMessageBoxes
         }
     }
 
+    public static Task ShowError(Window ownerWindow, string message, string? title = null)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(message);
+        title ??= Texts.Error;
+
+        return MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
+        {
+            ButtonDefinitions =
+            [
+                new ButtonDefinition { Name = Texts.Ok, IsDefault = true }
+            ],
+            ContentTitle = title,
+            ContentMessage = message,
+            Icon = Icon.Error,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        }).ShowWindowDialogAsync(ownerWindow);
+    }
+
     public static Task ShowException(Window ownerWindow, Exception ex, string? message = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);

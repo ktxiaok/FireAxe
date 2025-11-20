@@ -903,4 +903,43 @@
   <data name="ConfirmDeleteAll" xml:space="preserve">
     <value>Are you sure you want to delete all the items?</value>
   </data>
+  <data name="AddonNameAutoSetter" xml:space="preserve">
+    <value>Addon Name Auto Setter</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="GettingName" xml:space="preserve">
+    <value>Getting Name...</value>
+  </data>
+  <data name="FailedToGetName" xml:space="preserve">
+    <value>Failed to get the name.</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ApplyAll" xml:space="preserve">
+    <value>Apply All</value>
+  </data>
+  <data name="RetryAll" xml:space="preserve">
+    <value>Retry All</value>
+  </data>
+  <data name="ForceUseWorkshopTitle" xml:space="preserve">
+    <value>Force to use workshop item's title.</value>
+  </data>
+  <data name="Targets" xml:space="preserve">
+    <value>Targets</value>
+  </data>
+  <data name="NoItemsToStart" xml:space="preserve">
+    <value>There are no items to start.</value>
+  </data>
+  <data name="FailedToApplyNameWithCount" xml:space="preserve">
+    <value>Failed to apply names for {0} items.</value>
+  </data>
+  <data name="AddTargets" xml:space="preserve">
+    <value>Add Targets</value>
+  </data>
 </root>

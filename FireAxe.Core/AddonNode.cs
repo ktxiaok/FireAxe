@@ -395,6 +395,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
+    public virtual bool CanGetSuggestedName => false;
+
     internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
 
     internal virtual ReadOnlyObservableCollection<AddonNode> Children_Internal => throw new NotSupportedException();
@@ -448,6 +450,11 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     public static T Create<T>(AddonRoot root, AddonGroup? group = null) where T : AddonNode
     {
         return (T)Create(typeof(T), root, group);
+    }
+
+    public virtual Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<string?>(null);
     }
 
     public void SetNewId()

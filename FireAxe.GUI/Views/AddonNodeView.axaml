@@ -203,9 +203,6 @@
         </Style>
       </StackPanel.Styles>
       <Button
-        Name="autoSetNameButton"
-        Content="{x:Static r:Texts.AutoSetName}"/>
-      <Button
         Content="{x:Static r:Texts.Check}"
         Command="{Binding Check}"/>
       <Button

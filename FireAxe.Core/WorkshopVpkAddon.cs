@@ -11,6 +11,8 @@ public class WorkshopVpkAddon : VpkAddon
 {
     public const string MetaInfoFileName = ".workshop";
 
+    public static readonly object ForceUseWorkshopTitle = new();
+
     internal static readonly JsonSerializerSettings s_metaInfoJsonSettings = new()
     {
         Formatting = Formatting.Indented,
@@ -387,6 +389,44 @@ public class WorkshopVpkAddon : VpkAddon
         }
 
         return new DeleteRedundantVpkFilesReport(vpks);
+    }
+
+    public override async Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
+    {
+        var addonTaskCreator = this.GetValidTaskCreator();
+
+        if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false)) is { } pfd)
+        {
+            var title = pfd.Title;
+            if (title.Length > 0)
+            {
+                title = title.Trim();
+                if (title.Length > 0)
+                {
+                    title = FileSystemUtils.SanitizeFileName(title);
+                    if (title.Length > 0)
+                    {
+                        return title;
+                    }
+                }
+            }
+        }
+
+        if (arg == ForceUseWorkshopTitle)
+        {
+            return null;
+        }
+
+        var baseTask = Task.FromResult<string?>(null);
+        await addonTaskCreator.StartNew(_ =>
+        {
+            try
+            {
+                baseTask = base.TryGetSuggestedNameAsync(cancellationToken);
+            }
+            catch (OperationCanceledException) { }
+        }).ConfigureAwait(false);
+        return await baseTask.ConfigureAwait(false);
     }
 
     public void CheckDownload()

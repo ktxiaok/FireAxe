@@ -160,6 +160,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
             _windowManager.OpenFileCleanerWindow(addonRoot);
         }, _addonRootNotNullObservable);
+        OpenAddonNameAutoSetterWindowCommand = ReactiveCommand.Create(() =>
+        {
+            var addonRoot = AddonRoot;
+            if (addonRoot is null)
+            {
+                return;
+            }
+            _windowManager.OpenAddonNameAutoSetterWindow(addonRoot);
+        }, _addonRootNotNullObservable);
 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
@@ -392,6 +401,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public ReactiveCommand<Unit, Unit> OpenWorkshopVpkFinderWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenFileCleanerWindowCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenAddonNameAutoSetterWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 

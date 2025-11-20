@@ -51,56 +51,8 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
                 .DisposeWith(disposables);
         });
 
-        autoSetNameButton.Click += AutoSetNameButton_Click;
         editTagButton.Click += EditTagButton_Click;
         customizeImageButton.Click += CustomizeImageButton_Click;
-    }
-
-    private void AutoSetNameButton_Click(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext != null)
-        {
-            if (DataContext is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
-            {
-                if (workshopVpkAddonViewModel.PublishedFileDetails is var details && details != null)
-                {
-                    if (TrySetName(details.Title))
-                    {
-                        return;
-                    }
-                }
-            }
-
-            if (DataContext is VpkAddonViewModel vpkAddonViewModel)
-            {
-                if (vpkAddonViewModel.Info is { } info && info.Title is { } title)
-                {
-                    if (TrySetName(title))
-                    {
-                        return;
-                    }
-                }
-            }
-        }
-
-        TrySetName(Texts.NoAvailableName);
-
-        bool TrySetName(string name)
-        {
-            name = name.Trim();
-            if (name.Length == 0)
-            {
-                return false;
-            }
-
-            nameControl.IsEditing = true;
-            var textBox = nameControl.TextBox;
-            if (textBox != null)
-            {
-                textBox.Text = name;
-            }
-            return true;
-        }
     }
 
     private void EditTagButton_Click(object? sender, RoutedEventArgs e)

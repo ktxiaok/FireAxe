@@ -11,7 +11,7 @@
         x:Class="FireAxe.Views.FileCleanerWindow"
         x:DataType="vm:FileCleanerViewModel"
         Title="{x:Static r:Texts.FileCleaner}"
-        Width="700" Height="700"
+        Width="900" Height="900"
         WindowStartupLocation="CenterScreen">
   <Design.DataContext>
     <vm:FileCleanerViewModelDesign/>
