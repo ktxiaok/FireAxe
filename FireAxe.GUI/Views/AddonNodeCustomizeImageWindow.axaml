@@ -5,32 +5,40 @@
         xmlns:r="using:FireAxe.Resources"
         xmlns:vm="using:FireAxe.ViewModels"
         xmlns:dt="using:FireAxe.DataTemplates"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="120"
         x:Class="FireAxe.Views.AddonNodeCustomizeImageWindow"
         x:DataType="vm:AddonNodeCustomizeImageViewModel"
         Title="{x:Static r:Texts.CustomizePreviewImage}"
         WindowStartupLocation="CenterOwner"
-        SizeToContent="Width"
-        Height="100">
+        Width="600" Height="120">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
   </Window.DataTemplates>
   <StackPanel
-    Orientation="Horizontal"
-    Margin="10"
-    HorizontalAlignment="Center"
-    VerticalAlignment="Center">
+    Orientation="Vertical"
+    VerticalAlignment="Center"
+    Margin="10">
+    <StackPanel
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+      <TextBlock
+        Text="{x:Static r:Texts.ImagePathColon}"
+        Margin="5"
+        VerticalAlignment="Center"/>
+      <TextBox
+        Text="{Binding CustomImagePath}"
+        Margin="5"
+        Width="400"/>
+      <Button
+        Content="{x:Static r:Texts.Select}"
+        Command="{Binding SelectCustomImagePathCommand}"
+        Margin="5"/>
+    </StackPanel>
+    <Control Height="10"/>
     <TextBlock
-      Text="{x:Static r:Texts.ImagePathColon}"
-      Margin="5"
+      Text="{x:Static r:Texts.AlternativeCustomizeAddonPreviewImageNote}"
+      TextWrapping="Wrap"
       VerticalAlignment="Center"/>
-    <TextBox
-      Text="{Binding CustomImagePath}"
-      Margin="5"
-      Width="400"/>
-    <Button
-      Content="{x:Static r:Texts.Select}"
-      Command="{Binding SelectCustomImagePathCommand}"
-      Margin="5"/>
-  </StackPanel>
+   </StackPanel>
 </Window>

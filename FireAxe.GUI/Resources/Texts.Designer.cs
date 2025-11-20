@@ -169,6 +169,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NOTE: You can also place an image file with the same name next to the addon&apos;s file to customize the preview image (this method takes higher priority)..
+        /// </summary>
+        public static string AlternativeCustomizeAddonPreviewImageNote {
+            get {
+                return ResourceManager.GetString("AlternativeCustomizeAddonPreviewImageNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A tool for managing Left 4 Dead 2 addons..
         /// </summary>
         public static string AppDescription {

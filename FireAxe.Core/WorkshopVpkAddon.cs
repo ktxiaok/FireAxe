@@ -393,6 +393,8 @@ public class WorkshopVpkAddon : VpkAddon
 
     public override async Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         var addonTaskCreator = this.GetValidTaskCreator();
 
         if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false)) is { } pfd)

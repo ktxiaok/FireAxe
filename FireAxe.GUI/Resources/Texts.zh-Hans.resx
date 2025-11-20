@@ -942,4 +942,7 @@
   <data name="AddTargets" xml:space="preserve">
     <value>添加目标</value>
   </data>
+  <data name="AlternativeCustomizeAddonPreviewImageNote" xml:space="preserve">
+    <value>注意：你也可以通过在模组的文件旁放置一个相同名称的图像文件来自定义预览图像（此方式优先级更高）。</value>
+  </data>
 </root>

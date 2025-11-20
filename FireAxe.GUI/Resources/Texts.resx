@@ -942,4 +942,7 @@
   <data name="AddTargets" xml:space="preserve">
     <value>Add Targets</value>
   </data>
+  <data name="AlternativeCustomizeAddonPreviewImageNote" xml:space="preserve">
+    <value>NOTE: You can also place an image file with the same name next to the addon's file to customize the preview image (this method takes higher priority).</value>
+  </data>
 </root>

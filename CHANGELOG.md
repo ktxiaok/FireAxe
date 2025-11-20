@@ -4,6 +4,8 @@
 - add: Workshop VPK Finder
 - add: support import and export for .addonroot files
 - add: addon deletion progress window
+- add: mechanism of addon linked files: all files with the same name as the addon file will follow the addon when it is moved
+- add: alternative method of customizing addon preview image: place an image file with the same name next to the addon file (issue #17)
 - fix: deletion of addons doesn't delete the corresponding files in some cases
 - improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   

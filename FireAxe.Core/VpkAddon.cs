@@ -126,6 +126,8 @@ public abstract class VpkAddon : AddonNode
 
     public override Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         if (RetrieveInfo()?.Title is { } title)
         {
             title = title.Trim();

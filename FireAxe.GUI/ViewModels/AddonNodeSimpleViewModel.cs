@@ -359,7 +359,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
             try
             {
-                var customImagePath = addon.CustomImageFullPath;
+                var customImagePath = addon.ActualImageFilePath;
                 if (customImagePath != null)
                 {
                     try

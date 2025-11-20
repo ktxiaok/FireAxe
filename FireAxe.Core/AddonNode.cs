@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
- 
+
 namespace FireAxe;
 
 public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 {
     public const string NullName = "__null__";
+
+    private static readonly string[] s_linkedImageFileSupportedExtensions = [".jpg", ".jpeg", ".png"];
 
     private bool _isValid = true;
 
@@ -183,8 +185,6 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public virtual bool RequireFile => false;
 
-    public bool MayHaveFile => RequireFile && Name != NullName;
-
     public bool IsAutoCheckEnabled => Root.IsAutoCheckEnabled;
 
     bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
@@ -267,19 +267,31 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             {
                 ThrowIfMoveDenied();
 
-                var parentInternal = (IAddonNodeContainerInternal)Parent;
+                var parent = Parent;
+                var parentInternal = (IAddonNodeContainerInternal)parent;
+
                 parentInternal.ThrowIfNodeNameInvalid(value, this);
 
-                // Try to move the file.
-                if (MayHaveFile)
+                // Move the linked files.
+                if (Root.IsDirectoryPathSet && Name != NullName && parent.FileSystemPath is { } parentFilePath)
                 {
-                    string sourcePath = BuildFilePath(Group, FileName);
-                    string fullSourcePath = GetFullFilePath(sourcePath);
-                    if (FileSystemUtils.Exists(fullSourcePath))
+                    // Move the content file first.
+                    if (RequireFile)
                     {
-                        string targetPath = Path.Join(Path.GetDirectoryName(sourcePath) ?? "", value + FileExtension);
-                        string fullTargetPath = GetFullFilePath(targetPath);
-                        FileSystemUtils.Move(fullSourcePath, fullTargetPath);
+                        var contentFilePath = FullFilePath;
+                        if (FileSystemUtils.Exists(contentFilePath))
+                        {
+                            var newContentFilePath = Path.Join(parentFilePath, value + FileExtension);
+                            FileSystemUtils.Move(contentFilePath, newContentFilePath);
+                        }
+                    }
+
+                    // Move other linked files.
+                    foreach (var linkedFilePath in EnumerateLinkedFiles())
+                    {
+                        var extension = Path.GetExtension(linkedFilePath);
+                        var newLinkedFilePath = Path.Join(parentFilePath, value + extension);
+                        FileSystemUtils.Move(linkedFilePath, newLinkedFilePath);
                     }
                 }
 
@@ -395,6 +407,23 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
+    public string? ActualImageFilePath
+    {
+        get
+        {
+            this.ThrowIfInvalid();
+
+            var path = TryGetLinkedImageFilePath();
+            if (path is not null)
+            {
+                return path;
+            }
+
+            path = CustomImageFullPath;
+            return path;
+        }
+    }
+
     public virtual bool CanGetSuggestedName => false;
 
     internal CancellationToken DestructionCancellationToken => _destructionCancellationTokenSource.Token;
@@ -454,6 +483,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public virtual Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
     {
+        this.ThrowIfInvalid();
+
         return Task.FromResult<string?>(null);
     }
 
@@ -546,6 +577,29 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return _tagSet.Contains(tag);
     }
 
+    public string? TryGetLinkedImageFilePath()
+    {
+        this.ThrowIfInvalid();
+
+        var path = FullFilePath;
+        try
+        {
+            foreach (var extension in s_linkedImageFileSupportedExtensions)
+            {
+                var imagePath = path + extension;
+                if (File.Exists(imagePath))
+                {
+                    return imagePath;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Exception occurred during {nameof(AddonNode)}.{nameof(TryGetLinkedImageFilePath)}.");
+        }
+        return null;
+    }
+
     public Task<byte[]?> GetImageAsync(CancellationToken cancellationToken = default)
     {
         this.ThrowIfInvalid();
@@ -590,6 +644,30 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     protected virtual Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
     {
         return Task.FromResult<byte[]?>(null);
+    }
+
+    public IEnumerable<string> EnumerateLinkedFiles()
+    {
+        this.ThrowIfInvalid();
+
+        if (!Root.IsDirectoryPathSet || Name == NullName)
+        {
+            yield break;
+        }
+        var parentPath = Parent.FileSystemPath;
+        if (parentPath is null)
+        {
+            yield break;
+        }
+
+        var corePathNormalized = FileSystemUtils.NormalizePath(Path.Join(parentPath, Name));
+        foreach (var path in Directory.EnumerateFileSystemEntries(parentPath))
+        {
+            if (FileSystemUtils.NormalizePath(Path.ChangeExtension(path, null)) == corePathNormalized)
+            {
+                yield return path;
+            }
+        }
     }
 
     public bool CanMoveTo(AddonGroup? group)
@@ -641,20 +719,28 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             ThrowIfMoveDenied();
 
-            var containerInternal = targetGroup == null ? (IAddonNodeContainerInternal)Root : (IAddonNodeContainerInternal)targetGroup;
-            containerInternal.ThrowIfNodeNameInvalid(Name, this);
+            var targetContainer = targetGroup == null ? (IAddonNodeContainer)Root : (IAddonNodeContainer)targetGroup;
+            var targetContainerInternal = (IAddonNodeContainerInternal)targetContainer;
 
-            // Try to move the file.
-            if (MayHaveFile)
+            targetContainerInternal.ThrowIfNodeNameInvalid(Name, this);
+
+            // Move the linked files.
+            if (Root.IsDirectoryPathSet && Name != NullName && targetContainer.FileSystemPath is { } targetContainerFilePath)
             {
-                string fileName = FileName;
-                string sourcePath = BuildFilePath(Group, fileName);
-                string fullSourcePath = GetFullFilePath(sourcePath);
-                if (FileSystemUtils.Exists(fullSourcePath))
+                // Move the content file first.
+                var contentFilePath = FullFilePath;
+                if (FileSystemUtils.Exists(contentFilePath))
                 {
-                    string targetPath = BuildFilePath(targetGroup, fileName);
-                    string fullTargetPath = GetFullFilePath(targetPath);
-                    FileSystemUtils.Move(fullSourcePath, fullTargetPath);
+                    var newContentFilePath = Path.Join(targetContainerFilePath, FileName);
+                    FileSystemUtils.Move(contentFilePath, newContentFilePath);
+                }
+
+                // Move other linked files.
+                foreach (var linkedFilePath in EnumerateLinkedFiles())
+                {
+                    var linkedFileName = Path.GetFileName(linkedFilePath);
+                    var newLinkedFilePath = Path.Join(targetContainerFilePath, linkedFileName);
+                    FileSystemUtils.Move(linkedFilePath, newLinkedFilePath);
                 }
             }
 
@@ -738,7 +824,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         ClearCacheFiles();
 
         string? pathToDelete = null;
-        if (MayHaveFile)
+        if (RequireFile && Name != NullName)
         {
             pathToDelete = FullFilePath;
         }
