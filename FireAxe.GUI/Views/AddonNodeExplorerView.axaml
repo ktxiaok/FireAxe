@@ -329,6 +329,7 @@
 
           <MenuItem Header="{x:Static r:Texts.New}">
             <MenuItem Header="{x:Static r:Texts.Group}" Command="{Binding NewGroupCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.ReferenceAddon}" Command="{Binding NewRefAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopCollection}" Command="{Binding NewWorkshopCollectionCommand}"/>
           </MenuItem>

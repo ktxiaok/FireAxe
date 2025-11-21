@@ -27,21 +27,28 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
                     {
                         if (viewModel is AddonGroupViewModel addonGroupViewModel)
                         {
-                            AddSectionView(new AddonGroupSectionView()
+                            AddSectionView(new AddonGroupSectionView
                             {
                                 ViewModel = addonGroupViewModel
                             });
                         }
+                        else if (viewModel is RefAddonNodeViewModel refAddonViewModel)
+                        {
+                            AddSectionView(new RefAddonNodeSectionView
+                            {
+                                ViewModel = refAddonViewModel
+                            });
+                        }
                         else if (viewModel is VpkAddonViewModel vpkAddonViewModel)
                         {
-                            AddSectionView(new VpkAddonSectionView()
+                            AddSectionView(new VpkAddonSectionView
                             {
                                 ViewModel = vpkAddonViewModel
                             });
-                        
+
                             if (viewModel is WorkshopVpkAddonViewModel workshopVpkAddonViewModel)
                             {
-                                AddSectionView(new WorkshopVpkAddonSectionView()
+                                AddSectionView(new WorkshopVpkAddonSectionView
                                 {
                                     ViewModel = workshopVpkAddonViewModel
                                 });

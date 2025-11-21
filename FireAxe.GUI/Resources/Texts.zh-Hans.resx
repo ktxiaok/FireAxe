@@ -957,4 +957,31 @@
   <data name="EnableAll" xml:space="preserve">
     <value>启用全部</value>
   </data>
+  <data name="ReferenceAddon" xml:space="preserve">
+    <value>引用模组</value>
+  </data>
+  <data name="Reference" xml:space="preserve">
+    <value>引用</value>
+  </data>
+  <data name="SourceColon" xml:space="preserve">
+    <value>源：</value>
+  </data>
+  <data name="Set" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="SyncTags" xml:space="preserve">
+    <value>同步标签</value>
+  </data>
+  <data name="SyncDependencies" xml:space="preserve">
+    <value>同步依赖项</value>
+  </data>
+  <data name="UnnamedReferenceAddon" xml:space="preserve">
+    <value>未命名引用模组</value>
+  </data>
+  <data name="SetSource" xml:space="preserve">
+    <value>设置源</value>
+  </data>
+  <data name="AddonCircularRefExplain" xml:space="preserve">
+    <value>出现循环引用。</value>
+  </data>
 </root>

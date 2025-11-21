@@ -184,6 +184,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             .Select(movingNodes => movingNodes.Any()));
 
         NewGroupCommand = ReactiveCommand.Create(() => { NewGroup(); });
+        NewRefAddonCommand = ReactiveCommand.Create(() => { NewRefAddon(); });
         NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
         NewWorkshopCollectionCommand = ReactiveCommand.CreateFromTask(async () => await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup)));
 
@@ -457,6 +458,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
     public ReactiveCommand<Unit, Unit> NewGroupCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> NewRefAddonCommand { get; }
+
     public ReactiveCommand<Unit, Unit> NewWorkshopAddonCommand { get; }
 
     public ReactiveCommand<Unit, Unit> NewWorkshopCollectionCommand { get; }
@@ -537,6 +540,14 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         Directory.CreateDirectory(group.FullFilePath);
         SelectNode(group);
         return group;
+    }
+
+    public RefAddonNode NewRefAddon()
+    {
+        var addon = AddonNode.Create<RefAddonNode>(AddonRoot, CurrentGroup);
+        addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedReferenceAddon);
+        SelectNode(addon);
+        return addon;
     }
 
     public WorkshopVpkAddon NewWorkshopAddon()

@@ -47,6 +47,10 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
         {
             return new AddonGroupViewModel(group);
         }
+        else if (addonNode is RefAddonNode refAddon)
+        {
+            return new RefAddonNodeViewModel(refAddon);
+        }
         else if (addonNode is LocalVpkAddon localVpkAddon)
         {
             return new LocalVpkAddonViewModel(localVpkAddon);

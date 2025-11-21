@@ -43,7 +43,7 @@ public partial class AddonNodeEnableButton : ReactiveUserControl<AddonNodeSimple
                     else
                     {
                         iconData = iconDisabled;
-                        color = Colors.Red;
+                        color = Colors.Gray;
                     }
                     if (iconData != null)
                     {

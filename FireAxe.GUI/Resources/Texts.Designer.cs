@@ -106,6 +106,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is a circular reference..
+        /// </summary>
+        public static string AddonCircularRefExplain {
+            get {
+                return ResourceManager.GetString("AddonCircularRefExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are dependencies that are not enabled..
         /// </summary>
         public static string AddonDependenciesProblemExplain {
@@ -2023,6 +2032,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reference.
+        /// </summary>
+        public static string Reference {
+            get {
+                return ResourceManager.GetString("Reference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reference Addon.
+        /// </summary>
+        public static string ReferenceAddon {
+            get {
+                return ResourceManager.GetString("ReferenceAddon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh.
         /// </summary>
         public static string Refresh {
@@ -2203,6 +2230,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Set.
+        /// </summary>
+        public static string Set {
+            get {
+                return ResourceManager.GetString("Set", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set the auto update strategy to Default recursively.
         /// </summary>
         public static string SetAutoUpdateStrategyToDefaultRecursively {
@@ -2226,6 +2262,15 @@ namespace FireAxe.Resources {
         public static string SetAutoUpdateStrategyToEnabledRecursively {
             get {
                 return ResourceManager.GetString("SetAutoUpdateStrategyToEnabledRecursively", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set Source.
+        /// </summary>
+        public static string SetSource {
+            get {
+                return ResourceManager.GetString("SetSource", resourceCulture);
             }
         }
         
@@ -2266,6 +2311,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source: .
+        /// </summary>
+        public static string SourceColon {
+            get {
+                return ResourceManager.GetString("SourceColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Start.
         /// </summary>
         public static string Start {
@@ -2289,6 +2343,24 @@ namespace FireAxe.Resources {
         public static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync Dependencies.
+        /// </summary>
+        public static string SyncDependencies {
+            get {
+                return ResourceManager.GetString("SyncDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync Tags.
+        /// </summary>
+        public static string SyncTags {
+            get {
+                return ResourceManager.GetString("SyncTags", resourceCulture);
             }
         }
         
@@ -2406,6 +2478,15 @@ namespace FireAxe.Resources {
         public static string UnnamedGroup {
             get {
                 return ResourceManager.GetString("UnnamedGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unnamed Reference Addon.
+        /// </summary>
+        public static string UnnamedReferenceAddon {
+            get {
+                return ResourceManager.GetString("UnnamedReferenceAddon", resourceCulture);
             }
         }
         

@@ -565,12 +565,15 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 {
                     string fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
 
-                    if (TryParseLocalVpkFileNameNoExt(fileNameNoExt, out _))
+                    if (TryParseLinkVpkFileNameNoExt(fileNameNoExt, out _))
                     {
                         filePathsToDelete.Add(filePath);
                     }
-
-                    if (TryParseWorkshopVpkFileNameNoExt(fileNameNoExt, out _))
+                    else if (TryParseLegacyLocalVpkFileNameNoExt(fileNameNoExt, out _))
+                    {
+                        filePathsToDelete.Add(filePath);
+                    }
+                    else if (TryParseLegacyWorkshopVpkFileNameNoExt(fileNameNoExt, out _))
                     {
                         filePathsToDelete.Add(filePath);
                     }
@@ -613,7 +616,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
 
         var addonEntries = new Dictionary<string, (string IsEnabled, int Priority)>();           
-        // Remove old entries in addonlist.
+        // Load the content of the addonlist and ignore old entries in addonlist.
         if (addonList != null)
         {
             foreach (var obj in addonList)
@@ -621,13 +624,17 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 string name = obj.Name;
                 if (name.EndsWith(".vpk"))
                 {
-                    string nameNoExt = name.Substring(0, name.Length - 4);
+                    string nameNoExt = name.Substring(0, name.Length - ".vpk".Length);
 
-                    if (TryParseLocalVpkFileNameNoExt(nameNoExt, out _))
+                    if (TryParseLinkVpkFileNameNoExt(nameNoExt, out _))
                     {
                         continue;
                     }
-                    if (TryParseWorkshopVpkFileNameNoExt(nameNoExt, out _))
+                    if (TryParseLegacyLocalVpkFileNameNoExt(nameNoExt, out _))
+                    {
+                        continue;
+                    }
+                    if (TryParseLegacyWorkshopVpkFileNameNoExt(nameNoExt, out _))
                     {
                         continue;
                     }
@@ -646,40 +653,35 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         // Add enabled addons to entries.
         foreach (var addon in Nodes.SelectMany(addon => addon.GetAllNodesEnabledInHierarchy()))
         {
-            if (addon is VpkAddon vpkAddon)
+            var actualAddon = addon;
+
+            if (addon is RefAddonNode refAddon)
+            {
+                var sourceAddon = refAddon.ActualSourceAddon;
+                if (sourceAddon is null)
+                {
+                    continue;
+                }
+                actualAddon = sourceAddon;
+            }
+
+            if (actualAddon is VpkAddon vpkAddon)
             {
                 string? vpkPath = vpkAddon.FullVpkFilePath;
-                string? linkFileName = null;
 
                 if (vpkPath == null || !File.Exists(vpkPath))
                 {
                     continue;
                 }
 
-                if (vpkAddon is LocalVpkAddon localVpkAddon)
-                {
-                    linkFileName = BuildLocalVpkFileName(localVpkAddon.Id);
-                }
-                else if (vpkAddon is WorkshopVpkAddon workshopVpkAddon)
-                {
-                    if (workshopVpkAddon.PublishedFileId.HasValue)
-                    {
-                        linkFileName = BuildWorkshopVpkFileName(workshopVpkAddon.PublishedFileId.Value);
-                    }
-                }
-
-                if (linkFileName == null)
-                {
-                    continue;
-                }
-
+                string linkFileName = BuildLinkVpkFileName(addon.Id);
                 string linkFilePath = Path.Join(addonsPath, linkFileName);
                 if (File.Exists(linkFilePath))
                 {
                     continue;
                 }
                 File.CreateSymbolicLink(linkFilePath, vpkPath);
-                addonEntries[linkFileName] = ("1", vpkAddon.PriorityInHierarchy);
+                addonEntries[linkFileName] = ("1", addon.PriorityInHierarchy);
             }
         }
 
@@ -700,15 +702,18 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             kv.Serialize(stream, addonList);
         }
 
-        bool TryParseLocalVpkFileNameNoExt(string nameNoExt, out Guid guid)
+        const string LinkVpkFilePrefix = "fireaxe_link_";
+
+        string BuildLinkVpkFileName(Guid guid) => $"{LinkVpkFilePrefix}{guid:N}.vpk";
+
+        bool TryParseLinkVpkFileNameNoExt(string nameNoExt, out Guid guid)
         {
-            const int PrefixLength = 6;
             const int GuidLength = 32;
 
-            guid = Guid.Empty;
-            if (nameNoExt.Length == (PrefixLength + GuidLength) && nameNoExt.StartsWith("local_"))
+            guid = default;
+            if (nameNoExt.Length == (LinkVpkFilePrefix.Length + GuidLength) && nameNoExt.StartsWith(LinkVpkFilePrefix))
             {
-                string guidStr = nameNoExt.Substring(PrefixLength);
+                var guidStr = nameNoExt.AsSpan().Slice(LinkVpkFilePrefix.Length);
                 if (Guid.TryParse(guidStr, out guid))
                 {
                     return true;
@@ -717,14 +722,32 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             return false;
         }
 
-        bool TryParseWorkshopVpkFileNameNoExt(string nameNoExt, out ulong publishedFileId)
+        // Legacy Formats
+        bool TryParseLegacyLocalVpkFileNameNoExt(string nameNoExt, out Guid guid)
         {
-            const int PrefixLength = 9;
+            const int GuidLength = 32;
+            const string Prefix = "local_";
+
+            guid = default;
+            if (nameNoExt.Length == (Prefix.Length + GuidLength) && nameNoExt.StartsWith(Prefix))
+            {
+                var guidStr = nameNoExt.AsSpan().Slice(Prefix.Length);
+                if (Guid.TryParse(guidStr, out guid))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool TryParseLegacyWorkshopVpkFileNameNoExt(string nameNoExt, out ulong publishedFileId)
+        {
+            const string Prefix = "workshop_";
 
             publishedFileId = 0;
-            if (nameNoExt.Length > PrefixLength && nameNoExt.StartsWith("workshop_"))
+            if (nameNoExt.Length > Prefix.Length && nameNoExt.StartsWith(Prefix))
             {
-                string idStr = nameNoExt.Substring(PrefixLength);
+                var idStr = nameNoExt.AsSpan().Slice(Prefix.Length);
                 if (ulong.TryParse(idStr, out publishedFileId))
                 {
                     return true;
@@ -733,15 +756,15 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             return false;
         }
 
-        string BuildLocalVpkFileName(Guid guid)
-        {
-            return $"local_{guid:N}.vpk";
-        }
+        //string BuildLocalVpkFileName(Guid guid)
+        //{
+        //    return $"local_{guid:N}.vpk";
+        //}
 
-        string BuildWorkshopVpkFileName(ulong publishedFileId)
-        {
-            return $"workshop_{publishedFileId}.vpk";
-        }
+        //string BuildWorkshopVpkFileName(ulong publishedFileId)
+        //{
+        //    return $"workshop_{publishedFileId}.vpk";
+        //}
     }
 
     public void LoadFile()

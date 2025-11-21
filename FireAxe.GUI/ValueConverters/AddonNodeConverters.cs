@@ -44,6 +44,11 @@ public static class AddonNodeConverters
                 return null;
             }
 
+            if (id.Value == Guid.Empty)
+            {
+                return null;
+            }
+
             return new AddonNodeSimpleViewModel(addonRoot, id.Value);
         }
     }

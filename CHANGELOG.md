@@ -1,4 +1,5 @@
 - add: VPK conflict checking system
+- add: new addon type: reference addon (you can use this type to operate the same addon in different groups)
 - add: addon dependency management
 - add: Addon Name Auto Setter
 - add: File Cleaner (supports deleting redundant VPK files for workshop items, download temp files and empty directories)

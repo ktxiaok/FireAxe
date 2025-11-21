@@ -14,5 +14,6 @@ internal static class AddonProblemExplanations
         manager.Register<AddonGroup.EnableStrategyProblem>((problem, arg) => Texts.AddonGroupEnableStrategyProblemExplain);
         manager.Register<VpkAddonConflictProblem>((problem, arg) => Texts.VpkAddonConflictProblemExplain);
         manager.Register<AddonDependenciesProblem>((problem, arg) => Texts.AddonDependenciesProblemExplain);
+        manager.Register<AddonCircularRefProblem>((problem, arg) => Texts.AddonCircularRefExplain);
     }
 }
