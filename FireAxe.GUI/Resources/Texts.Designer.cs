@@ -1609,6 +1609,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} items selected randomly..
+        /// </summary>
+        public static string ItemsRandomSelectedWithCount {
+            get {
+                return ResourceManager.GetString("ItemsRandomSelectedWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string Language {
@@ -1758,6 +1767,15 @@ namespace FireAxe.Resources {
         public static string NoAvailableName {
             get {
                 return ResourceManager.GetString("NoAvailableName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no items to be selected randomly..
+        /// </summary>
+        public static string NoItemRandomSelected {
+            get {
+                return ResourceManager.GetString("NoItemRandomSelected", resourceCulture);
             }
         }
         

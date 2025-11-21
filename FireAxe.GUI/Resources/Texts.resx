@@ -984,4 +984,10 @@
   <data name="AddonCircularRefExplain" xml:space="preserve">
     <value>There is a circular reference.</value>
   </data>
+  <data name="ItemsRandomSelectedWithCount" xml:space="preserve">
+    <value>{0} items selected randomly.</value>
+  </data>
+  <data name="NoItemRandomSelected" xml:space="preserve">
+    <value>There are no items to be selected randomly.</value>
+  </data>
 </root>

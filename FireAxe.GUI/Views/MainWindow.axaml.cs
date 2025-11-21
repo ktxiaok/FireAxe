@@ -206,5 +206,19 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             await CommonMessageBoxes.ShowInfo(this, Texts.SaveAddonRootFileSuccess.FormatNoThrow(filePath));
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
+
+        viewModel.ShowItemsRandomSelectedInteraction.RegisterHandler(async context =>
+        {
+            int count = context.Input;
+            if (count == 0)
+            {
+                await CommonMessageBoxes.ShowInfo(this, Texts.NoItemRandomSelected);
+            }
+            else
+            {
+                await CommonMessageBoxes.ShowInfo(this, Texts.ItemsRandomSelectedWithCount.FormatNoThrow(count));
+            }
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
     }
 }

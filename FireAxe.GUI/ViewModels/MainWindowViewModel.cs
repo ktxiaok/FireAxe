@@ -173,7 +173,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
         ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNullObservable);
-        RandomlySelectCommand = ReactiveCommand.Create(RandomlySelect, _addonRootNotNullObservable);
+        RandomlySelectCommand = 
+            ReactiveCommand.CreateFromTask(async () => await ShowItemsRandomSelectedInteraction.Handle(RandomlySelect()), _addonRootNotNullObservable);
+        RandomlySelectForSelectedItemsCommand = 
+            ReactiveCommand.CreateFromTask(async () => await ShowItemsRandomSelectedInteraction.Handle(RandomlySelect(true)), this.WhenAnyValue(x => x.HasSelection));
         DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(), _addonRootNotNullObservable);
         DeleteRedundantVpkFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(true), this.WhenAnyValue(x => x.HasSelection));
         ExportSelectedItemsAsAddonRootFile = ReactiveCommand.CreateFromTask(async () =>
@@ -412,6 +415,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> RandomlySelectCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> RandomlySelectForSelectedItemsCommand { get; }
+
     public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesCommand { get; }
 
     public ReactiveCommand<Unit, Unit> DeleteRedundantVpkFilesForSelectedItemsCommand { get; }
@@ -457,6 +462,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public Interaction<WorkshopVpkAddon.DeleteRedundantVpkFilesReport, Unit> ShowDeleteRedundantVpkFilesSuccessInteraction { get; } = new();
 
     public Interaction<string, Unit> ShowSaveAddonRootFileSuccessInteraction { get; } = new();
+
+    public Interaction<int, Unit> ShowItemsRandomSelectedInteraction { get; } = new();
 
     public async void InitIfNot()
     {
@@ -589,18 +596,24 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
-    public void RandomlySelect()
+    public int RandomlySelect(bool forSelectedItems = false)
     {
-        if (_addonRoot != null)
+        IEnumerable<AddonGroup>? targets = forSelectedItems ?
+            AddonNodeExplorerViewModel?.SelectedNodes.SelectMany(node => node.GetSelfAndDescendants()).OfType<AddonGroup>() :
+            AddonRoot?.GetDescendants().OfType<AddonGroup>();
+        if (targets is null)
         {
-            foreach (var addonNode in _addonRoot.GetDescendants())
+            return 0;
+        }
+        int count = 0;
+        foreach (var group in targets)
+        {
+            if (group.EnableOneChildRandomlyIfSingleRandom())
             {
-                if (addonNode is AddonGroup addonGroup)
-                {
-                    addonGroup.EnableOneChildRandomlyIfSingleRandom();
-                }
+                count++;
             }
         }
+        return count;
     }
 
     public async void CheckUpdate(bool silenced)

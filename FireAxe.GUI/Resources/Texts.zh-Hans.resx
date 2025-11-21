@@ -984,4 +984,10 @@
   <data name="AddonCircularRefExplain" xml:space="preserve">
     <value>出现循环引用。</value>
   </data>
+  <data name="ItemsRandomSelectedWithCount" xml:space="preserve">
+    <value>已随机选择{0}项。</value>
+  </data>
+  <data name="NoItemRandomSelected" xml:space="preserve">
+    <value>没有可随机选择的项。</value>
+  </data>
 </root>
