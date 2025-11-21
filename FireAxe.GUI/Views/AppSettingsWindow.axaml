@@ -4,11 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:r="using:FireAxe.Resources"
         xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:v="using:FireAxe.Views"
         xmlns:conv="using:FireAxe.ValueConverters"
         xmlns:me="using:FireAxe.MarkupExtensions"
         xmlns:dt="using:FireAxe.DataTemplates"
         xmlns:local="using:FireAxe"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
@@ -110,6 +111,22 @@
           Classes="PropertyValue"
           IsChecked="{Binding Settings.IsAutoRedownload}"/>
       </DockPanel>
+
+      <!--web proxy address-->
+      <TextBlock
+        Classes="PropertyName">
+        <TextBlock.Text>
+          <MultiBinding StringFormat="{}{0} {1}">
+            <Binding Source="{x:Static r:Texts.WebProxyAddress}"/>
+            <Binding Source="{x:Static r:Texts.NeedRestartHint}"/>
+          </MultiBinding>
+        </TextBlock.Text>
+      </TextBlock>
+      <v:EditableTextBlock
+        Value="{Binding Settings.WebProxyAddress}"
+        Display="{Binding Settings.WebProxyAddress, Converter={x:Static conv:StringConverters.ShowEmpty}}"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"/>
     </StackPanel>
   </ScrollViewer>
 </Window>

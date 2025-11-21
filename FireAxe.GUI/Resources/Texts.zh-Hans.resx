@@ -990,4 +990,7 @@
   <data name="NoItemRandomSelected" xml:space="preserve">
     <value>没有可随机选择的项。</value>
   </data>
+  <data name="WebProxyAddress" xml:space="preserve">
+    <value>Web代理地址</value>
+  </data>
 </root>

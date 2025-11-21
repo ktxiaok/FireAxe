@@ -24,9 +24,6 @@ public partial class App : Application
         _documentDirectoryPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DocumentDirectoryName);
         Directory.CreateDirectory(_documentDirectoryPath);
 
-        var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", null));
-
         Services = new ServiceCollection()
             .AddSingleton(this)
             .AddSingleton<MainWindowViewModel>()
@@ -35,8 +32,21 @@ public partial class App : Application
             .AddSingleton<DownloadItemListViewModel>()
             .AddSingleton<SaveManager>()
             .AddSingleton<IAppWindowManager, AppWindowManager>()
-            .AddSingleton<IDownloadService, DownloadService>()
-            .AddSingleton(httpClient)
+            .AddSingleton<IDownloadService, DownloadService>(
+                services => new DownloadService(services.GetRequiredService<AppSettings>().GetDownloadServiceSettings()))
+            .AddSingleton<HttpClient>(services =>
+            {
+                var appSettings = services.GetRequiredService<AppSettings>();
+                var socketsHttpHandler = new SocketsHttpHandler();
+                if (appSettings.WebProxy is { } webProxy)
+                {
+                    socketsHttpHandler.UseProxy = true;
+                    socketsHttpHandler.Proxy = webProxy;
+                }
+                var httpClient = new HttpClient(socketsHttpHandler);
+                httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", null));
+                return httpClient;
+            })
             .BuildServiceProvider();
     }
 

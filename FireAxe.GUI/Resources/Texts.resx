@@ -990,4 +990,7 @@
   <data name="NoItemRandomSelected" xml:space="preserve">
     <value>There are no items to be selected randomly.</value>
   </data>
+  <data name="WebProxyAddress" xml:space="preserve">
+    <value>Web Proxy Address</value>
+  </data>
 </root>

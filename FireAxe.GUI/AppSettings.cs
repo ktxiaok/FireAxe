@@ -6,6 +6,7 @@ using ReactiveUI;
 using Serilog;
 using System;
 using System.IO;
+using System.Net;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
@@ -38,6 +39,8 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private string? _suppressedUpdateRequestVersion = null;
     private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
     private bool _isAutoRedownload = false;
+    private Uri? _webProxyUri = null;
+    private IWebProxy? _webProxy = null;
 
     private string _settingsFilePath;
 
@@ -253,6 +256,37 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             }
         }
     }
+
+    [JsonProperty]
+    public string WebProxyAddress
+    {
+        get => _webProxyUri?.OriginalString ?? "";
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            if (value == WebProxyAddress)
+            {
+                return;
+            }
+
+            Uri? uri = null;
+            IWebProxy? proxy = null;
+            if (value.Length > 0)
+            {
+                uri = new Uri(value);
+                proxy = new WebProxy(uri);
+            }
+
+            _webProxyUri = uri;
+            _webProxy = proxy;
+
+            NotifyChanged();
+            NotifyChanged(nameof(WebProxy));
+        }
+    }
+
+    public IWebProxy? WebProxy => _webProxy;
 
     public void LoadFile()
     {

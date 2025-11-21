@@ -2590,6 +2590,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Web Proxy Address.
+        /// </summary>
+        public static string WebProxyAddress {
+            get {
+                return ResourceManager.GetString("WebProxyAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Workshop.
         /// </summary>
         public static string Workshop {

@@ -20,6 +20,7 @@ public sealed class DownloadService : IDownloadService
         private bool _disposed = false;
 
         private readonly DownloadService _service;
+        private readonly Downloader.DownloadConfiguration _config;
         private readonly string _url;
         private readonly string _filePath;
 
@@ -47,11 +48,19 @@ public sealed class DownloadService : IDownloadService
         internal DownloadItem(string url, string filePath, DownloadService service)
         {
             _service = service;
+            lock (service._settingsLock)
+            {
+                _config = service._downloaderConfig;
+            }
             _url = url;
             _filePath = filePath;
 
-            Task.Run(Prepare);
-            async void Prepare()
+            lock (service._downloadItemsLock)
+            {
+                service._activeDownloadItems.Add(this);
+            }
+
+            Task.Run(async () =>
             {
                 bool downloadCreated = false;
 
@@ -65,10 +74,10 @@ public sealed class DownloadService : IDownloadService
                         try
                         {
                             var downloadPackageJObj = JObject.Parse(File.ReadAllText(downloadInfoFilePath));
-                            downloadPackageJObj["FileName"] = downloadingFilePath;
-                            if (downloadPackageJObj.TryGetValue("Storage", out var storageToken))
+                            downloadPackageJObj[nameof(DownloadPackage.FileName)] = downloadingFilePath;
+                            if (downloadPackageJObj.TryGetValue(nameof(DownloadPackage.Storage), out var storageToken))
                             {
-                                storageToken["Path"] = downloadingFilePath;
+                                storageToken[nameof(ConcurrentStream.Path)] = downloadingFilePath;
                             }
                             downloadPackage = downloadPackageJObj.ToObject<DownloadPackage>();
                         }
@@ -84,10 +93,6 @@ public sealed class DownloadService : IDownloadService
                                 downloadPackage = null;
                             }
                         }
-                        //if (downloadPackage != null)
-                        //{
-                        //    downloadPackage.FileName = downloadingFilePath;
-                        //}
                     }
 
                     while (true)
@@ -112,7 +117,7 @@ public sealed class DownloadService : IDownloadService
                     {
                         if (_status == DownloadStatus.Preparing || _status == DownloadStatus.PreparingAndPaused)
                         {
-                            _download = new(_service._config);
+                            _download = new(_config);
                             _download.DownloadStarted += OnDownloadStarted;
                             _download.DownloadProgressChanged += OnDownloadProgressChanged;
                             _download.DownloadFileCompleted += OnDownloadFileCompleted;
@@ -145,7 +150,7 @@ public sealed class DownloadService : IDownloadService
                 {
                     OnCompleted();
                 }
-            }
+            });
         }
 
         public string Url => _url;
@@ -411,6 +416,11 @@ public sealed class DownloadService : IDownloadService
 
         private void OnCompleted()
         {
+            lock (_service._downloadItemsLock)
+            {
+                _service._activeDownloadItems.Remove(this);
+            }
+
             lock (_downloadLock)
             {
                 if (_downloadCountBorrowed)
@@ -451,25 +461,63 @@ public sealed class DownloadService : IDownloadService
         }
     }
 
-    private bool _disposed = false;
+    private volatile bool _disposed = false;
 
-    private DownloadConfiguration _config = new()
-    {
-        ChunkCount = 4,
-        ParallelDownload = true
-    };
+    private readonly object _settingsLock = new();
+    private DownloadServiceSettings _settings = null!;
+    private Downloader.DownloadConfiguration _downloaderConfig = null!;
+
+    private readonly object _downloadItemsLock = new();
+    private readonly HashSet<DownloadItem> _activeDownloadItems = new();
 
     private readonly SemaphoreSlim _availableDownloads = new(5);
 
-    public DownloadService()
+    public DownloadService(DownloadServiceSettings settings)
     {
+        Settings = settings;
+    }
 
+    public DownloadServiceSettings Settings
+    {
+        get => _settings;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            lock (_settingsLock)
+            {
+                _settings = value;
+
+                _downloaderConfig = new()
+                {
+                    ChunkCount = 4,
+                    ParallelDownload = true
+                };
+                if (_settings.Proxy is { } proxy)
+                {
+                    _downloaderConfig.RequestConfiguration.Proxy = proxy;
+                }
+            }
+        }
+    }
+
+    public IEnumerable<IDownloadItem> ActiveDownloadItems
+    {
+        get
+        {
+            lock (_downloadItemsLock)
+            {
+                return [.. _activeDownloadItems];
+            }
+        }
     }
 
     public IDownloadItem Download(string url, string filePath)
     {
         ArgumentNullException.ThrowIfNull(url);
         ArgumentNullException.ThrowIfNull(filePath);
+
+        ThrowIfDisposed();
 
         return new DownloadItem(url, filePath, this);
     }
@@ -478,9 +526,27 @@ public sealed class DownloadService : IDownloadService
     {
         if (!_disposed)
         {
-            _availableDownloads.Dispose();
-
             _disposed = true;
+
+            DownloadItem[] downloadItems;
+            lock (_downloadItemsLock)
+            {
+                downloadItems = [.. _activeDownloadItems];
+            }
+            foreach (var downloadItem in downloadItems)
+            {
+                downloadItem.Dispose();
+            }
+
+            _availableDownloads.Dispose();
+        }
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().Name);
         }
     }
 }
