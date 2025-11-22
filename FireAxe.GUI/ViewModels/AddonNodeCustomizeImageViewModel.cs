@@ -9,7 +9,7 @@ namespace FireAxe.ViewModels;
 
 public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewModel
 {
-    private AddonNode _addon;
+    private readonly AddonNode _addon;
 
     public AddonNodeCustomizeImageViewModel(AddonNode addon)
     {
@@ -29,8 +29,8 @@ public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewM
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             _addon.WhenAnyValue(x => x.CustomImagePath)
-            .Subscribe(_ => this.RaisePropertyChanged(nameof(CustomImagePath)))
-            .DisposeWith(disposables);
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(CustomImagePath)))
+                .DisposeWith(disposables);
         });
     }
 
@@ -43,14 +43,7 @@ public class AddonNodeCustomizeImageViewModel : ViewModelBase, IActivatableViewM
         get => _addon.CustomImagePath ?? "";
         set
         {
-            if (value.Length == 0)
-            {
-                _addon.CustomImagePath = null;
-            }
-            else
-            {
-                _addon.CustomImagePath = FileSystemUtils.NormalizePath(value);
-            }
+            _addon.CustomImagePath = value.Length == 0 ? null : value;
         }
     }
 

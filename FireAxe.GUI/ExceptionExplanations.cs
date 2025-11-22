@@ -18,8 +18,21 @@ internal static class ExceptionExplanations
             }
             return Texts.ExceptionOccurMessage + '\n' + exception.ToString();
         });
+        manager.Register<ArgumentException>((exception, arg) =>
+        {
+            if (arg is ExceptionExplanationScene scene)
+            {
+                if (scene == ExceptionExplanationScene.Input)
+                {
+                    return exception.Message;
+                }
+            }
+            return exception.ToString();
+        });
         manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
         manager.Register<FileNameExistsException>((exception, arg) => Texts.FileNameExists);
         manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.NodePath));
+        manager.Register<InvalidFilePathException>((exception, arg) => Texts.InvalidFilePath);
+        manager.Register<FileOutOfAddonRootException>((exception, arg) => Texts.FileMustBeInCurrentDirectory);
     }
 }

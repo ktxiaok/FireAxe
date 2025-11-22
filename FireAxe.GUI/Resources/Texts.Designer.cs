@@ -1033,33 +1033,6 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        public static string Enum_AutoUpdateStrategy_Default {
-            get {
-                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Default", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disabled.
-        /// </summary>
-        public static string Enum_AutoUpdateStrategy_Disabled {
-            get {
-                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Disabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enabled.
-        /// </summary>
-        public static string Enum_AutoUpdateStrategy_Enabled {
-            get {
-                return ResourceManager.GetString("Enum_AutoUpdateStrategy_Enabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         public static string Error {
@@ -1146,6 +1119,15 @@ namespace FireAxe.Resources {
         public static string FileDownloadUncompleted {
             get {
                 return ResourceManager.GetString("FileDownloadUncompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file must be in the current directory..
+        /// </summary>
+        public static string FileMustBeInCurrentDirectory {
+            get {
+                return ResourceManager.GetString("FileMustBeInCurrentDirectory", resourceCulture);
             }
         }
         
@@ -1546,6 +1528,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid File Path.
+        /// </summary>
+        public static string InvalidFilePath {
+            get {
+                return ResourceManager.GetString("InvalidFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The game path &quot;{0}&quot; is invalid..
         /// </summary>
         public static string InvalidGamePathMessage {
@@ -1573,11 +1564,20 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid published file id..
+        ///   Looks up a localized string similar to The published file ID is invalid..
         /// </summary>
         public static string InvalidPublishedFileIdMessage {
             get {
                 return ResourceManager.GetString("InvalidPublishedFileIdMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid URI.
+        /// </summary>
+        public static string InvalidUri {
+            get {
+                return ResourceManager.GetString("InvalidUri", resourceCulture);
             }
         }
         
@@ -2532,6 +2532,15 @@ namespace FireAxe.Resources {
         public static string UseRegex {
             get {
                 return ResourceManager.GetString("UseRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be an integer..
+        /// </summary>
+        public static string ValueMustBeInteger {
+            get {
+                return ResourceManager.GetString("ValueMustBeInteger", resourceCulture);
             }
         }
         

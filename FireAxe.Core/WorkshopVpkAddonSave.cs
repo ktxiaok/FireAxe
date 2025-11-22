@@ -8,7 +8,27 @@ public class WorkshopVpkAddonSave : VpkAddonSave
 
     public ulong? PublishedFileId { get; set; }
 
-    public AutoUpdateStrategy AutoUpdateStrategy { get; set; }
+    public bool? IsAutoUpdate { get; set; } = null;
+
+    // for backward compatibility
+    public string? AutoUpdateStrategy
+    {
+        set
+        {
+            if (value == "Enabled")
+            {
+                IsAutoUpdate = true;
+            }
+            else if (value == "Disabled")
+            {
+                IsAutoUpdate = false;
+            }
+            else
+            {
+                IsAutoUpdate = null;
+            }
+        }
+    }
 
     public bool RequestAutoSetName { get; set; } = false;
 

@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
+using FireAxe.Resources;
 using ReactiveUI;
 
 namespace FireAxe.ViewModels;
@@ -24,7 +25,7 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
         {
             if (!int.TryParse(value, out int priority))
             {
-                throw new ArgumentException($"{nameof(Priority)} must be a integer.");
+                throw new ArgumentException(Texts.ValueMustBeInteger);
             }
 
             var addon = Addon;

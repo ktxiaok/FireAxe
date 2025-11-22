@@ -6,6 +6,8 @@ namespace FireAxe;
 
 public static class FileSystemUtils
 {
+    private static readonly FrozenSet<char> s_invalidPathChars = FrozenSet.ToFrozenSet(Path.GetInvalidPathChars());
+
     private const int FO_DELETE = 0x0003;
     private const int FOF_ALLOWUNDO = 0x0040;           // Preserve undo information, if possible. 
     private const int FOF_NOCONFIRMATION = 0x0010;      // Show no confirmation dialog box to the user
@@ -84,16 +86,25 @@ public static class FileSystemUtils
     {
         ArgumentNullException.ThrowIfNull(path);
 
-        try
+        foreach (char c in path)
         {
-            Path.GetFullPath(path);
-        }
-        catch (Exception)
-        {
-            return false;
+            if (s_invalidPathChars.Contains(c))
+            {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    public static void ThrowIfPathInvalid(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        if (!IsValidPath(path))
+        {
+            throw new InvalidFilePathException(path);
+        }
     }
 
     public static string GetUniqueFileName(string name, string dirPath)

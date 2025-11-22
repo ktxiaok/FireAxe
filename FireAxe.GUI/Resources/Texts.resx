@@ -360,15 +360,6 @@
   <data name="Enum_AppColorTheme_Light" xml:space="preserve">
     <value>Light</value>
   </data>
-  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
-    <value>Default</value>
-  </data>
-  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
-    <value>Disabled</value>
-  </data>
-  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
-    <value>Enabled</value>
-  </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
@@ -478,7 +469,7 @@
     <value>The target group is the subgroup of the source group.</value>
   </data>
   <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
-    <value>Invalid published file id.</value>
+    <value>The published file ID is invalid.</value>
   </data>
   <data name="ItemId" xml:space="preserve">
     <value>Item ID</value>
@@ -992,5 +983,17 @@
   </data>
   <data name="WebProxyAddress" xml:space="preserve">
     <value>Web Proxy Address</value>
+  </data>
+  <data name="InvalidFilePath" xml:space="preserve">
+    <value>Invalid File Path</value>
+  </data>
+  <data name="ValueMustBeInteger" xml:space="preserve">
+    <value>The value must be an integer.</value>
+  </data>
+  <data name="InvalidUri" xml:space="preserve">
+    <value>Invalid URI</value>
+  </data>
+  <data name="FileMustBeInCurrentDirectory" xml:space="preserve">
+    <value>The file must be in the current directory.</value>
   </data>
 </root>

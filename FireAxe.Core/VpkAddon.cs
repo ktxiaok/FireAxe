@@ -202,13 +202,18 @@ public abstract class VpkAddon : AddonNode
         save1.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
     }
 
-    protected override void OnLoadSave(AddonNodeSave save)
+    protected override void OnLoadSave(AddonNodeSave save0)
     {
-        base.OnLoadSave(save);
-        var save1 = (VpkAddonSave)save;
+        base.OnLoadSave(save0);
+
+        var save = (VpkAddonSave)save0;
         ClearConflictIgnoringFiles();
-        foreach (var file in save1.ConflictIgnoringFiles)
+        foreach (var file in save.ConflictIgnoringFiles)
         {
+            if (string.IsNullOrEmpty(file))
+            {
+                continue;
+            }
             AddConflictIgnoringFile(file);
         }
     }

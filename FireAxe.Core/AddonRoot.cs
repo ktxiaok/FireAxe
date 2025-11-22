@@ -914,18 +914,6 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
     }
 
-    public bool ShouldAutoUpdateWorkshopItem(AutoUpdateStrategy strategy)
-    {
-        if (strategy == AutoUpdateStrategy.Default)
-        {
-            return IsAutoUpdateWorkshopItem;
-        }
-        else
-        {
-            return strategy == AutoUpdateStrategy.Enabled;
-        }
-    }
-
     public IDisposable BlockAutoCheck()
     {
         this.ThrowIfInvalid();

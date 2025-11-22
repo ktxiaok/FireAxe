@@ -20,7 +20,7 @@ public class WorkshopVpkAddon : VpkAddon
 
     private ulong? _publishedFileId = null;
 
-    private AutoUpdateStrategy _autoUpdateStrategy = AutoUpdateStrategy.Default;
+    private bool? _isAutoUpdate = null;
 
     private readonly WeakReference<PublishedFileDetails?> _publishedFileDetailsCache = new(null);
     private Task<GetPublishedFileDetailsResult>? _getPublishedFileDetailsTask = null;
@@ -93,27 +93,35 @@ public class WorkshopVpkAddon : VpkAddon
         }
     }
 
-    public AutoUpdateStrategy AutoUpdateStrategy
+    public bool? IsAutoUpdate
     {
-        get => _autoUpdateStrategy;
+        get => _isAutoUpdate;
         set
         {
             this.ThrowIfInvalid();
 
-            if (NotifyAndSetIfChanged(ref _autoUpdateStrategy, value))
+            if (NotifyAndSetIfChanged(ref _isAutoUpdate, value))
             {
                 Root.RequestSave = true;
             }
         }
     }
 
-    public bool IsAutoUpdate
+    public bool IsAutoUpdateActually
     {
         get
         {
             this.ThrowIfInvalid();
 
-            return Root.ShouldAutoUpdateWorkshopItem(AutoUpdateStrategy);
+            var raw = IsAutoUpdate;
+            if (raw.HasValue)
+            {
+                return raw.Value;
+            }
+            else
+            {
+                return Root.IsAutoUpdateWorkshopItem;
+            }
         }
     }
 
@@ -697,7 +705,7 @@ public class WorkshopVpkAddon : VpkAddon
                     if (metaInfo.TimeUpdated != details.TimeUpdated)
                     {
                         bool isAutoUpdate = false;
-                        invalid = await addonTaskCreator.StartNew(self => isAutoUpdate = self.IsAutoUpdate).ConfigureAwait(false);
+                        invalid = await addonTaskCreator.StartNew(self => isAutoUpdate = self.IsAutoUpdateActually).ConfigureAwait(false);
                         if (invalid)
                         {
                             return;
@@ -896,27 +904,29 @@ public class WorkshopVpkAddon : VpkAddon
         return TaskUtils.WhenAllIgnoreCanceled(tasks);
     }
 
-    protected override void OnCreateSave(AddonNodeSave save)
+    protected override void OnCreateSave(AddonNodeSave save0)
     {
-        base.OnCreateSave(save);
-        var save1 = (WorkshopVpkAddonSave)save;
-        save1.PublishedFileId = PublishedFileId;
-        save1.AutoUpdateStrategy = AutoUpdateStrategy;
-        save1.RequestAutoSetName = RequestAutoSetName;
-        save1.RequestApplyTagsFromWorkshop = RequestApplyTagsFromWorkshop;
+        base.OnCreateSave(save0);
+
+        var save = (WorkshopVpkAddonSave)save0;
+        save.PublishedFileId = PublishedFileId;
+        save.IsAutoUpdate = IsAutoUpdate;
+        save.RequestAutoSetName = RequestAutoSetName;
+        save.RequestApplyTagsFromWorkshop = RequestApplyTagsFromWorkshop;
     }
 
-    protected override void OnLoadSave(AddonNodeSave save)
+    protected override void OnLoadSave(AddonNodeSave save0)
     {
-        base.OnLoadSave(save);
-        var save1 = (WorkshopVpkAddonSave)save;
-        if (save1.PublishedFileId.HasValue)
+        base.OnLoadSave(save0);
+
+        var save = (WorkshopVpkAddonSave)save0;
+        if (save.PublishedFileId.HasValue)
         {
-            PublishedFileId = save1.PublishedFileId;
+            PublishedFileId = save.PublishedFileId;
         }
-        AutoUpdateStrategy = save1.AutoUpdateStrategy;
-        RequestAutoSetName = save1.RequestAutoSetName;
-        RequestApplyTagsFromWorkshop = save1.RequestApplyTagsFromWorkshop;
+        IsAutoUpdate = save.IsAutoUpdate;
+        RequestAutoSetName = save.RequestAutoSetName;
+        RequestApplyTagsFromWorkshop = save.RequestApplyTagsFromWorkshop;
     }
 
     private Task<GetPublishedFileDetailsResult> DoGetPublishedFileDetailsAsync(CancellationToken cancellationToken)

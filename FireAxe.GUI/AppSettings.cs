@@ -1,5 +1,6 @@
 ﻿using Avalonia.Styling;
 using FireAxe.ViewModels;
+using FireAxe.Resources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ReactiveUI;
@@ -190,7 +191,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             {
                 if (!FileSystemUtils.IsValidPath(value) || !Path.IsPathRooted(value))
                 {
-                    throw new ArgumentException("The path is invalid.");
+                    throw new ArgumentException(Texts.InvalidFilePath);
                 }
                 value = FileSystemUtils.NormalizePath(value);
             }
@@ -274,7 +275,14 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             IWebProxy? proxy = null;
             if (value.Length > 0)
             {
-                uri = new Uri(value);
+                try
+                {
+                    uri = new Uri(value);
+                }
+                catch (UriFormatException)
+                {
+                    throw new ArgumentException(Texts.InvalidUri);
+                }
                 proxy = new WebProxy(uri);
             }
 

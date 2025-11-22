@@ -45,20 +45,12 @@ public sealed class DownloadService : IDownloadService
 
         private readonly TaskCompletionSource _waitTaskCompletionSource = new();
 
-        internal DownloadItem(string url, string filePath, DownloadService service)
+        internal DownloadItem(string url, string filePath, DownloadService service, Downloader.DownloadConfiguration downloaderConfig)
         {
             _service = service;
-            lock (service._settingsLock)
-            {
-                _config = service._downloaderConfig;
-            }
+            _config = downloaderConfig;
             _url = url;
             _filePath = filePath;
-
-            lock (service._downloadItemsLock)
-            {
-                service._activeDownloadItems.Add(this);
-            }
 
             Task.Run(async () =>
             {
@@ -519,7 +511,17 @@ public sealed class DownloadService : IDownloadService
 
         ThrowIfDisposed();
 
-        return new DownloadItem(url, filePath, this);
+        Downloader.DownloadConfiguration downloaderConfig;
+        lock (_settingsLock)
+        {
+            downloaderConfig = _downloaderConfig;
+        }
+        lock (_downloadItemsLock)
+        {
+            var downloadItem = new DownloadItem(url, filePath, this, downloaderConfig);
+            _activeDownloadItems.Add(downloadItem);
+            return downloadItem;
+        }
     }
 
     public void Dispose()

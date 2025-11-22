@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using Serilog;
 
 namespace FireAxe;
 
@@ -136,6 +137,11 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         set
         {
             this.ThrowIfInvalid();
+
+            if (!Enum.IsDefined(value))
+            {
+                throw new InvalidEnumArgumentException(nameof(EnableStrategy), (int)value, typeof(AddonGroupEnableStrategy));
+            }
 
             if (value == _enableStrategy)
             {
@@ -283,11 +289,24 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         save1.EnableStrategy = EnableStrategy;
     }
 
-    protected override void OnLoadSave(AddonNodeSave save)
+    protected override void OnLoadSave(AddonNodeSave save0)
     {
-        base.OnLoadSave(save);
-        var save1 = (AddonGroupSave)save;
-        EnableStrategy = save1.EnableStrategy;
+        base.OnLoadSave(save0);
+
+        var save = (AddonGroupSave)save0;
+        try
+        {
+            EnableStrategy = save.EnableStrategy;
+        }
+        catch (Exception ex)
+        {
+            LogValueException(ex, nameof(EnableStrategy), save.EnableStrategy);
+        }
+
+        void LogValueException(Exception ex, string name, object? value)
+        {
+            Log.Error(ex, $"Exception occurred during setting {name} at {nameof(AddonGroup)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", value);
+        }
     }
 
     internal void AddChild(AddonNode child)

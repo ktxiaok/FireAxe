@@ -97,7 +97,7 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
         {
             if (!PublishedFileUtils.TryParsePublishedFileId(value, out var id))
             {
-                throw new ArgumentException("Invalid published file id."); 
+                throw new ArgumentException(Texts.InvalidPublishedFileIdMessage); 
             }
 
             var addon = Addon;

@@ -190,9 +190,9 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
         DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, this.WhenAnyValue(x => x.HasSelection));
 
-        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Default));
-        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Enabled));
-        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(AutoUpdateStrategy.Disabled));
+        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null));
+        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true));
+        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false));
 
         Selection.ObserveCollectionChanges()
             .Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedNodes)));
@@ -736,14 +736,14 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         RefreshNodes();
     }
 
-    public void SetAutoUpdateStrategyRecursively(AutoUpdateStrategy strategy)
+    public void SetAutoUpdateStrategyRecursively(bool? strategy)
     {
         var selectedNodes = SelectedNodes.ToArray();
         foreach (var addon in selectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()))
         {
             if (addon is WorkshopVpkAddon workshopVpkAddon)
             {
-                workshopVpkAddon.AutoUpdateStrategy = strategy;
+                workshopVpkAddon.IsAutoUpdate = strategy;
             }
         }
     }

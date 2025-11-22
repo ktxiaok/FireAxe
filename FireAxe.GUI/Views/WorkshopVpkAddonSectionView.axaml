@@ -55,11 +55,11 @@
       Grid.Row="2" Grid.Column="0"
       Classes="PropertyName"
       Text="{x:Static r:Texts.AutoUpdateStrategy}"/>
-    <ComboBox
+    <CheckBox
       Grid.Row="2" Grid.Column="1"
-      Classes="EnumComboBox PropertyValue"
-      ItemsSource="{Binding Source={me:EnumValues {x:Type local:AutoUpdateStrategy}}}"
-      SelectedItem="{Binding Addon.AutoUpdateStrategy}"/>
+      Classes="PropertyValue"
+      IsThreeState="True"
+      IsChecked="{Binding Addon.IsAutoUpdate}"/>
 
     <!--download item-->
     <StackPanel

@@ -360,15 +360,6 @@
   <data name="Enum_AppColorTheme_Light" xml:space="preserve">
     <value>浅色</value>
   </data>
-  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
-    <value>默认</value>
-  </data>
-  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
-    <value>禁用</value>
-  </data>
-  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
-    <value>启用</value>
-  </data>
   <data name="Error" xml:space="preserve">
     <value>错误</value>
   </data>
@@ -992,5 +983,17 @@
   </data>
   <data name="WebProxyAddress" xml:space="preserve">
     <value>Web代理地址</value>
+  </data>
+  <data name="InvalidFilePath" xml:space="preserve">
+    <value>无效的文件路径</value>
+  </data>
+  <data name="ValueMustBeInteger" xml:space="preserve">
+    <value>值必须是整数。</value>
+  </data>
+  <data name="InvalidUri" xml:space="preserve">
+    <value>无效的URI</value>
+  </data>
+  <data name="FileMustBeInCurrentDirectory" xml:space="preserve">
+    <value>文件必须要在当前目录中。</value>
   </data>
 </root>

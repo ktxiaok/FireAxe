@@ -410,17 +410,27 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         get => _customImagePath;
         set
         {
-            if (value != null && !FileSystemUtils.IsValidPath(value))
+            if (value is not null)
             {
-                throw new ArgumentException($"invalid path: {value}");
+                FileSystemUtils.ThrowIfPathInvalid(value);
+                if (value.StartsWith("..") || Path.IsPathRooted(value))
+                {
+                    throw new FileOutOfAddonRootException(value);
+                }
+                value = FileSystemUtils.NormalizePath(value);
             }
 
             this.ThrowIfInvalid();
 
-            if (NotifyAndSetIfChanged(ref _customImagePath, value))
+            if (value == _customImagePath)
             {
-                Root.RequestSave = true;
+                return;
             }
+
+            _customImagePath = value;
+            NotifyChanged();
+
+            Root.RequestSave = true;
         }
     }
 
@@ -1277,7 +1287,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             AddDependentAddon(id);
         }
 
-        CustomImagePath = save.CustomImagePath;
+        try
+        {
+            CustomImagePath = save.CustomImagePath;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Exception occurred during setting {nameof(CustomImagePath)} at {nameof(AddonNode)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", save.CustomImagePath);
+        }
     }
 
     protected virtual void OnAncestorsChanged()
