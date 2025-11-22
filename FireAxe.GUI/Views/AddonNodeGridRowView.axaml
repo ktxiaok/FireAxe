@@ -50,8 +50,8 @@
     </Panel>
     <TextBlock
       Grid.Column="3"
-      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}}"
-      Text="{Binding FileSizeReadable}"
+      IsVisible="{Binding Addon.FileSize, Converter={x:Static ObjectConverters.IsNotNull}}"
+      Text="{Binding Addon.FileSize, Converter={StaticResource converter_readable_bytes}}"
       VerticalAlignment="Center"
       TextTrimming="CharacterEllipsis"/>
     <Grid

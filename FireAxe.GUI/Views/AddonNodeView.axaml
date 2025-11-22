@@ -183,7 +183,7 @@
     <!--file size-->
     <DockPanel
       Classes="PropertyRow"
-      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
+      IsVisible="{Binding Addon.FileSize, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
       <TextBlock
         Classes="PropertyName"
         DockPanel.Dock="Left"
@@ -191,7 +191,7 @@
       <TextBlock
         Classes="PropertyValue"
         DockPanel.Dock="Right"
-        Text="{Binding FileSizeReadable}"/>
+        Text="{Binding Addon.FileSize, Converter={StaticResource converter_readable_bytes}}"/>
     </DockPanel>
 
     <!--creation time-->
@@ -229,6 +229,37 @@
         Name="customizeImageButton"
         Content="{x:Static r:Texts.CustomizePreviewImage}"/>
     </StackPanel>
+
+    <!--advanced panel-->
+    <Expander
+      IsExpanded="False"
+      Margin="0, 5, 0, 5"
+      HorizontalAlignment="Stretch">
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.AdvancedPanel}"
+          Classes="Heading1"
+          VerticalAlignment="Center"/>
+      </Expander.Header>
+
+      <StackPanel Orientation="Vertical">
+        <DockPanel
+          LastChildFill="False">
+          <TextBlock
+            DockPanel.Dock="Left"
+            Classes="PropertyName"
+            Text="ID"/>
+          <v:EditableTextBlock
+            DockPanel.Dock="Right"
+            Classes="PropertyValue"
+            Value="{Binding AddonIdString}"/>
+        </DockPanel>
+        <TextBlock
+          Text="{x:Static r:Texts.ChangeIdNote}"
+          TextWrapping="Wrap"
+          VerticalAlignment="Center"/>
+      </StackPanel>
+    </Expander>
 
     <!--problems-->
     <Border

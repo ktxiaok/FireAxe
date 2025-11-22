@@ -996,4 +996,13 @@
   <data name="FileMustBeInCurrentDirectory" xml:space="preserve">
     <value>文件必须要在当前目录中。</value>
   </data>
+  <data name="InvalidGuid" xml:space="preserve">
+    <value>无效的GUID</value>
+  </data>
+  <data name="ChangeIdNote" xml:space="preserve">
+    <value>注意：修改ID可以解决引用问题但也可能导致引用丢失问题。请确保理解其机制后再修改。</value>
+  </data>
+  <data name="AdvancedPanel" xml:space="preserve">
+    <value>高级面板</value>
+  </data>
 </root>

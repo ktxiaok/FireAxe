@@ -996,4 +996,13 @@
   <data name="FileMustBeInCurrentDirectory" xml:space="preserve">
     <value>The file must be in the current directory.</value>
   </data>
+  <data name="InvalidGuid" xml:space="preserve">
+    <value>Invalid GUID</value>
+  </data>
+  <data name="ChangeIdNote" xml:space="preserve">
+    <value>NOTE: Changing the ID might resolve the reference problem but can also lead to reference loss problems. Please ensure you understand its mechanism before making change.</value>
+  </data>
+  <data name="AdvancedPanel" xml:space="preserve">
+    <value>Advanced Panel</value>
+  </data>
 </root>

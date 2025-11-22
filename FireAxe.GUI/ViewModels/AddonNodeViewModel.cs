@@ -18,6 +18,26 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
             .ToProperty(this, nameof(DependenciesViewModel), deferSubscription: true);
     }
 
+    public string? AddonIdString
+    {
+        get => Addon?.Id.ToString();
+        set
+        {
+            if (!Guid.TryParse(value, out var guid) || guid == Guid.Empty)
+            {
+                throw new ArgumentException(Texts.InvalidGuid);
+            }
+
+            var addon = Addon;
+            if (addon is null)
+            {
+                return;
+            }
+
+            addon.Id = guid;
+        }
+    }
+
     public string? Priority
     {
         get => Addon?.Priority.ToString();
@@ -70,6 +90,9 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
     {
         base.OnNewAddon(addon, disposables);
 
+        addon.WhenAnyValue(x => x.Id)
+            .Subscribe(_ => this.RaisePropertyChanged(nameof(AddonIdString)))
+            .DisposeWith(disposables);
         addon.WhenAnyValue(x => x.Priority)
             .Subscribe(_ => this.RaisePropertyChanged(nameof(Priority)))
             .DisposeWith(disposables);
@@ -79,6 +102,7 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
     {
         base.OnNullAddon();
 
+        this.RaisePropertyChanged(nameof(AddonIdString));
         this.RaisePropertyChanged(nameof(Priority));
     }
 }

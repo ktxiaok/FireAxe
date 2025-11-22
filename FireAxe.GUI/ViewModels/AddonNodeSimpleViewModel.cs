@@ -29,8 +29,6 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     private ObservableAsPropertyHelper<bool>? _shouldShowUnknownIcon = null; 
     private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
 
-    private ObservableAsPropertyHelper<string?>? _fileSizeReadable = null;
-
     private object? _currentRefreshId = null;
     private CancellationTokenSource? _refreshCts = null;
 
@@ -125,12 +123,15 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             _shouldShowUnknownIcon = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is not AddonGroup)
                 .ToProperty(this, nameof(ShouldShowUnknownIcon));
+            this.RaisePropertyChanged(nameof(ShouldShowUnknownIcon));
             _shouldShowImage = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && args.HasImage)
                 .ToProperty(this, nameof(ShouldShowImage));
+            this.RaisePropertyChanged(nameof(ShouldShowImage));
             _shouldShowFolderIcon = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is AddonGroup)
                 .ToProperty(this, nameof(ShouldShowFolderIcon));
+            this.RaisePropertyChanged(nameof(ShouldShowFolderIcon));
 
             Refresh();
 
@@ -226,8 +227,6 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
     public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
 
-    public string? FileSizeReadable => _fileSizeReadable?.Value;
-
     public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 
     protected object? CurrentRefreshId => _currentRefreshId;
@@ -290,6 +289,16 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 }
             })
             .DisposeWith(disposables);
+        addon.WhenAnyValue(x => x.Id)
+            .Subscribe(id =>
+            {
+                if (id != AddonId)
+                {
+                    Addon = null;
+                }
+            })
+            .DisposeWith(disposables);
+
         _enableState = addon.WhenAnyValue(x => x.IsEnabled, x => x.IsEnabledInHierarchy)
             .Select(((bool IsEnabled, bool IsEnabledInHierarchy) enableState) =>
             {
@@ -310,9 +319,8 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 }
             })
             .ToProperty(this, nameof(EnableState));
-        _fileSizeReadable = addon.WhenAnyValue(x => x.FileSize)
-            .Select(fileSize => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)
-            .ToProperty(this, nameof(FileSizeReadable));
+        this.RaisePropertyChanged(nameof(EnableState));
+        
         addon.WhenAnyValue(x => x.CustomImagePath)
             .Skip(1)
             .Throttle(TimeSpan.FromSeconds(0.5), RxApp.MainThreadScheduler)
@@ -329,7 +337,6 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
         Disposable.Create(() =>
         {
             Utils.DisposeAndSetNull(ref _enableState);
-            Utils.DisposeAndSetNull(ref _fileSizeReadable);
         }).DisposeWith(disposables);
     }
 

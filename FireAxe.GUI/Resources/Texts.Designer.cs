@@ -187,6 +187,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced Panel.
+        /// </summary>
+        public static string AdvancedPanel {
+            get {
+                return ResourceManager.GetString("AdvancedPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All.
         /// </summary>
         public static string All {
@@ -336,6 +345,15 @@ namespace FireAxe.Resources {
         public static string CantMoveItemWithName {
             get {
                 return ResourceManager.GetString("CantMoveItemWithName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NOTE: Changing the ID might resolve the reference problem but can also lead to reference loss problems. Please ensure you understand its mechanism before making change..
+        /// </summary>
+        public static string ChangeIdNote {
+            get {
+                return ResourceManager.GetString("ChangeIdNote", resourceCulture);
             }
         }
         
@@ -1542,6 +1560,15 @@ namespace FireAxe.Resources {
         public static string InvalidGamePathMessage {
             get {
                 return ResourceManager.GetString("InvalidGamePathMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid GUID.
+        /// </summary>
+        public static string InvalidGuid {
+            get {
+                return ResourceManager.GetString("InvalidGuid", resourceCulture);
             }
         }
         
