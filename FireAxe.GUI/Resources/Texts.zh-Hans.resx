@@ -1026,4 +1026,22 @@
   <data name="NoProblemFound" xml:space="preserve">
     <value>没有发现问题。</value>
   </data>
+  <data name="AppAlreadyRunningMessage" xml:space="preserve">
+    <value>FireAxe正在运行中。在同一时间只允许运行一个实例。</value>
+  </data>
+  <data name="FileBackup" xml:space="preserve">
+    <value>文件备份</value>
+  </data>
+  <data name="AddonRootBackupDirectoryLocationNote" xml:space="preserve">
+    <value>备份文件位于“.addonrootdir/backups”。</value>
+  </data>
+  <data name="MaxRetainedBackupFileCount" xml:space="preserve">
+    <value>备份文件最多保留个数</value>
+  </data>
+  <data name="FileBackupIntervalMinutes" xml:space="preserve">
+    <value>文件备份间隔（分钟）</value>
+  </data>
+  <data name="ValueMustBeWithinValidRange" xml:space="preserve">
+    <value>值必须在有效范围内。</value>
+  </data>
 </root>

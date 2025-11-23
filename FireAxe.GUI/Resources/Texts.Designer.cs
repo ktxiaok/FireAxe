@@ -178,6 +178,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup files are in &quot;.addonrootdir/backups&quot;..
+        /// </summary>
+        public static string AddonRootBackupDirectoryLocationNote {
+            get {
+                return ResourceManager.GetString("AddonRootBackupDirectoryLocationNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Sources of Searching.
         /// </summary>
         public static string AddSearchSource {
@@ -228,6 +237,15 @@ namespace FireAxe.Resources {
         public static string AlternativeCustomizeAddonPreviewImageNote {
             get {
                 return ResourceManager.GetString("AlternativeCustomizeAddonPreviewImageNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FireAxe is already running. Only one instance is allowed to run at the same time..
+        /// </summary>
+        public static string AppAlreadyRunningMessage {
+            get {
+                return ResourceManager.GetString("AppAlreadyRunningMessage", resourceCulture);
             }
         }
         
@@ -1150,6 +1168,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Backup.
+        /// </summary>
+        public static string FileBackup {
+            get {
+                return ResourceManager.GetString("FileBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Backup Interval (minutes).
+        /// </summary>
+        public static string FileBackupIntervalMinutes {
+            get {
+                return ResourceManager.GetString("FileBackupIntervalMinutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Cleaner.
         /// </summary>
         public static string FileCleaner {
@@ -1695,6 +1731,15 @@ namespace FireAxe.Resources {
         public static string LifetimeSubscriptionsColon {
             get {
                 return ResourceManager.GetString("LifetimeSubscriptionsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max Retained Backup File Count.
+        /// </summary>
+        public static string MaxRetainedBackupFileCount {
+            get {
+                return ResourceManager.GetString("MaxRetainedBackupFileCount", resourceCulture);
             }
         }
         
@@ -2631,6 +2676,15 @@ namespace FireAxe.Resources {
         public static string ValueMustBeInteger {
             get {
                 return ResourceManager.GetString("ValueMustBeInteger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be within the valid range..
+        /// </summary>
+        public static string ValueMustBeWithinValidRange {
+            get {
+                return ResourceManager.GetString("ValueMustBeWithinValidRange", resourceCulture);
             }
         }
         

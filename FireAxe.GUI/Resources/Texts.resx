@@ -1026,4 +1026,22 @@
   <data name="NoProblemFound" xml:space="preserve">
     <value>No problems found.</value>
   </data>
+  <data name="AppAlreadyRunningMessage" xml:space="preserve">
+    <value>FireAxe is already running. Only one instance is allowed to run at the same time.</value>
+  </data>
+  <data name="FileBackup" xml:space="preserve">
+    <value>File Backup</value>
+  </data>
+  <data name="AddonRootBackupDirectoryLocationNote" xml:space="preserve">
+    <value>Backup files are in ".addonrootdir/backups".</value>
+  </data>
+  <data name="MaxRetainedBackupFileCount" xml:space="preserve">
+    <value>Max Retained Backup File Count</value>
+  </data>
+  <data name="FileBackupIntervalMinutes" xml:space="preserve">
+    <value>File Backup Interval (minutes)</value>
+  </data>
+  <data name="ValueMustBeWithinValidRange" xml:space="preserve">
+    <value>The value must be within the valid range.</value>
+  </data>
 </root>

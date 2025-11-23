@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using ValveKeyValue;
 
 namespace FireAxe;
@@ -14,6 +15,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 {
     public const string SaveFileName = ".addonroot";
     public const string VersionFileName = ".addonrootversion";
+    public const string AddonRootDirectoryName = ".addonrootdir";
+    public const string CacheDirectoryName = "caches";
+    public const string BackupDirectoryName = "backups";
 
     private static readonly JsonSerializerSettings s_jsonSettings = new()
     {
@@ -24,6 +28,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             new StringEnumConverter()
         }
     };
+
+    private static readonly Regex s_backupFileNameRegex = new(@"^backup_(\d+)-(\d+)-(\d+)_(\d+)-(\d+)\.addonroot$");
 
     private bool _disposed = false;
 
@@ -161,7 +167,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     string? IAddonNodeContainer.FileSystemPath => IsDirectoryPathSet ? DirectoryPath : null;
 
-    public string CacheDirectoryPath => Path.Join(DirectoryPath, ".addonrootdir", "caches");
+    public string CacheDirectoryPath => Path.Join(DirectoryPath, AddonRootDirectoryName, CacheDirectoryName);
+
+    public string BackupDirectoryPath => Path.Join(DirectoryPath, AddonRootDirectoryName, BackupDirectoryName);
 
     public string GamePath
     {
@@ -788,6 +796,111 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         //{
         //    return $"workshop_{publishedFileId}.vpk";
         //}
+    }
+
+    public bool BackUpIfNeed(int maxRetainedFileCount, int backupIntervalMinutes, DateTime? overrideCurrentDateTime = null)
+    {
+        if (maxRetainedFileCount < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxRetainedFileCount));
+        }
+        if (backupIntervalMinutes < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(backupIntervalMinutes));
+        }
+
+        var dir = BackupDirectoryPath;
+        Directory.CreateDirectory(dir);
+
+        DateTime currentDateTime = overrideCurrentDateTime ?? DateTime.Now;
+
+        // Find existing backup files.
+        var existingItems = new List<(string Path, DateTime DateTime)>();
+        foreach (var path in Directory.EnumerateFiles(dir))
+        {
+            var fileName = Path.GetFileName(path);
+            if (TryParseBackupFileName(fileName, out var dateTime))
+            {
+                existingItems.Add((path, dateTime));
+            }
+        }
+
+        // Sort existing items by date time and check the backup interval.
+        if (existingItems.Count > 0)
+        {
+            existingItems.Sort((a, b) => a.DateTime.Ticks.CompareTo(b.DateTime.Ticks));
+
+            // Ignore future items.
+            while (existingItems.Count > 0 && existingItems[existingItems.Count - 1].DateTime > currentDateTime)
+            {
+                existingItems.RemoveAt(existingItems.Count - 1);
+            }
+
+            // Check the backup interval.
+            if (existingItems.Count > 0)
+            {
+                var latestDateTime = existingItems[existingItems.Count - 1].DateTime;
+                if (currentDateTime - latestDateTime < TimeSpan.FromMinutes(backupIntervalMinutes))
+                {
+                    return false;
+                }
+            }
+        }
+
+        // Delete overflowed items.
+        int overflowedCount = existingItems.Count + 1 - maxRetainedFileCount;
+        if (overflowedCount > 0)
+        {
+            for (int i = 0; i < overflowedCount; i++)
+            {
+                var path = existingItems[i].Path;
+                if (File.Exists(path))
+                {
+                    FileSystemUtils.MoveToRecycleBin(path);
+                }
+            }
+        }
+
+        // Finally create the backup.
+        var backupPath = Path.Join(dir, BuildBackupFileName(currentDateTime));
+        File.WriteAllText(backupPath, Serialize(CreateSave()));
+        return true;
+    }
+
+    public static string BuildBackupFileName(DateTime dateTime)
+    {
+        return $"backup_{dateTime.Year}-{dateTime.Month:D2}-{dateTime.Day:D2}_{dateTime.Hour:D2}-{dateTime.Minute:D2}.addonroot";
+    }
+
+    public static bool TryParseBackupFileName(string? input, out DateTime dateTime)
+    {
+        dateTime = default;
+        if (input is null)
+        {
+            return false;
+        }
+        var match = s_backupFileNameRegex.Match(input);
+        if (match.Success)
+        {
+            var groups = match.Groups;
+            if (int.TryParse(groups[1].ValueSpan, out int year)
+                && int.TryParse(groups[2].ValueSpan, out int month)
+                && int.TryParse(groups[3].ValueSpan, out int day)
+                && int.TryParse(groups[4].ValueSpan, out int hour)
+                && int.TryParse(groups[5].ValueSpan, out int minute))
+            {
+                try
+                {
+                    dateTime = new DateTime(year, month, day, hour, minute, 0);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void LoadFile()

@@ -1,16 +1,18 @@
 - add: VPK conflict checking system
 - add: new addon type: reference addon (you can use this type to operate the same addon in different groups)
 - add: addon dependency management
+- add: new tool: Problem List
 - add: new tool: Addon Name Auto Setter
 - add: new tool: File Cleaner (supports deleting redundant VPK files for workshop items, download temp files and empty directories)
 - add: new tool: Workshop VPK Finder
+- add: .addonroot file backup function
 - add: support import and export for .addonroot files
 - add: addon deletion progress window
 - add: mechanism of addon linked files: all files with the same name as the addon file will follow the addon when it is moved
 - add: alternative method of customizing addon preview image: place an image file with the same name next to the addon file (issue #17)
 - add: web proxy address setting (issue #19)
-- add: new tool: Problem List
 - add: Addon Advanced Panel
+- add: singleton mode: only one app instance is allowed to run at the same time
 - fix: deletion of addons doesn't delete the corresponding files in some cases
 - improve: better download logic of WorkshopVpkAddon
 - improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   

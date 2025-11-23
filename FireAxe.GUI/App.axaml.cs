@@ -3,17 +3,22 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using FireAxe.ViewModels;
+using FireAxe.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace FireAxe;
 
 public partial class App : Application
 {
     public const string DocumentDirectoryName = "FireAxe";
+
+    private IServiceProvider? _services = null;
 
     private string _documentDirectoryPath;
 
@@ -23,36 +28,11 @@ public partial class App : Application
     {
         _documentDirectoryPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DocumentDirectoryName);
         Directory.CreateDirectory(_documentDirectoryPath);
-
-        Services = new ServiceCollection()
-            .AddSingleton(this)
-            .AddSingleton<MainWindowViewModel>()
-            .AddSingleton<AppSettings>()
-            .AddSingleton<AppSettingsViewModel>()
-            .AddSingleton<DownloadItemListViewModel>()
-            .AddSingleton<SaveManager>()
-            .AddSingleton<IAppWindowManager, AppWindowManager>()
-            .AddSingleton<IDownloadService, DownloadService>(
-                services => new DownloadService(services.GetRequiredService<AppSettings>().GetDownloadServiceSettings()))
-            .AddSingleton<HttpClient>(services =>
-            {
-                var appSettings = services.GetRequiredService<AppSettings>();
-                var socketsHttpHandler = new SocketsHttpHandler();
-                if (appSettings.WebProxy is { } webProxy)
-                {
-                    socketsHttpHandler.UseProxy = true;
-                    socketsHttpHandler.Proxy = webProxy;
-                }
-                var httpClient = new HttpClient(socketsHttpHandler);
-                httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", null));
-                return httpClient;
-            })
-            .BuildServiceProvider();
     }
 
     //public static new App Current => (App?)Application.Current ?? throw new InvalidOperationException("The App.Current is null.");
 
-    public IServiceProvider Services { get; }
+    public IServiceProvider Services => _services ?? throw new InvalidOperationException($"{nameof(Services)} is not set.");
 
     public string DocumentDirectoryPath => _documentDirectoryPath;
 
@@ -65,24 +45,76 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose; 
+            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-            Services.GetRequiredService<AppSettings>();
-
-            desktop.ShutdownRequested += (sender, args) =>
+            if (AppMutex.TryEnter())
             {
-                ShutdownRequested?.Invoke();
-            };
+                var services = new ServiceCollection()
+                    .AddSingleton(this)
+                    .AddSingleton<MainWindowViewModel>()
+                    .AddSingleton<AppSettings>()
+                    .AddSingleton<DownloadItemListViewModel>()
+                    .AddSingleton<SaveManager>()
+                    .AddSingleton<IAppWindowManager, AppWindowManager>()
+                    .AddSingleton<IDownloadService, DownloadService>(
+                        services => new DownloadService(services.GetRequiredService<AppSettings>().GetDownloadServiceSettings()))
+                    .AddSingleton<HttpClient>(services =>
+                    {
+                        var appSettings = services.GetRequiredService<AppSettings>();
+                        var socketsHttpHandler = new SocketsHttpHandler();
+                        if (appSettings.WebProxy is { } webProxy)
+                        {
+                            socketsHttpHandler.UseProxy = true;
+                            socketsHttpHandler.Proxy = webProxy;
+                        }
+                        var httpClient = new HttpClient(socketsHttpHandler);
+                        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(".NET", null));
+                        return httpClient;
+                    })
+                    .BuildServiceProvider();
 
-            var mainWindowViewModel = Services.GetRequiredService<MainWindowViewModel>();
-            var mainWindow = Services.GetRequiredService<IAppWindowManager>().CreateMainWindow(mainWindowViewModel);
-            desktop.MainWindow = mainWindow;
-            mainWindow.Show();
+                _services = services;
 
-            var saveManager = Services.GetRequiredService<SaveManager>();
-            saveManager.Register(Services.GetRequiredService<MainWindowViewModel>());
-            saveManager.Register(Services.GetRequiredService<AppSettings>());
-            saveManager.Run();
+                desktop.ShutdownRequested += (sender, args) =>
+                {
+                    ShutdownRequested?.Invoke();
+
+                    args.Cancel = true;
+                    services.DisposeAsync()
+                        .AsTask()
+                        .ContinueWith(task =>
+                        {
+                            if (task.Exception is { } ex)
+                            {
+                                Log.Error(ex, "Exception occurred during disposing services.");
+                            }
+                            else
+                            {
+                                Log.Information("All services disposed successfully.");
+                            }
+
+                            desktop.Shutdown();
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                };
+
+                services.GetRequiredService<AppSettings>();
+
+                var mainWindowViewModel = services.GetRequiredService<MainWindowViewModel>();
+                var mainWindow = services.GetRequiredService<IAppWindowManager>().CreateMainWindow(mainWindowViewModel);
+                desktop.MainWindow = mainWindow;
+                mainWindow.Show();
+
+                var saveManager = services.GetRequiredService<SaveManager>();
+                saveManager.Register(services.GetRequiredService<MainWindowViewModel>());
+                saveManager.Register(services.GetRequiredService<AppSettings>());
+                saveManager.Run();
+            }
+            else
+            {
+                var messageWindow = new AppAlreadyRunningMessageWindow();
+                desktop.MainWindow = messageWindow;
+                messageWindow.Show();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

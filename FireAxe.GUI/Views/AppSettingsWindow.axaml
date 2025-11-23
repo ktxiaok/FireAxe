@@ -9,11 +9,11 @@
         xmlns:me="using:FireAxe.MarkupExtensions"
         xmlns:dt="using:FireAxe.DataTemplates"
         xmlns:local="using:FireAxe"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
-        Width="600" Height="400"
+        Width="600" Height="600"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
@@ -127,6 +127,52 @@
         Display="{Binding Settings.WebProxyAddress, Converter={x:Static conv:StringConverters.ShowEmpty}}"
         HorizontalAlignment="Left"
         VerticalAlignment="Center"/>
+
+      <!--file backup-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.FileBackup}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsFileBackupEnabled}"/>
+      </DockPanel>
+
+      <!--max retained backup file count-->
+      <DockPanel IsVisible="{Binding Settings.IsFileBackupEnabled}">
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.MaxRetainedBackupFileCount}"/>
+        <v:EditableTextBlock
+          Classes="PropertyValue"
+          Value="{Binding MaxRetainedBackupFileCount}"/>
+      </DockPanel>
+
+      <!--file backup interval minutes-->
+      <DockPanel IsVisible="{Binding Settings.IsFileBackupEnabled}">
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.FileBackupIntervalMinutes}"/>
+        <v:EditableTextBlock
+          Classes="PropertyValue"
+          Value="{Binding FileBackupIntervalMinutes}"/>
+      </DockPanel>
+
+      <!--file backup directory location note-->
+      <StackPanel
+        Orientation="Horizontal"
+        Margin="0, 5, 0, 5">
+        <TextBlock
+          Text="{x:Static r:Texts.AddonRootBackupDirectoryLocationNote}"
+          VerticalAlignment="Center"/>
+        <Control Width="10"/>
+        <Button
+          Command="{Binding OpenBackupDirectoryCommand}"
+          Content="{x:Static r:Texts.Open}"/>
+      </StackPanel>
     </StackPanel>
   </ScrollViewer>
 </Window>

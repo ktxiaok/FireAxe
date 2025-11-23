@@ -5,26 +5,29 @@ using System.Collections.Generic;
 
 namespace FireAxe;
 
-public class SaveManager
+public sealed class SaveManager : IDisposable
 {
     public static readonly TimeSpan DefaultAutoSaveInterval = TimeSpan.FromSeconds(3);
 
+    private bool _disposed = false;
     private bool _active = false;
-    
-    private List<ISaveable> _saveables = new();
 
-    private DispatcherTimer _autoSaveTimer;
+    private readonly App _app;
+    
+    private readonly List<ISaveable> _saveables = new();
+
+    private readonly DispatcherTimer _autoSaveTimer;
 
     public SaveManager(App app)
     {
+        ArgumentNullException.ThrowIfNull(app);
+        _app = app;
+
         _autoSaveTimer = new(DefaultAutoSaveInterval, DispatcherPriority.Normal, (sender, e) =>
         {
             SaveAll();
         });
-        app.ShutdownRequested += () =>
-        {
-            SaveAll();
-        };
+        _app.ShutdownRequested += OnAppShutdownRequested;
     }
 
     public IEnumerable<ISaveable> Saveables => _saveables;
@@ -68,5 +71,22 @@ public class SaveManager
                 }
             }
         }
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _autoSaveTimer.Stop();
+
+            _app.ShutdownRequested -= OnAppShutdownRequested;
+
+            _disposed = true;
+        }
+    }
+
+    private void OnAppShutdownRequested()
+    {
+        SaveAll(true);
     }
 }

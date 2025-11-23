@@ -42,6 +42,9 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private bool _isAutoRedownload = false;
     private Uri? _webProxyUri = null;
     private IWebProxy? _webProxy = null;
+    private bool _isFileBackupEnabled = true;
+    private int _maxRetainedBackupFileCount = 25;
+    private int _fileBackupIntervalMinutes = 30;
 
     private string _settingsFilePath;
 
@@ -295,6 +298,65 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     }
 
     public IWebProxy? WebProxy => _webProxy;
+
+    [JsonProperty]
+    public bool IsFileBackupEnabled
+    {
+        get => _isFileBackupEnabled;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref _isFileBackupEnabled, value))
+            {
+                RequestSave = true;
+            }
+        }
+    }
+
+    [JsonProperty]
+    public int MaxRetainedBackupFileCount
+    {
+        get => _maxRetainedBackupFileCount;
+        set
+        {
+            if (value < 1)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (value == _maxRetainedBackupFileCount)
+            {
+                return;
+            }
+
+            _maxRetainedBackupFileCount = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    }
+
+    [JsonProperty]
+    public int FileBackupIntervalMinutes
+    {
+        get => _fileBackupIntervalMinutes;
+        set
+        {
+            if (value <= 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            if (value == _fileBackupIntervalMinutes)
+            {
+                return;
+            }
+
+            _fileBackupIntervalMinutes = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    }
 
     public void LoadFile()
     {

@@ -3,26 +3,42 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
+using FireAxe.Resources;
 
 namespace FireAxe.ViewModels;
 
 public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
 {
-    private AppSettings _settings;
+    private readonly AppSettings _settings;
+    private readonly MainWindowViewModel _mainWindowViewModel;
 
-    private IEnumerable<string?> _languageItemsSource;
+    private readonly IEnumerable<string?> _languageItemsSource;
 
-    public AppSettingsViewModel(AppSettings settings)
+    private bool _addonRootNotNull = false;
+
+    public AppSettingsViewModel(AppSettings settings, MainWindowViewModel mainWindowViewModel)
     {
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(mainWindowViewModel);
         _settings = settings;
+        _mainWindowViewModel = mainWindowViewModel;
 
         _languageItemsSource = [null, .. LanguageManager.SupportedLanguages];
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            
+            _mainWindowViewModel.WhenAnyValue(x => x.AddonRoot)
+                .Subscribe(addonRoot => AddonRootNotNull = addonRoot is not null)
+                .DisposeWith(disposables);
+            Disposable.Create(() => AddonRootNotNull = false)
+                .DisposeWith(disposables);
+
+            _settings.WhenAnyValue(x => x.MaxRetainedBackupFileCount)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(MaxRetainedBackupFileCount)));
+            _settings.WhenAnyValue(x => x.FileBackupIntervalMinutes)
+                .Subscribe(_ => this.RaisePropertyChanged(nameof(FileBackupIntervalMinutes)));
         });
 
         SelectGamePathCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -48,6 +64,13 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
             }
             Settings.GamePath = gamePath;
         });
+        OpenBackupDirectoryCommand = ReactiveCommand.Create(() =>
+        {
+            if (_mainWindowViewModel.AddonRoot?.BackupDirectoryPath is { } path)
+            {
+                Utils.ShowInFileExplorer(path);
+            }
+        }, this.WhenAnyValue(x => x.AddonRootNotNull));
     }
 
     public ViewModelActivator Activator { get; } = new();
@@ -56,13 +79,49 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
 
     public IEnumerable<string?> LanguageItemsSource => _languageItemsSource;
 
+    public string MaxRetainedBackupFileCount
+    {
+        get => _settings.MaxRetainedBackupFileCount.ToString();
+        set
+        {
+            if (!int.TryParse(value, out int count))
+            {
+                throw new ArgumentException(Texts.ValueMustBeInteger);
+            }
+
+            _settings.MaxRetainedBackupFileCount = count;
+        }
+    }
+
+    public string FileBackupIntervalMinutes
+    {
+        get => _settings.FileBackupIntervalMinutes.ToString();
+        set
+        {
+            if (!int.TryParse(value, out int minutes))
+            {
+                throw new ArgumentException(Texts.ValueMustBeInteger);
+            }
+
+            _settings.FileBackupIntervalMinutes = minutes;
+        }
+    }
+
     public ReactiveCommand<Unit, Unit> SelectGamePathCommand { get; }
 
     public ReactiveCommand<Unit, Unit> FindGamePathCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenBackupDirectoryCommand { get; }
 
     public Interaction<Unit, string?> ChooseGamePathDirectoryInteraction { get; } = new();
 
     public Interaction<string, bool> ConfirmFoundGamePathInteraction { get; } = new();
 
     public Interaction<Unit, Unit> ReportGamePathNotFoundInteraction { get; } = new();
+
+    private bool AddonRootNotNull
+    {
+        get => _addonRootNotNull;
+        set => this.RaiseAndSetIfChanged(ref _addonRootNotNull, value);
+    }
 }

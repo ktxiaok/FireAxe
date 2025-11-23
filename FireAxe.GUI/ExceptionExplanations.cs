@@ -29,6 +29,17 @@ internal static class ExceptionExplanations
             }
             return exception.ToString();
         });
+        manager.Register<ArgumentOutOfRangeException>((exception, arg) =>
+        {
+            if (arg is ExceptionExplanationScene scene)
+            {
+                if (scene == ExceptionExplanationScene.Input)
+                {
+                    return Texts.ValueMustBeWithinValidRange;
+                }
+            }
+            return exception.ToString();
+        });
         manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
         manager.Register<FileNameExistsException>((exception, arg) => Texts.FileNameExists);
         manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.NodePath));

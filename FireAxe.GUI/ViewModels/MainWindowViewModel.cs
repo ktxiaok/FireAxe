@@ -21,7 +21,8 @@ namespace FireAxe.ViewModels;
 public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
 {
     private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
-    private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(15);
+    private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(5);
+    private static TimeSpan BackupInterval = TimeSpan.FromMinutes(1);
 
     private bool _disposed = false;
 
@@ -54,6 +55,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     private string? _lastClipboardText = null;
 
     private IDisposable _autoRedownloadTimer;
+
+    private IDisposable _backupTimer;
 
     public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
     {
@@ -268,6 +271,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             return true;
         }, AutoRedownloadInterval);
 
+        _backupTimer = DispatcherTimer.Run(() =>
+        {
+            BackUpIfNeed();
+            return true;
+        }, BackupInterval);
+        this.WhenAnyValue(x => x.AddonRoot)
+            .Subscribe(_ => BackUpIfNeed());
+
         MessageBus.Current.Listen<AddonNodeJumpMessage>()
             .Subscribe(msg =>
             {
@@ -343,13 +354,13 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _addonRoot.HttpClient = _httpClient;
                 
                 _addonRoot.LoadFile();
-                
+
+                _addonRoot.CheckAsync();
+
                 AddonNodeExplorerViewModel = new(_addonRoot);
             }
 
             this.RaisePropertyChanged();
-
-            _addonRoot?.CheckAsync();
         }
     }
 
@@ -762,6 +773,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
+    public void BackUpIfNeed()
+    {
+        if (!_settings.IsFileBackupEnabled)
+        {
+            return;
+        }
+        AddonRoot?.BackUpIfNeed(_settings.MaxRetainedBackupFileCount, _settings.FileBackupIntervalMinutes);
+    }
+
     public void DummyCrash()
     {
         throw new Exception("dummy crash");
@@ -780,6 +800,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         AddonRoot = null;
         _checkClipboardTimer.Dispose();
         _autoRedownloadTimer.Dispose();
+        _backupTimer.Dispose();
     }
 
     private async Task DeleteRedundantVpkFiles(bool selectedItems = false)

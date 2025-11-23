@@ -8,7 +8,7 @@ namespace FireAxe;
 
 public class AppWindowManager : IAppWindowManager
 {
-    private readonly AppSettingsViewModel _settingsViewModel;
+    private readonly AppSettings _settings;
     private readonly DownloadItemListViewModel _downloadItemListViewModel;
     private readonly HttpClient _httpClient;
 
@@ -21,12 +21,12 @@ public class AppWindowManager : IAppWindowManager
     private WindowReference<AddonProblemListWindow>? _problemListWindowRef = null;
     private WindowReference<VpkAddonConflictListWindow>? _vpkConflictListWindowRef = null;
 
-    public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
+    public AppWindowManager(AppSettings settings, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
     {
-        ArgumentNullException.ThrowIfNull(settingsViewModel);
+        ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
         ArgumentNullException.ThrowIfNull(httpClient);
-        _settingsViewModel = settingsViewModel;
+        _settings = settings;
         _downloadItemListViewModel = downloadItemListViewModel;
         _httpClient = httpClient;
     }
@@ -56,9 +56,10 @@ public class AppWindowManager : IAppWindowManager
 
     public void OpenSettingsWindow()
     {
+        var mainWindowViewModel = MainWindowViewModel;
         OpenWindow(ref _settingsWindowRef, () => new AppSettingsWindow
         {
-            DataContext = _settingsViewModel
+            DataContext = new AppSettingsViewModel(_settings, mainWindowViewModel)
         });
     }
 
