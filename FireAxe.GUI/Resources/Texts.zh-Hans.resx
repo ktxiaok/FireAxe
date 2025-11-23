@@ -972,7 +972,7 @@
   <data name="SetSource" xml:space="preserve">
     <value>设置源</value>
   </data>
-  <data name="AddonCircularRefExplain" xml:space="preserve">
+  <data name="AddonCircularRefProblemExplain" xml:space="preserve">
     <value>出现循环引用。</value>
   </data>
   <data name="ItemsRandomSelectedWithCount" xml:space="preserve">
@@ -1004,5 +1004,26 @@
   </data>
   <data name="AdvancedPanel" xml:space="preserve">
     <value>高级面板</value>
+  </data>
+  <data name="AddonFileNotExist" xml:space="preserve">
+    <value>模组文件不存在。</value>
+  </data>
+  <data name="AddonDownloadFailedProblemExplain" xml:space="preserve">
+    <value>下载失败 ({0})。文件路径：{1}。URL：{2}。</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>下载失败</value>
+  </data>
+  <data name="ProblemList" xml:space="preserve">
+    <value>问题列表</value>
+  </data>
+  <data name="ProblematicAddons" xml:space="preserve">
+    <value>问题模组</value>
+  </data>
+  <data name="ProblemsFoundWithCount" xml:space="preserve">
+    <value>发现{0}个问题。</value>
+  </data>
+  <data name="NoProblemFound" xml:space="preserve">
+    <value>没有发现问题。</value>
   </data>
 </root>

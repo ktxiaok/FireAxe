@@ -8,6 +8,8 @@ public interface IAppWindowManager
 {
     MainWindow? MainWindow { get; }
 
+    MainWindowViewModel MainWindowViewModel { get; }
+
     MainWindow CreateMainWindow(MainWindowViewModel viewModel);
 
     void OpenSettingsWindow();
@@ -16,13 +18,15 @@ public interface IAppWindowManager
 
     void OpenAboutWindow();
 
-    void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel);
+    void OpenProblemListWindow();
 
-    void OpenVpkConflictListWindow(AddonRoot addonRoot);
+    void OpenTagManagerWindow();
 
-    void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel);
+    void OpenVpkConflictListWindow();
 
-    void OpenFileCleanerWindow(AddonRoot addonRoot);
+    void OpenWorkshopVpkFinderWindow();
 
-    void OpenAddonNameAutoSetterWindow(AddonRoot addonRoot);
+    void OpenFileCleanerWindow();
+
+    void OpenAddonNameAutoSetterWindow();
 }

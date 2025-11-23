@@ -37,6 +37,10 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
 
             addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
         });
     }
 

@@ -37,6 +37,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     private readonly Dictionary<Guid, AddonNode> _idToNode = new();
 
+    private int _problemCount = 0;
+
+    private Task? _checkTask = null; 
     private CancellationTokenSource? _checkVpkConflictsCts = null;
     private Task<VpkAddonConflictResult>? _checkVpkConflictsTask = null;
 
@@ -116,6 +119,24 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public ReadOnlyObservableCollection<AddonNode> Nodes => _containerService.Nodes;
 
+    public int ProblemCount
+    {
+        get => _problemCount;
+        internal set => NotifyAndSetIfChanged(ref _problemCount, value);
+    }
+
+    public Task? CheckTask
+    {
+        get => _checkTask;
+        private set => NotifyAndSetIfChanged(ref _checkTask, value);
+    }
+
+    public Task<VpkAddonConflictResult>? CheckVpkConflictsTask
+    {
+        get => _checkVpkConflictsTask;
+        private set => NotifyAndSetIfChanged(ref _checkVpkConflictsTask, value);
+    }
+
     public string DirectoryPath
     {
         get => _directory?.FullName ?? throw new InvalidOperationException($"{nameof(DirectoryPath)} is not set.");
@@ -158,18 +179,6 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     public bool IsAutoCheckEnabled => _blockAutoCheck == 0;
 
     public bool IsAutoUpdateWorkshopItem { get; set; } = true;
-
-    public bool IsCheckingVpkConflicts => CheckVpkConflictsTask is not null;
-
-    private Task<VpkAddonConflictResult>? CheckVpkConflictsTask
-    {
-        get => _checkVpkConflictsTask;
-        set
-        {
-            _checkVpkConflictsTask = value;
-            NotifyChanged(nameof(IsCheckingVpkConflicts));
-        }
-    }
 
     IAddonNodeContainer? IAddonNodeContainer.Parent => null;
 
@@ -344,12 +353,28 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         return _containerService.GetUniqueName(name);
     }
 
-    public void Check()
+    public Task CheckAsync()
     {
         this.ThrowIfInvalid();
 
         this.CheckDescendants();
-        CheckVpkConflictsAsync();
+        var vpkConflictsCheckTask = CheckVpkConflictsAsync();
+
+        var checkTask = Task.WhenAll(vpkConflictsCheckTask);
+        CheckTask = checkTask;
+        checkTask.ContinueWith(_ =>
+        {
+            if (CheckTask == checkTask)
+            {
+                CheckTask = null;
+            }
+
+            if (checkTask.Exception is { } ex)
+            {
+                Log.Error(ex, "Exception occurred during checking the AddonRoot.");
+            }
+        }, TaskScheduler);
+        return checkTask;
     }
 
     public Task<VpkAddonConflictResult> CheckVpkConflictsAsync()
@@ -376,19 +401,13 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             }
         }
 
-        var addonRootTaskScheduler = TaskScheduler;
+        var addonTaskCreator = this.GetValidTaskCreator();
 
-        CheckVpkConflictsTask = Task.Run(async () =>
+        var checkTask = Task.Run(async () =>
         {
             var conflictResult = await rawTask.ConfigureAwait(false);
-            var endingTask = new Task(() =>
+            await addonTaskCreator.StartNew(self =>
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (!IsValid)
-                {
-                    return;
-                }
-
                 if (conflictResult.HasConflict)
                 {
                     foreach (var vpkAddon in conflictResult.ConflictingAddons)
@@ -408,19 +427,23 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                         }
                     }
                 }
-            }, cancellationToken);
-            endingTask.Start(addonRootTaskScheduler);
-            await endingTask.ConfigureAwait(false);
+            }).ConfigureAwait(false);
             return conflictResult;
         }, cancellationToken);
-        CheckVpkConflictsTask.ContinueWith(task =>
+        CheckVpkConflictsTask = checkTask;
+        checkTask.ContinueWith(_ =>
         {
-            if (CheckVpkConflictsTask == task)
+            if (CheckVpkConflictsTask == checkTask)
             {
                 CheckVpkConflictsTask = null;
             }
-        }, addonRootTaskScheduler);
-        return CheckVpkConflictsTask;
+
+            if (checkTask.Exception is { } ex)
+            {
+                Log.Error(ex, "Exception occurred during checking VPK conflicts.");
+            }
+        }, TaskScheduler);
+        return checkTask;
     }
 
     public void CancelCheckVpkConflicts()
@@ -902,6 +925,12 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             CancelCheckVpkConflicts();
 
             var tasks = new List<Task>();
+
+            if (CheckTask is { } checkTask)
+            {
+                tasks.Add(checkTask);
+            }
+
             foreach (var node in Nodes)
             {
                 tasks.Add(node.DestroyAsync());
@@ -910,7 +939,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             _disposed = true;
             NotifyChanged(nameof(IsValid));
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            await TaskUtils.WhenAllIgnoreCanceled(tasks).ConfigureAwait(false);
         }
     }
 

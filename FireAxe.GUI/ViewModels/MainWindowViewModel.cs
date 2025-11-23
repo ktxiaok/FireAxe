@@ -136,39 +136,17 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 AddonNode.LoadSave(nodeSave, addonRoot, importedGroup);
             }
-            addonRoot.Check();
+            _ = addonRoot.CheckAsync();
         }, _addonRootNotNullObservable);
 
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
+        OpenProblemListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenProblemListWindow(), _addonRootNotNullObservable);
         OpenDownloadListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenDownloadListWindow());
-        OpenTagManagerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenTagManagerWindow(this));
-        OpenVpkConflictListWindowCommand = ReactiveCommand.Create(() =>
-        {
-            if (_addonRoot is null)
-            {
-                return;
-            }
-            _windowManager.OpenVpkConflictListWindow(_addonRoot);
-        }, _addonRootNotNullObservable);
-        OpenWorkshopVpkFinderWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenWorkshopVpkFinderWindow(this));
-        OpenFileCleanerWindowCommand = ReactiveCommand.Create(() =>
-        {
-            var addonRoot = AddonRoot;
-            if (addonRoot is null)
-            {
-                return;
-            }
-            _windowManager.OpenFileCleanerWindow(addonRoot);
-        }, _addonRootNotNullObservable);
-        OpenAddonNameAutoSetterWindowCommand = ReactiveCommand.Create(() =>
-        {
-            var addonRoot = AddonRoot;
-            if (addonRoot is null)
-            {
-                return;
-            }
-            _windowManager.OpenAddonNameAutoSetterWindow(addonRoot);
-        }, _addonRootNotNullObservable);
+        OpenTagManagerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenTagManagerWindow(), _addonRootNotNullObservable);
+        OpenVpkConflictListWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenVpkConflictListWindow(), _addonRootNotNullObservable);
+        OpenWorkshopVpkFinderWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenWorkshopVpkFinderWindow());
+        OpenFileCleanerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFileCleanerWindow(), _addonRootNotNullObservable);
+        OpenAddonNameAutoSetterWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAddonNameAutoSetterWindow(), _addonRootNotNullObservable);
 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
@@ -371,7 +349,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
             this.RaisePropertyChanged();
 
-            _addonRoot?.Check();
+            _addonRoot?.CheckAsync();
         }
     }
 
@@ -396,6 +374,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public ReactiveCommand<Unit, Unit> OpenSettingsWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenDownloadListWindowCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenProblemListWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> OpenTagManagerWindowCommand { get; }
 
@@ -557,7 +537,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             return;
         }
         
-        _addonRoot.Check();
+        _ = _addonRoot.CheckAsync();
         try
         {
             _addonRoot.Push();
@@ -582,7 +562,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             return;
         }
 
-        _addonRoot.Check();
+        _addonRoot.CheckAsync();
     }
 
     public void ClearCaches()

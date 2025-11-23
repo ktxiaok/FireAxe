@@ -972,7 +972,7 @@
   <data name="SetSource" xml:space="preserve">
     <value>Set Source</value>
   </data>
-  <data name="AddonCircularRefExplain" xml:space="preserve">
+  <data name="AddonCircularRefProblemExplain" xml:space="preserve">
     <value>There is a circular reference.</value>
   </data>
   <data name="ItemsRandomSelectedWithCount" xml:space="preserve">
@@ -1004,5 +1004,26 @@
   </data>
   <data name="AdvancedPanel" xml:space="preserve">
     <value>Advanced Panel</value>
+  </data>
+  <data name="AddonFileNotExist" xml:space="preserve">
+    <value>Addon file does not exist.</value>
+  </data>
+  <data name="AddonDownloadFailedProblemExplain" xml:space="preserve">
+    <value>Download Failed ({0}). File Path: {1}. URL: {2}.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Download Failed</value>
+  </data>
+  <data name="ProblemList" xml:space="preserve">
+    <value>Problem List</value>
+  </data>
+  <data name="ProblematicAddons" xml:space="preserve">
+    <value>Problematic Addons</value>
+  </data>
+  <data name="ProblemsFoundWithCount" xml:space="preserve">
+    <value>{0} problems found.</value>
+  </data>
+  <data name="NoProblemFound" xml:space="preserve">
+    <value>No problems found.</value>
   </data>
 </root>

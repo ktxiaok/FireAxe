@@ -13,10 +13,12 @@ public class AppWindowManager : IAppWindowManager
     private readonly HttpClient _httpClient;
 
     private MainWindow? _mainWindow = null;
+    private MainWindowViewModel? _mainWindowViewModel = null;
     private WindowReference<AppSettingsWindow>? _settingsWindowRef = null;
     private WindowReference<DownloadItemListWindow>? _downloadItemListWindowRef = null;
     private WindowReference<AboutWindow>? _aboutWindowRef = null;
     private WindowReference<AddonTagManagerWindow>? _tagManagerWindowRef = null;
+    private WindowReference<AddonProblemListWindow>? _problemListWindowRef = null;
     private WindowReference<VpkAddonConflictListWindow>? _vpkConflictListWindowRef = null;
 
     public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
@@ -31,8 +33,20 @@ public class AppWindowManager : IAppWindowManager
 
     public MainWindow? MainWindow => _mainWindow;
 
+    public MainWindowViewModel MainWindowViewModel => _mainWindowViewModel ?? throw new InvalidOperationException($"{nameof(MainWindowViewModel)} is not set.");
+
+    public AddonRoot ActiveAddonRoot => MainWindowViewModel.AddonRoot ?? throw new InvalidOperationException($"No available {nameof(ActiveAddonRoot)}.");
+
     public MainWindow CreateMainWindow(MainWindowViewModel viewModel)
     {
+        ArgumentNullException.ThrowIfNull(viewModel);
+
+        if (_mainWindow is not null)
+        {
+            throw new InvalidOperationException("The main window already exists.");
+        }
+
+        _mainWindowViewModel = viewModel;
         _mainWindow = new MainWindow()
         {
             DataContext = viewModel
@@ -61,28 +75,36 @@ public class AppWindowManager : IAppWindowManager
         OpenWindow(ref _aboutWindowRef, () => new AboutWindow());
     }
 
-    public void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel)
+    public void OpenProblemListWindow()
     {
+        var addonRoot = ActiveAddonRoot;
+        OpenWindow(ref _problemListWindowRef, () => new AddonProblemListWindow
+        {
+            DataContext = new AddonProblemListViewModel(addonRoot)
+        });
+    }
+
+    public void OpenTagManagerWindow()
+    {
+        var mainWindowViewModel = MainWindowViewModel;
         OpenWindow(ref _tagManagerWindowRef, () => new AddonTagManagerWindow()
         {
             DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
         });
     }
 
-    public void OpenVpkConflictListWindow(AddonRoot addonRoot)
+    public void OpenVpkConflictListWindow()
     {
-        ArgumentNullException.ThrowIfNull(addonRoot);
-
+        var addonRoot = ActiveAddonRoot;
         OpenWindow(ref _vpkConflictListWindowRef, () => new VpkAddonConflictListWindow
         {
             DataContext = new VpkAddonConflictListViewModel(addonRoot)
         });
     }
 
-    public void OpenWorkshopVpkFinderWindow(MainWindowViewModel mainWindowViewModel)
+    public void OpenWorkshopVpkFinderWindow()
     {
-        ArgumentNullException.ThrowIfNull(mainWindowViewModel);
-
+        var mainWindowViewModel = MainWindowViewModel;
         var window = new WorkshopVpkFinderWindow
         {
             DataContext = new WorkshopVpkFinderViewModel(mainWindowViewModel, _httpClient)
@@ -90,10 +112,9 @@ public class AppWindowManager : IAppWindowManager
         window.Show();
     }
 
-    public void OpenFileCleanerWindow(AddonRoot addonRoot)
+    public void OpenFileCleanerWindow()
     {
-        ArgumentNullException.ThrowIfNull(addonRoot);
-
+        var addonRoot = ActiveAddonRoot;
         var window = new FileCleanerWindow
         {
             DataContext = new FileCleanerViewModel(addonRoot)
@@ -101,10 +122,9 @@ public class AppWindowManager : IAppWindowManager
         window.Show();
     }
 
-    public void OpenAddonNameAutoSetterWindow(AddonRoot addonRoot)
+    public void OpenAddonNameAutoSetterWindow()
     {
-        ArgumentNullException.ThrowIfNull(addonRoot);
-
+        var addonRoot = ActiveAddonRoot;
         var window = new AddonNameAutoSetterWindow
         {
             DataContext = new AddonNameAutoSetterViewModel(addonRoot)

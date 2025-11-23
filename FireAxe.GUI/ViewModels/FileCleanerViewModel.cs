@@ -215,6 +215,10 @@ public class FileCleanerViewModel : ViewModelBase, IActivatableViewModel, IValid
 
             addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
         });
     }
 

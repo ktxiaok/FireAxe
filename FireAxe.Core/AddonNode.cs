@@ -41,7 +41,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     private string? _customImagePath = null;
 
-    internal readonly ObservableCollection<AddonProblem> _problems = new();
+    private int _lastProblemCountGiveToRoot = 0;
+    private readonly ObservableCollection<AddonProblem> _problems = new();
     private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
     private bool _isBusyChecking = false;
 
@@ -1132,7 +1133,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         _isValid = false;
         NotifyChanged(nameof(IsValid));
 
-        Root.UnregisterNodeId(_id);
+        var root = Root;
+
+        root.ProblemCount -= _lastProblemCountGiveToRoot;
+        root.UnregisterNodeId(_id);
 
         var tasks = new List<Task>();
         _destructionCancellationTokenSource.Cancel();
@@ -1208,6 +1212,20 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 Log.Error(ex, "Exception occurred during AddonNode.CheckFiles.");
             }
         }
+    }
+
+    internal void AddProblem(AddonProblem problem)
+    {
+        this.ThrowIfInvalid();
+
+        _problems.Add(problem);
+    }
+
+    internal void RemoveProblem(AddonProblem problem)
+    {
+        this.ThrowIfInvalid();
+
+        _problems.Remove(problem);
     }
 
     protected virtual long? GetFileSize()
@@ -1370,6 +1388,27 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     private void OnProblemCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        int problemCount;
+        if (this is AddonGroup)
+        {
+            problemCount = 0;
+            foreach (var problem in _problems)
+            {
+                if (problem is AddonChildrenProblem)
+                {
+                    continue;
+                }
+                problemCount++;
+            }
+        }
+        else
+        {
+            problemCount = _problems.Count;
+        }
+        var root = Root;
+        root.ProblemCount = root.ProblemCount - _lastProblemCountGiveToRoot + problemCount;
+        _lastProblemCountGiveToRoot = problemCount;
+
         if (IsAutoCheckEnabled)
         {
             Group?.Check();

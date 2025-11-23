@@ -108,9 +108,9 @@ namespace FireAxe.Resources {
         /// <summary>
         ///   Looks up a localized string similar to There is a circular reference..
         /// </summary>
-        public static string AddonCircularRefExplain {
+        public static string AddonCircularRefProblemExplain {
             get {
-                return ResourceManager.GetString("AddonCircularRefExplain", resourceCulture);
+                return ResourceManager.GetString("AddonCircularRefProblemExplain", resourceCulture);
             }
         }
         
@@ -120,6 +120,24 @@ namespace FireAxe.Resources {
         public static string AddonDependenciesProblemExplain {
             get {
                 return ResourceManager.GetString("AddonDependenciesProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Failed ({0}). File Path: {1}. URL: {2}..
+        /// </summary>
+        public static string AddonDownloadFailedProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonDownloadFailedProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Addon file does not exist..
+        /// </summary>
+        public static string AddonFileNotExist {
+            get {
+                return ResourceManager.GetString("AddonFileNotExist", resourceCulture);
             }
         }
         
@@ -768,6 +786,15 @@ namespace FireAxe.Resources {
         public static string Download {
             get {
                 return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Failed.
+        /// </summary>
+        public static string DownloadFailed {
+            get {
+                return ResourceManager.GetString("DownloadFailed", resourceCulture);
             }
         }
         
@@ -1825,6 +1852,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No problems found..
+        /// </summary>
+        public static string NoProblemFound {
+            get {
+                return ResourceManager.GetString("NoProblemFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Null.
         /// </summary>
         public static string Null {
@@ -2005,11 +2041,38 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Problematic Addons.
+        /// </summary>
+        public static string ProblematicAddons {
+            get {
+                return ResourceManager.GetString("ProblematicAddons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Problem List.
+        /// </summary>
+        public static string ProblemList {
+            get {
+                return ResourceManager.GetString("ProblemList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Problems.
         /// </summary>
         public static string Problems {
             get {
                 return ResourceManager.GetString("Problems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} problems found..
+        /// </summary>
+        public static string ProblemsFoundWithCount {
+            get {
+                return ResourceManager.GetString("ProblemsFoundWithCount", resourceCulture);
             }
         }
         

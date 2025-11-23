@@ -18,6 +18,8 @@ public partial class NewWorkshopCollectionWindow : ReactiveWindow<NewWorkshopCol
     {
         InitializeComponent();
 
+        Closed += NewWorkshopCollectionWindow_Closed;
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
@@ -27,6 +29,10 @@ public partial class NewWorkshopCollectionWindow : ReactiveWindow<NewWorkshopCol
         {
             viewModel.RegisterInvalidHandler(Close)
                 .DisposeWith(disposables);
+            if (!viewModel.IsValid)
+            {
+                return;
+            }
 
             viewModel.CloseRequested += Close;
             Disposable.Create(() => viewModel.CloseRequested -= Close).DisposeWith(disposables);
@@ -42,5 +48,14 @@ public partial class NewWorkshopCollectionWindow : ReactiveWindow<NewWorkshopCol
                 context.SetOutput(Unit.Default);
             }).DisposeWith(disposables);
         });
+    }
+
+    private void NewWorkshopCollectionWindow_Closed(object? sender, EventArgs e)
+    {
+        if (ViewModel is { } viewModel)
+        {
+            ViewModel = null;
+            viewModel.Dispose();
+        }
     }
 }

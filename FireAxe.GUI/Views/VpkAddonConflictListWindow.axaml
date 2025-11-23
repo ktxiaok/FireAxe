@@ -31,18 +31,12 @@
         Orientation="Horizontal">
         <TextBlock
           Text="{x:Static r:Texts.RefreshingHint}"
-          IsVisible="{Binding IsRefreshing}"
+          IsVisible="{Binding RefreshCommand.IsExecuting^, FallbackValue=False}"
           Margin="5"
           VerticalAlignment="Center"/>
         <Button
           Command="{Binding RefreshCommand}"
           Content="{x:Static r:Texts.Refresh}"
-          IsVisible="{Binding !IsRefreshing}"
-          Margin="5"/>
-        <Button
-          Command="{Binding CancelRefreshCommand}"
-          Content="{x:Static r:Texts.CancelRefreshing}"
-          IsVisible="{Binding IsRefreshing}"
           Margin="5"/>
       </StackPanel>
       <TabStrip

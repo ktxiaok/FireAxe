@@ -24,6 +24,10 @@ public partial class AddonNodePickerWindow : ReactiveWindow<AddonNodePickerViewM
         {
             viewModel.RegisterInvalidHandler(Close)
                 .DisposeWith(disposables);
+            if (!viewModel.IsValid)
+            {
+                return;
+            }
 
             void OnCloseRequested() => Close(viewModel.GetSelectedAddons());
             viewModel.CloseRequested += OnCloseRequested;

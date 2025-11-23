@@ -1,0 +1,155 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:v="using:FireAxe.Views"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:conv="using:FireAxe.ValueConverters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+        x:Class="FireAxe.Views.AddonProblemListWindow"
+        x:DataType="vm:AddonProblemListViewModel"
+        Title="{x:Static r:Texts.ProblemList}"
+        Width="800" Height="800"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel
+    Margin="10">
+    <DockPanel.Styles>
+      <Style Selector="TextBlock.EmptyHint">
+        <Setter Property="Text" Value="{x:Static r:Texts.Empty}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="15"/>
+      </Style>
+    </DockPanel.Styles>
+
+    <DockPanel
+      DockPanel.Dock="Top"
+      LastChildFill="False"
+      Margin="0, 0, 0, 5">
+      <TabStrip
+        DockPanel.Dock="Left">
+        <TabStripItem
+          Name="problemsTab"
+          Content="{x:Static r:Texts.Problems}"/>
+        <TabStripItem
+          Name="problematicAddonsTab"
+          Content="{x:Static r:Texts.ProblematicAddons}"/>
+      </TabStrip>
+
+      <StackPanel
+        DockPanel.Dock="Right"
+        Orientation="Horizontal">
+        <StackPanel
+          Orientation="Horizontal"
+          IsVisible="{Binding AddonRoot.ProblemCount, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}">
+          <PathIcon
+            Data="{StaticResource icon_warning}"
+            Foreground="{DynamicResource brush_warning}"/>
+          <Control Width="5"/>
+          <TextBlock
+            Text="{Binding AddonRoot.ProblemCount, StringFormat={x:Static r:Texts.ProblemsFoundWithCount}}"
+            VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel
+          Orientation="Horizontal"
+          IsVisible="{Binding AddonRoot.ProblemCount, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}">
+          <PathIcon
+            Data="{StaticResource icon_checkmark}"
+            Foreground="Green"/>
+          <Control Width="5"/>
+          <TextBlock
+            Text="{x:Static r:Texts.NoProblemFound}"
+            VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Control Width="10"/>
+
+        <TextBlock
+          Text="{x:Static r:Texts.RefreshingHint}"
+          IsVisible="{Binding RefreshCommand.IsExecuting^, FallbackValue=False}"
+          VerticalAlignment="Center"
+          Margin="0, 0, 5, 0"/>
+        <Button
+          Command="{Binding RefreshCommand}"
+          Content="{x:Static r:Texts.Refresh}"/>
+      </StackPanel>
+    </DockPanel>
+
+    <Border
+      BorderBrush="Gray"
+      BorderThickness="2">
+      <ScrollViewer>
+        <Panel>
+          <Panel IsVisible="{Binding #problemsTab.IsSelected}">
+            <ItemsControl
+              ItemsSource="{Binding ProblemViewModels}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Expander
+                    IsExpanded="False"
+                    HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                          Text="{Binding AddonViewModels.Count, StringFormat=({0}) }"
+                          VerticalAlignment="Center"/>
+                        <TextBlock
+                          Text="{Binding Description}"
+                          VerticalAlignment="Center"/>
+                      </StackPanel>
+                    </Expander.Header>
+
+                    <ItemsControl
+                      ItemsSource="{Binding AddonViewModels}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <v:AddonRefView/>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                  </Expander>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <TextBlock
+              Classes="EmptyHint"
+              IsVisible="{Binding ProblemViewModels, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"/>
+          </Panel>
+
+          <Panel IsVisible="{Binding #problematicAddonsTab.IsSelected}">
+            <ItemsControl
+              ItemsSource="{Binding ProblematicAddonViewModels}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <v:AddonRefView/>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <TextBlock
+              Classes="EmptyHint"
+              IsVisible="{Binding ProblematicAddonViewModels, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"/>
+          </Panel>
+        </Panel>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

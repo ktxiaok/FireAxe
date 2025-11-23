@@ -41,6 +41,10 @@ public class AddonNodeDependenciesViewModel : ViewModelBase, IActivatableViewMod
 
             addon.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
 
             addon.DependentAddonIds.ToObservableChangeSet()
                 .Transform(id => new DependencyViewModel(this, id))

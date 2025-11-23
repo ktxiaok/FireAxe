@@ -116,6 +116,10 @@ public class AddonTagEditorViewModel : ViewModelBase, IActivatableViewModel, IVa
 
             addon.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
         });
     }
 

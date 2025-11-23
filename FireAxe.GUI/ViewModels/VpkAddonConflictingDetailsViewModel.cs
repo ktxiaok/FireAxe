@@ -28,9 +28,14 @@ public class VpkAddonConflictingDetailsViewModel : ViewModelBase, IActivatableVi
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             var addon = Addon;
-            var addonRoot = addon.Root;
+            addon.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
 
-            addon.RegisterInvalidHandler(() => IsValid = false).DisposeWith(disposables);
+            var addonRoot = addon.Root;
 
             addon.ConflictingAddonIdsWithFiles
                 .ToObservableChangeSet()

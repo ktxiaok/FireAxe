@@ -12,71 +12,59 @@ using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public class VpkAddonConflictListViewModel : ViewModelBase, IActivatableViewModel, IValidity
+public sealed class VpkAddonConflictListViewModel : ViewModelBase, IActivatableViewModel, IValidity, IDisposable
 {
-    private bool _isValid = true;
+    private bool _disposed = false;
+    private bool _valid = true;
+    private bool _active = false;
 
-    private bool _isActive = false;
-
-    private readonly AddonRoot _addonRoot;
-
-    private ObservableValidRefCollection<VpkAddonConflictingDetailsViewModel>? _vpkConflictingDetailsViewModels = null;
-    private ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> _vpkConflictingDetailsViewModelsReadOnly = ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel>.Empty;
+    private ObservableValidRefCollection<VpkAddonConflictingDetailsViewModel> _vpkConflictingDetailsViewModels = new();
+    private ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> _vpkConflictingDetailsViewModelsReadOnly;
 
     private IEnumerable<ConflictingVpkFileWithAddonsViewModel> _conflictingFileWithAddonsViewModels = [];
 
-    private bool _isRefreshing = false;
-    private object? _refreshId = null;
-    private CancellationTokenSource? _waitRefreshCts = null;
+    private readonly CancellationTokenSource _cts = new();
 
     public VpkAddonConflictListViewModel(AddonRoot addonRoot)
     {
         ArgumentNullException.ThrowIfNull(addonRoot);
-        _addonRoot = addonRoot;
+        AddonRoot = addonRoot;
+
+        _vpkConflictingDetailsViewModelsReadOnly = _vpkConflictingDetailsViewModels.AsReadOnlyObservableCollection();
+
+        RefreshCommand = ReactiveCommand.CreateFromTask(RefreshAsync);
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            _isActive = true;
+            addonRoot.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
 
-            addonRoot.RegisterInvalidHandler(() => IsValid = false).DisposeWith(disposables);
-
-            _vpkConflictingDetailsViewModels = new();
-            VpkConflictingDetailsViewModels = _vpkConflictingDetailsViewModels.AsReadOnlyObservableCollection();
-
-            _ = RefreshAsync();
+            _active = true;
 
             Disposable.Create(() =>
             {
-                _isActive = false;
-
-                CancelWaitRefresh();
-
-                Utils.DisposeAndSetNull(ref _vpkConflictingDetailsViewModels);
-                VpkConflictingDetailsViewModels = ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel>.Empty;
-
-                ConflictingFileWithAddonsViewModels = [];
+                _active = false;
             }).DisposeWith(disposables);
-        });
 
-        RefreshCommand = ReactiveCommand.CreateFromTask(RefreshAsync);
-        CancelRefreshCommand = ReactiveCommand.Create(CancelRefresh);
+            RefreshCommand.Execute().Subscribe();
+        });
     }
 
     public ViewModelActivator Activator { get; } = new();
 
     public bool IsValid
     {
-        get => _isValid;
-        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
+        get => _valid;
+        private set => this.RaiseAndSetIfChanged(ref _valid, value);
     }
 
-    public AddonRoot AddonRoot => _addonRoot;
+    public AddonRoot AddonRoot { get; }
 
-    public ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> VpkConflictingDetailsViewModels
-    {
-        get => _vpkConflictingDetailsViewModelsReadOnly;
-        private set => this.RaiseAndSetIfChanged(ref _vpkConflictingDetailsViewModelsReadOnly, value);
-    }
+    public ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> VpkConflictingDetailsViewModels => _vpkConflictingDetailsViewModelsReadOnly;
 
     public IEnumerable<ConflictingVpkFileWithAddonsViewModel> ConflictingFileWithAddonsViewModels
     {
@@ -84,37 +72,33 @@ public class VpkAddonConflictListViewModel : ViewModelBase, IActivatableViewMode
         private set => this.RaiseAndSetIfChanged(ref _conflictingFileWithAddonsViewModels, value);
     }
 
-    public bool IsRefreshing
-    {
-        get => _isRefreshing;
-        private set => this.RaiseAndSetIfChanged(ref _isRefreshing, value);
-    }
-
     public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
-
-    public ReactiveCommand<Unit, Unit> CancelRefreshCommand { get; }
 
     public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
 
-    public async Task RefreshAsync()
+    public void Dispose()
     {
-        if (!_isActive)
+        if (!_disposed)
         {
-            return;
-        }
-        if (IsRefreshing)
-        {
-            return;
-        }
+            IsValid = false;
 
-        _vpkConflictingDetailsViewModels!.Clear();
+            _vpkConflictingDetailsViewModels.Dispose();
+
+            _cts.Cancel();
+            _cts.Dispose();
+
+            _disposed = true;
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        this.ThrowIfInvalid();
+
+        _vpkConflictingDetailsViewModels.Clear();
         ConflictingFileWithAddonsViewModels = [];
 
-        IsRefreshing = true;
-        _waitRefreshCts ??= new();
-        var cancellationToken = _waitRefreshCts.Token;
-        _refreshId = new();
-        var refreshId = _refreshId;
+        var cancellationToken = _cts.Token;
         var addonRoot = AddonRoot;
 
         VpkAddonConflictResult conflictResult;
@@ -128,56 +112,22 @@ public class VpkAddonConflictListViewModel : ViewModelBase, IActivatableViewMode
         }
         catch (Exception ex)
         {
-            if (_isActive)
+            if (_active)
             {
                 await ShowExceptionInteraction.Handle(ex);
             }
             return;
         }
 
-        if (!_isActive)
-        {
-            return;
-        }
-        if (refreshId != _refreshId)
-        {
-            return;
-        }
-
-        _vpkConflictingDetailsViewModels!.Reset(
-            conflictResult.ConflictingAddons.Select(addon => new VpkAddonConflictingDetailsViewModel(addon)));
-        ConflictingFileWithAddonsViewModels = conflictResult.ConflictingFiles
-            .Select(file => new ConflictingVpkFileWithAddonsViewModel(file, addonRoot, conflictResult.GetConflictingAddons(file).Select(addon => addon.Id)))
-            .ToArray();
-
-        _refreshId = null;
-        IsRefreshing = false;
-    }
-
-    public void CancelRefresh()
-    {
         if (!IsValid)
         {
             return;
         }
-        if (!IsRefreshing)
-        {
-            return;
-        }
 
-        CancelWaitRefresh();
-        AddonRoot.CancelCheckVpkConflicts();
-    }
-
-    private void CancelWaitRefresh()
-    {
-        _refreshId = null;
-        if (_waitRefreshCts is not null)
-        {
-            _waitRefreshCts.Cancel();
-            _waitRefreshCts.Dispose();
-            _waitRefreshCts = null;
-        }
-        IsRefreshing = false;
+        _vpkConflictingDetailsViewModels.Reset(
+            conflictResult.ConflictingAddons.Select(addon => new VpkAddonConflictingDetailsViewModel(addon)));
+        ConflictingFileWithAddonsViewModels = conflictResult.ConflictingFiles
+            .Select(file => new ConflictingVpkFileWithAddonsViewModel(file, addonRoot, conflictResult.GetConflictingAddons(file).Select(addon => addon.Id)))
+            .ToArray();
     }
 }

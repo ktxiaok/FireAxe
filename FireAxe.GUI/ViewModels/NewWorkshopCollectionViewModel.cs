@@ -11,7 +11,7 @@ using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.ViewModels;
 
-public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewModel, IValidity
+public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewModel, IValidity, IDisposable
 {
     private readonly AddonRoot _addonRoot;
     private readonly ValidRef<AddonGroup>? _addonGroupRef = null;
@@ -22,10 +22,9 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
     private CancellationTokenSource? _createCts = null;
 
     private bool _created = false;
-
     private bool _active = false;
-
-    private bool _isValid = true;
+    private bool _valid = true;
+    private bool _disposed = false;
 
     public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup)
     {
@@ -36,22 +35,23 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
             _addonGroupRef = new(addonGroup);
         }
 
-        CreateCommand = ReactiveCommand.CreateFromTask(Create);
+        CreateCommand = ReactiveCommand.CreateFromTask(CreateAsync);
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            _active = true;
-
             _addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
+
+            _active = true;
 
             Disposable.Create(() =>
             {
                 _active = false;
-
-                CancelCreate();
-            })
-            .DisposeWith(disposables);
+            }).DisposeWith(disposables);
         });
     }
 
@@ -61,8 +61,8 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
 
     public bool IsValid
     {
-        get => _isValid;
-        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
+        get => _valid;
+        private set => this.RaiseAndSetIfChanged(ref _valid, value);
     }
 
     public string CollectionId
@@ -83,7 +83,19 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
 
     public Interaction<Unit, Unit> ShowCreateFailedInteraction { get; } = new();
 
-    public void CancelCreate()
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            IsValid = false;
+
+            CancelCreate();
+
+            _disposed = true;
+        }
+    }
+    
+    private void CancelCreate()
     {
         if (_createCts is not null)
         {
@@ -93,8 +105,10 @@ public class NewWorkshopCollectionViewModel : ViewModelBase, IActivatableViewMod
         }
     }
 
-    private async Task Create()
+    private async Task CreateAsync()
     {
+        this.ThrowIfInvalid();
+
         if (_created)
         {
             return;

@@ -37,6 +37,10 @@ public partial class AddonNameAutoSetterWindow : ReactiveWindow<AddonNameAutoSet
     {
         viewModel.RegisterInvalidHandler(Close)
             .DisposeWith(disposables);
+        if (!viewModel.IsValid)
+        {
+            return;
+        }
 
         viewModel.ShowNoItemsToStartInteraction.RegisterHandler(async context =>
         {

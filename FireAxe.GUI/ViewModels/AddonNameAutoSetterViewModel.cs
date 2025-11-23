@@ -107,6 +107,10 @@ public sealed class AddonNameAutoSetterViewModel : ViewModelBase, IActivatableVi
 
             addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
         });
     }
 

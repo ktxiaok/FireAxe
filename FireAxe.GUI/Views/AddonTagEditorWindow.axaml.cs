@@ -30,6 +30,10 @@ public partial class AddonTagEditorWindow : ReactiveWindow<AddonTagEditorViewMod
     {
         viewModel.RegisterInvalidHandler(Close)
             .DisposeWith(disposables);
+        if (!viewModel.IsValid)
+        {
+            return;
+        }
 
         viewModel.AddTagInteraction.RegisterHandler(async (context) =>
         {

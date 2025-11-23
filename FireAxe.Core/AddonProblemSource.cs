@@ -5,8 +5,9 @@ namespace FireAxe;
 public class AddonProblemSource : ProblemSource
 {
     public AddonProblemSource(AddonNode addon)
-        : base(problem => addon._problems.Add((AddonProblem)problem), problem => addon._problems.Remove((AddonProblem)problem))
+        : base(problem => addon.AddProblem((AddonProblem)problem), problem => addon.RemoveProblem((AddonProblem)problem))
     {
+        ArgumentNullException.ThrowIfNull(addon);
         Addon = addon;
     }
 

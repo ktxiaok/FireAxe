@@ -1,23 +1,23 @@
 using System;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FireAxe.ViewModels;
 using ReactiveUI;
-using System.Reactive;
 using ReactiveUI.Avalonia;
-using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 
-public partial class VpkAddonConflictListWindow : ReactiveWindow<VpkAddonConflictListViewModel>
+public partial class AddonProblemListWindow : ReactiveWindow<AddonProblemListViewModel>
 {
-    public VpkAddonConflictListWindow()
+    public AddonProblemListWindow()
     {
         InitializeComponent();
 
-        Closed += VpkAddonConflictListWindow_Closed;
+        Closed += AddonProblemListWindow_Closed;
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -41,11 +41,11 @@ public partial class VpkAddonConflictListWindow : ReactiveWindow<VpkAddonConflic
         });
     }
 
-    private void VpkAddonConflictListWindow_Closed(object? sender, EventArgs e)
+    private void AddonProblemListWindow_Closed(object? sender, EventArgs e)
     {
-        if (DataContext is VpkAddonConflictListViewModel viewModel)
+        if (ViewModel is { } viewModel)
         {
-            DataContext = null;
+            ViewModel = null;
             viewModel.Dispose();
         }
     }
