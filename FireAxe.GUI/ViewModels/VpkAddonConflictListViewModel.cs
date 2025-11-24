@@ -17,6 +17,7 @@ public sealed class VpkAddonConflictListViewModel : ViewModelBase, IActivatableV
     private bool _disposed = false;
     private bool _valid = true;
     private bool _active = false;
+    private bool _refreshing = false;
 
     private ObservableValidRefCollection<VpkAddonConflictingDetailsViewModel> _vpkConflictingDetailsViewModels = new();
     private ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> _vpkConflictingDetailsViewModelsReadOnly;
@@ -64,6 +65,12 @@ public sealed class VpkAddonConflictListViewModel : ViewModelBase, IActivatableV
 
     public AddonRoot AddonRoot { get; }
 
+    public bool IsRefreshing
+    {
+        get => _refreshing;
+        private set => this.RaiseAndSetIfChanged(ref _refreshing, value);
+    }
+
     public ReadOnlyObservableCollection<VpkAddonConflictingDetailsViewModel> VpkConflictingDetailsViewModels => _vpkConflictingDetailsViewModelsReadOnly;
 
     public IEnumerable<ConflictingVpkFileWithAddonsViewModel> ConflictingFileWithAddonsViewModels
@@ -95,39 +102,52 @@ public sealed class VpkAddonConflictListViewModel : ViewModelBase, IActivatableV
     {
         this.ThrowIfInvalid();
 
-        _vpkConflictingDetailsViewModels.Clear();
-        ConflictingFileWithAddonsViewModels = [];
+        if (IsRefreshing)
+        {
+            return;
+        }
 
-        var cancellationToken = _cts.Token;
-        var addonRoot = AddonRoot;
-
-        VpkAddonConflictResult conflictResult;
+        IsRefreshing = true;
         try
         {
-            conflictResult = await addonRoot.CheckVpkConflictsAsync().WaitAsync(cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        catch (Exception ex)
-        {
-            if (_active)
+            _vpkConflictingDetailsViewModels.Clear();
+            ConflictingFileWithAddonsViewModels = [];
+
+            var cancellationToken = _cts.Token;
+            var addonRoot = AddonRoot;
+
+            VpkAddonConflictResult conflictResult;
+            try
             {
-                await ShowExceptionInteraction.Handle(ex);
+                conflictResult = await addonRoot.CheckVpkAddonConflictsAsync().WaitAsync(cancellationToken);
             }
-            return;
-        }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                if (_active)
+                {
+                    await ShowExceptionInteraction.Handle(ex);
+                }
+                return;
+            }
 
-        if (!IsValid)
+            if (!IsValid)
+            {
+                return;
+            }
+
+            _vpkConflictingDetailsViewModels.Reset(
+                conflictResult.ConflictingAddons.Select(addon => new VpkAddonConflictingDetailsViewModel(addon)));
+            ConflictingFileWithAddonsViewModels = conflictResult.ConflictingFiles
+                .Select(file => new ConflictingVpkFileWithAddonsViewModel(file, addonRoot, conflictResult.GetConflictingAddons(file).Select(addon => addon.Id)))
+                .ToArray();
+        }
+        finally
         {
-            return;
+            IsRefreshing = false;
         }
-
-        _vpkConflictingDetailsViewModels.Reset(
-            conflictResult.ConflictingAddons.Select(addon => new VpkAddonConflictingDetailsViewModel(addon)));
-        ConflictingFileWithAddonsViewModels = conflictResult.ConflictingFiles
-            .Select(file => new ConflictingVpkFileWithAddonsViewModel(file, addonRoot, conflictResult.GetConflictingAddons(file).Select(addon => addon.Id)))
-            .ToArray();
     }
 }

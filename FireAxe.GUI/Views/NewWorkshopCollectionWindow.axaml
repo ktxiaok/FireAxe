@@ -4,40 +4,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:r="using:FireAxe.Resources"
         xmlns:vm="using:FireAxe.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="180"
         x:Class="FireAxe.Views.NewWorkshopCollectionWindow"
         x:DataType="vm:NewWorkshopCollectionViewModel"
         Title="{x:Static r:Texts.WorkshopCollection}"
-        WindowStartupLocation="CenterScreen"
-        SizeToContent="WidthAndHeight">
-  <Grid
-    RowDefinitions="Auto, Auto, Auto"
-    ColumnDefinitions="Auto, 40, Auto"
+        Width="500" Height="180"
+        WindowStartupLocation="CenterScreen">
+  <StackPanel
+    Orientation="Vertical"
+    VerticalAlignment="Center"
     Margin="10">
-    <TextBlock
-      Grid.Row="0" Grid.Column="0"
-      Text="{x:Static r:Texts.CollectionId}"
-      Classes="PropertyName"/>
-    <TextBox
-      Grid.Row="0" Grid.Column="2"
-      Text="{Binding CollectionId}"
+    <DockPanel>
+      <TextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.CollectionId}"
+        Classes="PropertyName"/>
+      <TextBox
+        Text="{Binding CollectionId}"
+        Classes="PropertyValue"
+        Width="300"/>
+    </DockPanel>
+    
+    <DockPanel>
+      <TextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.IncludeLinkedCollections}"
+        Classes="PropertyName"/>
+      <CheckBox
+        IsChecked="{Binding IncludeLinkedCollections}"
+        Classes="PropertyValue"/>
+    </DockPanel>
+    
+    <StackPanel
+      Orientation="Horizontal"
       HorizontalAlignment="Right"
-      Margin="0, 5, 0, 5"
-      Width="300"/>
-    
-    <TextBlock
-      Grid.Row="1" Grid.Column="0"
-      Text="{x:Static r:Texts.IncludeLinkedCollections}"
-      Classes="PropertyName"/>
-    <CheckBox
-      Grid.Row="1" Grid.Column="2"
-      IsChecked="{Binding IncludeLinkedCollections}"
-      Classes="PropertyValue"/>
-    
-    <Button
-      Grid.Row="2" Grid.Column="2"
-      Content="{x:Static r:Texts.Create}"
-      Command="{Binding CreateCommand}"
-      HorizontalAlignment="Right"/>
-  </Grid>
+      Margin="0, 5, 0, 5">
+      <TextBlock
+        Text="{x:Static r:Texts.Creating}"
+        IsVisible="{Binding IsCreating, FallbackValue=False}"
+        VerticalAlignment="Center"/>
+      <Control Width="10"/>
+      <Button
+        Content="{x:Static r:Texts.Create}"
+        Command="{Binding CreateCommand}"/>
+    </StackPanel>
+  </StackPanel>
 </Window>

@@ -31,7 +31,7 @@
         Orientation="Horizontal">
         <TextBlock
           Text="{x:Static r:Texts.RefreshingHint}"
-          IsVisible="{Binding RefreshCommand.IsExecuting^, FallbackValue=False}"
+          IsVisible="{Binding IsRefreshing, FallbackValue=False}"
           Margin="5"
           VerticalAlignment="Center"/>
         <Button

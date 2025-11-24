@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="ExportedAssets\**" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <AvaloniaResource Remove="Assets\CommonResources.axaml" />
     <AvaloniaResource Remove="Assets\Texts.resx" />
   </ItemGroup>

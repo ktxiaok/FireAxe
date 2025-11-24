@@ -10,6 +10,11 @@ using System.IO;
 using System.Net;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
+using System.Collections.Frozen;
+using System.Reactive;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace FireAxe;
 
@@ -17,6 +22,8 @@ namespace FireAxe;
 public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
 {
     public const string SettingsFileName = "Settings.json";
+
+    public const string CustomVpkAddonConflictIgnoringFilesDirectoryName = "CustomVpkAddonConflictIgnoringFiles";
 
     private static readonly JsonSerializerSettings s_jsonSettings = new()
     {
@@ -30,12 +37,17 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private bool _disposed = false;
     private CompositeDisposable _disposables = new();
 
+    private readonly App _app;
+
+    private readonly string _settingsFilePath;
+
     private AddonNodeSortMethod _addonNodeSortMethod = AddonNodeSortMethod.None;
     private bool _isAddonNodeAscendingOrder = true;
     private AddonNodeListItemViewKind _addonNodeListItemViewKind = AddonNodeListItemViewKind.MediumTile;
     private string? _lastOpenDirectory = null;
     private string? _language = null;
     private string _gamePath = "";
+    private bool _ignoreHalfLife2FilesForVpkAddonConflicts = true;
     private bool _isAutoUpdateWorkshopItem = true;
     private string? _suppressedUpdateRequestVersion = null;
     private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
@@ -46,9 +58,9 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private int _maxRetainedBackupFileCount = 25;
     private int _fileBackupIntervalMinutes = 30;
 
-    private string _settingsFilePath;
-
-    private readonly App _app;
+    private FrozenSet<string>? _customVpkAddonConflictIgnoringFiles = null;
+    private readonly object _customVpkAddonConflictIgnoringFilesLock = new();
+    private bool _isLoadingCustomVpkAddonConflictIgnoringFiles = false;
 
     public AppSettings(App app)
     {
@@ -64,10 +76,37 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
         this.WhenAnyValue(x => x.ColorTheme)
             .Subscribe(_ => RequestSave = true);
 
+        LoadCustomVpkAddonConflictIgnoringFilesCommand = ReactiveCommand.CreateFromTask(LoadCustomVpkAddonConflictIgnoringFilesAsync);
+
         LoadFile();
+        LoadCustomVpkAddonConflictIgnoringFilesCommand.Execute().Subscribe();
     }
 
     public bool RequestSave { get; set; } = true;
+
+    public string SettingsFilePath => _settingsFilePath;
+
+    public string CustomVpkAddonConflictIgnoringFilesDirectoryPath => Path.Join(_app.DocumentDirectoryPath, CustomVpkAddonConflictIgnoringFilesDirectoryName);
+
+    public IReadOnlySet<string>? CustomVpkAddonConflictIgnoringFiles
+    {
+        get
+        {
+            IReadOnlySet<string>? result = null;
+            if (Monitor.TryEnter(_customVpkAddonConflictIgnoringFilesLock))
+            {
+                result = _customVpkAddonConflictIgnoringFiles;
+                Monitor.Exit(_customVpkAddonConflictIgnoringFilesLock);
+            }
+            return result;
+        }
+    }
+
+    public bool IsLoadingCustomVpkAddonConflictIgnoringFiles
+    {
+        get => _isLoadingCustomVpkAddonConflictIgnoringFiles;
+        private set => NotifyAndSetIfChanged(ref _isLoadingCustomVpkAddonConflictIgnoringFiles, value);
+    }
 
     [JsonProperty]
     public AddonNodeSortMethod AddonNodeSortMethod
@@ -206,6 +245,19 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             _gamePath = value;
             NotifyChanged();
             RequestSave = true;
+        }
+    }
+
+    [JsonProperty]
+    public bool IgnoreHalfLife2FilesForVpkAddonConflicts
+    {
+        get => _ignoreHalfLife2FilesForVpkAddonConflicts;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref _ignoreHalfLife2FilesForVpkAddonConflicts, value))
+            {
+                RequestSave = true;
+            }
         }
     }
 
@@ -355,6 +407,87 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             NotifyChanged();
 
             RequestSave = true;
+        }
+    }
+
+    public ReactiveCommand<Unit, IReadOnlySet<string>?> LoadCustomVpkAddonConflictIgnoringFilesCommand { get; }
+
+    public IReadOnlySet<string>? WaitCustomVpkAddonConflictIgnoringFiles()
+    {
+        lock (_customVpkAddonConflictIgnoringFilesLock)
+        {
+            return _customVpkAddonConflictIgnoringFiles;
+        }
+    }
+
+    private async Task<IReadOnlySet<string>?> LoadCustomVpkAddonConflictIgnoringFilesAsync()
+    {
+        if (IsLoadingCustomVpkAddonConflictIgnoringFiles)
+        {
+            return await Task.Run(WaitCustomVpkAddonConflictIgnoringFiles);
+        }
+
+        IsLoadingCustomVpkAddonConflictIgnoringFiles = true;
+        try
+        {
+            var dirPath = CustomVpkAddonConflictIgnoringFilesDirectoryPath;
+
+            var oldValue = CustomVpkAddonConflictIgnoringFiles;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    lock (_customVpkAddonConflictIgnoringFilesLock)
+                    {
+                        _customVpkAddonConflictIgnoringFiles = null;
+                        _customVpkAddonConflictIgnoringFiles = FrozenSet.ToFrozenSet(LoadCustomVpkAddonConflictIgnoringFiles(dirPath));
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during loading custom VPK addon conflict ignoring files.");
+            }
+            var newValue = CustomVpkAddonConflictIgnoringFiles;
+            if (oldValue != newValue)
+            {
+                NotifyChanged(nameof(CustomVpkAddonConflictIgnoringFiles));
+            }
+            return newValue;
+        }
+        finally
+        {
+            IsLoadingCustomVpkAddonConflictIgnoringFiles = false;
+        }
+    }
+
+    private static IEnumerable<string> LoadCustomVpkAddonConflictIgnoringFiles(string dirPath)
+    {
+        if (!Directory.Exists(dirPath))
+        {
+            yield break;
+        }
+        foreach (var file in Directory.EnumerateFiles(dirPath))
+        {
+            if (!file.EndsWith(".txt"))
+            {
+                continue;
+            }
+            var fileName = Path.GetFileName(file);
+            if (fileName == "readme.txt")
+            {
+                continue;
+            }
+
+            using (var reader = File.OpenText(file))
+            {
+                string? line;
+                while ((line = reader.ReadLine()) is not null)
+                {
+                    line = line.Trim().Replace('\\', '/');
+                    yield return line;
+                }
+            }
         }
     }
 

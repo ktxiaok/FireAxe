@@ -9,11 +9,11 @@
         xmlns:me="using:FireAxe.MarkupExtensions"
         xmlns:dt="using:FireAxe.DataTemplates"
         xmlns:local="using:FireAxe"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="750"
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
-        Width="600" Height="600"
+        Width="600" Height="750"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
@@ -22,6 +22,24 @@
     <StackPanel
       Orientation="Vertical"
       Margin="10">
+      <!--settings file location note-->
+      <DockPanel
+        LastChildFill="False"
+        Margin="0, 5, 0, 5">
+        <SelectableTextBlock
+          DockPanel.Dock="Left"
+          Text="{Binding Settings.SettingsFilePath, StringFormat={x:Static r:Texts.AppSettingsFileLocationNote}}"
+          TextWrapping="Wrap"
+          TextAlignment="Left"
+          MaxWidth="400"
+          VerticalAlignment="Center"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding ShowSettingsFileCommand}"
+          Content="{x:Static r:Texts.Open}"/>
+      </DockPanel>
+
       <!--language-->
       <DockPanel>
         <StackPanel
@@ -78,6 +96,46 @@
           Content="{x:Static r:Texts.Find}"
           Margin="5"/>
       </StackPanel>
+
+      <!--ignore Half Life 2 files for VPK addon conficts-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Text="{x:Static r:Texts.IgnoreHalfLife2FilesForVpkAddonConflicts}"
+          Classes="PropertyName"/>
+        <CheckBox
+          IsChecked="{Binding Settings.IgnoreHalfLife2FilesForVpkAddonConflicts}"
+          Classes="PropertyValue"/>
+      </DockPanel>
+
+      <!--customize VPK addon conflict ignoring files note-->
+      <DockPanel
+        LastChildFill="False"
+        Margin="0, 5, 0, 5">
+        <SelectableTextBlock
+          DockPanel.Dock="Left"
+          Text="{Binding Settings.CustomVpkAddonConflictIgnoringFilesDirectoryPath, StringFormat={x:Static r:Texts.CustomizeVpkAddonConflictIgnoringFilesNote}}"
+          TextWrapping="Wrap"
+          TextAlignment="Left"
+          MaxWidth="400"
+          VerticalAlignment="Center"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding OpenCustomVpkAddonConflictIgnoringFilesDirectory}"
+          Content="{x:Static r:Texts.Open}"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding Settings.LoadCustomVpkAddonConflictIgnoringFilesCommand}"
+          Content="{x:Static r:Texts.Refresh}"/>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Text="{x:Static r:Texts.RefreshingHint}"
+          IsVisible="{Binding Settings.IsLoadingCustomVpkAddonConflictIgnoringFiles, FallbackValue=False}"
+          VerticalAlignment="Center"
+          Margin="10, 0, 10, 0"/>
+      </DockPanel>
 
       <!--workshop item auto update-->
       <DockPanel>

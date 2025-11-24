@@ -80,6 +80,10 @@ public partial class App : Application
                     ShutdownRequested?.Invoke();
 
                     args.Cancel = true;
+                    foreach (var window in desktop.Windows)
+                    {
+                        window.Close();
+                    }
                     services.DisposeAsync()
                         .AsTask()
                         .ContinueWith(task =>

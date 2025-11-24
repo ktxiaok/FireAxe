@@ -22,6 +22,8 @@ public static class AppGlobal
 
     public static string VersionString => Version.ToString(3);
 
+    public const string ExportedAssetsDirectoryName = "ExportedAssets";
+
     public static async Task<string?> GetLatestVersionAsync(HttpClient httpClient, CancellationToken cancellationToken)
     {
         var url = GitHubApiUrl + "/releases/latest";

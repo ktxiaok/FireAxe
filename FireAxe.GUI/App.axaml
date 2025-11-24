@@ -55,6 +55,12 @@
       <Setter Property="Margin" Value="0, 5, 0, 5"/>
     </Style>
 
+    <Style Selector="TextBox.PropertyValue">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0, 5, 0, 5"/>
+    </Style>
+
     <Style Selector="v|EditableTextBlock.PropertyValue">
       <Setter Property="HorizontalAlignment" Value="Right"/>
       <Setter Property="VerticalAlignment" Value="Center"/>

@@ -1044,4 +1044,18 @@
   <data name="ValueMustBeWithinValidRange" xml:space="preserve">
     <value>值必须在有效范围内。</value>
   </data>
+  <data name="Creating" xml:space="preserve">
+    <value>创建中...</value>
+  </data>
+  <data name="AppSettingsFileLocationNote" xml:space="preserve">
+    <value>设置文件位于：
+“{0}”</value>
+  </data>
+  <data name="IgnoreHalfLife2FilesForVpkAddonConflicts" xml:space="preserve">
+    <value>VPK冲突忽略半条命2文件</value>
+  </data>
+  <data name="CustomizeVpkAddonConflictIgnoringFilesNote" xml:space="preserve">
+    <value>你可以在此目录中自定义VPK冲突忽略文件：
+{0}</value>
+  </data>
 </root>

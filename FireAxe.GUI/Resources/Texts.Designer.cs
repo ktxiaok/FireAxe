@@ -286,6 +286,16 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The settings file is located at: 
+        ///&quot;{0}&quot;.
+        /// </summary>
+        public static string AppSettingsFileLocationNote {
+            get {
+                return ResourceManager.GetString("AppSettingsFileLocationNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ascending.
         /// </summary>
         public static string Ascending {
@@ -619,6 +629,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Creating....
+        /// </summary>
+        public static string Creating {
+            get {
+                return ResourceManager.GetString("Creating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creation Time: .
         /// </summary>
         public static string CreationTimeColon {
@@ -642,6 +661,16 @@ namespace FireAxe.Resources {
         public static string CustomizePreviewImage {
             get {
                 return ResourceManager.GetString("CustomizePreviewImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can customize VPK addon conflict ignoring files in this directory: 
+        ///{0}.
+        /// </summary>
+        public static string CustomizeVpkAddonConflictIgnoringFilesNote {
+            get {
+                return ResourceManager.GetString("CustomizeVpkAddonConflictIgnoringFilesNote", resourceCulture);
             }
         }
         
@@ -1461,6 +1490,15 @@ namespace FireAxe.Resources {
         public static string IgnoreCase {
             get {
                 return ResourceManager.GetString("IgnoreCase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore Half Life 2 Files for VPK addon conflicts.
+        /// </summary>
+        public static string IgnoreHalfLife2FilesForVpkAddonConflicts {
+            get {
+                return ResourceManager.GetString("IgnoreHalfLife2FilesForVpkAddonConflicts", resourceCulture);
             }
         }
         

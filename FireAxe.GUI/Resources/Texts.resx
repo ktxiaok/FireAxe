@@ -1044,4 +1044,18 @@
   <data name="ValueMustBeWithinValidRange" xml:space="preserve">
     <value>The value must be within the valid range.</value>
   </data>
+  <data name="Creating" xml:space="preserve">
+    <value>Creating...</value>
+  </data>
+  <data name="AppSettingsFileLocationNote" xml:space="preserve">
+    <value>The settings file is located at: 
+"{0}"</value>
+  </data>
+  <data name="IgnoreHalfLife2FilesForVpkAddonConflicts" xml:space="preserve">
+    <value>Ignore Half Life 2 Files for VPK addon conflicts</value>
+  </data>
+  <data name="CustomizeVpkAddonConflictIgnoringFilesNote" xml:space="preserve">
+    <value>You can customize VPK addon conflict ignoring files in this directory: 
+{0}</value>
+  </data>
 </root>

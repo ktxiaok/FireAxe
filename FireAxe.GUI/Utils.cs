@@ -5,6 +5,7 @@ using ReactiveUI;
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
@@ -49,7 +50,7 @@ internal static class Utils
         }
     }
 
-    public static void ShowInFileExplorer(string path)
+    public static void ShowInFileExplorer(string path, bool openDir = false)
     {
         ArgumentNullException.ThrowIfNull(path);
 
@@ -58,11 +59,16 @@ internal static class Utils
             if (OperatingSystem.IsWindows())
             {
                 path = path.Replace('/', '\\');
-                using var process = Process.Start(new ProcessStartInfo()
+                string processArgs;
+                if (openDir && Directory.Exists(path))
                 {
-                    FileName = "explorer.exe",
-                    Arguments = $" /select, {path}"
-                });
+                    processArgs = path;
+                }
+                else
+                {
+                    processArgs = $"/select, {path}";
+                }
+                using var process = Process.Start("explorer.exe", processArgs);
             }
         }
         catch (Exception ex)

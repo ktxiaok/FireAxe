@@ -5,6 +5,56 @@ using System.Collections.Immutable;
 
 namespace FireAxe;
 
+public interface IVpkAddonConflictIgnoringFileSet
+{
+    bool ShouldIgnore(string file);
+}
+
+public class VpkAddonConflictIgnoringFileSet : IVpkAddonConflictIgnoringFileSet
+{
+    private readonly IReadOnlySet<string>[] _sets;
+    private readonly Func<IReadOnlySet<string>?>[] _setProviders;
+
+    public VpkAddonConflictIgnoringFileSet(IEnumerable<IReadOnlySet<string>> sets, IEnumerable<Func<IReadOnlySet<string>?>>? setProviders = null)
+    {
+        ArgumentNullException.ThrowIfNull(sets);
+        setProviders ??= [];
+
+        _sets = [.. sets];
+        _setProviders = [.. setProviders];
+    }
+
+    public static VpkAddonConflictIgnoringFileSet Empty { get; } = new([]);
+    
+    public bool ShouldIgnore(string file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+
+        foreach (var set in _sets)
+        {
+            if (set.Contains(file))
+            {
+                return true;
+            }
+        }
+        foreach (var setProvider in _setProviders)
+        {
+            if (setProvider()?.Contains(file) ?? false)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+public class VpkAddonConflictCheckSettings
+{
+    public IVpkAddonConflictIgnoringFileSet IgnoringFileSet { get; init; } = VpkAddonConflictIgnoringFileSet.Empty;
+
+    public static VpkAddonConflictCheckSettings Default { get; } = new();
+}
+
 public static class AddonConflictUtils
 {
     private static readonly FrozenSet<string> s_commonIgnoringVpkFiles = FrozenSet.ToFrozenSet([
@@ -13,9 +63,10 @@ public static class AddonConflictUtils
         "scripts/vscripts/mapspawn_addon.nut", "scripts/vscripts/response_testbed_addon.nut", "scripts/vscripts/scriptedmode_addon.nut", "scripts/vscripts/director_base_addon.nut"
     ]);
 
-    public static Task<VpkAddonConflictResult> FindVpkConflicts(IEnumerable<AddonNode> addons, CancellationToken cancellationToken = default)
+    public static Task<VpkAddonConflictResult> CheckVpkConflictsAsync(IEnumerable<AddonNode> addons, VpkAddonConflictCheckSettings? settings = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(addons);
+        settings ??= VpkAddonConflictCheckSettings.Default;
 
         var vpkItems = new List<VpkItem>();
         foreach (var addon in addons.SelectMany(addon => addon.GetAllNodesEnabledInHierarchy()))
@@ -37,13 +88,20 @@ public static class AddonConflictUtils
                 foreach (var vpkItem in vpkItems)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+
                     var vpkPath = vpkItem.VpkPath;
                     if (!File.Exists(vpkPath))
                     {
                         continue;
                     }
+
                     using var pak = new Package();
                     pak.Read(vpkPath);
+                    if (pak.Entries is null)
+                    {
+                        continue;
+                    }
+
                     var addon = vpkItem.Addon;
                     var priority = vpkItem.Priority;
                     if (!priorityGroups.TryGetValue(priority, out var priorityGroup))
@@ -52,13 +110,15 @@ public static class AddonConflictUtils
                         priorityGroups[priority] = priorityGroup;
                     }
                     var (fileToAddons, addonToFiles) = priorityGroup;
+
                     foreach (var pakEntries in pak.Entries.Values)
                     {
                         foreach (var pakEntry in pakEntries)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
+
                             string file = pakEntry.GetFullPath();
-                            if (s_commonIgnoringVpkFiles.Contains(file) || vpkItem.IgnoredFiles.Contains(file))
+                            if (s_commonIgnoringVpkFiles.Contains(file) || vpkItem.IgnoredFiles.Contains(file) || settings.IgnoringFileSet.ShouldIgnore(file))
                             {
                                 continue;
                             }

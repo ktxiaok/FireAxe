@@ -33,6 +33,7 @@ public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewM
     private bool _disposed = false;
     private bool _valid = true;
     private bool _active = false;
+    private bool _refreshing = false;
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -79,6 +80,12 @@ public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewM
 
     public AddonRoot AddonRoot { get; }
 
+    public bool IsRefreshing
+    {
+        get => _refreshing;
+        private set => this.RaiseAndSetIfChanged(ref _refreshing, value);
+    }
+
     public IEnumerable<AddonNodeSimpleViewModel> ProblematicAddonViewModels
     {
         get => _problematicAddonViewModels;
@@ -99,62 +106,75 @@ public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewM
     {
         this.ThrowIfInvalid();
 
-        ProblematicAddonViewModels = [];
-        ProblemViewModels = [];
-        var cancellationToken = _cts.Token;
-        var addonRoot = AddonRoot;
-        
-        try
-        {
-            await addonRoot.CheckAsync().WaitAsync(cancellationToken);
-        }
-        catch (OperationCanceledException)
+        if (IsRefreshing)
         {
             return;
         }
-        catch (Exception ex)
+
+        IsRefreshing = true;
+        try
         {
-            if (_active)
+            ProblematicAddonViewModels = [];
+            ProblemViewModels = [];
+            var cancellationToken = _cts.Token;
+            var addonRoot = AddonRoot;
+
+            try
             {
-                await ShowExceptionInteraction.Handle(ex);
+                await addonRoot.CheckAsync().WaitAsync(cancellationToken);
             }
-        }
-
-        var problematicAddonViewModels = new List<AddonNodeSimpleViewModel>();
-        var problemToAddons = new Dictionary<Type, List<AddonNode>>();
-        foreach (var addon in addonRoot.GetDescendants())
-        {
-            var problems = addon.Problems;
-
-            if (problems.Count == 0)
+            catch (OperationCanceledException)
             {
-                continue;
+                return;
             }
-            if (addon is AddonGroup && problems is [AddonChildrenProblem _])
+            catch (Exception ex)
             {
-                continue;
+                if (_active)
+                {
+                    await ShowExceptionInteraction.Handle(ex);
+                }
             }
 
-            problematicAddonViewModels.Add(new AddonNodeSimpleViewModel(addon));
-
-            foreach (var problem in problems)
+            var problematicAddonViewModels = new List<AddonNodeSimpleViewModel>();
+            var problemToAddons = new Dictionary<Type, List<AddonNode>>();
+            foreach (var addon in addonRoot.GetDescendants())
             {
-                if (problem is AddonChildrenProblem)
+                var problems = addon.Problems;
+
+                if (problems.Count == 0)
+                {
+                    continue;
+                }
+                if (addon is AddonGroup && problems is [AddonChildrenProblem _])
                 {
                     continue;
                 }
 
-                var problemType = problem.GetType();
-                if (!problemToAddons.TryGetValue(problemType, out var correspondingAddons))
+                problematicAddonViewModels.Add(new AddonNodeSimpleViewModel(addon));
+
+                foreach (var problem in problems)
                 {
-                    correspondingAddons = new List<AddonNode>();
-                    problemToAddons[problemType] = correspondingAddons;
+                    if (problem is AddonChildrenProblem)
+                    {
+                        continue;
+                    }
+
+                    var problemType = problem.GetType();
+                    if (!problemToAddons.TryGetValue(problemType, out var correspondingAddons))
+                    {
+                        correspondingAddons = new List<AddonNode>();
+                        problemToAddons[problemType] = correspondingAddons;
+                    }
+                    correspondingAddons.Add(addon);
                 }
-                correspondingAddons.Add(addon);
             }
+            ProblematicAddonViewModels = problematicAddonViewModels.ToArray();
+            ProblemViewModels = problemToAddons.Select(pair => new ProblemViewModel(pair.Key, pair.Value)).ToArray();
         }
-        ProblematicAddonViewModels = problematicAddonViewModels.ToArray();
-        ProblemViewModels = problemToAddons.Select(pair => new ProblemViewModel(pair.Key, pair.Value)).ToArray();
+        finally
+        {
+            IsRefreshing = false;
+        }
     }
 
     public void Dispose()

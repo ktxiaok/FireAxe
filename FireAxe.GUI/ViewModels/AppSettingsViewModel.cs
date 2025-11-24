@@ -6,6 +6,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using FireAxe.Resources;
+using System.IO;
+using Serilog;
 
 namespace FireAxe.ViewModels;
 
@@ -41,6 +43,7 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
                 .Subscribe(_ => this.RaisePropertyChanged(nameof(FileBackupIntervalMinutes)));
         });
 
+        ShowSettingsFileCommand = ReactiveCommand.Create(() => Utils.ShowInFileExplorer(_settings.SettingsFilePath));
         SelectGamePathCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var path = await ChooseGamePathDirectoryInteraction.Handle(Unit.Default);
@@ -64,11 +67,39 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
             }
             Settings.GamePath = gamePath;
         });
+        OpenCustomVpkAddonConflictIgnoringFilesDirectory = ReactiveCommand.Create(() =>
+        {
+            var dirPath = _settings.CustomVpkAddonConflictIgnoringFilesDirectoryPath;
+            try
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during creating the directory: {Path}", dirPath);
+                return;
+            }
+            try
+            {
+                var readmeFilePath = Path.Join(dirPath, "readme.txt");
+                if (!FileSystemUtils.Exists(readmeFilePath))
+                {
+                    using var sourceStream = File.OpenRead(Path.Join(AppGlobal.ExportedAssetsDirectoryName, "CustomVpkAddonConflictIgnoringFiles_ReadMe.asset"));
+                    using var targetStream = File.Create(readmeFilePath);
+                    sourceStream.CopyTo(targetStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during creating CustomVpkAddonConflictIgnoringFiles readme file.");
+            }
+            Utils.ShowInFileExplorer(dirPath, openDir: true);
+        });
         OpenBackupDirectoryCommand = ReactiveCommand.Create(() =>
         {
             if (_mainWindowViewModel.AddonRoot?.BackupDirectoryPath is { } path)
             {
-                Utils.ShowInFileExplorer(path);
+                Utils.ShowInFileExplorer(path, openDir: true);
             }
         }, this.WhenAnyValue(x => x.AddonRootNotNull));
     }
@@ -107,9 +138,13 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
         }
     }
 
+    public ReactiveCommand<Unit, Unit> ShowSettingsFileCommand { get; }
+
     public ReactiveCommand<Unit, Unit> SelectGamePathCommand { get; }
 
     public ReactiveCommand<Unit, Unit> FindGamePathCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenCustomVpkAddonConflictIgnoringFilesDirectory { get; }
 
     public ReactiveCommand<Unit, Unit> OpenBackupDirectoryCommand { get; }
 

@@ -20,6 +20,20 @@ namespace FireAxe.ViewModels;
 
 public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, ISaveable, IDisposable
 {
+    private class AddonRootParentSettings : IAddonRootParentSettings
+    {
+        private readonly MainWindowViewModel _mainWindowViewModel;
+
+        internal AddonRootParentSettings(MainWindowViewModel mainWindowViewModel)
+        {
+            _mainWindowViewModel = mainWindowViewModel;
+        }
+
+        public bool IsAutoUpdateWorkshopItem => _mainWindowViewModel._settings.IsAutoUpdateWorkshopItem;
+
+        public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => _mainWindowViewModel._vpkAddonConflictCheckSettings;
+    }
+
     private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
     private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(5);
     private static TimeSpan BackupInterval = TimeSpan.FromMinutes(1);
@@ -39,6 +53,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     private AddonRoot? _addonRoot = null;
     private readonly IObservable<bool> _addonRootNotNullObservable;
+
+    private readonly AddonRootParentSettings _addonRootParentSettings;
+    private VpkAddonConflictCheckSettings _vpkAddonConflictCheckSettings = VpkAddonConflictCheckSettings.Default;
 
     private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
@@ -72,6 +89,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         _downloadItemListViewModel = downloadItemListViewModel;
 
         _addonRootNotNullObservable = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
+
+        _addonRootParentSettings = new(this);
 
         _titleExtraInfo = this.WhenAnyValue(x => x.AddonRoot)
             .Select((addonRoot) =>
@@ -206,17 +225,21 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 }
             })
             .DisposeWith(_disposables);
-        _settings.WhenAnyValue(x => x.IsAutoUpdateWorkshopItem)
-            .CombineLatest(this.WhenAnyValue(x => x.AddonRoot))
-            .Subscribe(args =>
+        _settings.WhenAnyValue(x => x.IgnoreHalfLife2FilesForVpkAddonConflicts)
+            .Subscribe(_ =>
             {
-                var (isAutoUpdateWorkshopItem, addonRoot) = args;
-                if (addonRoot is not null)
+                bool ignoreHl2 = _settings.IgnoreHalfLife2FilesForVpkAddonConflicts;
+                _vpkAddonConflictCheckSettings = new()
                 {
-                    addonRoot.IsAutoUpdateWorkshopItem = isAutoUpdateWorkshopItem;
-                }
+                    IgnoringFileSet = new VpkAddonConflictIgnoringFileSet([], [
+                        () => _settings.WaitCustomVpkAddonConflictIgnoringFiles(),
+                        () => ignoreHl2 ? CommonVpkAddonConflictIgnoringFiles.HalfLife2 : null
+                    ])
+                };
             })
             .DisposeWith(_disposables);
+        
+
         this.WhenAnyValue(x => x.AddonNodeExplorerViewModel)
             .Subscribe(explorerViewModel =>
             {
@@ -349,6 +372,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 using var blockAutoCheck = _addonRoot.BlockAutoCheck();
 
                 _addonRoot.NewDownloadItem += OnAddonRootNewDownloadItem;
+                _addonRoot.ParentSettings = _addonRootParentSettings;
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
                 _addonRoot.HttpClient = _httpClient;
