@@ -716,11 +716,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             }
         }
 
-        // Update addonlist.txt.
-        if (!File.Exists(addonListPath))
-        {
-            File.Create(addonListPath);
-        }
+        // Finally update addonlist.txt.
         addonList = new KVObject("AddonList", 
             addonEntries.Select(pair => new 
             {
@@ -728,11 +724,12 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             })
             .OrderByDescending(obj => obj.Priority)
             .Select(obj => new KVObject(obj.Key, obj.IsEnabled)));
-        using (var stream = File.Open(addonListPath, FileMode.Truncate))
+        using (var stream = File.Create(addonListPath))
         {
             kv.Serialize(stream, addonList);
         }
 
+        // File name format-related functions
         const string LinkVpkFilePrefix = "fireaxe_link_";
 
         string BuildLinkVpkFileName(Guid guid) => $"{LinkVpkFilePrefix}{guid:N}.vpk";
