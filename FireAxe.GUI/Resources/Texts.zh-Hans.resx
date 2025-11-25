@@ -1058,4 +1058,13 @@
     <value>你可以在此目录中自定义VPK冲突忽略文件：
 {0}</value>
   </data>
+  <data name="LastPushedAt" xml:space="preserve">
+    <value>最近推送于 {0}</value>
+  </data>
+  <data name="OpenDirectoryNote" xml:space="preserve">
+    <value>打开存放模组的目录。不要打开“left4dead2/addons”或“left4dead2/addons/workshop”！</value>
+  </data>
+  <data name="OpeningDirectory" xml:space="preserve">
+    <value>打开目录中...</value>
+  </data>
 </root>

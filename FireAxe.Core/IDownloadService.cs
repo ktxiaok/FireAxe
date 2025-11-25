@@ -2,7 +2,7 @@
 
 namespace FireAxe;
 
-public interface IDownloadService : IDisposable
+public interface IDownloadService : IAsyncDisposable
 {
     const string DownloadingFileExtension = ".downloading";
 

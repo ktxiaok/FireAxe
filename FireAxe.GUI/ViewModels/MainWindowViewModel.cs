@@ -54,8 +54,13 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     private AddonRoot? _addonRoot = null;
     private readonly IObservable<bool> _addonRootNotNullObservable;
 
+    private bool _isOpeningDirectory = false;
+    private readonly ObservableAsPropertyHelper<bool> _isEmptyDirectory; 
+
     private readonly AddonRootParentSettings _addonRootParentSettings;
     private VpkAddonConflictCheckSettings _vpkAddonConflictCheckSettings = VpkAddonConflictCheckSettings.Default;
+
+    private DateTime? _lastPushDateTime = null;
 
     private AddonNodeExplorerViewModel? _addonNodeExplorerViewModel = null;
 
@@ -89,6 +94,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         _downloadItemListViewModel = downloadItemListViewModel;
 
         _addonRootNotNullObservable = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
+
+        _isEmptyDirectory = this.WhenAnyValue(x => x.AddonRoot, x => x.IsOpeningDirectory, (addonRoot, isOpeningDirectory) => addonRoot is null && !isOpeningDirectory)
+            .ToProperty(this, nameof(IsEmptyDirectory));
 
         _addonRootParentSettings = new(this);
 
@@ -238,7 +246,6 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 };
             })
             .DisposeWith(_disposables);
-        
 
         this.WhenAnyValue(x => x.AddonNodeExplorerViewModel)
             .Subscribe(explorerViewModel =>
@@ -276,6 +283,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                     .BindTo(explorerViewModel, x => x.ListItemViewKind)
                     .DisposeWith(disposables);
             });
+
+        this.WhenAnyValue(x => x.AddonRoot)
+            .Subscribe(_ => LastPushDateTime = null);
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -357,6 +367,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _addonRoot.Save();
 
                 _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
+                _addonRoot.Pushed -= OnAddonRootPushed;
                 _addonRoot.DisposeAsync().AsTask(); // TODO
                 _addonRoot = null;
             }
@@ -372,6 +383,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 using var blockAutoCheck = _addonRoot.BlockAutoCheck();
 
                 _addonRoot.NewDownloadItem += OnAddonRootNewDownloadItem;
+                _addonRoot.Pushed += OnAddonRootPushed;
                 _addonRoot.ParentSettings = _addonRootParentSettings;
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
@@ -388,6 +400,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
+    public bool IsOpeningDirectory
+    {
+        get => _isOpeningDirectory;
+        private set => this.RaiseAndSetIfChanged(ref _isOpeningDirectory, value);
+    }
+
+    public bool IsEmptyDirectory => _isEmptyDirectory.Value;
+
     public AddonNodeExplorerViewModel? AddonNodeExplorerViewModel
     {
         get => _addonNodeExplorerViewModel;
@@ -397,6 +417,12 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public string TitleExtraInfo => _titleExtraInfo.Value;
 
     public bool HasSelection => _hasSelection.Value;
+
+    public DateTime? LastPushDateTime
+    {
+        get => _lastPushDateTime;
+        private set => this.RaiseAndSetIfChanged(ref _lastPushDateTime, value);
+    }
 
     public ReactiveCommand<Unit, Unit> OpenDirectoryCommand { get; }
 
@@ -507,31 +533,47 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     {
         ArgumentNullException.ThrowIfNull(dirPath);
 
-        if (GamePathUtils.IsAddonsPath(dirPath))
+        if (IsOpeningDirectory)
         {
             return;
         }
 
-        string versionFilePath = Path.Join(dirPath, AddonRoot.VersionFileName);
-        if (File.Exists(versionFilePath))
+        IsOpeningDirectory = true;
+        try
         {
-            if (Version.TryParse(File.ReadAllText(versionFilePath), out var version))
+            await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                if (version > AppGlobal.Version)
+                if (GamePathUtils.IsAddonsPath(dirPath))
                 {
-                    if (!(await ConfirmOpenHigherVersionFileInteraction.Handle($"{dirPath} v{version.ToString(3)}")))
+                    return;
+                }
+
+                string versionFilePath = Path.Join(dirPath, AddonRoot.VersionFileName);
+                if (File.Exists(versionFilePath))
+                {
+                    if (Version.TryParse(File.ReadAllText(versionFilePath), out var version))
                     {
-                        return;
+                        if (version > AppGlobal.Version)
+                        {
+                            if (!(await ConfirmOpenHigherVersionFileInteraction.Handle($"{dirPath} v{version.ToString(3)}")))
+                            {
+                                return;
+                            }
+                        }
                     }
                 }
-            }
+
+                var addonRoot = new AddonRoot();
+                addonRoot.DirectoryPath = dirPath;
+                AddonRoot = addonRoot;
+
+                _settings.LastOpenDirectory = dirPath;
+            }, DispatcherPriority.Default);
         }
-
-        var addonRoot = new AddonRoot();
-        addonRoot.DirectoryPath = dirPath;
-        AddonRoot = addonRoot;
-
-        _settings.LastOpenDirectory = dirPath;
+        finally
+        {
+            IsOpeningDirectory = false;
+        }
     }
 
     public void CloseDirectory()
@@ -864,5 +906,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)
     {
         _downloadItemListViewModel.Add(downloadItem);
+    }
+
+    private void OnAddonRootPushed()
+    {
+        LastPushDateTime = DateTime.Now;
     }
 }

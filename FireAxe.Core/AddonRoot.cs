@@ -208,6 +208,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public event Action<AddonNode>? NewNodeIdRegistered = null;
 
+    public event Action? Pushed = null;
+
     public bool TryGetNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
     {
         this.ThrowIfInvalid();
@@ -732,6 +734,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         {
             kv.Serialize(stream, addonList);
         }
+
+        Pushed?.Invoke();
 
         // File name format-related functions
         const string LinkVpkFilePrefix = "fireaxe_link_";

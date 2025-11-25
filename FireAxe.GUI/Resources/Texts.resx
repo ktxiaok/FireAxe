@@ -1058,4 +1058,13 @@
     <value>You can customize VPK addon conflict ignoring files in this directory: 
 {0}</value>
   </data>
+  <data name="LastPushedAt" xml:space="preserve">
+    <value>Last pushed at {0}</value>
+  </data>
+  <data name="OpenDirectoryNote" xml:space="preserve">
+    <value>Open the directory where addons are stored. Do not open "left4dead2/addons" or "left4dead2/addon/workshop"!</value>
+  </data>
+  <data name="OpeningDirectory" xml:space="preserve">
+    <value>Opening Directory...</value>
+  </data>
 </root>

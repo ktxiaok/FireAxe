@@ -90,14 +90,18 @@
                     IsExpanded="False"
                     HorizontalAlignment="Stretch">
                     <Expander.Header>
-                      <StackPanel Orientation="Horizontal">
+                      <DockPanel>
                         <TextBlock
+                          DockPanel.Dock="Left"
                           Text="{Binding AddonViewModels.Count, StringFormat=({0}) }"
                           VerticalAlignment="Center"/>
-                        <TextBlock
+                        <SelectableTextBlock
                           Text="{Binding Description}"
+                          TextWrapping="Wrap"
+                          TextAlignment="Left"
+                          HorizontalAlignment="Left"
                           VerticalAlignment="Center"/>
-                      </StackPanel>
+                      </DockPanel>
                     </Expander.Header>
 
                     <ItemsControl

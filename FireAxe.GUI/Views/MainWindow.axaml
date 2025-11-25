@@ -3,6 +3,7 @@
         xmlns:v="using:FireAxe.Views"
         xmlns:vm="using:FireAxe.ViewModels"
         xmlns:r="using:FireAxe.Resources"
+        xmlns:conv="using:FireAxe.ValueConverters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
@@ -70,7 +71,110 @@
         <MenuItem Header="{x:Static r:Texts.AboutApp}" Command="{Binding OpenAboutWindowCommand}"/>
       </MenuItem>
     </Menu>
+
+    <DockPanel
+      DockPanel.Dock="Bottom"
+      LastChildFill="False"
+      Margin="0, 5, 0, 5">
+      <StackPanel
+        DockPanel.Dock="Left"
+        Orientation="Horizontal">
+        <Button
+          Command="{Binding CheckCommand}"
+          Content="{x:Static r:Texts.Check}"
+          Margin="5, 0, 5, 0"/>
+        <StackPanel
+          Orientation="Horizontal"
+          IsVisible="{Binding AddonRoot.ProblemCount, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}"
+          Margin="5, 0, 5, 0">
+          <PathIcon
+            Data="{StaticResource icon_checkmark}"
+            Foreground="Green"/>
+          <Control Width="5"/>
+          <TextBlock
+            Text="{x:Static r:Texts.NoProblemFound}"
+            VerticalAlignment="Center"/>
+        </StackPanel>
+        <Button
+          Command="{Binding OpenProblemListWindowCommand}"
+          IsVisible="{Binding AddonRoot.ProblemCount, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          Background="Transparent"
+          Margin="5, 0, 5, 0">
+          <StackPanel
+            Orientation="Horizontal">
+            <PathIcon
+              Data="{StaticResource icon_warning}"
+              Foreground="{DynamicResource brush_warning}"/>
+            <Control Width="5"/>
+            <TextBlock
+              Text="{Binding AddonRoot.ProblemCount, StringFormat={x:Static r:Texts.ProblemsFoundWithCount}}"
+              VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+      <StackPanel
+        DockPanel.Dock="Right"
+        Orientation="Horizontal">
+        <TextBlock
+          Text="{Binding LastPushDateTime, Converter={x:Static conv:DateTimeConverters.HourMinuteSecond}, StringFormat={x:Static r:Texts.LastPushedAt}}"
+          IsVisible="{Binding LastPushDateTime, Converter={x:Static ObjectConverters.IsNotNull}}"
+          Margin="5, 0, 5, 0"
+          VerticalAlignment="Center"/>
+        <Button
+          Command="{Binding PushCommand}"
+          Margin="5, 0, 5, 0">
+          <StackPanel Orientation="Horizontal">
+            <PathIcon Data="{StaticResource icon_arrow_up_circle}"/>
+            <Control Width="5"/>
+            <TextBlock
+              Text="{x:Static r:Texts.Push}"
+              VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </DockPanel>
     
-    <v:AddonNodeExplorerView DataContext="{Binding AddonNodeExplorerViewModel}"/>
+    <Panel>
+      <v:AddonNodeExplorerView
+        DataContext="{Binding AddonNodeExplorerViewModel}"
+        IsVisible="{Binding AddonRoot, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"/>
+      
+      <StackPanel
+        Orientation="Vertical"
+        IsVisible="{Binding IsEmptyDirectory}"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
+        <Button
+          Command="{Binding OpenDirectoryCommand}"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal">
+            <PathIcon
+              Data="{StaticResource icon_folder}"
+              Width="32"
+              Height="{Binding $self.Width}"/>
+            <Control Width="10"/>
+            <TextBlock
+              Text="{x:Static r:Texts.OpenDirectory}"
+              FontSize="30"
+              VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Control Height="15"/>
+        <TextBlock
+          Text="{x:Static r:Texts.OpenDirectoryNote}"
+          TextWrapping="Wrap"
+          TextAlignment="Center"
+          VerticalAlignment="Center"/>
+      </StackPanel>
+
+      <TextBlock
+        Text="{x:Static r:Texts.OpeningDirectory}"
+        IsVisible="{Binding IsOpeningDirectory, FallbackValue=False}"
+        FontSize="30"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"/>
+    </Panel>
   </DockPanel>
 </Window>

@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FireAxe;
@@ -80,10 +82,13 @@ public partial class App : Application
                     ShutdownRequested?.Invoke();
 
                     args.Cancel = true;
-                    foreach (var window in desktop.Windows)
+
+                    var windows = desktop.Windows.ToArray();
+                    foreach (var window in windows)
                     {
                         window.Close();
                     }
+
                     services.DisposeAsync()
                         .AsTask()
                         .ContinueWith(task =>
@@ -99,6 +104,20 @@ public partial class App : Application
 
                             desktop.Shutdown();
                         }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                    new Thread(() =>
+                    {
+                        try
+                        {
+                            Thread.Sleep(TimeSpan.FromSeconds(15));
+                            Log.Warning("Application Shutdown Timeout: The application will be forcibly terminated.");
+                            Program.OnExit();
+                        }
+                        finally
+                        {
+                            Environment.Exit(-1);
+                        }
+                    }){ IsBackground = true }.Start();
                 };
 
                 services.GetRequiredService<AppSettings>();

@@ -43,6 +43,8 @@ public sealed class DownloadService : IDownloadService
 
         private readonly object _downloadLock = new();
 
+        private bool _completed = false;
+
         private readonly TaskCompletionSource _waitTaskCompletionSource = new();
 
         internal DownloadItem(string url, string filePath, DownloadService service, Downloader.DownloadConfiguration downloaderConfig)
@@ -241,22 +243,17 @@ public sealed class DownloadService : IDownloadService
 
         public void Cancel()
         {
-            Downloader.DownloadService? downloadToCancel = null;
+            Downloader.DownloadService? download = null;
             lock (_downloadLock)
             {
-                if (_download is null)
+                if (!_status.IsCompleted())
                 {
-                    if (_status is DownloadStatus.Preparing or DownloadStatus.PreparingAndPaused)
-                    {
-                        _status = DownloadStatus.Cancelled;
-                    }
+                    _status = DownloadStatus.Cancelled;
                 }
-                else
-                {
-                    downloadToCancel = _download;
-                }
+
+                download = _download;
             }
-            downloadToCancel?.CancelAsync();
+            download?.CancelAsync();
         }
 
         public void Wait()
@@ -278,7 +275,7 @@ public sealed class DownloadService : IDownloadService
 
         public void Dispose()
         {
-            Downloader.DownloadService? downloadToDispose = null;
+            Downloader.DownloadService? download = null;
             lock (_downloadLock)
             {
                 if (_disposed)
@@ -288,21 +285,18 @@ public sealed class DownloadService : IDownloadService
 
                 _disposed = true;
 
-                if (_download is null)
+                if (!_status.IsCompleted())
                 {
-                    if (_status is DownloadStatus.Preparing or DownloadStatus.PreparingAndPaused)
-                    {
-                        _status = DownloadStatus.Cancelled;
-                    }
+                    _status = DownloadStatus.Cancelled;
                 }
-                else
-                {
-                    downloadToDispose = _download;
-                }
+
+                download = _download;
+                _download = null;
             }
-            if (downloadToDispose is not null)
+            OnCompleted();
+            if (download is not null)
             {
-                DisposeDownload(downloadToDispose);
+                DisposeDownload(download);
             }
         }
 
@@ -368,12 +362,27 @@ public sealed class DownloadService : IDownloadService
             DownloadedBytes = e.ReceivedBytesSize;
             BytesPerSecondSpeed = e.BytesPerSecondSpeed;
 
+            Downloader.DownloadService? download;
+            long lastSaveTimeMs;
+            lock (_downloadLock)
+            {
+                download = _download;
+                if (download is null)
+                {
+                    return;
+                }
+                lastSaveTimeMs = _lastSaveTimeMs;
+            }
+
             bool needSave = false;
             long currentTime = Environment.TickCount64;
-            if (currentTime - _lastSaveTimeMs > SaveDownloadProgressIntervalMs)
+            if (currentTime - lastSaveTimeMs > SaveDownloadProgressIntervalMs)
             {
                 needSave = true;
-                _lastSaveTimeMs = currentTime;
+                lock (_downloadLock)
+                {
+                    _lastSaveTimeMs = currentTime;
+                }
             }
             
             if (needSave)
@@ -381,7 +390,7 @@ public sealed class DownloadService : IDownloadService
                 string savePath = _filePath + IDownloadService.DownloadInfoFileExtension;
                 try
                 {
-                    File.WriteAllText(savePath, JsonConvert.SerializeObject(_download!.Package, s_downloadInfoJsonSettings));
+                    File.WriteAllText(savePath, JsonConvert.SerializeObject(download.Package, s_downloadInfoJsonSettings));
                 }
                 catch (Exception ex)
                 {
@@ -408,13 +417,13 @@ public sealed class DownloadService : IDownloadService
 
         private void OnCompleted()
         {
-            lock (_service._downloadItemsLock)
-            {
-                _service._activeDownloadItems.Remove(this);
-            }
-
             lock (_downloadLock)
             {
+                if (_completed)
+                {
+                    return;
+                }
+
                 if (_downloadCountBorrowed)
                 {
                     _service._availableDownloads.Release();
@@ -422,9 +431,16 @@ public sealed class DownloadService : IDownloadService
                 }
 
                 Monitor.PulseAll(_downloadLock);
-            }
 
-            _waitTaskCompletionSource.SetResult();
+                _waitTaskCompletionSource.SetResult();
+
+                lock (_service._downloadItemsLock)
+                {
+                    _service._activeDownloadItems.Remove(this);
+                }
+
+                _completed = true;
+            }
         }
 
         private static void DisposeDownload(Downloader.DownloadService download)
@@ -524,7 +540,7 @@ public sealed class DownloadService : IDownloadService
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         if (!_disposed)
         {
@@ -535,10 +551,13 @@ public sealed class DownloadService : IDownloadService
             {
                 downloadItems = [.. _activeDownloadItems];
             }
-            foreach (var downloadItem in downloadItems)
+            var downloadItemDisposeTasks = new Task[downloadItems.Length];
+            for (int i = 0, len = downloadItems.Length; i < len; i++)
             {
-                downloadItem.Dispose();
+                var downloadItem = downloadItems[i];
+                downloadItemDisposeTasks[i] = Task.Run(downloadItem.Dispose);
             }
+            await Task.WhenAll(downloadItemDisposeTasks).ConfigureAwait(false);
 
             _availableDownloads.Dispose();
         }

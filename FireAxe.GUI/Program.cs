@@ -18,6 +18,7 @@ internal sealed class Program
         SetupLogger();
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         Log.Information("FireAxe Start (Version: {Version})", AppGlobal.VersionString);
+
         try
         {
             RegisterObjectExplanations();
@@ -32,8 +33,7 @@ internal sealed class Program
         }
         finally
         {
-            Log.CloseAndFlush();
-            AppMutex.Release();
+            OnExit();
         }
     }
 
@@ -44,6 +44,12 @@ internal sealed class Program
             .WithInterFont()
             .LogToTrace()
             .UseReactiveUI();
+
+    internal static void OnExit()
+    {
+        Log.CloseAndFlush();
+        AppMutex.Release();
+    }
 
     private static void SetupLogger()
     {

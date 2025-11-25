@@ -1755,6 +1755,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Last pushed at {0}.
+        /// </summary>
+        public static string LastPushedAt {
+            get {
+                return ResourceManager.GetString("LastPushedAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Lifetime Favorites: .
         /// </summary>
         public static string LifetimeFavoritesColon {
@@ -1980,11 +1989,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open the directory where addons are stored. Do not open &quot;left4dead2/addons&quot; or &quot;left4dead2/addon/workshop&quot;!.
+        /// </summary>
+        public static string OpenDirectoryNote {
+            get {
+                return ResourceManager.GetString("OpenDirectoryNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open a directory where the addons are stored. .
         /// </summary>
         public static string OpenDirectoryTip {
             get {
                 return ResourceManager.GetString("OpenDirectoryTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening Directory....
+        /// </summary>
+        public static string OpeningDirectory {
+            get {
+                return ResourceManager.GetString("OpeningDirectory", resourceCulture);
             }
         }
         
