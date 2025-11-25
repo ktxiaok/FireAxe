@@ -25,6 +25,7 @@
 - add: game path auto finding
 - change: rename "Default Order" to "No Sort"
 - improve: improve the addon problem checking system
+- upgrade: .NET from 8.0 to 10.0
 - upgrade: upgrade dependent packages
 - bugfixes
 # v0.6.1
