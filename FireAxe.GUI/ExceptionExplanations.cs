@@ -1,25 +1,49 @@
 ﻿using FireAxe.Resources;
 using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal static class ExceptionExplanations
 {
-    internal static class ExceptionExplanations
+    public static void Register(ObjectExplanationManager manager)
     {
-        public static void Register(ObjectExplanationManager manager)
+        manager.Register<Exception>((exception, arg) =>
         {
-            manager.Register<Exception>((exception, arg) =>
+            if (arg is ExceptionExplanationScene scene)
             {
-                if (arg is ExceptionExplanationScene scene)
+                if (scene == ExceptionExplanationScene.Input)
                 {
-                    if (scene == ExceptionExplanationScene.Input)
-                    {
-                        return Texts.InvalidInputMessage;
-                    }
+                    return $"{Texts.InvalidInputMessage} ({exception.GetType().Name})";
                 }
-                return Texts.ExceptionOccurMessage + '\n' + exception.ToString();
-            });
-            manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
-            manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.FullName));
-        }
+            }
+            return Texts.ExceptionOccurMessage + '\n' + exception.ToString();
+        });
+        manager.Register<ArgumentException>((exception, arg) =>
+        {
+            if (arg is ExceptionExplanationScene scene)
+            {
+                if (scene == ExceptionExplanationScene.Input)
+                {
+                    return exception.Message;
+                }
+            }
+            return exception.ToString();
+        });
+        manager.Register<ArgumentOutOfRangeException>((exception, arg) =>
+        {
+            if (arg is ExceptionExplanationScene scene)
+            {
+                if (scene == ExceptionExplanationScene.Input)
+                {
+                    return Texts.ValueMustBeWithinValidRange;
+                }
+            }
+            return exception.ToString();
+        });
+        manager.Register<AddonNameExistsException>((exception, arg) => Texts.ItemNameExists);
+        manager.Register<FileNameExistsException>((exception, arg) => Texts.FileNameExists);
+        manager.Register<AddonNodeMoveDeniedException>((exception, arg) => string.Format(Texts.AddonMoveDeniedMessage, exception.AddonNode.NodePath));
+        manager.Register<InvalidFilePathException>((exception, arg) => Texts.InvalidFilePath);
+        manager.Register<FileOutOfAddonRootException>((exception, arg) => Texts.FileMustBeInCurrentDirectory);
     }
 }

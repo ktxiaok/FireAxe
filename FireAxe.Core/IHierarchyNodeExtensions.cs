@@ -3,190 +3,214 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 
-namespace FireAxe
+namespace FireAxe;
+
+public static class IHierarchyNodeExtensions
 {
-    public static class IHierarchyNodeExtensions
+    private class EnumerableWrapper<T> : IEnumerable<T> where T : IHierarchyNode<T>
     {
-        private class EnumerableWrapper<T> : IEnumerable<T> where T : IHierarchyNode<T>
+        private readonly Func<IEnumerator<T>> _getEnumerator;
+
+        public EnumerableWrapper(Func<IEnumerator<T>> getEnumerator)
         {
-            private readonly Func<IEnumerator<T>> _getEnumerator;
-
-            public EnumerableWrapper(Func<IEnumerator<T>> getEnumerator)
-            {
-                _getEnumerator = getEnumerator;
-            }
-
-            public IEnumerator<T> GetEnumerator()
-            {
-                return _getEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return _getEnumerator();
-            }
+            _getEnumerator = getEnumerator;
         }
 
-        private class HierarchyPreorderDfs<T> : IHierarchyPreorderDfs<T> where T : IHierarchyNode<T>
+        public IEnumerator<T> GetEnumerator()
         {
-            private readonly IEnumerator<T> _enumerator;
-            private readonly Action _skip;
-
-            public HierarchyPreorderDfs(IEnumerator<T> enumerator, Action skip)
-            {
-                _enumerator = enumerator;
-                _skip = skip;
-            }
-
-            public T Current => _enumerator.Current;
-
-            object IEnumerator.Current => _enumerator.Current;
-
-            public void Dispose()
-            {
-                _enumerator.Dispose();
-            }
-
-            public bool MoveNext()
-            {
-                return _enumerator.MoveNext();
-            }
-
-            public void Reset()
-            {
-                _enumerator.Reset();
-            }
-
-            public void SkipDescendantsOfCurrent()
-            {
-                _skip();
-            }
+            return _getEnumerator();
         }
 
-        public static IEnumerable<T> GetDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return new EnumerableWrapper<T>(() => GetDescendantsEnumByDfsPreorder(node));
+            return _getEnumerator();
+        }
+    }
+
+    private class HierarchyPreorderDfs<T> : IHierarchyPreorderDfs<T> where T : IHierarchyNode<T>
+    {
+        private readonly IEnumerator<T> _enumerator;
+        private readonly Action _skip;
+
+        public HierarchyPreorderDfs(IEnumerator<T> enumerator, Action skip)
+        {
+            _enumerator = enumerator;
+            _skip = skip;
         }
 
-        public static IEnumerable<T> GetSelfAndDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public T Current => _enumerator.Current;
+
+        object IEnumerator.Current => _enumerator.Current;
+
+        public void Dispose()
         {
-            return new EnumerableWrapper<T>(() => GetSelfAndDescendantsEnumByDfsPreorder(node));
+            _enumerator.Dispose();
         }
 
-        public static IHierarchyPreorderDfs<T> GetDescendantsEnumByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        public bool MoveNext()
         {
-            bool needSkip = false;
-            var enumerator = GetEnumerator();
-            IEnumerator<T> GetEnumerator()
+            return _enumerator.MoveNext();
+        }
+
+        public void Reset()
+        {
+            _enumerator.Reset();
+        }
+
+        public void SkipDescendantsOfCurrent()
+        {
+            _skip();
+        }
+    }
+
+    public static IEnumerable<T> GetDescendants<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        => node.GetDescendantsByDfsPreorder();
+
+    public static IEnumerable<T> GetDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+    {
+        return new EnumerableWrapper<T>(() => GetDescendantsEnumeratorByDfsPreorder(node));
+    }
+
+    public static IEnumerable<T> GetSelfAndDescendants<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+        => node.GetSelfAndDescendantsByDfsPreorder();
+
+    public static IEnumerable<T> GetSelfAndDescendantsByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+    {
+        return new EnumerableWrapper<T>(() => GetSelfAndDescendantsEnumeratorByDfsPreorder(node));
+    }
+
+    public static IHierarchyPreorderDfs<T> GetDescendantsEnumeratorByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+    {
+        bool needSkip = false;
+        var enumerator = GetEnumerator();
+        IEnumerator<T> GetEnumerator()
+        {
+            if (node.IsNonterminal)
             {
-                if (node.IsNonterminal)
+                List<IEnumerator<T>> stack = new() { node.Children.GetEnumerator() };
+                while (stack.Count > 0)
                 {
-                    List<IEnumerator<T>> stack = new() { node.Children.GetEnumerator() };
-                    while (stack.Count > 0)
+                    IEnumerator<T> current = stack[stack.Count - 1];
+                    if (current.MoveNext())
                     {
-                        IEnumerator<T> current = stack[stack.Count - 1];
-                        if (current.MoveNext())
+                        T child = current.Current;
+                        yield return child;
+                        if (!needSkip && child.IsNonterminal)
                         {
-                            T child = current.Current;
-                            yield return child;
-                            if (!needSkip && child.IsNonterminal)
-                            {
-                                stack.Add(child.Children.GetEnumerator());
-                            }
-                            needSkip = false;
+                            stack.Add(child.Children.GetEnumerator());
                         }
-                        else
-                        {
-                            stack.RemoveAt(stack.Count - 1);
-                        }
-                    }
-                }
-            }
-            var skip = () =>
-            {
-                needSkip = true;
-            };
-            return new HierarchyPreorderDfs<T>(enumerator, skip);
-        }
-
-        public static IHierarchyPreorderDfs<T> GetSelfAndDescendantsEnumByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
-        {
-            Lazy<IHierarchyPreorderDfs<T>> dfsLazy = new(() => node.GetDescendantsEnumByDfsPreorder(), false);
-            bool needSkip = false;
-            IEnumerator<T> GetEnumerator()
-            {
-                yield return (T)node;
-                if (needSkip)
-                {
-                    yield break;
-                }
-                var dfs = dfsLazy.Value;
-                while (dfs.MoveNext())
-                {
-                    yield return dfs.Current;
-                }
-            }
-            var enumerator = GetEnumerator();
-            var skip = () =>
-            {
-                if (dfsLazy.IsValueCreated)
-                {
-                    dfsLazy.Value.SkipDescendantsOfCurrent();
-                }
-                else
-                {
-                    needSkip = true;
-                }
-            };
-            return new HierarchyPreorderDfs<T>(enumerator, skip);
-        }
-
-        public static IEnumerable<T> GetDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
-        {
-            if (!node.IsNonterminal)
-            {
-                yield break;
-            }
-            List<(T? Parent, IEnumerator<T> Children)> stack = new() { (null, node.Children.GetEnumerator()) };
-            while (stack.Count > 0)
-            {
-                int lastIndex = stack.Count - 1;
-                var current = stack[lastIndex];
-                if (current.Children.MoveNext())
-                {
-                    T child = current.Children.Current;
-                    if (child.IsNonterminal)
-                    {
-                        stack.Add((child, child.Children.GetEnumerator()));
+                        needSkip = false;
                     }
                     else
                     {
-                        yield return child;
+                        stack.RemoveAt(stack.Count - 1);
                     }
+                }
+            }
+        }
+        var skip = () =>
+        {
+            needSkip = true;
+        };
+        return new HierarchyPreorderDfs<T>(enumerator, skip);
+    }
+
+    public static IHierarchyPreorderDfs<T> GetSelfAndDescendantsEnumeratorByDfsPreorder<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+    {
+        Lazy<IHierarchyPreorderDfs<T>> dfsLazy = new(() => node.GetDescendantsEnumeratorByDfsPreorder(), false);
+        bool needSkip = false;
+        IEnumerator<T> GetEnumerator()
+        {
+            yield return (T)node;
+            if (needSkip)
+            {
+                yield break;
+            }
+            var dfs = dfsLazy.Value;
+            while (dfs.MoveNext())
+            {
+                yield return dfs.Current;
+            }
+        }
+        var enumerator = GetEnumerator();
+        var skip = () =>
+        {
+            if (dfsLazy.IsValueCreated)
+            {
+                dfsLazy.Value.SkipDescendantsOfCurrent();
+            }
+            else
+            {
+                needSkip = true;
+            }
+        };
+        return new HierarchyPreorderDfs<T>(enumerator, skip);
+    }
+
+    public static IEnumerable<T> GetDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
+    {
+        if (!node.IsNonterminal)
+        {
+            yield break;
+        }
+        List<(T? Parent, IEnumerator<T> Children)> stack = new() { (null, node.Children.GetEnumerator()) };
+        while (stack.Count > 0)
+        {
+            int lastIndex = stack.Count - 1;
+            var current = stack[lastIndex];
+            if (current.Children.MoveNext())
+            {
+                T child = current.Children.Current;
+                if (child.IsNonterminal)
+                {
+                    stack.Add((child, child.Children.GetEnumerator()));
                 }
                 else
                 {
-                    if (current.Parent != null)
-                    {
-                        yield return current.Parent;
-                    }
-                    stack.RemoveAt(lastIndex);
+                    yield return child;
                 }
             }
-        }
-
-        public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
-        {
-            foreach (var element in node.GetDescendantsByDfsPostorder())
+            else
             {
-                yield return element;
+                if (current.Parent != null)
+                {
+                    yield return current.Parent;
+                }
+                stack.RemoveAt(lastIndex);
             }
-            yield return (T)node;
         }
     }
 
-    public interface IHierarchyPreorderDfs<T> : IEnumerator<T> where T : IHierarchyNode<T>
+    public static IEnumerable<T> GetSelfAndDescendantsByDfsPostorder<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
     {
-        void SkipDescendantsOfCurrent();
+        foreach (var element in node.GetDescendantsByDfsPostorder())
+        {
+            yield return element;
+        }
+        yield return (T)node;
     }
+
+    public static IEnumerable<IHierarchyNode<T>> GetAncestors<T>(this IHierarchyNode<T> node) where T : IHierarchyNode<T>
+    {
+        var current = node.Parent;
+        while (current != null)
+        {
+            yield return current;
+            current = current.Parent;
+        }
+    }
+
+    public static IEnumerable<IHierarchyNode<T>> GetSelfAndAncestors<T>(this IHierarchyNode<T> node) where T : class, IHierarchyNode<T>
+    {
+        yield return node;
+        foreach (var ancestor in node.GetAncestors())
+        {
+            yield return ancestor;
+        }
+    }
+}
+
+public interface IHierarchyPreorderDfs<T> : IEnumerator<T> where T : IHierarchyNode<T>
+{
+    void SkipDescendantsOfCurrent();
 }

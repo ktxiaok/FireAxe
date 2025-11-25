@@ -1,0 +1,191 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:v="using:FireAxe.Views"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="700"
+        x:Class="FireAxe.Views.AddonNameAutoSetterWindow"
+        x:DataType="vm:AddonNameAutoSetterViewModel"
+        Title="{x:Static r:Texts.AddonNameAutoSetter}"
+        Width="900" Height="900"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel Margin="10">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Margin="0, 5, 0, 5">
+
+      <!--buttons-->
+      <DockPanel
+        LastChildFill="False">
+        <StackPanel
+          DockPanel.Dock="Left"
+          Orientation="Horizontal">
+          <Button
+            Command="{Binding StartCommand}"
+            Content="{x:Static r:Texts.Start}"/>
+          <Control Width="10"/>
+          <Button
+            Command="{Binding RetryAllCommand}"
+            Content="{x:Static r:Texts.Retry}"/>
+        </StackPanel>
+
+        <StackPanel
+          DockPanel.Dock="Right"
+          Orientation="Horizontal">
+          <Button
+            Command="{Binding RemoveAllCommand}"
+            Content="{x:Static r:Texts.RemoveAll}"/>
+          <Control Width="10"/>
+          <Button
+            Command="{Binding ApplyAllCommand}"
+            Content="{x:Static r:Texts.ApplyAll}"/>
+        </StackPanel>
+      </DockPanel>
+
+      <Control Height="10"/>
+
+      <!--ForceUseWorkshopTitle-->
+      <StackPanel Orientation="Horizontal">
+        <CheckBox
+          IsChecked="{Binding ForceUseWorkshopTitle}"/>
+        <Control Width="3"/>
+        <TextBlock
+          Text="{x:Static r:Texts.ForceUseWorkshopTitle}"
+          VerticalAlignment="Center"/>
+      </StackPanel>
+
+      <Control Height="10"/>
+
+      <!--targets-->
+      <StackPanel Orientation="Horizontal">
+        <TextBlock
+          Text="{x:Static r:Texts.Targets}"
+          VerticalAlignment="Center"/>
+        <Control Width="10"/>
+        <Button
+          Name="addTargetButton"
+          Content="{x:Static r:Texts.Add}"/>
+      </StackPanel>
+      <Control Height="10"/>
+      <Border
+        BorderBrush="Gray"
+        BorderThickness="2"
+        MinHeight="100"
+        MaxHeight="200">
+        <ScrollViewer>
+          <ItemsControl
+            ItemsSource="{Binding TargetAddonViewModels}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border
+                  BorderBrush="Gray"
+                  BorderThickness="1"
+                  CornerRadius="15"
+                  Margin="5"
+                  Padding="2.5">
+                  <StackPanel Orientation="Horizontal">
+                    <StackPanel.Styles>
+                      <Style Selector="v|AddonNodeEnableButton">
+                        <Setter Property="IsVisible" Value="False"/>
+                      </Style>
+                    </StackPanel.Styles>
+                    <v:AddonRefView/>
+                    <Button
+                      Command="{Binding Remove}"
+                      Background="Transparent">
+                      <PathIcon
+                        Data="{StaticResource icon_dismiss}"/>
+                    </Button>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+    </StackPanel>
+
+    <Border
+      BorderBrush="Gray"
+      BorderThickness="2"
+      Margin="0, 5, 0, 5"
+      Padding="5">
+      <ScrollViewer>
+        <ItemsControl
+          ItemsSource="{Binding JobViewModels}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="5"
+                Margin="5"
+                Padding="2.5">
+                <DockPanel>
+                  <DockPanel.Styles>
+                    <Style Selector="v|AddonNodeEnableButton">
+                      <Setter Property="IsVisible" Value="False"/>
+                    </Style>
+                  </DockPanel.Styles>
+                  <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal"
+                    Margin="15, 0, 0, 0">
+                    <TextBlock
+                      Text="{Binding SetNameErrorMessage}"
+                      IsVisible="{Binding SetNameErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      VerticalAlignment="Center"
+                      Foreground="{DynamicResource brush_warning}"/>                   
+                    <TextBlock
+                      Text="{x:Static r:Texts.FailedToGetName}"
+                      IsVisible="{Binding IsFailed}"
+                      VerticalAlignment="Center"
+                      Foreground="{DynamicResource brush_warning}"/>
+                    <TextBlock
+                      Text="{x:Static r:Texts.GettingName}"
+                      IsVisible="{Binding IsRunning}"
+                      VerticalAlignment="Center"/>
+                    <Control Width="5"/>
+                    <Button
+                      Command="{Binding $parent[v:AddonNameAutoSetterWindow].ViewModel.RemoveJobViewModel}"
+                      CommandParameter="{Binding}"
+                      Content="{x:Static r:Texts.Remove}"/>
+                    <Control Width="5"/>
+                    <Button
+                      Command="{Binding ApplyCommand}"
+                      Content="{x:Static r:Texts.Apply}"/>
+                  </StackPanel>
+
+                  <DockPanel>
+                    <v:AddonRefView DockPanel.Dock="Left"/>
+                    <Control DockPanel.Dock="Left" Width="5"/>
+                    <TextBox
+                      Text="{Binding TargetName}"
+                      TextWrapping="Wrap"
+                      IsVisible="{Binding IsSucceeded}"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Center"/>
+                  </DockPanel>
+                </DockPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

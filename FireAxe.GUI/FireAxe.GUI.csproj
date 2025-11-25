@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -9,12 +9,16 @@
     <RootNamespace>FireAxe</RootNamespace>
     <ApplicationIcon>Assets/AppLogo.ico</ApplicationIcon>
     <AssemblyName>FireAxe</AssemblyName>
-    <Configurations>Debug;Release;release-win-x64</Configurations>
-    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="ExportedAssets\**" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -27,22 +31,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+    <PackageReference Include="Avalonia" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.9" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.9" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.3" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
-    <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.9" />
+    <PackageReference Include="MessageBox.Avalonia" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FireAxe.Core\FireAxe.Core.csproj" />
-    <ProjectReference Include="..\FireAxe.CrashReporter\FireAxe.CrashReporter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,9 +68,6 @@
     </Compile>
     <Compile Update="Views\AddonNodeNavBarView.axaml.cs">
       <DependentUpon>AddonNodeNavBarView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\FlatVpkAddonListWindow.axaml.cs">
-      <DependentUpon>FlatVpkAddonListWindow.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 

@@ -204,6 +204,9 @@
   <data name="CollectionId" xml:space="preserve">
     <value>Collection ID</value>
   </data>
+  <data name="ColorTheme" xml:space="preserve">
+    <value>Color Theme</value>
+  </data>
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Confirm Delete</value>
   </data>
@@ -215,6 +218,18 @@
   </data>
   <data name="ConfirmOpenHigherVersionFileMessage" xml:space="preserve">
     <value>Higher version of files are opening. This will cause file information loss. Are you sure you want to continue?</value>
+  </data>
+  <data name="ConflictIgnoringFiles" xml:space="preserve">
+    <value>Conflict Ignoring Files</value>
+  </data>
+  <data name="ConflictingAddons" xml:space="preserve">
+    <value>Conflicting Addons</value>
+  </data>
+  <data name="ConflictingDetails" xml:space="preserve">
+    <value>Conflicting Details</value>
+  </data>
+  <data name="ConflictingFiles" xml:space="preserve">
+    <value>Conflicting Files</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
@@ -238,7 +253,7 @@
     <value>Delete</value>
   </data>
   <data name="DeleteAndRetainFile" xml:space="preserve">
-    <value>Delete And Retain Files</value>
+    <value>Delete and Retain Files</value>
   </data>
   <data name="DeleteCompletely" xml:space="preserve">
     <value>Delete Completely</value>
@@ -266,6 +281,9 @@
   </data>
   <data name="DownloadList" xml:space="preserve">
     <value>Download List</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>Empty</value>
   </data>
   <data name="Enable" xml:space="preserve">
     <value>Enable</value>
@@ -304,22 +322,25 @@
     <value>Small Tile View</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_CreationTime" xml:space="preserve">
-    <value>Sort By Creation Time</value>
+    <value>Sort by Creation Time</value>
   </data>
-  <data name="Enum_AddonNodeSortMethod_Default" xml:space="preserve">
-    <value>Default Order</value>
+  <data name="Enum_AddonNodeSortMethod_None" xml:space="preserve">
+    <value>No Sort</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_EnableState" xml:space="preserve">
-    <value>Sort By State</value>
+    <value>Sort by State</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileCreationTime" xml:space="preserve">
-    <value>Sort By File Creation Time</value>
+    <value>Sort by File Creation Time</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_FileSize" xml:space="preserve">
-    <value>Sort By File Size</value>
+    <value>Sort by File Size</value>
   </data>
   <data name="Enum_AddonNodeSortMethod_Name" xml:space="preserve">
-    <value>Sort By Name</value>
+    <value>Sort by Name</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Tag" xml:space="preserve">
+    <value>Sort by Tags</value>
   </data>
   <data name="Enum_AddonTagFilterMode_And" xml:space="preserve">
     <value>And</value>
@@ -330,14 +351,14 @@
   <data name="Enum_AddonTagFilterMode_Or" xml:space="preserve">
     <value>Or</value>
   </data>
-  <data name="Enum_AutoUpdateStrategy_Default" xml:space="preserve">
+  <data name="Enum_AppColorTheme_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Enum_AppColorTheme_Default" xml:space="preserve">
     <value>Default</value>
   </data>
-  <data name="Enum_AutoUpdateStrategy_Disabled" xml:space="preserve">
-    <value>Disabled</value>
-  </data>
-  <data name="Enum_AutoUpdateStrategy_Enabled" xml:space="preserve">
-    <value>Enabled</value>
+  <data name="Enum_AppColorTheme_Light" xml:space="preserve">
+    <value>Light</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
@@ -390,6 +411,9 @@
   <data name="Ignore" xml:space="preserve">
     <value>Ignore</value>
   </data>
+  <data name="IgnoreAll" xml:space="preserve">
+    <value>Ignore All</value>
+  </data>
   <data name="IgnoreCase" xml:space="preserve">
     <value>Ignore Case</value>
   </data>
@@ -439,13 +463,13 @@
     <value>The game path "{0}" is invalid.</value>
   </data>
   <data name="InvalidInputMessage" xml:space="preserve">
-    <value>Invalid input.</value>
+    <value>Invalid Input</value>
   </data>
   <data name="InvalidMoveMessage" xml:space="preserve">
     <value>The target group is the subgroup of the source group.</value>
   </data>
   <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
-    <value>Invalid published file id.</value>
+    <value>The published file ID is invalid.</value>
   </data>
   <data name="ItemId" xml:space="preserve">
     <value>Item ID</value>
@@ -679,9 +703,368 @@
     <value>Workshop Item Auto Update</value>
   </data>
   <data name="WorkshopVpkFileNotLoadProblemExplain" xml:space="preserve">
-    <value>The workshop vpk file is not loaded.</value>
+    <value>The workshop vpk file is not loaded. This problem will disappear once the download is completed successfully. If the download didn't start, you can press Check button to try to start the download.</value>
   </data>
   <data name="Yes" xml:space="preserve">
     <value>Yes</value>
+  </data>
+  <data name="GlobalPriority" xml:space="preserve">
+    <value>Global Priority</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_PriorityInHierarchy" xml:space="preserve">
+    <value>Sort by Global Priority</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_ProblemCount" xml:space="preserve">
+    <value>Sort by Problem Count</value>
+  </data>
+  <data name="Enum_AddonNodeSortMethod_Priority" xml:space="preserve">
+    <value>Sort by Priority</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RemoveAll" xml:space="preserve">
+    <value>Remove All</value>
+  </data>
+  <data name="ConfirmIgnoreAllConflictingFiles" xml:space="preserve">
+    <value>Are you sure you want to ignore all the conflicting files? </value>
+  </data>
+  <data name="ConfirmRemoveAllConflictIgnoringFiles" xml:space="preserve">
+    <value>Are you sure you want to remove all the conflict ignoring files?</value>
+  </data>
+  <data name="VpkAddonConflictProblemExplain" xml:space="preserve">
+    <value>VPK file conflicts found.  </value>
+  </data>
+  <data name="MissingAddon" xml:space="preserve">
+    <value>Missing Addon</value>
+  </data>
+  <data name="CancelRefreshing" xml:space="preserve">
+    <value>Cancel Refreshing</value>
+  </data>
+  <data name="VpkConflictList" xml:space="preserve">
+    <value>VPK Conflict List</value>
+  </data>
+  <data name="RefreshingHint" xml:space="preserve">
+    <value>Refreshing...</value>
+  </data>
+  <data name="CrashReporterMessageHeader" xml:space="preserve">
+    <value>FireAxe crashed due to an unhandled exception. The following is the details of the exception:</value>
+  </data>
+  <data name="Find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="GamePathNotFoundMessage" xml:space="preserve">
+    <value>Failed to find the game path. Please set it manually. </value>
+  </data>
+  <data name="ConfirmFoundGamePathMessage" xml:space="preserve">
+    <value>Game path "{0}" found. Are you sure you want to use this path?</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportConfirmMessage" xml:space="preserve">
+    <value>{0} redundant VPK file(s) with a total size of {1} were found. Each addon's directory will retain only the latest VPK file. Are you sure you want to proceed? </value>
+  </data>
+  <data name="DeleteRedundantVpkFiles" xml:space="preserve">
+    <value>Delete Redundant VPK files</value>
+  </data>
+  <data name="HintSelectedItems" xml:space="preserve">
+    <value>(selected items)</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportEmptyMessage" xml:space="preserve">
+    <value>No redundant VPK files were found.</value>
+  </data>
+  <data name="WorkshopVpkAddonDeleteRedundantVpkFilesReportSuccessMessage" xml:space="preserve">
+    <value>{0} redundant VPK file(s) with a total size of {1} have been deleted.</value>
+  </data>
+  <data name="PathColon" xml:space="preserve">
+    <value>Path: </value>
+  </data>
+  <data name="ParentGroupColon" xml:space="preserve">
+    <value>Parent Group: </value>
+  </data>
+  <data name="WorkshopVpkFinder" xml:space="preserve">
+    <value>Workshop VPK Finder </value>
+  </data>
+  <data name="OpenWebsite" xml:space="preserve">
+    <value>Open Website</value>
+  </data>
+  <data name="FindFromDirectory" xml:space="preserve">
+    <value>Find from Directory</value>
+  </data>
+  <data name="HintGettingTitle" xml:space="preserve">
+    <value>(Getting the title...)</value>
+  </data>
+  <data name="HintFailedGetTitle" xml:space="preserve">
+    <value>(Failed to get the title)</value>
+  </data>
+  <data name="SelectGamePath" xml:space="preserve">
+    <value>Select Game Path</value>
+  </data>
+  <data name="ExportSelectedItemsAsAddonRootFile" xml:space="preserve">
+    <value>Export Selected Items as an .addonroot File</value>
+  </data>
+  <data name="SaveAddonRootFile" xml:space="preserve">
+    <value>Save .addonroot File</value>
+  </data>
+  <data name="ImportAddonRootFile" xml:space="preserve">
+    <value>Import .addonroot File</value>
+  </data>
+  <data name="ImportedGroup" xml:space="preserve">
+    <value>Imported Group</value>
+  </data>
+  <data name="SaveAddonRootFileSuccess" xml:space="preserve">
+    <value>The .addonroot file "{0}" saved successfully.</value>
+  </data>
+  <data name="FileNameExists" xml:space="preserve">
+    <value>A file with the same name already exists.</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="DeletingAddons" xml:space="preserve">
+    <value>Deleting Addons</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Progress" xml:space="preserve">
+    <value>Deleting... ({0} / {1})</value>
+  </data>
+  <data name="OperationsProgress_Deletion_ProgressWithFailure" xml:space="preserve">
+    <value>Deleting... ({0} / {1}, {2} failures)</value>
+  </data>
+  <data name="OperationsProgress_Deletion_Done" xml:space="preserve">
+    <value>Done. {0} items have been deleted.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_DoneWithFailure" xml:space="preserve">
+    <value>Done. {0} items have been deleted and {1} items failed.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationSucceeded" xml:space="preserve">
+    <value>"{0}" deleted.</value>
+  </data>
+  <data name="OperationsProgress_Deletion_OperationFailed" xml:space="preserve">
+    <value>Failed to delete "{0}": {1}</value>
+  </data>
+  <data name="OperationCanceled" xml:space="preserve">
+    <value>The operation was canceled.</value>
+  </data>
+  <data name="FileCleaner" xml:space="preserve">
+    <value>File Cleaner</value>
+  </data>
+  <data name="Retain" xml:space="preserve">
+    <value>Retain</value>
+  </data>
+  <data name="Deleting" xml:space="preserve">
+    <value>Deleting...</value>
+  </data>
+  <data name="DeletionFailed" xml:space="preserve">
+    <value>Deletion Failed</value>
+  </data>
+  <data name="RetainAll" xml:space="preserve">
+    <value>Retain All</value>
+  </data>
+  <data name="TotalFileSizeColon" xml:space="preserve">
+    <value>Total File Size: </value>
+  </data>
+  <data name="GlobalSearch" xml:space="preserve">
+    <value>Global Search</value>
+  </data>
+  <data name="SearchSources" xml:space="preserve">
+    <value>Sources of Searching</value>
+  </data>
+  <data name="FindAllCleanable" xml:space="preserve">
+    <value>Find All Cleanable</value>
+  </data>
+  <data name="FindRedundantVpkFiles" xml:space="preserve">
+    <value>Find Redundant VPK Files</value>
+  </data>
+  <data name="FindEmptyDirectories" xml:space="preserve">
+    <value>Find Empty Directories</value>
+  </data>
+  <data name="FindDownloadTempFiles" xml:space="preserve">
+    <value>Find Download Temp Files</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>Delete All</value>
+  </data>
+  <data name="AddSearchSource" xml:space="preserve">
+    <value>Add Sources of Searching</value>
+  </data>
+  <data name="ItemsFoundWithCount" xml:space="preserve">
+    <value>{0} items found.</value>
+  </data>
+  <data name="ConfirmDeleteAll" xml:space="preserve">
+    <value>Are you sure you want to delete all the items?</value>
+  </data>
+  <data name="AddonNameAutoSetter" xml:space="preserve">
+    <value>Addon Name Auto Setter</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="GettingName" xml:space="preserve">
+    <value>Getting Name...</value>
+  </data>
+  <data name="FailedToGetName" xml:space="preserve">
+    <value>Failed to get the name.</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ApplyAll" xml:space="preserve">
+    <value>Apply All</value>
+  </data>
+  <data name="RetryAll" xml:space="preserve">
+    <value>Retry All</value>
+  </data>
+  <data name="ForceUseWorkshopTitle" xml:space="preserve">
+    <value>Force to use workshop item's title.</value>
+  </data>
+  <data name="Targets" xml:space="preserve">
+    <value>Targets</value>
+  </data>
+  <data name="NoItemsToStart" xml:space="preserve">
+    <value>There are no items to start.</value>
+  </data>
+  <data name="FailedToApplyNameWithCount" xml:space="preserve">
+    <value>Failed to apply names for {0} items.</value>
+  </data>
+  <data name="AddTargets" xml:space="preserve">
+    <value>Add Targets</value>
+  </data>
+  <data name="AlternativeCustomizeAddonPreviewImageNote" xml:space="preserve">
+    <value>NOTE: You can also place an image file with the same name next to the addon's file to customize the preview image (this method takes higher priority).</value>
+  </data>
+  <data name="AddonDependenciesProblemExplain" xml:space="preserve">
+    <value>There are dependencies that are not enabled.</value>
+  </data>
+  <data name="Dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="AddDependencies" xml:space="preserve">
+    <value>Add Dependencies</value>
+  </data>
+  <data name="EnableAll" xml:space="preserve">
+    <value>Enable All</value>
+  </data>
+  <data name="ReferenceAddon" xml:space="preserve">
+    <value>Reference Addon</value>
+  </data>
+  <data name="Reference" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="SourceColon" xml:space="preserve">
+    <value>Source: </value>
+  </data>
+  <data name="Set" xml:space="preserve">
+    <value>Set</value>
+  </data>
+  <data name="SyncTags" xml:space="preserve">
+    <value>Sync Tags</value>
+  </data>
+  <data name="SyncDependencies" xml:space="preserve">
+    <value>Sync Dependencies</value>
+  </data>
+  <data name="UnnamedReferenceAddon" xml:space="preserve">
+    <value>Unnamed Reference Addon</value>
+  </data>
+  <data name="SetSource" xml:space="preserve">
+    <value>Set Source</value>
+  </data>
+  <data name="AddonCircularRefProblemExplain" xml:space="preserve">
+    <value>There is a circular reference.</value>
+  </data>
+  <data name="ItemsRandomSelectedWithCount" xml:space="preserve">
+    <value>{0} items selected randomly.</value>
+  </data>
+  <data name="NoItemRandomSelected" xml:space="preserve">
+    <value>There are no items to be selected randomly.</value>
+  </data>
+  <data name="WebProxyAddress" xml:space="preserve">
+    <value>Web Proxy Address</value>
+  </data>
+  <data name="InvalidFilePath" xml:space="preserve">
+    <value>Invalid File Path</value>
+  </data>
+  <data name="ValueMustBeInteger" xml:space="preserve">
+    <value>The value must be an integer.</value>
+  </data>
+  <data name="InvalidUri" xml:space="preserve">
+    <value>Invalid URI</value>
+  </data>
+  <data name="FileMustBeInCurrentDirectory" xml:space="preserve">
+    <value>The file must be in the current directory.</value>
+  </data>
+  <data name="InvalidGuid" xml:space="preserve">
+    <value>Invalid GUID</value>
+  </data>
+  <data name="ChangeIdNote" xml:space="preserve">
+    <value>NOTE: Changing the ID might resolve the reference problem but can also lead to reference loss problems. Please ensure you understand its mechanism before making change.</value>
+  </data>
+  <data name="AdvancedPanel" xml:space="preserve">
+    <value>Advanced Panel</value>
+  </data>
+  <data name="AddonFileNotExist" xml:space="preserve">
+    <value>Addon file does not exist.</value>
+  </data>
+  <data name="AddonDownloadFailedProblemExplain" xml:space="preserve">
+    <value>Download Failed ({0}). File Path: {1}. URL: {2}.</value>
+  </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Download Failed</value>
+  </data>
+  <data name="ProblemList" xml:space="preserve">
+    <value>Problem List</value>
+  </data>
+  <data name="ProblematicAddons" xml:space="preserve">
+    <value>Problematic Addons</value>
+  </data>
+  <data name="ProblemsFoundWithCount" xml:space="preserve">
+    <value>{0} problems found.</value>
+  </data>
+  <data name="NoProblemFound" xml:space="preserve">
+    <value>No problems found.</value>
+  </data>
+  <data name="AppAlreadyRunningMessage" xml:space="preserve">
+    <value>FireAxe is already running. Only one instance is allowed to run at the same time.</value>
+  </data>
+  <data name="FileBackup" xml:space="preserve">
+    <value>File Backup</value>
+  </data>
+  <data name="AddonRootBackupDirectoryLocationNote" xml:space="preserve">
+    <value>Backup files are in ".addonrootdir/backups".</value>
+  </data>
+  <data name="MaxRetainedBackupFileCount" xml:space="preserve">
+    <value>Max Retained Backup File Count</value>
+  </data>
+  <data name="FileBackupIntervalMinutes" xml:space="preserve">
+    <value>File Backup Interval (minutes)</value>
+  </data>
+  <data name="ValueMustBeWithinValidRange" xml:space="preserve">
+    <value>The value must be within the valid range.</value>
+  </data>
+  <data name="Creating" xml:space="preserve">
+    <value>Creating...</value>
+  </data>
+  <data name="AppSettingsFileLocationNote" xml:space="preserve">
+    <value>The settings file is located at: 
+"{0}"</value>
+  </data>
+  <data name="IgnoreHalfLife2FilesForVpkAddonConflicts" xml:space="preserve">
+    <value>Ignore Half Life 2 Files for VPK addon conflicts</value>
+  </data>
+  <data name="CustomizeVpkAddonConflictIgnoringFilesNote" xml:space="preserve">
+    <value>You can customize VPK addon conflict ignoring files in this directory: 
+{0}</value>
+  </data>
+  <data name="LastPushedAt" xml:space="preserve">
+    <value>Last pushed at {0}</value>
+  </data>
+  <data name="OpenDirectoryNote" xml:space="preserve">
+    <value>Open the directory where addons are stored. Do not open "left4dead2/addons" or "left4dead2/addon/workshop"!</value>
+  </data>
+  <data name="OpeningDirectory" xml:space="preserve">
+    <value>Opening Directory...</value>
   </data>
 </root>

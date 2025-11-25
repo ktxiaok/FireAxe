@@ -1,242 +1,240 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.ReactiveUI;
 using FireAxe.Resources;
 using FireAxe.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 
-namespace FireAxe.Views
+namespace FireAxe.Views;
+
+public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplorerViewModel>
 {
-    public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplorerViewModel>
+    public static readonly StyledProperty<bool> IsSingleSelectionEnabledProperty =
+        AvaloniaProperty.Register<AddonNodeExplorerView, bool>(nameof(IsSingleSelectionEnabled), defaultValue: false);
+
+    public static readonly DirectProperty<AddonNodeExplorerView, SelectionMode> ExpectedSelectionModeProperty =
+        AvaloniaProperty.RegisterDirect<AddonNodeExplorerView, SelectionMode>(nameof(ExpectedSelectionMode), t => t.ExpectedSelectionMode);
+
+    private const int AddonNodeViewColumnIndex = 2;
+
+    private SelectionMode _expectedSelectionMode = SelectionMode.Multiple;
+
+    public AddonNodeExplorerView()
     {
-        private IDisposable? _viewModelDisposable = null;
+        InitializeComponent();
 
-        public AddonNodeExplorerView()
+        this.WhenAnyValue(x => x.IsSingleSelectionEnabled)
+            .Select(singleSelection => singleSelection ? SelectionMode.Single : SelectionMode.Multiple)
+            .Subscribe(selectionMode => ExpectedSelectionMode = selectionMode);
+
+        this.WhenActivated((CompositeDisposable disposables) =>
         {
-            InitializeComponent();
-
-            this.WhenActivated((CompositeDisposable disposables) =>
-            {
-                this.WhenAnyValue(x => x.ViewModel)
-                .WhereNotNull()
-                .Subscribe((viewModel) =>
-                {
-                    ConnectViewModel(viewModel);
-                })
-                .DisposeWith(disposables);
-
-                var topLevel = TopLevel.GetTopLevel(this)!;
-                topLevel.KeyDown += HandleKeyDown;
-
-                Disposable.Create(() =>
-                {
-                    DisconnectViewModel();
-
-                    topLevel.KeyDown -= HandleKeyDown;
-                })
-                .DisposeWith(disposables);
-            });
-
-            DoubleTapped += AddonNodeExplorerView_DoubleTapped;
-            AddHandler(ListBox.SelectionChangedEvent, AddonNodeExplorerView_SelectionChanged);
-            PointerReleased += AddonNodeExplorerView_PointerReleased;
-
-            searchOptionsButton.Click += (sender, e) =>
-            {
-                searchOptionsControl.IsVisible = !searchOptionsControl.IsVisible;
-            };
-        }
-
-        private void ConnectViewModel(AddonNodeExplorerViewModel viewModel)
-        {
-            DisconnectViewModel();
-            var disposables = new CompositeDisposable();
-            _viewModelDisposable = disposables;
-
-            var setSelection = (IEnumerable<AddonNode> nodes) =>
-            {
-                var listBox = FindActiveListBox();
-                if (listBox == null)
-                {
-                    return;
-                }
-                var selection = listBox.Selection;
-                SelectionModelHelper.Select(selection, nodes, (obj) =>
-                {
-                    if (obj is AddonNodeSimpleViewModel viewModel)
-                    {
-                        return viewModel.AddonNode;
-                    }
-                    return null;
-                });
-            };
-            viewModel.SetSelection += setSelection;
-
-            viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
-            {
-                await CommonMessageBoxes.ShowException(FindWindow(), context.Input);
-                context.SetOutput(Unit.Default);
-            }).DisposeWith(disposables);
-
-            viewModel.ConfirmDeleteInteraction.RegisterHandler(async (context) =>
-            {
-                bool retainFile = context.Input;
-                string message = Texts.ConfirmDeleteMessage;
-                if (retainFile)
-                {
-                    message += '\n' + Texts.RetainFileMessage;
-                }
-                bool result = await CommonMessageBoxes.Confirm(FindWindow(), message, Texts.ConfirmDelete);
-                context.SetOutput(result);
-            }).DisposeWith(disposables);
-
-            viewModel.ReportInvalidMoveInteraction.RegisterHandler(async (context) =>
-            {
-                string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.InvalidMoveMessage;
-                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
-                context.SetOutput(reply);
-            }).DisposeWith(disposables);
-
-            viewModel.ReportNameExistsForMoveInteraction.RegisterHandler(async (context) =>
-            {
-                string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.ItemNameExists;
-                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
-                context.SetOutput(reply);
-            }).DisposeWith(disposables);
-
-            viewModel.ReportExceptionForMoveInteraction.RegisterHandler(async (context) =>
-            {
-                var input = context.Input;
-                string name = input.Item1;
-                Exception ex = input.Item2;
-                string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
-                string message = string.Format(Texts.CantMoveItemWithName, name) + '\n' + exceptionMessage;
-                var reply = await CommonMessageBoxes.GetErrorOperationReply(FindWindow(), message);
-                context.SetOutput(reply);
-            }).DisposeWith(disposables);
+            var topLevel = TopLevel.GetTopLevel(this)!;
+            topLevel.KeyDown += HandleKeyDown;
 
             Disposable.Create(() =>
             {
-                viewModel.SetSelection -= setSelection;
+                topLevel.KeyDown -= HandleKeyDown;
             }).DisposeWith(disposables);
-        }
+        });
 
-        private void DisconnectViewModel()
-        {
-            if (_viewModelDisposable != null)
-            {
-                _viewModelDisposable.Dispose();
-                _viewModelDisposable = null;
-            }
-        }
+        this.RegisterViewModelConnection(ConnectViewModel);
 
-        private Window FindWindow()
-        {
-            var visualRoot = VisualRoot;
-            if (visualRoot == null)
-            {
-                throw new Exception("VisualRoot is null.");
-            }
-            return (Window)visualRoot;
-        }
+        DoubleTapped += AddonNodeExplorerView_DoubleTapped;
+        PointerReleased += AddonNodeExplorerView_PointerReleased;
 
-        private ListBox? FindActiveListBox()
+        searchOptionsButton.Click += (sender, e) =>
         {
-            return Find(this);
-            
-            ListBox? Find(ILogical current)
+            searchOptionsControl.IsVisible = !searchOptionsControl.IsVisible;
+        };
+    }
+
+    public bool IsSingleSelectionEnabled
+    {
+        get => GetValue(IsSingleSelectionEnabledProperty);
+        set => SetValue(IsSingleSelectionEnabledProperty, value);
+    }
+
+    public SelectionMode ExpectedSelectionMode
+    {
+        get => _expectedSelectionMode;
+        private set => SetAndRaise(ExpectedSelectionModeProperty, ref _expectedSelectionMode, value);
+    }
+
+    private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
+    {
+        viewModel.WhenAnyValue(x => x.IsAddonNodeViewEnabled)
+            .Subscribe(isAddonNodeViewEnabled =>
             {
-                if (current is ListBox listBox)
+                if (isAddonNodeViewEnabled)
                 {
-                    if (listBox.IsVisible)
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = double.PositiveInfinity;
+                }
+                else
+                {
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = 0;
+                }
+            })
+            .DisposeWith(disposables);
+
+        viewModel.WhenAnyValue(x => x.TileViewSize)
+            .Subscribe(size =>
+            {
+                Resources["AddonTileSize"] = size;
+            })
+            .DisposeWith(disposables);
+
+        viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
+        {
+            await CommonMessageBoxes.ShowException(this.GetRootWindow(), context.Input);
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
+        viewModel.ConfirmDeleteInteraction.RegisterHandler(async (context) =>
+        {
+            bool retainFile = context.Input;
+            string message = Texts.ConfirmDeleteMessage;
+            if (retainFile)
+            {
+                message += '\n' + Texts.RetainFileMessage;
+            }
+            bool result = await CommonMessageBoxes.Confirm(this.GetRootWindow(), message, Texts.ConfirmDelete);
+            context.SetOutput(result);
+        }).DisposeWith(disposables);
+
+        viewModel.ReportInvalidMoveInteraction.RegisterHandler(async (context) =>
+        {
+            string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.InvalidMoveMessage;
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
+            context.SetOutput(reply);
+        }).DisposeWith(disposables);
+
+        viewModel.ReportNameExistsForMoveInteraction.RegisterHandler(async (context) =>
+        {
+            string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.ItemNameExists;
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
+            context.SetOutput(reply);
+        }).DisposeWith(disposables);
+
+        viewModel.ReportExceptionForMoveInteraction.RegisterHandler(async (context) =>
+        {
+            var input = context.Input;
+            string name = input.Item1;
+            Exception ex = input.Item2;
+            string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
+            string message = string.Format(Texts.CantMoveItemWithName, name) + '\n' + exceptionMessage;
+            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
+            context.SetOutput(reply);
+        }).DisposeWith(disposables);
+
+        viewModel.ShowDeletionProgressInteraction.RegisterHandler(context =>
+        {
+            var operations = context.Input;
+            var progressViewModel = new OperationsProgressViewModel();
+
+            var window = new OperationsProgressWindow
+            {
+                DataContext = progressViewModel,
+                Title = Texts.DeletingAddons,
+                OperationsProgressView =
+                {
+                    MessageTemplate = OperationsProgressViewMessageTemplates.Deletion
+                }
+            };
+            window.Show();
+            window.Activate();
+
+            new TaskOperationsProgressNotifier(operations, false, progressViewModel);
+
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
+        viewModel.ShowNewWorkshopCollectionWindowInteraction.RegisterHandler(context =>
+        {
+            var (addonRoot, addonGroup) = context.Input;
+            var window = new NewWorkshopCollectionWindow
+            {
+                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup)
+            };
+            window.Show();
+            window.Activate();
+
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+    }
+
+    private void AddonNodeExplorerView_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        var viewModel = ViewModel;
+        if (viewModel != null)
+        {
+            if (e.Source is Control sourceControl)
+            {
+                if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
+                {
+                    if (listItemViewModel.Addon is AddonGroup addonGroup)
                     {
-                        return listBox;
+                        viewModel.GotoGroup(addonGroup);
+                        e.Handled = true;
                     }
                 }
-                foreach (var child in current.LogicalChildren)
-                {
-                    var result = Find(child);
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                }
-                return null;
             }
         }
+    }
 
-        private void AddonNodeExplorerView_DoubleTapped(object? sender, TappedEventArgs e)
+    private void AddonNodeExplorerView_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.InitialPressMouseButton == MouseButton.XButton1)
         {
             var viewModel = ViewModel;
             if (viewModel != null)
             {
-                if (e.Source is Control sourceControl)
-                {
-                    if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
-                    {
-                        if (listItemViewModel.AddonNode is AddonGroup addonGroup)
-                        {
-                            viewModel.GotoGroup(addonGroup);
-                            e.Handled = true;
-                        }
-                    }
-                }
+                viewModel.GotoParent();
             }
         }
+    }
 
-        private void AddonNodeExplorerView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void HandleKeyDown(object? sender, KeyEventArgs e)
+    {
+        var viewModel = ViewModel;
+        if (viewModel == null)
         {
-            var viewModel = ViewModel;
-            if (viewModel != null)
-            {
-                if (e.Source is ListBox listBox)
-                {
-                    viewModel.Selection = listBox.Selection.SelectedItems
-                        .Select(item => item as AddonNodeListItemViewModel)
-                        .Where(x => x != null)
-                        .ToArray()!;
-                }
-            }
+            return;
         }
 
-        private void AddonNodeExplorerView_PointerReleased(object? sender, PointerReleasedEventArgs e)
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
         {
-            if (e.InitialPressMouseButton == MouseButton.XButton1)
+            if (e.Key == Key.X)
             {
-                var viewModel = ViewModel;
-                if (viewModel != null)
-                {
-                    viewModel.GotoParent();
-                }
+                e.Handled = true;
+                viewModel.Move();
+            }
+            else if (e.Key == Key.V)
+            {
+                e.Handled = true;
+                await viewModel.MoveHere();
+            }
+            else if (e.Key == Key.F)
+            {
+                e.Handled = true;
+                searchTextBox.Focus();
             }
         }
-
-        private async void HandleKeyDown(object? sender, KeyEventArgs e)
+        else
         {
-            var viewModel = ViewModel;
-            if (viewModel == null)
+            if (e.Key == Key.Delete)
             {
-                return;
-            }
-
-            if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
-            {
-                if (e.Key == Key.X)
-                {
-                    e.Handled = true;
-                    viewModel.Move();
-                }
-                else if (e.Key == Key.V)
-                {
-                    e.Handled = true;
-                    await viewModel.MoveHere();
-                }
+                e.Handled = true;
+                await viewModel.Delete(false);
             }
         }
     }

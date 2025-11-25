@@ -1,3 +1,33 @@
+- add: VPK conflict checking system
+- add: new addon type: reference addon (you can use this type to operate the same addon in different groups)
+- add: addon dependency management
+- add: new tool: Problem List
+- add: new tool: Addon Name Auto Setter
+- add: new tool: File Cleaner (supports deleting redundant VPK files for workshop items, download temp files and empty directories)
+- add: new tool: Workshop VPK Finder
+- add: .addonroot file backup function
+- add: support import and export for .addonroot files
+- add: addon deletion progress window
+- add: mechanism of addon linked files: all files with the same name as the addon file will follow the addon when it is moved
+- add: alternative method of customizing addon preview image: place an image file with the same name next to the addon file (issue #17)
+- add: web proxy address setting (issue #19)
+- add: Addon Advanced Panel
+- add: singleton mode: only one app instance is allowed to run at the same time
+- fix: deletion of addons doesn't delete the corresponding files in some cases
+- improve: better download logic of WorkshopVpkAddon
+- improve: move the addon priority setting to the AddonNode view and support addon global priority (now AddonGroups have priority too)   
+- remove: Flat VPK List (you can enable the Flatten option of the search options to realize this function approximately) 
+- add: Path and Parent Group to AddonNodeView
+- add: hotkeys "Ctrl+F" to focus the search text box, "Delete" to delete the selected addons and "Enter" to confirm operations in confirmation dialog boxes
+- add: app color theme settings (supporting Light and Dark)
+- add: addon sort method and addon view kind will be memorized
+- add: new addon sort methods: Sort by Tags, Sort by Priority, Sort by Global Priority, Sort by Problem Count
+- add: game path auto finding
+- change: rename "Default Order" to "No Sort"
+- improve: improve the addon problem checking system
+- upgrade: .NET from 8.0 to 10.0
+- upgrade: upgrade dependent packages
+- bugfixes
 # v0.6.1
 - add: addon preview image customization (issue #11)
 - upgrade: update dependent packages

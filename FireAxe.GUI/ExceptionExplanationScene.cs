@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public enum ExceptionExplanationScene
 {
-    public enum ExceptionExplanationScene
-    {
-        Default,
-        Input
-    }
+    Default,
+    Input
 }

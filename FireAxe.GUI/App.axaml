@@ -3,11 +3,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   x:Class="FireAxe.App"
   xmlns:local="using:FireAxe"
+  xmlns:v="using:FireAxe.Views"
   xmlns:conv="using:FireAxe.ValueConverters"
   xmlns:dt="using:FireAxe.DataTemplates"
   xmlns:r="using:FireAxe.Resources"
-  RequestedThemeVariant="Dark">
-  <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  xmlns:sys="using:System">
 
   <Application.DataTemplates>
     <dt:ViewLocator/>
@@ -55,6 +55,18 @@
       <Setter Property="Margin" Value="0, 5, 0, 5"/>
     </Style>
 
+    <Style Selector="TextBox.PropertyValue">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0, 5, 0, 5"/>
+    </Style>
+
+    <Style Selector="v|EditableTextBlock.PropertyValue">
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0, 5, 0, 5"/>
+    </Style>
+
     <Style Selector="ComboBox.PropertyValue">
       <Setter Property="HorizontalAlignment" Value="Right"/>
       <Setter Property="Margin" Value="0, 5, 0, 5"/>
@@ -77,6 +89,12 @@
     <Style Selector="Button.cancel /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Content" Value="{x:Static r:Texts.Cancel}" />
     </Style>
+
+    <Style Selector="Border.Level1">
+      <Setter Property="BorderBrush" Value="Gray"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="5"/>
+    </Style>
   </Application.Styles>
 
   <Application.Resources>
@@ -86,6 +104,11 @@
         <ResourceInclude Source="/Views/EditableTextBlock.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
+
+    <Thickness x:Key="ExpanderHeaderPadding">5</Thickness>
+    <Thickness x:Key="ExpanderContentPadding">5</Thickness>
+
+    <sys:Double x:Key="AddonTileSize">75</sys:Double>
   </Application.Resources>
   
 </Application>

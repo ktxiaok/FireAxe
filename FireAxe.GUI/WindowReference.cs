@@ -1,25 +1,24 @@
 ﻿using Avalonia.Controls;
 using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class WindowReference<T> where T : Window
 {
-    public class WindowReference<T> where T : Window
+    private T? _target;
+
+    public WindowReference(T target)
     {
-        private T? _target;
+        ArgumentNullException.ThrowIfNull(target);
 
-        public WindowReference(T target)
-        {
-            ArgumentNullException.ThrowIfNull(target);
+        _target = target;
+        target.Closed += Target_Closed;
+    }
 
-            _target = target;
-            target.Closed += Target_Closed;
-        }
+    public T? Get() => _target;
 
-        public T? Get() => _target;
-
-        private void Target_Closed(object? sender, EventArgs e)
-        {
-            _target = null;
-        }
+    private void Target_Closed(object? sender, EventArgs e)
+    {
+        _target = null;
     }
 }

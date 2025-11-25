@@ -1,13 +1,16 @@
 ﻿using System;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public enum AddonNodeSortMethod
 {
-    public enum AddonNodeSortMethod
-    {
-        Default,
-        Name,
-        EnableState,
-        CreationTime,
-        FileSize
-    }
+    None,
+    Name,
+    EnableState,
+    Priority,
+    PriorityInHierarchy,
+    ProblemCount,
+    Tag,
+    CreationTime,
+    FileSize,
 }

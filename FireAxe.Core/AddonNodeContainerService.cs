@@ -1,90 +1,173 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Serilog;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal class AddonNodeContainerService
 {
-    internal class AddonNodeContainerService
+    private readonly IAddonNodeContainer _container;
+
+    private readonly ObservableCollection<AddonNode> _nodes;
+    private readonly ReadOnlyObservableCollection<AddonNode> _nodesReadOnly;
+
+    private readonly Dictionary<string, AddonNode> _nameToNode = new(StringComparer.InvariantCultureIgnoreCase);
+
+    public AddonNodeContainerService(IAddonNodeContainer container)
     {
-        private ObservableCollection<AddonNode> _nodes;
-        private ReadOnlyObservableCollection<AddonNode> _nodesReadOnly;
+        _container = container;
+        _nodes = new();
+        _nodesReadOnly = new(_nodes);
+    }
 
-        private Dictionary<string, AddonNode> _nodeNames = new();
+    public IAddonNodeContainer Container => _container;
 
-        public AddonNodeContainerService()
+    public ReadOnlyObservableCollection<AddonNode> Nodes => _nodesReadOnly;
+
+    public void AddUnchecked(AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        ChangeNameUnchecked(null, node.Name, node);
+        foreach (var nodeOrDescendant in node.GetSelfAndDescendantsByDfsPreorder())
         {
-            _nodes = new();
-            _nodesReadOnly = new(_nodes);
+            nodeOrDescendant.NotifyAncestorsChanged();
         }
-
-        public ReadOnlyObservableCollection<AddonNode> Nodes => _nodesReadOnly;
-
-        public void AddUncheckName(AddonNode node)
+        _nodes.Add(node);
+        foreach (var containerOrAncestor in _container.GetSelfAndAncestors())
         {
-            ArgumentNullException.ThrowIfNull(node);
-
-            ChangeNameUnchecked(null, node.Name, node);
-            _nodes.Add(node);
+            ((IAddonNodeContainerInternal)containerOrAncestor).NotifyDescendantNodeMoved(node);
         }
+    }
 
-        public void Remove(AddonNode node)
+    public void Remove(AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        var name = node.Name;
+        if (name != AddonNode.NullName)
         {
-            ArgumentNullException.ThrowIfNull(node);
-
-            var name = node.Name;
-            if (name.Length > 0)
-            {
-                _nodeNames.Remove(name);
-            }
-            _nodes.Remove(node);
+            _nameToNode.Remove(name);
         }
-
-        public string GetUniqueName(string name)
+        _nodes.Remove(node);
+        foreach (var containerOrAncestor in _container.GetSelfAndAncestors())
         {
-            ArgumentNullException.ThrowIfNull(name);
+            ((IAddonNodeContainerInternal)containerOrAncestor).NotifyDescendantNodeMoved(node);
+        }
+    }
 
-            if (!NameExists(name))
+    public string GetUniqueName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        var fileSystemEntries = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+        var fileSystemPath = _container.FileSystemPath;
+        if (fileSystemPath is not null)
+        {
+            try
             {
-                return name;
-            }
-            int i = 1;
-            while (true)
-            {
-                string nameTry = name + $"({i})";
-                if (!NameExists(nameTry))
+                foreach (var path in Directory.EnumerateFileSystemEntries(fileSystemPath))
                 {
-                    return nameTry;
+                    fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", fileSystemPath);
+            }
+        }
+
+        bool Exists(string name) => NameExists(name) || fileSystemEntries.Contains(name);
+
+        if (!Exists(name))
+        {
+            return name;
+        }
+        int i = 1;
+        while (true)
+        {
+            string nameTry = name + $"({i})";
+            if (!Exists(nameTry))
+            {
+                return nameTry;
+            }
+            checked
+            {
                 i++;
             }
         }
+    }
 
-        public void ThrowIfNameInvalid(string name)
+    public AddonNode? TryGetByName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        if (_nameToNode.TryGetValue(name, out var node))
         {
-            ArgumentNullException.ThrowIfNull(name);
-
-            if (NameExists(name))
-            {
-                throw new AddonNameExistsException(name);
-            }
+            return node;
         }
+        return null;
+    }
 
-        public bool NameExists(string name)
+    public AddonNode? TryGetByPath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        var names = path.Split('/');
+        int i = 0;
+        IAddonNodeContainer parent = _container;
+        while (true)
         {
-            ArgumentNullException.ThrowIfNull(name);
-
-            return _nodeNames.ContainsKey(name);
-        }
-
-        public void ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
-        {
-            ArgumentNullException.ThrowIfNull(newName);
-            ArgumentNullException.ThrowIfNull(node);
-
-            if (oldName != null && oldName.Length > 0)
+            var node = parent.TryGetNodeByName(names[i]);
+            if (node is null)
             {
-                _nodeNames.Remove(oldName);
+                return null;
             }
-            _nodeNames[newName] = node;
+            if (i == names.Length - 1)
+            {
+                return node;
+            }
+            var container = node as IAddonNodeContainer;
+            if (container is null)
+            {
+                return null;
+            }
+            parent = container;
+            i++;
+        }
+    }
+
+    public void ThrowIfNameInvalid(string name, AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(node);
+
+        if (_nameToNode.TryGetValue(name, out var existingNode) && existingNode != node)
+        {
+            throw new AddonNameExistsException(name);
+        }
+    }
+
+    public bool NameExists(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        return _nameToNode.ContainsKey(name);
+    }
+
+    public void ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
+    {
+        ArgumentNullException.ThrowIfNull(newName);
+        ArgumentNullException.ThrowIfNull(node);
+
+        if (oldName != null && oldName != AddonNode.NullName)
+        {
+            _nameToNode.Remove(oldName);
+        }
+        if (newName != AddonNode.NullName)
+        {
+            _nameToNode[newName] = node;
         }
     }
 }

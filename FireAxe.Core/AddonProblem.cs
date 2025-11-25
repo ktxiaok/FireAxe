@@ -1,35 +1,15 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public abstract class AddonProblem : Problem
 {
-    public abstract class AddonProblem
+    private readonly AddonProblemSource _problemSource;
+
+    public AddonProblem(AddonProblemSource problemSource) : base(problemSource)
     {
-        public AddonProblem(AddonNode source)
-        {
-            ArgumentNullException.ThrowIfNull(source);
-            Source = source;
-        }
-
-        public AddonNode Source { get; }
-
-        public virtual bool CanAutoSolve => false;
-
-        public bool TryAutoSolve()
-        {
-            if (OnAutoSolve())
-            {
-                Source.RemoveProblem(this);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        protected virtual bool OnAutoSolve()
-        {
-            return false;
-        }
+        _problemSource = problemSource;
     }
+
+    public AddonNode Addon => _problemSource.Addon;
 }

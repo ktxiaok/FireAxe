@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace FireAxe
-{
-    public class LocalVpkAddonSave : VpkAddonSave
-    {
-        public override Type TargetType => typeof(LocalVpkAddon);
+namespace FireAxe;
 
-        public Guid VpkGuid { get; set; } = Guid.Empty;
-    }
+public class LocalVpkAddonSave : VpkAddonSave
+{
+    public override Type TargetType => typeof(LocalVpkAddon);
 }

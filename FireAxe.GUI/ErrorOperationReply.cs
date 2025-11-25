@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public enum ErrorOperationReply
 {
-    public enum ErrorOperationReply
-    {
-        Abort,
-        Skip,
-        SkipAll
-    }
+    Abort,
+    Skip,
+    SkipAll
 }

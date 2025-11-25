@@ -6,154 +6,154 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class DownloadItemListViewModel : ViewModelBase, IActivatableViewModel, IDisposable
 {
-    public class DownloadItemListViewModel : ViewModelBase, IActivatableViewModel, IDisposable
+    private static TimeSpan CleanInterval = TimeSpan.FromSeconds(0.5);
+
+    private bool _disposed = false;
+
+    private readonly ObservableCollection<IDownloadItem> _downloadItems = new();
+    private readonly ReadOnlyObservableCollection<DownloadItemViewModel> _downloadItemViewModels;
+
+    private IReadOnlyList<DownloadItemViewModel>? _selection = null;
+    private readonly ObservableAsPropertyHelper<bool> _hasSelection;
+
+    private IDisposable _cleanTimer;
+
+    public DownloadItemListViewModel()
     {
-        private static TimeSpan CleanInterval = TimeSpan.FromSeconds(0.5);
+        _downloadItems.ToObservableChangeSet()
+            .Transform(downloadItem => new DownloadItemViewModel(downloadItem))
+            .Bind(out _downloadItemViewModels)
+            .Subscribe();
 
-        private bool _disposed = false;
-
-        private readonly ObservableCollection<IDownloadItem> _downloadItems = new();
-        private readonly ReadOnlyObservableCollection<DownloadItemViewModel> _downloadItemViewModels;
-
-        private IReadOnlyList<DownloadItemViewModel>? _selection = null;
-        private readonly ObservableAsPropertyHelper<bool> _hasSelection;
-
-        private IDisposable _cleanTimer;
-
-        public DownloadItemListViewModel()
-        {
-            _downloadItems.ToObservableChangeSet()
-                .Transform(downloadItem => new DownloadItemViewModel(downloadItem))
-                .Bind(out _downloadItemViewModels)
-                .Subscribe();
-
-            _hasSelection = this.WhenAnyValue(x => x.Selection)
-                .Select(selection =>
-                {
-                    if (selection == null)
-                    {
-                        return false;
-                    }
-                    return selection.Count > 0;
-                })
-                .ToProperty(this, nameof(HasSelection));
-
-            _cleanTimer = DispatcherTimer.Run(() =>
+        _hasSelection = this.WhenAnyValue(x => x.Selection)
+            .Select(selection =>
             {
-                Clean();
-                return true;
-            }, CleanInterval);
-
-            this.WhenActivated((CompositeDisposable disposables) =>
-            {
-                Disposable.Create(() =>
-                {
-                    Selection = null;
-                })
-                .DisposeWith(disposables);
-            });
-        }
-
-        public ViewModelActivator Activator { get; } = new();
-
-        public ReadOnlyObservableCollection<DownloadItemViewModel> DownloadItemViewModels => _downloadItemViewModels;
-
-        public IReadOnlyList<DownloadItemViewModel>? Selection
-        {
-            get => _selection;
-            set
-            {
-                _selection = value;
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public IEnumerable<IDownloadItem> SelectedDownloadItems
-        {
-            get
-            {
-                var selection = Selection;
                 if (selection == null)
                 {
-                    yield break;
+                    return false;
                 }
-                foreach (var item in selection)
-                {
-                    yield return item.DownloadItem;
-                }
-            }
-        }
+                return selection.Count > 0;
+            })
+            .ToProperty(this, nameof(HasSelection));
 
-        public bool HasSelection => _hasSelection.Value;
-
-        public void Add(IDownloadItem downloadItem)
+        _cleanTimer = DispatcherTimer.Run(() =>
         {
-            ArgumentNullException.ThrowIfNull(downloadItem);
+            Clean();
+            return true;
+        }, CleanInterval);
 
-            _downloadItems.Add(downloadItem);
-        }
-
-        public void Remove(IDownloadItem downloadItem)
+        this.WhenActivated((CompositeDisposable disposables) =>
         {
-            ArgumentNullException.ThrowIfNull(downloadItem);
-
-            _downloadItems.Remove(downloadItem);
-        }
-
-        public void Clean()
-        {
-            int i = 0;
-            while (i < _downloadItems.Count)
+            Disposable.Create(() =>
             {
-                var downloadItem = _downloadItems[i];
-                if (downloadItem.Status.IsCompleted())
-                {
-                    _downloadItems.RemoveAt(i);
-                }
-                else
-                {
-                    i++;
-                }
-            }
-        }
+                Selection = null;
+            })
+            .DisposeWith(disposables);
+        });
+    }
 
-        public void Pause()
+    public ViewModelActivator Activator { get; } = new();
+
+    public ReadOnlyObservableCollection<DownloadItemViewModel> DownloadItemViewModels => _downloadItemViewModels;
+
+    public IReadOnlyList<DownloadItemViewModel>? Selection
+    {
+        get => _selection;
+        set
         {
-            foreach (var download in SelectedDownloadItems)
-            {
-                download.Pause();
-            }
+            _selection = value;
+            this.RaisePropertyChanged();
         }
+    }
 
-        public void Resume()
+    public IEnumerable<IDownloadItem> SelectedDownloadItems
+    {
+        get
         {
-            foreach (var download in SelectedDownloadItems)
+            var selection = Selection;
+            if (selection == null)
             {
-                download.Resume();
+                yield break;
+            }
+            foreach (var item in selection)
+            {
+                yield return item.DownloadItem;
             }
         }
+    }
 
-        public void Cancel()
+    public bool HasSelection => _hasSelection.Value;
+
+    public void Add(IDownloadItem downloadItem)
+    {
+        ArgumentNullException.ThrowIfNull(downloadItem);
+
+        _downloadItems.Add(downloadItem);
+    }
+
+    public void Remove(IDownloadItem downloadItem)
+    {
+        ArgumentNullException.ThrowIfNull(downloadItem);
+
+        _downloadItems.Remove(downloadItem);
+    }
+
+    public void Clean()
+    {
+        int i = 0;
+        while (i < _downloadItems.Count)
         {
-            foreach (var download in SelectedDownloadItems)
+            var downloadItem = _downloadItems[i];
+            if (downloadItem.Status.IsCompleted())
             {
-                download.Cancel();
+                _downloadItems.RemoveAt(i);
+            }
+            else
+            {
+                i++;
             }
         }
+    }
 
-        public void Dispose()
+    public void Pause()
+    {
+        foreach (var download in SelectedDownloadItems)
         {
-            if (_disposed)
-            {
-                return;
-            }
-            _disposed = true;
-
-            _cleanTimer.Dispose();
+            download.Pause();
         }
+    }
+
+    public void Resume()
+    {
+        foreach (var download in SelectedDownloadItems)
+        {
+            download.Resume();
+        }
+    }
+
+    public void Cancel()
+    {
+        foreach (var download in SelectedDownloadItems)
+        {
+            download.Cancel();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+        _disposed = true;
+
+        _cleanTimer.Dispose();
     }
 }

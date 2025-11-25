@@ -1,57 +1,46 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using FireAxe.ViewModels;
+using FireAxe.Resources;
 using ReactiveUI;
 using System;
+using System.Reactive;
 using System.Reactive.Disposables;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 
 public partial class AppSettingsWindow : ReactiveWindow<AppSettingsViewModel> 
 {
-    private CompositeDisposable? _viewModelConnection = null;
-
     public AppSettingsWindow()
     {
         InitializeComponent();
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            this.WhenAnyValue(x => x.ViewModel)
-            .Subscribe((viewModel) =>
-            {
-                ConnectViewModel(viewModel);
-            }).DisposeWith(disposables);
-
-            Disposable.Create(() =>
-            {
-                DisconnectViewModel();
-            }).DisposeWith(disposables);
+            
         });
+
+        this.RegisterViewModelConnection(ConnectViewModel);
     }
 
-    private void ConnectViewModel(AppSettingsViewModel? viewModel)
+    private void ConnectViewModel(AppSettingsViewModel viewModel, CompositeDisposable disposables)
     {
-        DisconnectViewModel();
-        if (viewModel == null)
+        viewModel.ChooseGamePathDirectoryInteraction.RegisterHandler(async context =>
         {
-            return;
-        }
-        _viewModelConnection = new();
-
-        viewModel.ChooseDirectoryInteraction.RegisterHandler(async (context) =>
+            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this, new ChooseDirectoryOptions { Title = Texts.SelectGamePath }));
+        }).DisposeWith(disposables);
+        viewModel.ConfirmFoundGamePathInteraction.RegisterHandler(async context =>
         {
-            context.SetOutput(await CommonMessageBoxes.ChooseDirectory(this));
-        }).DisposeWith(_viewModelConnection);
-    }
-
-    private void DisconnectViewModel()
-    {
-        if (_viewModelConnection != null)
+            bool confirm = await CommonMessageBoxes.Confirm(this, Texts.ConfirmFoundGamePathMessage.FormatNoThrow(context.Input));
+            context.SetOutput(confirm);
+        }).DisposeWith(disposables);
+        viewModel.ReportGamePathNotFoundInteraction.RegisterHandler(async context =>
         {
-            _viewModelConnection.Dispose();
-            _viewModelConnection = null;
-        }
+            await CommonMessageBoxes.ShowInfo(this, Texts.GamePathNotFoundMessage);
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
     }
 }

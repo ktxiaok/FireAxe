@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+internal class DescriptiveObject
 {
-    internal class DescriptiveObject
+    public DescriptiveObject(string description)
     {
-        public DescriptiveObject(string description)
-        {
-            Description = description;
-        }
-
-        public string Description { get; set; }
-
-        public override string ToString() => Description;
+        Description = description;
     }
+
+    public string Description { get; set; }
+
+    public override string ToString() => Description;
 }

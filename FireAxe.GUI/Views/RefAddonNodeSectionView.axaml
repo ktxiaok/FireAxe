@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             xmlns:conv="using:FireAxe.ValueConverters"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             x:Class="FireAxe.Views.RefAddonNodeSectionView"
+             x:DataType="vm:RefAddonNodeViewModel">
+  <StackPanel Orientation="Vertical">
+    <TextBlock
+      Text="{x:Static r:Texts.Reference}"
+      Classes="Heading1"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Center"/>
+    <Control Height="10"/>
+
+    <!--source-->
+    <DockPanel>
+      <TextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.SourceColon}"
+        VerticalAlignment="Center"/>
+      <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Right">
+        <TextBlock
+          Text="{x:Static r:Texts.Empty}"
+          IsVisible="{Binding #sourceRefView.DataContext, Converter={x:Static ObjectConverters.IsNull}}"
+          VerticalAlignment="Center"/>
+        <v:AddonRefView
+          Name="sourceRefView"
+          DataContext="{Binding SourceViewModel}"
+          IsVisible="{Binding $self.DataContext, Converter={x:Static ObjectConverters.IsNotNull}}">
+        </v:AddonRefView>
+        <Control Width="10"/>
+        <Button
+          Name="setSourceButton"
+          Content="{x:Static r:Texts.Set}"/>
+      </StackPanel>
+    </DockPanel>
+
+    <Control Height="10"/>
+
+    <!--sync tags-->
+    <DockPanel
+      LastChildFill="False">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.SyncTags}"
+        VerticalAlignment="Center"/>
+      <CheckBox
+        DockPanel.Dock="Right"
+        IsChecked="{Binding Addon.IsTagsSyncEnabled}"/>
+    </DockPanel>
+
+    <Control Height="10"/>
+
+    <!--sync dependencies-->
+    <DockPanel
+      LastChildFill="False">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.SyncDependencies}"
+        VerticalAlignment="Center"/>
+      <CheckBox
+        DockPanel.Dock="Right"
+        IsChecked="{Binding Addon.IsDependenciesSyncEnabled}"/>
+    </DockPanel>
+  </StackPanel>
+</UserControl>

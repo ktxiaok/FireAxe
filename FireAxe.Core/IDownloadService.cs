@@ -1,9 +1,12 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IDownloadService : IAsyncDisposable
 {
-    public interface IDownloadService : IDisposable
-    {
-        IDownloadItem Download(string url, string filePath);
-    }
+    const string DownloadingFileExtension = ".downloading";
+
+    const string DownloadInfoFileExtension = ".downloadinfo";
+
+    IDownloadItem Download(string url, string filePath);
 }

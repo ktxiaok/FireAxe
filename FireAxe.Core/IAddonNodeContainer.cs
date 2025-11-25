@@ -1,27 +1,38 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-namespace FireAxe
+namespace FireAxe;
+
+public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
 {
-    public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
-    {
-        IEnumerable<AddonNode> IHierarchyNode<AddonNode>.Children => Nodes;
+    IEnumerable<AddonNode> IHierarchyNode<AddonNode>.Children => Nodes;
 
-        bool IHierarchyNode<AddonNode>.IsNonterminal => true;
+    bool IHierarchyNode<AddonNode>.IsNonterminal => true;
 
-        ReadOnlyObservableCollection<AddonNode> Nodes { get; }
+    IHierarchyNode<AddonNode>? IHierarchyNode<AddonNode>.Parent => Parent;
 
-        IAddonNodeContainer? Parent { get; }
+    ReadOnlyObservableCollection<AddonNode> Nodes { get; }
 
-        AddonRoot Root { get; }
+    new IAddonNodeContainer? Parent { get; }
 
-        string GetUniqueNodeName(string name);
-    }
+    AddonRoot Root { get; }
 
-    internal interface IAddonNodeContainerInternal
-    {
-        void ThrowIfNodeNameInvalid(string name);
+    string? FileSystemPath { get; }
 
-        void ChangeNameUnchecked(string? oldName, string newName, AddonNode node);
-    }
+    event Action<AddonNode>? DescendantNodeMoved;
+
+    string GetUniqueNodeName(string name);
+
+    AddonNode? TryGetNodeByName(string name);
+
+    AddonNode? TryGetNodeByPath(string path);
+}
+
+internal interface IAddonNodeContainerInternal
+{
+    void ThrowIfNodeNameInvalid(string name, AddonNode node);
+
+    void ChangeNameUnchecked(string? oldName, string newName, AddonNode node);
+
+    void NotifyDescendantNodeMoved(AddonNode node);
 }

@@ -1,16 +1,11 @@
 ﻿using System;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class AddonNodeListItemViewModel : AddonNodeSimpleViewModel
 {
-    public class AddonNodeListItemViewModel : AddonNodeSimpleViewModel
+    public AddonNodeListItemViewModel(AddonNode addon) : base(addon)
     {
-        private readonly AddonNodeContainerViewModel? _containerViewModel;
-
-        public AddonNodeListItemViewModel(AddonNode addonNode, AddonNodeContainerViewModel? containerViewModel) : base(addonNode)
-        {
-            _containerViewModel = containerViewModel;
-        }
-
-        public AddonNodeContainerViewModel? ContainerViewModel => _containerViewModel;
+        
     }
 }

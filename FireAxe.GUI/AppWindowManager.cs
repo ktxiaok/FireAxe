@@ -1,118 +1,146 @@
-﻿using FireAxe.ViewModels;
+﻿using Avalonia.Controls;
+using FireAxe.ViewModels;
 using FireAxe.Views;
 using System;
 using System.Net.Http;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AppWindowManager : IAppWindowManager
 {
-    public class AppWindowManager : IAppWindowManager
+    private readonly AppSettings _settings;
+    private readonly DownloadItemListViewModel _downloadItemListViewModel;
+    private readonly HttpClient _httpClient;
+
+    private MainWindow? _mainWindow = null;
+    private MainWindowViewModel? _mainWindowViewModel = null;
+    private WindowReference<AppSettingsWindow>? _settingsWindowRef = null;
+    private WindowReference<DownloadItemListWindow>? _downloadItemListWindowRef = null;
+    private WindowReference<AboutWindow>? _aboutWindowRef = null;
+    private WindowReference<AddonTagManagerWindow>? _tagManagerWindowRef = null;
+    private WindowReference<AddonProblemListWindow>? _problemListWindowRef = null;
+    private WindowReference<VpkAddonConflictListWindow>? _vpkConflictListWindowRef = null;
+
+    public AppWindowManager(AppSettings settings, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
     {
-        private AppSettingsViewModel _settingsViewModel;
-        private DownloadItemListViewModel _downloadItemListViewModel;
-        private HttpClient _httpClient;
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
+        ArgumentNullException.ThrowIfNull(httpClient);
+        _settings = settings;
+        _downloadItemListViewModel = downloadItemListViewModel;
+        _httpClient = httpClient;
+    }
 
-        private MainWindow? _mainWindow = null;
-        private WindowReference<AppSettingsWindow>? _settingsWindow = null;
-        private WindowReference<DownloadItemListWindow>? _downloadItemListWindow = null;
-        private WindowReference<AboutWindow>? _aboutWindow = null;
-        private WindowReference<FlatVpkAddonListWindow>? _flatVpkAddonListWindow = null;
-        private WindowReference<AddonTagManagerWindow>? _tagManagerWindow = null;
+    public MainWindow? MainWindow => _mainWindow;
 
-        public AppWindowManager(AppSettingsViewModel settingsViewModel, DownloadItemListViewModel downloadItemListViewModel, HttpClient httpClient)
+    public MainWindowViewModel MainWindowViewModel => _mainWindowViewModel ?? throw new InvalidOperationException($"{nameof(MainWindowViewModel)} is not set.");
+
+    public AddonRoot ActiveAddonRoot => MainWindowViewModel.AddonRoot ?? throw new InvalidOperationException($"No available {nameof(ActiveAddonRoot)}.");
+
+    public MainWindow CreateMainWindow(MainWindowViewModel viewModel)
+    {
+        ArgumentNullException.ThrowIfNull(viewModel);
+
+        if (_mainWindow is not null)
         {
-            ArgumentNullException.ThrowIfNull(settingsViewModel);
-            ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
-            ArgumentNullException.ThrowIfNull(httpClient);
-            _settingsViewModel = settingsViewModel;
-            _downloadItemListViewModel = downloadItemListViewModel;
-            _httpClient = httpClient;
+            throw new InvalidOperationException("The main window already exists.");
         }
 
-        public MainWindow? MainWindow => _mainWindow;
-
-        public MainWindow CreateMainWindow(MainWindowViewModel viewModel)
+        _mainWindowViewModel = viewModel;
+        _mainWindow = new MainWindow()
         {
-            _mainWindow = new MainWindow()
-            {
-                DataContext = viewModel
-            };
-            return _mainWindow;
-        }
+            DataContext = viewModel
+        };
+        return _mainWindow;
+    }
 
-        public void OpenSettingsWindow()
+    public void OpenSettingsWindow()
+    {
+        var mainWindowViewModel = MainWindowViewModel;
+        OpenWindow(ref _settingsWindowRef, () => new AppSettingsWindow
         {
-            if (_settingsWindow == null || _settingsWindow.Get() == null)
-            {
-                _settingsWindow = new(new AppSettingsWindow
-                {
-                    DataContext = _settingsViewModel
-                });
-            }
-            var window = _settingsWindow.Get()!;
-            window.Show();
-            window.Activate();
-        }
+            DataContext = new AppSettingsViewModel(_settings, mainWindowViewModel)
+        });
+    }
 
-        public void OpenDownloadListWindow()
+    public void OpenDownloadListWindow()
+    {
+        OpenWindow(ref _downloadItemListWindowRef, () => new DownloadItemListWindow()
         {
-            if (_downloadItemListWindow == null || _downloadItemListWindow.Get() == null)
-            {
-                _downloadItemListWindow = new(new DownloadItemListWindow()
-                {
-                    DataContext = _downloadItemListViewModel
-                });
-            }
-            var window = _downloadItemListWindow.Get()!;
-            window.Show();
-            window.Activate();
-        }
+            DataContext = _downloadItemListViewModel
+        });
+    }
 
-        public void OpenAboutWindow()
-        {
-            if (_aboutWindow == null || _aboutWindow.Get() == null)
-            {
-                _aboutWindow = new(new AboutWindow());
-            }
-            var window = _aboutWindow.Get()!;
-            window.Show();
-            window.Activate();
-        }
+    public void OpenAboutWindow()
+    {
+        OpenWindow(ref _aboutWindowRef, () => new AboutWindow());
+    }
 
-        public void OpenNewWorkshopCollectionWindow(AddonRoot addonRoot, AddonGroup? addonGroup)
+    public void OpenProblemListWindow()
+    {
+        var addonRoot = ActiveAddonRoot;
+        OpenWindow(ref _problemListWindowRef, () => new AddonProblemListWindow
         {
-            var window = new NewWorkshopCollectionWindow()
-            {
-                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup, _httpClient)
-            };
-            window.Show();
-        }
+            DataContext = new AddonProblemListViewModel(addonRoot)
+        });
+    }
 
-        public void OpenFlatVpkAddonListWindow(MainWindowViewModel mainWindowViewModel)
+    public void OpenTagManagerWindow()
+    {
+        var mainWindowViewModel = MainWindowViewModel;
+        OpenWindow(ref _tagManagerWindowRef, () => new AddonTagManagerWindow()
         {
-            if (_flatVpkAddonListWindow == null || _flatVpkAddonListWindow.Get() == null)
-            {
-                _flatVpkAddonListWindow = new(new FlatVpkAddonListWindow()
-                {
-                    DataContext = new FlatVpkAddonListViewModel(mainWindowViewModel)
-                });
-            }
-            var window = _flatVpkAddonListWindow.Get()!;
-            window.Show();
-            window.Activate();
-        }
+            DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
+        });
+    }
 
-        public void OpenTagManagerWindow(MainWindowViewModel mainWindowViewModel)
+    public void OpenVpkConflictListWindow()
+    {
+        var addonRoot = ActiveAddonRoot;
+        OpenWindow(ref _vpkConflictListWindowRef, () => new VpkAddonConflictListWindow
         {
-            if (_tagManagerWindow == null || _tagManagerWindow.Get() == null)
-            {
-                _tagManagerWindow = new(new AddonTagManagerWindow()
-                {
-                    DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
-                });
-            }
-            var window = _tagManagerWindow.Get()!;
-            window.Show();
-            window.Activate();
+            DataContext = new VpkAddonConflictListViewModel(addonRoot)
+        });
+    }
+
+    public void OpenWorkshopVpkFinderWindow()
+    {
+        var mainWindowViewModel = MainWindowViewModel;
+        var window = new WorkshopVpkFinderWindow
+        {
+            DataContext = new WorkshopVpkFinderViewModel(mainWindowViewModel, _httpClient)
+        };
+        window.Show();
+    }
+
+    public void OpenFileCleanerWindow()
+    {
+        var addonRoot = ActiveAddonRoot;
+        var window = new FileCleanerWindow
+        {
+            DataContext = new FileCleanerViewModel(addonRoot)
+        };
+        window.Show();
+    }
+
+    public void OpenAddonNameAutoSetterWindow()
+    {
+        var addonRoot = ActiveAddonRoot;
+        var window = new AddonNameAutoSetterWindow
+        {
+            DataContext = new AddonNameAutoSetterViewModel(addonRoot)
+        };
+        window.Show();
+    }
+
+    private static void OpenWindow<T>(ref WindowReference<T>? windowRef, Func<T> windowFactory) where T : Window
+    {
+        if (windowRef is null || windowRef.Get() is null)
+        {
+            windowRef = new(windowFactory());
         }
+        var window = windowRef.Get()!;
+        window.Show();
+        window.Activate();
     }
 }

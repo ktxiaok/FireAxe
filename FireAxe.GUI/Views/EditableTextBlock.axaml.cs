@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 
 namespace FireAxe.Views;
@@ -28,12 +29,17 @@ public class EditableTextBlock : TemplatedControl
     public const string TemplatePartName_DisplayView = "PART_DisplayView";
     public const string TemplatePartName_EditView = "PART_EditView";
 
-    public static readonly StyledProperty<string> ValueProperty = 
-        AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Value), defaultValue: "", defaultBindingMode: BindingMode.TwoWay, coerce: CoerceValue, enableDataValidation: true);
+    public static readonly StyledProperty<string?> ValueProperty = 
+        AvaloniaProperty.Register<EditableTextBlock, string?>(nameof(Value), defaultValue: null, defaultBindingMode: BindingMode.TwoWay, enableDataValidation: true);
+    
     public static readonly StyledProperty<string?> DisplayProperty =
         AvaloniaProperty.Register<EditableTextBlock, string?>(nameof(Display), defaultValue: null);
+    
     public static readonly StyledProperty<string> WatermarkProperty =
         AvaloniaProperty.Register<EditableTextBlock, string>(nameof(Watermark), defaultValue: "", coerce: CoerceWatermark);
+
+    public static readonly DirectProperty<EditableTextBlock, bool> IsEditingProperty =
+        AvaloniaProperty.RegisterDirect<EditableTextBlock, bool>(nameof(IsEditing), t => t.IsEditing);
 
     private TextBlock? _textBlock = null;
     private Button? _editButton = null;
@@ -50,26 +56,19 @@ public class EditableTextBlock : TemplatedControl
 
     public EditableTextBlock()
     {
-        this.GetObservable(DataContextProperty).Subscribe((dataContext) =>
-        {
-            _isEditing = false;
-            UpdateVisibility();
-        });
+        this.WhenAnyValue(x => x.DataContext)
+            .Subscribe(_ => EndEditing());
     }
 
     public bool IsEditing
     {
         get => _isEditing;
-        set
-        {
-            _isEditing = value;
-            UpdateVisibility();
-        }
+        private set => SetAndRaise(IsEditingProperty, ref _isEditing, value);
     }
 
     public TextBox? TextBox => _textBox;
 
-    public string Value
+    public string? Value
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
@@ -85,6 +84,56 @@ public class EditableTextBlock : TemplatedControl
     {
         get => GetValue(WatermarkProperty);
         set => SetValue(WatermarkProperty, value);
+    }
+
+    public void StartEditing()
+    {
+        if (IsEditing)
+        {
+            return;
+        }
+
+        UpdateVisibility(true);
+        if (_textBox is not null)
+        {
+            _textBox.Text = Value;
+            _textBox.Focus();
+            _textBox.SelectAll();
+        }
+        IsEditing = true;
+    }
+
+    public void EndEditing()
+    {
+        if (!IsEditing)
+        {
+            return;
+        }
+
+        UpdateVisibility(false);
+        IsEditing = false;
+    }
+
+    public void Submit()
+    {
+        if (!IsEditing)
+        {
+            return;
+        }
+
+        if (_textBox is not null)
+        {
+            var oldValue = Value;
+            Value = _textBox.Text;
+            if (_hasError)
+            {
+                Value = oldValue;
+            }
+        }
+        if (!_hasError)
+        {
+            EndEditing();
+        }
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -135,7 +184,7 @@ public class EditableTextBlock : TemplatedControl
         _displayView = displayView;
         _editView = editView;
 
-        UpdateVisibility();
+        UpdateVisibility(IsEditing);
     }
 
     protected override void UpdateDataValidation(AvaloniaProperty property, BindingValueType state, Exception? error)
@@ -154,81 +203,48 @@ public class EditableTextBlock : TemplatedControl
 
     private void EditButton_Click(object? sender, RoutedEventArgs e)
     {
-        _isEditing = true;
-        if (_textBox != null)
-        {
-            _textBox.Text = Value;
-        }
-        UpdateVisibility();
+        StartEditing();
     }
 
     private void SubmitButton_Click(object? sender, RoutedEventArgs e)
     {
-        if (_textBox != null)
-        {
-            var oldValue = Value;
-            Value = _textBox.Text!;
-            if (_hasError)
-            {
-                Value = oldValue;
-            }
-        }
-        if (!_hasError)
-        {
-            _isEditing = false;
-            UpdateVisibility();
-        }
+        Submit();
     }
 
     private void CancelButton_Click(object? sender, RoutedEventArgs e)
     {
-        _isEditing = false;
-        UpdateVisibility();
+        EndEditing();
     }
 
-    private void UpdateVisibility()
+    private void UpdateVisibility(bool editing)
     {
-        if (_isEditing)
+        if (editing)
         {
-            if (_displayView != null)
+            if (_displayView is not null)
             {
                 _displayView.IsVisible = false;
             }
-            if (_editView != null)
+            if (_editView is not null)
             {
                 _editView.IsVisible = true;
-            }
-            if (_textBox != null)
-            {
-                _textBox.Focus();
-                _textBox.SelectAll();
             }
         }
         else
         {
-            if (_displayView != null)
+            if (_displayView is not null)
             {
                 _displayView.IsVisible = true;
             }
-            if (_editView != null)
+            if (_editView is not null)
             {
                 _editView.IsVisible = false;
             }
-            if (_textBox != null)
+            if (_textBox is not null)
             {
                 _textBox.Text = "";
                 DataValidationErrors.SetError(_textBox, null);
             }
         }
-    }
-
-    private static string CoerceValue(AvaloniaObject sender, string? value)
-    {
-        if (value == null)
-        {
-            return "";
-        }
-        return value;
     }
 
     private static string CoerceWatermark(AvaloniaObject sender, string? value)

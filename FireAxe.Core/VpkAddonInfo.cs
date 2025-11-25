@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class VpkAddonInfo
 {
-    public class VpkAddonInfo
-    {
-        public string Version { get; set; } = "";
+    public string? Version { get; init; } = null;
 
-        public string Title { get; set; } = "";
+    public string? Title { get; init; } = null;
 
-        public string Author { get; set; } = "";
+    public string? Author { get; init; } = null;
 
-        public string Description { get; set; } = "";
-    }
+    public string? Description { get; init; } = null;
 }

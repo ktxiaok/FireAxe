@@ -23,15 +23,10 @@
           <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
       </StackPanel.Styles>
+      
       <TextBlock
         Text="{x:Static r:Texts.Workshop}"
         Classes="Heading1"/>
-      <TextBlock
-        Text="{x:Static r:Texts.FileDownloadUncompleted}"
-        IsVisible="{Binding !IsFileDownloadCompleted}"
-        Foreground="OrangeRed"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Center"/>
       
       <Button
         Content="{x:Static r:Texts.OpenWorkshopPage}"
@@ -39,6 +34,9 @@
       <Button
         Content="{x:Static r:Texts.ApplyTagsFromWorkshop}"
         Command="{Binding ApplyTagsFromWorkshopCommand}"/>
+      <Button
+        Content="{x:Static r:Texts.DeleteRedundantVpkFiles}"
+        Command="{Binding DeleteRedundantVpkFilesCommand}"/>
     </StackPanel>
 
     <!--item id-->
@@ -57,17 +55,17 @@
       Grid.Row="2" Grid.Column="0"
       Classes="PropertyName"
       Text="{x:Static r:Texts.AutoUpdateStrategy}"/>
-    <ComboBox
+    <CheckBox
       Grid.Row="2" Grid.Column="1"
-      Classes="EnumComboBox PropertyValue"
-      ItemsSource="{Binding Source={me:EnumValues {x:Type local:AutoUpdateStrategy}}}"
-      SelectedItem="{Binding AddonNode.AutoUpdateStrategy}"/>
+      Classes="PropertyValue"
+      IsThreeState="True"
+      IsChecked="{Binding Addon.IsAutoUpdate}"/>
 
     <!--download item-->
     <StackPanel
       Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
       Margin="0, 5, 0, 5"
-      IsVisible="{Binding DownloadItemViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+      IsVisible="{Binding DownloadItemViewModel, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
       <TextBlock
         Classes="PropertyName"
         Text="{x:Static r:Texts.Download}"/>

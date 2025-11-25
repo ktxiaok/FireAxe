@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             xmlns:conv="using:FireAxe.ValueConverters"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="800"
+             x:Class="FireAxe.Views.VpkAddonConflictingDetailsView"
+             x:DataType="vm:VpkAddonConflictingDetailsViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.EmptyHint">
+      <Setter Property="Text" Value="{x:Static r:Texts.Empty}"/>
+      <Setter Property="Margin" Value="5"/>
+      <Setter Property="HorizontalAlignment" Value="Left"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+  </UserControl.Styles>
+  
+  <StackPanel
+    Orientation="Vertical">
+    <StackPanel.Styles>
+      <Style Selector="Expander">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="IsExpanded" Value="True"/>
+      </Style>
+    </StackPanel.Styles>
+
+    <!--conflicting addons-->
+    <Expander>
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.ConflictingAddons}"/>
+      </Expander.Header>
+      <Panel>
+        <TextBlock
+          IsVisible="{Binding ConflictingAddonWithFilesViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+          Classes="EmptyHint"/>
+        <ItemsControl
+          IsVisible="{Binding ConflictingAddonWithFilesViewModels.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          ItemsSource="{Binding ConflictingAddonWithFilesViewModels}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Expander IsExpanded="False">
+                <Expander.Header>
+                  <v:AddonRefView DataContext="{Binding AddonViewModel}"/>
+                </Expander.Header>
+                <ItemsControl ItemsSource="{Binding Files}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <SelectableTextBlock
+                        Text="{Binding}"
+                        Margin="2.5"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
+              </Expander>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Panel>
+    </Expander>
+
+    <!--conflicting files-->
+    <Expander>
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.ConflictingFiles}"/>
+      </Expander.Header>
+      <StackPanel Orientation="Vertical">
+        <Button
+          Command="{Binding IgnoreAllConflictingFilesCommand}"
+          Content="{x:Static r:Texts.IgnoreAll}"
+          IsVisible="{Binding ConflictingFileWithAddonsViewModels.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          Margin="2.5"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"/>
+        <Panel>
+          <TextBlock
+            IsVisible="{Binding ConflictingFileWithAddonsViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+            Classes="EmptyHint"/>
+          <ItemsControl
+            IsVisible="{Binding ConflictingFileWithAddonsViewModels.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+            ItemsSource="{Binding ConflictingFileWithAddonsViewModels}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Expander IsExpanded="False">
+                  <Expander.Header>
+                    <DockPanel
+                      DataContext="{Binding File}"
+                      LastChildFill="False">
+                      <Button
+                        DockPanel.Dock="Right"
+                        Command="{Binding $parent[v:VpkAddonConflictingDetailsView].ViewModel.IgnoreConflictingFile}"
+                        CommandParameter="{Binding}"
+                        Content="{x:Static r:Texts.Ignore}"
+                        Margin="2.5"
+                        VerticalAlignment="Center"/>
+                      <SelectableTextBlock
+                        DockPanel.Dock="Left"
+                        Text="{Binding}"
+                        TextTrimming="CharacterEllipsis"
+                        VerticalAlignment="Center"/>
+                    </DockPanel>
+                  </Expander.Header>
+                  <ItemsControl ItemsSource="{Binding AddonViewModels}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Panel Margin="2.5">
+                          <v:AddonRefView/>
+                        </Panel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Panel>
+      </StackPanel>
+    </Expander>
+
+    <!--conflict ignoring files-->
+    <Expander>
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.ConflictIgnoringFiles}"/>
+      </Expander.Header>
+      <StackPanel Orientation="Vertical">
+        <Button
+          Command="{Binding RemoveAllConflictIgnoringFilesCommand}"
+          Content="{x:Static r:Texts.RemoveAll}"
+          IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+          Margin="2.5"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"/>
+        <Panel>
+          <TextBlock
+            IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+            Classes="EmptyHint"/>
+          <ItemsControl
+            IsVisible="{Binding Addon.ConflictIgnoringFiles.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+            ItemsSource="{Binding Addon.ConflictIgnoringFiles}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel
+                  Margin="2.5"
+                  LastChildFill="False">
+                  <Button
+                    DockPanel.Dock="Right"
+                    Command="{Binding $parent[v:VpkAddonConflictingDetailsView].ViewModel.RemoveConflictIgnoringFile}"
+                    CommandParameter="{Binding}"
+                    Content="{x:Static r:Texts.Remove}"
+                    Margin="2.5"
+                    VerticalAlignment="Center"/>
+                  <SelectableTextBlock
+                    DockPanel.Dock="Left"
+                    Text="{Binding}"
+                    TextTrimming="CharacterEllipsis"
+                    VerticalAlignment="Center"/>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </Panel>
+      </StackPanel>
+    </Expander>
+  </StackPanel>
+</UserControl>

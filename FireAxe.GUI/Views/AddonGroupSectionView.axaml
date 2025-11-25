@@ -33,6 +33,6 @@
       Grid.Row="1"
       Grid.Column="1"
       ItemsSource="{Binding Source={me:EnumValues {x:Type local:AddonGroupEnableStrategy}}}"
-      SelectedItem="{Binding AddonNode.EnableStrategy}"/>
+      SelectedItem="{Binding Addon.EnableStrategy}"/>
   </Grid>
 </UserControl>

@@ -7,7 +7,7 @@
              xmlns:dt="using:FireAxe.DataTemplates"
              xmlns:r="using:FireAxe.Resources"
              xmlns:conv="using:FireAxe.ValueConverters"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="1600"
              x:Class="FireAxe.Views.AddonNodeView"
              x:DataType="vm:AddonNodeViewModel">
   <Design.DataContext>
@@ -18,35 +18,29 @@
   </UserControl.DataTemplates>
   <StackPanel
     Orientation="Vertical">
+    <StackPanel.Styles>
+      <Style Selector="DockPanel.PropertyRow">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0, 5, 0, 5"/>
+        <Setter Property="LastChildFill" Value="False"/>
+      </Style>
+    </StackPanel.Styles>
+    
     <!--image-->
     <Border
       Margin="5"
       BoxShadow="{StaticResource boxshadow_regular}">
       <Panel
         Margin="10">
-        <Image
-          Name="image"
-          Source="{Binding Image}"
-          IsVisible="{Binding ShouldShowImage}"
-          Width="250"
-          Height="250"/>
-        <PathIcon
-          Data="{StaticResource icon_question}"
-          IsVisible="{Binding ShouldShowUnknownImage}"
-          Width="150"
-          Height="150"/>
-        <PathIcon
-          Data="{StaticResource icon_folder}"
-          IsVisible="{Binding ShouldShowFolderIcon}"
-          Width="150"
-          Height="150"/>
+        <v:AddonIconView ImageSize="250" SpecialIconSize="150"/>
       </Panel>
     </Border>
 
     <!--name-->
     <v:EditableTextBlock
       Name="nameControl"
-      Value="{Binding AddonNode.Name}"
+      Value="{Binding Addon.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>
         <Style Selector=":is(TextBlock)">
@@ -74,55 +68,144 @@
       <v:AddonNodeEnableButton/>
     </StackPanel>
 
-    <!--file size-->
-    <StackPanel
-      IsVisible="{Binding FileSizeReadable, Converter={x:Static ObjectConverters.IsNotNull}}"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
-      <TextBlock Text="{x:Static r:Texts.FileSizeColon}"/>
-      <TextBlock Text="{Binding FileSizeReadable}"/>
-    </StackPanel>
+    <!--path-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding Addon.Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.PathColon}"/>
+      <TextBlock
+        DockPanel.Dock="Right"
+        Classes="PropertyValue"
+        Text="{Binding Addon.NodePath}"
+        TextWrapping="Wrap"/>
+    </DockPanel>
 
-    <!--creation time-->
-    <StackPanel
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
-      <TextBlock Text="{x:Static r:Texts.CreationTimeColon}"/>
-      <TextBlock Text="{Binding AddonNode.CreationTime}"/>
-    </StackPanel>
+    <!--parent group-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding Addon.Group, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <TextBlock
+        DockPanel.Dock="Left"
+        Classes="PropertyName"
+        Text="{x:Static r:Texts.ParentGroupColon}"/>
+      <v:AddonRefView
+        DockPanel.Dock="Right"
+        DataContext="{Binding Addon.Group, Converter={x:Static conv:AddonNodeConverters.ToSimpleViewModel}}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"/>
+    </DockPanel>
+
+    <!--priority-->
+    <DockPanel Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.Priority}"/>
+      <v:EditableTextBlock
+        DockPanel.Dock="Right"
+        Value="{Binding Priority}"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"/>
+    </DockPanel>
+    <DockPanel Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.GlobalPriority}"/>
+      <SelectableTextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding Addon.PriorityInHierarchy}"/>
+    </DockPanel>
 
     <!--tags-->
-    <StackPanel
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Margin="5">
+    <Border
+      Classes="Level1"
+      Margin="0, 5, 0, 5">
+      <StackPanel Orientation="Vertical">
+        <StackPanel
+          Orientation="Horizontal"
+          HorizontalAlignment="Left"
+          Margin="0, 5, 0, 5">
+          <TextBlock
+            Text="{x:Static r:Texts.Tags}"
+            Classes="Heading1"
+            VerticalAlignment="Center"
+            Margin="5"/>
+          <Button Name="editTagButton">
+            <PathIcon Data="{StaticResource icon_edit}"/>
+          </Button>
+        </StackPanel>
+        <Panel>
+          <ItemsControl
+            ItemsSource="{Binding Addon.TagsInHierarchy}"
+            HorizontalAlignment="Left">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Panel Margin="5">
+                  <v:AddonTagView/>
+                </Panel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock
+            IsVisible="{Binding Addon.TagsInHierarchy, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"
+            Text="{x:Static r:Texts.Empty}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Margin="5"/>
+        </Panel>
+      </StackPanel>
+    </Border>
+
+    <!--dependencies-->
+    <Expander
+      IsExpanded="False"
+      HorizontalAlignment="Stretch"
+      Margin="0, 5, 0, 5">
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.Dependencies}"
+          Classes="Heading1"
+          VerticalAlignment="Center"/>
+      </Expander.Header>
+      <v:AddonNodeDependenciesView DataContext="{Binding DependenciesViewModel}"/>
+    </Expander>
+
+    <!--file size-->
+    <DockPanel
+      Classes="PropertyRow"
+      IsVisible="{Binding Addon.FileSize, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
       <TextBlock
-        Text="{x:Static r:Texts.Tags}"
-        Classes="Heading1"
-        VerticalAlignment="Center"
-        Margin="5"/>
-      <Button Name="editTagButton">
-        <PathIcon Data="{StaticResource icon_edit}"/>
-      </Button>
-    </StackPanel>
-    <ItemsControl
-      ItemsSource="{Binding AddonNode.TagsInHierarchy}"
-      HorizontalAlignment="Center">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Panel Margin="5">
-            <v:AddonTagView/>
-          </Panel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <WrapPanel/>
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-    </ItemsControl>
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.FileSizeColon}"/>
+      <TextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding Addon.FileSize, Converter={StaticResource converter_readable_bytes}}"/>
+    </DockPanel>
+
+    <!--creation time-->
+    <DockPanel
+      Classes="PropertyRow">
+      <TextBlock
+        Classes="PropertyName"
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.CreationTimeColon}"/>
+      <TextBlock
+        Classes="PropertyValue"
+        DockPanel.Dock="Right"
+        Text="{Binding Addon.CreationTime}"/>
+    </DockPanel>
     
     <!--buttons-->
     <StackPanel
@@ -133,9 +216,6 @@
           <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
       </StackPanel.Styles>
-      <Button
-        Name="autoSetNameButton"
-        Content="{x:Static r:Texts.AutoSetName}"/>
       <Button
         Content="{x:Static r:Texts.Check}"
         Command="{Binding Check}"/>
@@ -150,40 +230,77 @@
         Content="{x:Static r:Texts.CustomizePreviewImage}"/>
     </StackPanel>
 
-    <!--problems-->
-    <StackPanel
-      Orientation="Vertical"
-      IsVisible="{Binding HasProblem}">
-      <StackPanel.Styles>
-        <Style Selector=":is(TextBlock)">
-          <Setter Property="Foreground" Value="OrangeRed"/>
-        </Style>
-      </StackPanel.Styles>
-      
-      <TextBlock
-        Text="{x:Static r:Texts.Problems}"
-        Classes="Heading1"
-        Margin="0, 5, 0, 5"/>
-      <ItemsControl
-        ItemsSource="{Binding AddonNode.Problems}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"/>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
+    <!--advanced panel-->
+    <Expander
+      IsExpanded="False"
+      Margin="0, 5, 0, 5"
+      HorizontalAlignment="Stretch">
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.AdvancedPanel}"
+          Classes="Heading1"
+          VerticalAlignment="Center"/>
+      </Expander.Header>
 
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <SelectableTextBlock
-              Text="{Binding Converter={x:Static conv:ObjectExplanationConverter.Default}}"
-              TextWrapping="Wrap"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Center"
-              Margin="0, 5, 0, 5"/>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </StackPanel>
+      <StackPanel Orientation="Vertical">
+        <DockPanel
+          LastChildFill="False">
+          <TextBlock
+            DockPanel.Dock="Left"
+            Classes="PropertyName"
+            Text="ID"/>
+          <v:EditableTextBlock
+            DockPanel.Dock="Right"
+            Classes="PropertyValue"
+            Value="{Binding AddonIdString}"/>
+        </DockPanel>
+        <TextBlock
+          Text="{x:Static r:Texts.ChangeIdNote}"
+          TextWrapping="Wrap"
+          VerticalAlignment="Center"/>
+      </StackPanel>
+    </Expander>
+
+    <!--problems-->
+    <Border
+      IsVisible="{Binding Addon.Problems.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
+      Classes="Level1"
+      BorderBrush="{DynamicResource brush_warning}"
+      Padding="5"
+      Margin="0, 5, 0, 5">
+      <StackPanel
+        Orientation="Vertical">
+        <StackPanel.Styles>
+          <Style Selector=":is(TextBlock)">
+            <Setter Property="Foreground" Value="{DynamicResource brush_warning}"/>
+          </Style>
+        </StackPanel.Styles>
+      
+        <TextBlock
+          Text="{x:Static r:Texts.Problems}"
+          Classes="Heading1"
+          Margin="0, 5, 0, 5"/>
+        <ItemsControl
+          ItemsSource="{Binding Addon.Problems}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <SelectableTextBlock
+                Text="{Binding Converter={x:Static conv:ObjectExplanationConverter.Default}}"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="0, 5, 0, 5"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Border>
 
     <!--section views-->
     <StackPanel

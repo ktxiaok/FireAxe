@@ -4,96 +4,233 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:r="using:FireAxe.Resources"
         xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:v="using:FireAxe.Views"
         xmlns:conv="using:FireAxe.ValueConverters"
         xmlns:me="using:FireAxe.MarkupExtensions"
         xmlns:dt="using:FireAxe.DataTemplates"
         xmlns:local="using:FireAxe"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="250"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="750"
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
-        SizeToContent="WidthAndHeight"
+        Width="600" Height="750"
         WindowStartupLocation="CenterScreen">
   <Window.DataTemplates>
     <dt:ExceptionExplainer Scene="Input"/>
   </Window.DataTemplates>
   <ScrollViewer>
-    <Grid
-      RowDefinitions="Auto, Auto, Auto, Auto, Auto"
-      ColumnDefinitions="Auto, 50, *"
+    <StackPanel
+      Orientation="Vertical"
       Margin="10">
-      <!--language-->
-      <StackPanel
-        Grid.Row="0" Grid.Column="0"
-        Orientation="Horizontal">
-        <TextBlock
-          Classes="PropertyName"
-          Text="{x:Static r:Texts.Language}"/>
-        <TextBlock
-          Classes="PropertyName"
-          Text="{x:Static r:Texts.NeedRestartHint}"/>
-      </StackPanel>
-      <ComboBox
-        Grid.Row="0" Grid.Column="2"
-        HorizontalAlignment="Right"
-        ItemsSource="{Binding LanguageItemsSource}"
-        SelectedItem="{Binding Settings.Language}">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{ReflectionBinding Converter={x:Static conv:LanguageNativeNameConverter.Instance}}"/>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
+      <!--settings file location note-->
+      <DockPanel
+        LastChildFill="False"
+        Margin="0, 5, 0, 5">
+        <SelectableTextBlock
+          DockPanel.Dock="Left"
+          Text="{Binding Settings.SettingsFilePath, StringFormat={x:Static r:Texts.AppSettingsFileLocationNote}}"
+          TextWrapping="Wrap"
+          TextAlignment="Left"
+          MaxWidth="400"
+          VerticalAlignment="Center"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding ShowSettingsFileCommand}"
+          Content="{x:Static r:Texts.Open}"/>
+      </DockPanel>
 
+      <!--language-->
+      <DockPanel>
+        <StackPanel
+          DockPanel.Dock="Left"
+          Orientation="Horizontal">
+          <TextBlock
+            Classes="PropertyName"
+            Text="{x:Static r:Texts.Language}"/>
+          <TextBlock
+            Classes="PropertyName"
+            Text="{x:Static r:Texts.NeedRestartHint}"/>
+        </StackPanel>
+        <ComboBox
+          Classes="PropertyValue"
+          ItemsSource="{Binding LanguageItemsSource}"
+          SelectedItem="{Binding Settings.Language}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{ReflectionBinding Converter={x:Static conv:LanguageNativeNameConverter.Instance}}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </DockPanel>
+
+      <!--color theme-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.ColorTheme}"/>
+        <ComboBox
+          Classes="EnumComboBox PropertyValue"
+          ItemsSource="{Binding Source={me:EnumValues {x:Type local:AppColorTheme}}}"
+          SelectedItem="{Binding Settings.ColorTheme}"/>
+      </DockPanel>
+        
       <!--game path-->
       <TextBlock
-        Grid.Row="1" Grid.Column="0"
         Classes="PropertyName"
         Text="{x:Static r:Texts.GamePath}"/>
       <StackPanel
-        Grid.Row="1" Grid.Column="2"
         Orientation="Horizontal"
-        HorizontalAlignment="Right">
+        HorizontalAlignment="Left">
         <TextBox
           Text="{Binding Settings.GamePath}"
-          Width="250" 
-          Margin="5"/>
+          Width="350" 
+          Margin="0, 5, 5, 5"/>
         <Button
           Command="{Binding SelectGamePathCommand}"
           Content="{x:Static r:Texts.Select}"
           Margin="5"/>
+        <Button
+          Command="{Binding FindGamePathCommand}"
+          Content="{x:Static r:Texts.Find}"
+          Margin="5"/>
       </StackPanel>
 
+      <!--ignore Half Life 2 files for VPK addon conficts-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Text="{x:Static r:Texts.IgnoreHalfLife2FilesForVpkAddonConflicts}"
+          Classes="PropertyName"/>
+        <CheckBox
+          IsChecked="{Binding Settings.IgnoreHalfLife2FilesForVpkAddonConflicts}"
+          Classes="PropertyValue"/>
+      </DockPanel>
+
+      <!--customize VPK addon conflict ignoring files note-->
+      <DockPanel
+        LastChildFill="False"
+        Margin="0, 5, 0, 5">
+        <SelectableTextBlock
+          DockPanel.Dock="Left"
+          Text="{Binding Settings.CustomVpkAddonConflictIgnoringFilesDirectoryPath, StringFormat={x:Static r:Texts.CustomizeVpkAddonConflictIgnoringFilesNote}}"
+          TextWrapping="Wrap"
+          TextAlignment="Left"
+          MaxWidth="400"
+          VerticalAlignment="Center"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding OpenCustomVpkAddonConflictIgnoringFilesDirectory}"
+          Content="{x:Static r:Texts.Open}"/>
+        <Control DockPanel.Dock="Left" Width="10"/>
+        <Button
+          DockPanel.Dock="Left"
+          Command="{Binding Settings.LoadCustomVpkAddonConflictIgnoringFilesCommand}"
+          Content="{x:Static r:Texts.Refresh}"/>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Text="{x:Static r:Texts.RefreshingHint}"
+          IsVisible="{Binding Settings.IsLoadingCustomVpkAddonConflictIgnoringFiles, FallbackValue=False}"
+          VerticalAlignment="Center"
+          Margin="10, 0, 10, 0"/>
+      </DockPanel>
+
       <!--workshop item auto update-->
-      <TextBlock
-        Grid.Row="2" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
-      <CheckBox
-        Grid.Row="2" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.WorkshopItemAutoUpdate}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoUpdateWorkshopItem}"/>
+      </DockPanel>
 
       <!--auto detect workshop item link in clipboard-->
-      <TextBlock
-        Grid.Row="3" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
-      <CheckBox
-        Grid.Row="3" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.AutoDetectWorkshopItemLinkInClipboard}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoDetectWorkshopItemLinkInClipboard}"/>
+      </DockPanel>
 
       <!--auto redownload-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.AutoRedownload}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsAutoRedownload}"/>
+      </DockPanel>
+
+      <!--web proxy address-->
       <TextBlock
-        Grid.Row="4" Grid.Column="0"
-        Classes="PropertyName"
-        Text="{x:Static r:Texts.AutoRedownload}"/>
-      <CheckBox
-        Grid.Row="4" Grid.Column="2"
-        Classes="PropertyValue"
-        IsChecked="{Binding Settings.IsAutoRedownload}"/>
-    </Grid>
+        Classes="PropertyName">
+        <TextBlock.Text>
+          <MultiBinding StringFormat="{}{0} {1}">
+            <Binding Source="{x:Static r:Texts.WebProxyAddress}"/>
+            <Binding Source="{x:Static r:Texts.NeedRestartHint}"/>
+          </MultiBinding>
+        </TextBlock.Text>
+      </TextBlock>
+      <v:EditableTextBlock
+        Value="{Binding Settings.WebProxyAddress}"
+        Display="{Binding Settings.WebProxyAddress, Converter={x:Static conv:StringConverters.ShowEmpty}}"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center"/>
+
+      <!--file backup-->
+      <DockPanel>
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.FileBackup}"/>
+        <CheckBox
+          Classes="PropertyValue"
+          IsChecked="{Binding Settings.IsFileBackupEnabled}"/>
+      </DockPanel>
+
+      <!--max retained backup file count-->
+      <DockPanel IsVisible="{Binding Settings.IsFileBackupEnabled}">
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.MaxRetainedBackupFileCount}"/>
+        <v:EditableTextBlock
+          Classes="PropertyValue"
+          Value="{Binding MaxRetainedBackupFileCount}"/>
+      </DockPanel>
+
+      <!--file backup interval minutes-->
+      <DockPanel IsVisible="{Binding Settings.IsFileBackupEnabled}">
+        <TextBlock
+          DockPanel.Dock="Left"
+          Classes="PropertyName"
+          Text="{x:Static r:Texts.FileBackupIntervalMinutes}"/>
+        <v:EditableTextBlock
+          Classes="PropertyValue"
+          Value="{Binding FileBackupIntervalMinutes}"/>
+      </DockPanel>
+
+      <!--file backup directory location note-->
+      <StackPanel
+        Orientation="Horizontal"
+        Margin="0, 5, 0, 5">
+        <TextBlock
+          Text="{x:Static r:Texts.AddonRootBackupDirectoryLocationNote}"
+          VerticalAlignment="Center"/>
+        <Control Width="10"/>
+        <Button
+          Command="{Binding OpenBackupDirectoryCommand}"
+          Content="{x:Static r:Texts.Open}"/>
+      </StackPanel>
+    </StackPanel>
   </ScrollViewer>
-  
 </Window>

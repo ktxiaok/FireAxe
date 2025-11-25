@@ -14,7 +14,7 @@
     Margin="5">
     <TextBlock
       DockPanel.Dock="Top"
-      Text="{Binding AddonNode.Name, StringFormat={x:Static r:Texts.TagsOf}}"
+      Text="{Binding Addon.Name, StringFormat={x:Static r:Texts.TagsOf}}"
       Margin="5"/>
     <DockPanel>
       <StackPanel
@@ -45,7 +45,7 @@
       <ScrollViewer
         Margin="5">
         <ListBox
-          ItemsSource="{Binding AddonNode.Tags}"
+          ItemsSource="{Binding Addon.Tags}"
           SelectedItems="{Binding SelectedTags}"
           SelectionMode="Multiple">
         </ListBox>

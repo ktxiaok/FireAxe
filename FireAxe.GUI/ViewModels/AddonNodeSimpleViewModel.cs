@@ -2,296 +2,435 @@
 using ReactiveUI;
 using Serilog;
 using System;
-using System.Collections.Specialized;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace FireAxe.ViewModels
+namespace FireAxe.ViewModels;
+
+public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 {
-    public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
+    private bool _isActive = false;
+
+    private readonly AddonRoot _addonRoot;
+
+    private AddonNode? _addon = null;
+    private CompositeDisposable? _addonDisposables = null;
+
+    private Bitmap? _image = null;
+    private byte[]? _rawImage = null;
+
+    private ObservableAsPropertyHelper<AddonNodeEnableState>? _enableState = null;
+
+    private ObservableAsPropertyHelper<bool>? _shouldShowFolderIcon = null;
+    private ObservableAsPropertyHelper<bool>? _shouldShowUnknownIcon = null; 
+    private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
+
+    private object? _currentRefreshId = null;
+    private CancellationTokenSource? _refreshCts = null;
+
+    public AddonNodeSimpleViewModel(AddonNode addon)
+        : this(addon ?? throw new ArgumentNullException(nameof(addon)), null, default)
     {
-        private const int ImageWidthToDecode = 200;
 
-        private bool _isActive = false;
+    }
 
-        private readonly AddonNode _addonNode;
+    public AddonNodeSimpleViewModel(AddonRoot addonRoot, Guid addonId)
+        : this(null, addonRoot, addonId)
+    {
 
-        private Bitmap? _image = null;
-        private byte[]? _rawImage = null;
+    }
 
-        private ObservableAsPropertyHelper<AddonNodeEnableState>? _enableState = null;
-
-        private bool _hasProblem = false;
-
-        private ObservableAsPropertyHelper<bool>? _shouldShowFolderIcon = null;
-        private ObservableAsPropertyHelper<bool>? _shouldShowUnknownImage = null; 
-        private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
-
-        private ObservableAsPropertyHelper<string?>? _fileSizeReadable = null;
-
-        private CancellationTokenSource? _cancellationTokenSource = null;
-
-        public AddonNodeSimpleViewModel(AddonNode addonNode)
+    public AddonNodeSimpleViewModel(AddonNode? addon, AddonRoot? addonRoot, Guid addonId)
+    {
+        if (addon is null)
         {
-            _addonNode = addonNode;
-            Activator = new();
-
-            ToggleEnabledCommand = ReactiveCommand.Create(() => 
+            ArgumentNullException.ThrowIfNull(addonRoot);
+            _addonRoot = addonRoot;
+            AddonId = addonId;
+            if (_addonRoot.TryGetNodeById(addonId, out var node))
             {
-                _addonNode.IsEnabled = !_addonNode.IsEnabled;
-            });
+                Addon = node;
+            }
+        }
+        else
+        {
+            _addonRoot = addon.Root;
+            AddonId = addon.Id;
+            Addon = addon;
+        }
 
-            this.WhenActivated((CompositeDisposable disposables) =>
+        ToggleEnabledCommand = ReactiveCommand.Create(() =>
+        {
+            if (_addon == null)
             {
-                _isActive = true;
+                return;
+            }
 
-                var addon = AddonNode;
+            _addon.IsEnabled = !_addon.IsEnabled;
+        });
 
-                UpdateHasProblem();
-                NotifyCollectionChangedEventHandler problemsSubscription = (object? sender, NotifyCollectionChangedEventArgs e) =>
+        this.WhenActivated((CompositeDisposable disposables) =>
+        {
+            _isActive = true;
+
+            {
+                var addon = Addon;
+                if (addon == null)
                 {
-                    UpdateHasProblem();
-                };
-                ((INotifyCollectionChanged)addon.Problems).CollectionChanged += problemsSubscription;
-                
-
-                _enableState = _addonNode.WhenAnyValue(x => x.IsEnabled, x => x.IsEnabledInHierarchy)
-                .Select(((bool isEnabled, bool isEnabledInHierarchy) enableState) =>
-                {
-                    if (enableState.isEnabled)
+                    if (_addonRoot.TryGetNodeById(AddonId, out addon))
                     {
-                        if (enableState.isEnabledInHierarchy)
-                        {
-                            return AddonNodeEnableState.Enabled;
-                        }
-                        else
-                        {
-                            return AddonNodeEnableState.EnabledSuppressed;
-                        }
+                        Addon = addon;
+                    }
+                }
+            }
+
+            Action<AddonNode> addonRootNewNodeIdRegisteredListener = addon =>
+            {
+                if (Addon != null)
+                {
+                    return;
+                }
+
+                if (addon.Id == AddonId)
+                {
+                    Addon = addon;
+                }
+            };
+            _addonRoot.NewNodeIdRegistered += addonRootNewNodeIdRegisteredListener;
+
+            var addonObservable = this.WhenAnyValue(x => x.Addon);
+
+            addonObservable.Subscribe(addon =>
+            {
+                _addonDisposables?.Dispose();
+
+                if (addon == null)
+                {
+                    _addonDisposables = null;
+                }
+                else
+                {
+                    _addonDisposables = new();
+                    OnNewAddon(addon, _addonDisposables);
+                }
+            }).DisposeWith(disposables);
+
+            var hasImageObservable = this.WhenAnyValue(x => x.Image).Select(img => img != null);
+            _shouldShowUnknownIcon = addonObservable.CombineLatest(hasImageObservable)
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is not AddonGroup)
+                .ToProperty(this, nameof(ShouldShowUnknownIcon));
+            this.RaisePropertyChanged(nameof(ShouldShowUnknownIcon));
+            _shouldShowImage = addonObservable.CombineLatest(hasImageObservable)
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && args.HasImage)
+                .ToProperty(this, nameof(ShouldShowImage));
+            this.RaisePropertyChanged(nameof(ShouldShowImage));
+            _shouldShowFolderIcon = addonObservable.CombineLatest(hasImageObservable)
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is AddonGroup)
+                .ToProperty(this, nameof(ShouldShowFolderIcon));
+            this.RaisePropertyChanged(nameof(ShouldShowFolderIcon));
+
+            Refresh();
+
+            Disposable.Create(() =>
+            {
+                _isActive = false;
+
+                _addonRoot.NewNodeIdRegistered -= addonRootNewNodeIdRegisteredListener;
+
+                Utils.DisposeAndSetNull(ref _addonDisposables);
+                Utils.DisposeAndSetNull(ref _shouldShowUnknownIcon);
+                Utils.DisposeAndSetNull(ref _shouldShowImage);
+                Utils.DisposeAndSetNull(ref _shouldShowFolderIcon);
+
+                Image = null;
+
+                CancelRefreshTasks();
+            }).DisposeWith(disposables);
+        });
+    }
+
+    public ViewModelActivator Activator { get; } = new();
+
+    public AddonRoot AddonRoot => _addonRoot;
+
+    public AddonNode? Addon
+    {
+        get 
+        {
+            if (_addon != null && !_addon.IsValid)
+            {
+                Addon = null;
+            }
+
+            return _addon;
+        }
+        private set
+        {
+            if (value == _addon)
+            {
+                return;
+            }
+            if (value != null)
+            {
+                if (value.Root != _addonRoot)
+                {
+                    throw new ArgumentException("Different AddonRoot instance");
+                }
+                if (!value.IsValid || !value.GetType().IsAssignableTo(AddonType))
+                {
+                    value = null;
+                }
+            }
+
+            _addon = value;
+            this.RaisePropertyChanged();
+            if (_addon == null)
+            {
+                OnNullAddon();
+            }
+        }
+    }
+
+    public virtual Type AddonType => typeof(AddonNode);
+
+    public Guid AddonId { get; }
+
+    public Bitmap? Image
+    {
+        get => _image;
+        private set
+        {
+            if (value == _image)
+            {
+                return;
+            }
+            if (_image != null)
+            {
+                _image.Dispose();
+            }
+            _image = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    public virtual int ImageDecodingWidth => 200;
+
+    public AddonNodeEnableState EnableState => _enableState?.Value ?? AddonNodeEnableState.Disabled;
+
+    public bool ShouldShowFolderIcon => _shouldShowFolderIcon?.Value ?? false;
+
+    public bool ShouldShowUnknownIcon => _shouldShowUnknownIcon?.Value ?? false;
+
+    public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
+
+    public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
+
+    protected object? CurrentRefreshId => _currentRefreshId;
+
+    public void Refresh()
+    {
+        if (_isActive)
+        {
+            CancelRefreshTasks();
+            _refreshCts = new();
+            var cancellationToken = _refreshCts.Token;
+            _currentRefreshId = new();
+            OnRefresh(cancellationToken);
+        }
+    }
+
+    public void ClearCaches()
+    {
+        Addon?.ClearCaches();
+        OnClearCaches();
+        Refresh();
+    }
+
+    public void Check()
+    {
+        var addon = Addon;
+        if (addon == null)
+        {
+            return;
+        }
+
+        if (addon is AddonGroup addonGroup)
+        {
+            addonGroup.CheckDescendants();
+        }
+        addon.Check();
+
+        Refresh();
+    }
+
+    public void ShowInFileExplorer()
+    {
+        var addon = Addon;
+        if (addon == null)
+        {
+            return;
+        }
+
+        Utils.ShowInFileExplorer(addon.FullFilePath);
+    }
+
+    protected virtual void OnNewAddon(AddonNode addon, CompositeDisposable disposables)
+    {
+        addon.WhenAnyValue(x => x.IsValid)
+            .Subscribe(isValid =>
+            {
+                if (!isValid)
+                {
+                    Addon = null;
+                }
+            })
+            .DisposeWith(disposables);
+        addon.WhenAnyValue(x => x.Id)
+            .Subscribe(id =>
+            {
+                if (id != AddonId)
+                {
+                    Addon = null;
+                }
+            })
+            .DisposeWith(disposables);
+
+        _enableState = addon.WhenAnyValue(x => x.IsEnabled, x => x.IsEnabledInHierarchy)
+            .Select(((bool IsEnabled, bool IsEnabledInHierarchy) enableState) =>
+            {
+                if (enableState.IsEnabled)
+                {
+                    if (enableState.IsEnabledInHierarchy)
+                    {
+                        return AddonNodeEnableState.Enabled;
                     }
                     else
                     {
-                        return AddonNodeEnableState.Disabled;
+                        return AddonNodeEnableState.EnabledSuppressed;
                     }
-                })
-                .ToProperty(this, nameof(EnableState));
-
-                _shouldShowFolderIcon = this.WhenAnyValue(x => x.Image)
-                .Select(image => image == null && _addonNode is AddonGroup)
-                .ToProperty(this, nameof(ShouldShowFolderIcon));
-
-                _shouldShowUnknownImage = this.WhenAnyValue(x => x.Image)
-                .Select(image => image == null && _addonNode is not AddonGroup)
-                .ToProperty(this, nameof(ShouldShowUnknownImage));
-
-                _shouldShowImage = this.WhenAnyValue(x => x.Image)
-                    .Select(image => image != null)
-                    .ToProperty(this, nameof(ShouldShowImage));
-
-                _fileSizeReadable = this.WhenAnyValue(x => x.AddonNode.FileSize)
-                .Select((fileSize) => fileSize.HasValue ? Utils.GetReadableBytes(fileSize.Value) : null)
-                .ToProperty(this, nameof(FileSizeReadable));
-
-                addon.WhenAnyValue(x => x.CustomImagePath)
+                }
+                else
+                {
+                    return AddonNodeEnableState.Disabled;
+                }
+            })
+            .ToProperty(this, nameof(EnableState));
+        this.RaisePropertyChanged(nameof(EnableState));
+        
+        addon.WhenAnyValue(x => x.CustomImagePath)
+            .Skip(1)
+            .Throttle(TimeSpan.FromSeconds(0.5), RxApp.MainThreadScheduler)
+            .Subscribe(_ => Refresh())
+            .DisposeWith(disposables);
+        if (addon is VpkAddon vpkAddon)
+        {
+            vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
                 .Skip(1)
-                .Throttle(TimeSpan.FromSeconds(0.5))
                 .Subscribe(_ => Refresh())
                 .DisposeWith(disposables);
-                if (addon is VpkAddon vpkAddon)
-                {
-                    vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
-                    .Skip(1)
-                    .Subscribe(_ => Refresh())
-                    .DisposeWith(disposables);
-                }
-
-                Refresh();
-
-                Disposable.Create(() =>
-                {
-                    _isActive = false;
-
-                    ((INotifyCollectionChanged)addon.Problems).CollectionChanged -= problemsSubscription;
-
-                    _enableState.Dispose();
-                    _enableState = null;
-
-                    _shouldShowFolderIcon.Dispose();
-                    _shouldShowFolderIcon = null;
-
-                    _shouldShowUnknownImage.Dispose();
-                    _shouldShowUnknownImage = null;
-
-                    _shouldShowImage.Dispose();
-                    _shouldShowImage = null;
-
-                    _fileSizeReadable.Dispose();
-                    _fileSizeReadable = null;
-
-                    Image = null;
-
-                    CancelTasks();
-                })
-                .DisposeWith(disposables);
-            });
         }
 
-        public ViewModelActivator Activator { get; }
-
-        public AddonNode AddonNode => _addonNode;
-
-        public Bitmap? Image
+        Disposable.Create(() =>
         {
-            get => _image;
-            private set
+            Utils.DisposeAndSetNull(ref _enableState);
+        }).DisposeWith(disposables);
+    }
+
+    protected virtual void OnNullAddon()
+    {
+
+    }
+
+    protected virtual void OnRefresh(CancellationToken cancellationToken)
+    {
+        var addon = Addon;
+        var refreshId = CurrentRefreshId;
+
+        RefreshImage();
+
+        async void RefreshImage()
+        {
+            Image = null;
+            _rawImage = null;
+
+            if (addon == null)
             {
-                if (value == _image)
-                {
-                    return;
-                }
-                if (_image != null)
-                {
-                    _image.Dispose();
-                }
-                _image = value;
-                this.RaisePropertyChanged();
+                return;
             }
-        }
 
-        public AddonNodeEnableState EnableState => _enableState?.Value ?? AddonNodeEnableState.Disabled;
+            byte[]? imageData = null;
 
-        public bool HasProblem
-        {
-            get => _hasProblem;
-            private set => this.RaiseAndSetIfChanged(ref _hasProblem, value);
-        }
-
-        public bool ShouldShowFolderIcon => _shouldShowFolderIcon?.Value ?? false;
-
-        public bool ShouldShowUnknownImage => _shouldShowUnknownImage?.Value ?? false;
-
-        public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
-
-        public string? FileSizeReadable => _fileSizeReadable?.Value;
-
-        public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
-
-        public void Refresh()
-        {
-            if (_isActive)
+            try
             {
-                OnRefresh();
-            }
-        }
-
-        public void ClearCaches()
-        {
-            AddonNode.ClearCaches();
-            OnClearCaches();
-            Refresh();
-        }
-
-        public void Check()
-        {
-            if (AddonNode is AddonGroup addonGroup)
-            {
-                addonGroup.CheckAll();
-            }
-            AddonNode.Check();
-            Refresh();
-        }
-
-        public void ShowInFileExplorer()
-        {
-            Utils.ShowFileInExplorer(AddonNode.FullFilePath);
-        }
-
-        protected virtual void OnRefresh()
-        {
-            CancelTasks();
-            _cancellationTokenSource = new();
-            var cancellationToken = _cancellationTokenSource.Token;
-
-            var addon = AddonNode;
-
-            RefreshImage();
-
-            async void RefreshImage()
-            {
-                Image = null;
-                _rawImage = null;
-
-                byte[]? imageData = null;
-
-                try
-                {
-                    var customImagePath = addon.CustomImageFullPath;
-                    if (customImagePath != null)
-                    {
-                        try
-                        {
-                            if (File.Exists(customImagePath))
-                            {
-                                imageData = await File.ReadAllBytesAsync(customImagePath, cancellationToken);
-                            }
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            throw;
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex, "Exception occurred during reading custom image: {FilePath}", customImagePath);
-                        }
-                    }
-
-                    if (imageData == null)
-                    {
-                        imageData = await addon.GetImageAllowCacheAsync(cancellationToken);
-                        _rawImage = imageData;
-                    }
-                }
-                catch (OperationCanceledException) 
-                {
-                    return;
-                }
-
-                if (imageData != null)
+                var customImagePath = addon.ActualImageFilePath;
+                if (customImagePath != null)
                 {
                     try
                     {
-                        Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageWidthToDecode);
+                        if (File.Exists(customImagePath))
+                        {
+                            imageData = await File.ReadAllBytesAsync(customImagePath, cancellationToken);
+                            if (refreshId != CurrentRefreshId)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.OnRefresh.");
+                        Log.Error(ex, "Exception occurred during reading custom image: {FilePath}", customImagePath);
                     }
+                }
+
+                if (imageData == null)
+                {
+                    imageData = await addon.GetImageAllowCacheAsync(cancellationToken);
+                    if (refreshId != CurrentRefreshId)
+                    {
+                        return;
+                    }
+                    _rawImage = imageData;
+                }
+            }
+            catch (OperationCanceledException) 
+            {
+                return;
+            }
+
+            if (imageData != null)
+            {
+                try
+                {
+                    Image = Bitmap.DecodeToWidth(new MemoryStream(imageData), ImageDecodingWidth);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during Bitmap.DecodeToWidth at AddonNodeSimpleViewModel.OnRefresh.");
                 }
             }
         }
+    }
 
-        protected virtual void OnClearCaches()
-        {
-            Image = null;
-        }
+    protected virtual void OnClearCaches()
+    {
+        Image = null;
+    }
 
-        private void CancelTasks()
+    private void CancelRefreshTasks()
+    {
+        if (_refreshCts != null)
         {
-            if (_cancellationTokenSource != null)
-            {
-                _cancellationTokenSource.Cancel();
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
-            }
-        }
-
-        private void UpdateHasProblem()
-        {
-            HasProblem = AddonNode.Problems.Count > 0;
+            _refreshCts.Cancel();
+            _refreshCts.Dispose();
+            _refreshCts = null;
         }
     }
 }

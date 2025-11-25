@@ -6,11 +6,9 @@
              x:Class="FireAxe.Views.AddonNodeSectionViewDecorator">
   <Border
     Name="decorator"
+    Classes="Level1"
     Margin="0, 5, 0, 5"
-    Padding="5"
-    BorderBrush="Gray"
-    BorderThickness="1"
-    CornerRadius="5">
+    Padding="5">
     <TextBlock>Content</TextBlock>
   </Border>
 </UserControl>

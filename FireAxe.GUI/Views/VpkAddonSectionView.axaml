@@ -3,73 +3,68 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
              xmlns:r="using:FireAxe.Resources"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
              x:Class="FireAxe.Views.VpkAddonSectionView"
              x:DataType="vm:VpkAddonViewModel">
-  <Grid
-    RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto"
-    ColumnDefinitions="Auto, *">
+  <StackPanel
+    Orientation="Vertical">
+    <StackPanel.Styles>
+      <Style Selector="Expander">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      </Style>
+    </StackPanel.Styles>
     <TextBlock
       Text="{x:Static r:Texts.VpkInfo}"
-      Classes="Heading1"
-      Grid.Row="0"
-      Grid.Column="0"
-      Grid.ColumnSpan="2"/>
+      Classes="Heading1"/>
 
-    <SelectableTextBlock
-      Text="{x:Static r:Texts.VersionColon}"
-      Classes="PropertyName"
-      Grid.Row="1"
-      Grid.Column="0"/>
-    <SelectableTextBlock
-      Text="{Binding Info.Version}"
-      Classes="PropertyValue"
-      Grid.Row="1"
-      Grid.Column="1"/>
+    <DockPanel>
+      <SelectableTextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.VersionColon}"
+        Classes="PropertyName"/>
+      <SelectableTextBlock
+        Text="{Binding Info.Version}"
+        Classes="PropertyValue"/>
+    </DockPanel>
 
-    <SelectableTextBlock
-      Text="{x:Static r:Texts.TitleColon}"
-      Classes="PropertyName"
-      Grid.Row="2"
-      Grid.Column="0"/>
-    <SelectableTextBlock
-      Text="{Binding Info.Title}"
-      Classes="PropertyValue"
-      Grid.Row="2"
-      Grid.Column="1"/>
+    <DockPanel>
+      <SelectableTextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.TitleColon}"
+        Classes="PropertyName"/>
+      <SelectableTextBlock
+        Text="{Binding Info.Title}"
+        Classes="PropertyValue"/>
+    </DockPanel>
 
-    <SelectableTextBlock
-      Text="{x:Static r:Texts.AuthorColon}"
-      Classes="PropertyName"
-      Grid.Row="3"
-      Grid.Column="0"/>
-    <SelectableTextBlock
-      Text="{Binding Info.Author}"
-      Classes="PropertyValue"
-      Grid.Row="3"
-      Grid.Column="1"/>
+    <DockPanel>
+      <SelectableTextBlock
+        DockPanel.Dock="Left"
+        Text="{x:Static r:Texts.AuthorColon}"
+        Classes="PropertyName"/>
+      <SelectableTextBlock
+        Text="{Binding Info.Author}"
+        Classes="PropertyValue"/>
+    </DockPanel>
 
     <SelectableTextBlock
       Text="{x:Static r:Texts.DescriptionColon}"
-      Classes="PropertyName"
-      Grid.Row="4"
-      Grid.Column="0"/>
+      Classes="PropertyName"/>
     <SelectableTextBlock
       Text="{Binding Info.Description}"
-      Grid.Row="5"
-      Grid.Column="0"
-      Grid.ColumnSpan="2"
       TextWrapping="Wrap"/>
-    
-    <TextBlock
-      Grid.Row="6" Grid.Column="0"
-      Text="{x:Static r:Texts.Priority}"
-      Classes="PropertyName"/>
-    <TextBox
-      Grid.Row="6" Grid.Column="1"
-      Text="{Binding VpkPriority}"
-      HorizontalAlignment="Right"
-      VerticalAlignment="Center"/>
-  </Grid>
+
+    <Expander
+      Margin="0, 5, 0, 5">
+      <Expander.Header>
+        <TextBlock
+          Text="{x:Static r:Texts.ConflictingDetails}"
+          Classes="Heading1"/>
+      </Expander.Header>
+      <v:VpkAddonConflictingDetailsView
+        DataContext="{Binding ConflictingDetailsViewModel}"/>
+    </Expander>
+  </StackPanel>
 </UserControl>

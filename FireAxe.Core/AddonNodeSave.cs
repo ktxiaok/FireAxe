@@ -1,21 +1,26 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace FireAxe
+namespace FireAxe;
+
+public class AddonNodeSave
 {
-    public class AddonNodeSave
-    {
-        [JsonIgnore]
-        public virtual Type TargetType => typeof(AddonNode);
+    [JsonIgnore]
+    public virtual Type TargetType => typeof(AddonNode);
 
-        public bool IsEnabled { get; set; } = false;
+    public Guid Id { get; set; } = Guid.Empty; 
 
-        public string Name { get; set; } = "";
+    public bool IsEnabled { get; set; } = false;
 
-        public DateTime CreationTime { get; set; }
+    public string Name { get; set; } = "";
 
-        public string[] Tags { get; set; } = [];
+    public int Priority { get; set; } = 0; 
 
-        public string? CustomImagePath { get; set; } = null;
-    }
+    public DateTime CreationTime { get; set; }
+
+    public string[] Tags { get; set; } = [];
+
+    public Guid[] DependentAddonIds { get; set; } = [];
+
+    public string? CustomImagePath { get; set; } = null;
 }
