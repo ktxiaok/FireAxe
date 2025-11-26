@@ -71,6 +71,11 @@ public static class FileSystemUtils
     {
         ArgumentNullException.ThrowIfNull(sourcePath);
         ArgumentNullException.ThrowIfNull(targetPath);
+
+        if (IsSamePath(sourcePath, targetPath))
+        {
+            return;
+        }
         
         Directory.Move(sourcePath, targetPath);
     }
@@ -207,6 +212,14 @@ public static class FileSystemUtils
         ArgumentNullException.ThrowIfNull(path);
 
         return path.Replace('\\', '/');
+    }
+
+    public static bool IsSamePath(string path1, string path2)
+    {
+        ArgumentNullException.ThrowIfNull(path1);
+        ArgumentNullException.ThrowIfNull(path2);
+
+        return NormalizePath(path1) == NormalizePath(path2);
     }
 
     public static string GetFullAndNormalizedPath(string path) => NormalizePath(Path.GetFullPath(path));

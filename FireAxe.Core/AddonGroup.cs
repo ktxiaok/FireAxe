@@ -170,11 +170,11 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
     public event Action<AddonNode>? DescendantNodeMoved = null;
 
-    public string GetUniqueNodeName(string name)
+    public string GetUniqueChildName(string name, bool ignoreFileSystem = false)
     {
         this.ThrowIfInvalid();
 
-        return _containerService.GetUniqueName(name);
+        return _containerService.GetUniqueChildName(name, ignoreFileSystem);
     }
 
     public AddonNode? TryGetNodeByName(string name)
@@ -233,6 +233,24 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
         _enableStrategyProblemSource.Clear();
         EnableStrategyProblem.TryCreate(_enableStrategyProblemSource)?.Submit();
+    }
+
+    protected override void OnCheck()
+    {
+        base.OnCheck();
+
+        if (Root.IsDirectoryPathSet)
+        {
+            var dirPath = FullFilePath;
+            try
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during trying to create the directory: {Path}", dirPath);
+            }
+        }
     }
 
     protected override void OnPostCheck()
@@ -331,14 +349,14 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         _isBusyHandlingChildEnableOrDisable = false;
     }
 
-    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name, AddonNode node)
+    void IAddonNodeContainerInternal.ThrowIfChildNewNameDisallowed(string name, AddonNode child)
     {
-        _containerService.ThrowIfNameInvalid(name, node);
+        _containerService.ThrowIfChildNewNameDisallowed(name, child);
     }
 
-    void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
+    void IAddonNodeContainerInternal.ChangeChildNameUnchecked(string? oldName, string newName, AddonNode child)
     {
-        _containerService.ChangeNameUnchecked(oldName, newName, node);
+        _containerService.ChangeChildNameUnchecked(oldName, newName, child);
     }
 
     void IAddonNodeContainerInternal.NotifyDescendantNodeMoved(AddonNode node)

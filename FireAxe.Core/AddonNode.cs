@@ -287,15 +287,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            value = value.Trim(' ', '.');
-            if (value.Length == 0)
-            {
-                throw new ArgumentException("Cannot set the name to a empty string.");
-            }
-            if (value == NullName)
-            {
-                throw new ArgumentException($"Cannot set the name to \"{NullName}\" because it's a reserved name.");
-            }
+            value = SanitizeName(value);
 
             this.ThrowIfInvalid();
 
@@ -311,7 +303,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 var parent = Parent;
                 var parentInternal = (IAddonNodeContainerInternal)parent;
 
-                parentInternal.ThrowIfNodeNameInvalid(value, this);
+                parentInternal.ThrowIfChildNewNameDisallowed(value, this);
 
                 // Move the linked files.
                 if (Root.IsDirectoryPathSet && Name != NullName && parent.FileSystemPath is { } parentFilePath)
@@ -336,7 +328,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                     }
                 }
 
-                parentInternal.ChangeNameUnchecked(_name, value, this);
+                parentInternal.ChangeChildNameUnchecked(_name, value, this);
             });
 
             _name = value;
@@ -531,6 +523,39 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     {
         return (T)Create(typeof(T), root, group);
     }
+
+    public static string SanitizeName(string name, out bool empty)
+    {
+        const string Unnamed = "UNNAMED";
+
+        ArgumentNullException.ThrowIfNull(name);
+
+        empty = false;
+
+        if (name.Length == 0 || name == NullName)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        name = name.Trim(' ', '.');
+        if (name.Length == 0)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        name = FileSystemUtils.SanitizeFileName(name);
+        if (name.Length == 0)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        return name;
+    }
+
+    public static string SanitizeName(string name) => SanitizeName(name, out _);
 
     public virtual Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
     {
@@ -833,7 +858,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             var targetContainer = targetGroup == null ? (IAddonNodeContainer)Root : (IAddonNodeContainer)targetGroup;
             var targetContainerInternal = (IAddonNodeContainerInternal)targetContainer;
 
-            targetContainerInternal.ThrowIfNodeNameInvalid(Name, this);
+            targetContainerInternal.ThrowIfChildNewNameDisallowed(Name, this);
 
             // Move the linked files.
             if (Root.IsDirectoryPathSet && Name != NullName && targetContainer.FileSystemPath is { } targetContainerFilePath)
@@ -1275,13 +1300,18 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         IsEnabled = save.IsEnabled;
 
+        var name = Parent.GetUniqueChildName(save.Name, true);
+        if (name != save.Name)
+        {
+            Log.Warning($"Addon name corrected at {nameof(AddonNode)}.{nameof(OnLoadSave)}: from \"{{OldName}}\" to \"{{NewName}}\"", save.Name, name);
+        }
         try
         {
-            Name = save.Name;
+            Name = name;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Exception occurred during setting AddonNode.Name at AddonNode.OnLoadSave.");
+            LogValueException(ex, nameof(Name), name);
         }
 
         Priority = save.Priority;
@@ -1311,7 +1341,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Exception occurred during setting {nameof(CustomImagePath)} at {nameof(AddonNode)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", save.CustomImagePath);
+            LogValueException(ex, nameof(CustomImagePath), save.CustomImagePath);
+        }
+
+        void LogValueException(Exception ex, string propertyName, object? value)
+        {
+            Log.Error(ex, $"Exception occurred during setting {propertyName} at {nameof(AddonNode)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", value);
         }
     }
 

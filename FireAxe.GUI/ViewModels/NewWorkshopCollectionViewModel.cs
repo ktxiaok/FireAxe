@@ -170,12 +170,12 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
             }
 
             var collectionGroup = AddonNode.Create<AddonGroup>(_addonRoot, _addonGroupRef?.TryGet());
-            var collectionName = collectionGroup.Parent.GetUniqueNodeName(FileSystemUtils.SanitizeFileName(collectionDetails.Title));
+            var collectionName = collectionGroup.Parent.GetUniqueChildName(collectionDetails.Title);
             collectionGroup.Name = collectionName;
             foreach (var itemId in itemIds)
             {
                 var addon = AddonNode.Create<WorkshopVpkAddon>(_addonRoot, collectionGroup);
-                addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
+                addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
                 addon.RequestAutoSetName = true;
                 addon.PublishedFileId = itemId;
             }

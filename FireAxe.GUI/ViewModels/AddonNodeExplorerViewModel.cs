@@ -536,7 +536,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     public AddonGroup NewGroup()
     {
         var group = AddonNode.Create<AddonGroup>(AddonRoot, CurrentGroup);
-        group.Name = group.Parent.GetUniqueNodeName(Texts.UnnamedGroup);
+        group.Name = group.Parent.GetUniqueChildName(Texts.UnnamedGroup);
         Directory.CreateDirectory(group.FullFilePath);
         SelectNode(group);
         return group;
@@ -545,7 +545,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     public RefAddonNode NewRefAddon()
     {
         var addon = AddonNode.Create<RefAddonNode>(AddonRoot, CurrentGroup);
-        addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedReferenceAddon);
+        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedReferenceAddon);
         SelectNode(addon);
         return addon;
     }
@@ -553,7 +553,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     public WorkshopVpkAddon NewWorkshopAddon()
     {
         var addon = AddonNode.Create<WorkshopVpkAddon>(AddonRoot, CurrentGroup);
-        addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
+        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
         addon.RequestAutoSetName = true;
         SelectNode(addon);
         return addon;

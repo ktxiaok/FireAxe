@@ -405,20 +405,12 @@ public class WorkshopVpkAddon : VpkAddon
 
         var addonTaskCreator = this.GetValidTaskCreator();
 
-        if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false)) is { } pfd)
+        if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false))?.Title is { } title)
         {
-            var title = pfd.Title;
-            if (title.Length > 0)
+            title = SanitizeName(title, out bool empty);
+            if (!empty)
             {
-                title = title.Trim();
-                if (title.Length > 0)
-                {
-                    title = FileSystemUtils.SanitizeFileName(title);
-                    if (title.Length > 0)
-                    {
-                        return title;
-                    }
-                }
+                return title;
             }
         }
 
@@ -607,12 +599,7 @@ public class WorkshopVpkAddon : VpkAddon
                     {
                         blockMove.Dispose();
 
-                        var name = FileSystemUtils.SanitizeFileName(details.Title);
-                        if (name.Length == 0)
-                        {
-                            name = "UNNAMED";
-                        }
-                        name = self.Parent.GetUniqueNodeName(name);
+                        var name = self.Parent.GetUniqueChildName(details.Title);
                         try
                         {
                             self.Name = name;

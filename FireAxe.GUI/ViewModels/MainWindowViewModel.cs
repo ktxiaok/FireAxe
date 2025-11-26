@@ -160,7 +160,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
 
             var importedGroup = AddonNode.Create<AddonGroup>(addonRoot, explorerViewModel.CurrentGroup);
-            importedGroup.Name = importedGroup.Parent.GetUniqueNodeName(Texts.ImportedGroup);
+            importedGroup.Name = importedGroup.Parent.GetUniqueChildName(Texts.ImportedGroup);
             explorerViewModel.SelectNode(importedGroup);
             foreach (var nodeSave in nodeSaves)
             {

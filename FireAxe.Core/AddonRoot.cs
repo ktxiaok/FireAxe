@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Enumeration;
 using System.Text.RegularExpressions;
 using ValveKeyValue;
 
@@ -360,11 +361,11 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
     }
 
-    public string GetUniqueNodeName(string name)
+    public string GetUniqueChildName(string name, bool ignoreFileSystem = false)
     {
         this.ThrowIfInvalid();
 
-        return _containerService.GetUniqueName(name);
+        return _containerService.GetUniqueChildName(name, ignoreFileSystem);
     }
 
     public Task CheckAsync()
@@ -473,50 +474,173 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     private abstract class ImportItem
     {
-        public abstract void Create(AddonRoot root);
-    }
-
-    private class LocalVpkImportItem : ImportItem
-    {
-        public string Name;
-        public AddonGroup? Group;
-
-        public LocalVpkImportItem(string name, AddonGroup? group)
+        protected ImportItem(string filePath, AddonGroup? group)
         {
-            Name = name;
+            FilePath = filePath;
             Group = group;
         }
 
-        public override void Create(AddonRoot root)
+        public string FilePath { get; }
+
+        public AddonGroup? Group { get; }
+
+        public abstract AddonNode Create(AddonRoot addonRoot, out string? newFilePath);
+    }
+
+    private abstract class ImportItem<T> : ImportItem where T : AddonNode
+    {
+        public ImportItem(string filePath, AddonGroup? group) : base(filePath, group)
         {
-            var addon = AddonNode.Create<LocalVpkAddon>(root, Group);
-            addon.Name = Name;
-            addon.Check();
+
+        }
+
+        public sealed override AddonNode Create(AddonRoot addonRoot, out string? newFilePath)
+        {
+            newFilePath = null;
+
+            var addon = AddonNode.Create<T>(addonRoot, Group);
+
+            var name = Path.GetFileNameWithoutExtension(FilePath);
+            name = addon.Parent.GetUniqueChildName(name, true);
+            addon.Name = name;
+
+            OnCreate(addon);
+
+            var currentFilePath = addon.FullFilePath;
+            if (!FileSystemUtils.IsSamePath(FilePath, currentFilePath))
+            {
+                FileSystemUtils.Move(FilePath, currentFilePath);
+                newFilePath = currentFilePath;
+            }
+
+            return addon;
+        }
+
+        protected abstract void OnCreate(T addon);
+    }
+
+    private class LocalVpkImportItem : ImportItem<LocalVpkAddon>
+    {
+        public LocalVpkImportItem(string filePath, AddonGroup? group) : base(filePath, group)
+        {
+
+        }
+
+        protected override void OnCreate(LocalVpkAddon addon)
+        {
+            
         }
     }
 
-    private class WorkshopVpkImportItem : ImportItem
+    private class WorkshopVpkImportItem : ImportItem<WorkshopVpkAddon>
     {
-        public string Name;
-        public AddonGroup? Group;
-        public ulong PublishedFileId;
-
-        public WorkshopVpkImportItem(string name, AddonGroup? group, ulong publishedFileId)
+        public WorkshopVpkImportItem(string filePath, AddonGroup? group, ulong publishedFileId) : base(filePath, group)
         {
-            Name = name;
-            Group = group;
             PublishedFileId = publishedFileId;
         }
 
-        public override void Create(AddonRoot root)
+        public ulong PublishedFileId { get; }
+
+        protected override void OnCreate(WorkshopVpkAddon addon)
         {
-            var addon = AddonNode.Create<WorkshopVpkAddon>(root, Group);
-            addon.Name = Name;
             addon.PublishedFileId = PublishedFileId;
         }
     }
 
-    public void Import(AddonGroup? group = null)
+    public abstract class ImportResultItem
+    {
+        internal ImportResultItem(AddonRoot addonRoot, string filePath, string? newFilePath)
+        {
+            var addonRootDirPath = addonRoot.DirectoryPath;
+            RelativeFilePath = Path.GetRelativePath(addonRootDirPath, filePath);
+            if (newFilePath is not null)
+            {
+                NewRelativeFilePath = Path.GetRelativePath(addonRootDirPath, newFilePath);
+            }
+        }
+
+        public abstract bool Success { get; }
+
+        public string RelativeFilePath { get; }
+
+        public string? NewRelativeFilePath { get; } = null;
+
+        public abstract AddonNode Addon { get; }
+
+        public abstract Exception Exception { get; }
+    }
+
+    private class SuccessfulImportResultItem : ImportResultItem
+    {
+        internal SuccessfulImportResultItem(AddonRoot addonRoot, string filePath, string? newFilePath, AddonNode addon) : base(addonRoot, filePath, newFilePath)
+        {
+            Addon = addon;
+        }
+
+        public override bool Success => true;
+
+        public override AddonNode Addon { get; }
+
+        public override Exception Exception => throw new InvalidOperationException($"{nameof(Exception)} is not set.");
+    }
+
+    private class FailedImportResultItem : ImportResultItem
+    {
+        internal FailedImportResultItem(AddonRoot addonRoot, string filePath, string? newFilePath, Exception exception) : base(addonRoot, filePath, newFilePath)
+        {
+            Exception = exception;
+        }
+
+        public override bool Success => false;
+
+        public override AddonNode Addon => throw new InvalidOperationException($"{nameof(Addon)} is not set.");
+
+        public override Exception Exception { get; }
+    }
+
+    public class ImportResult
+    {
+        internal ImportResult(IReadOnlyList<ImportResultItem> items)
+        {
+            Items = items;
+        }
+
+        public IReadOnlyList<ImportResultItem> Items { get; }
+
+        public int SuccessCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (var item in Items)
+                {
+                    if (item.Success)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        }
+
+        public int FailureCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (var item in Items)
+                {
+                    if (!item.Success)
+                    {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        }
+    }
+
+    public ImportResult Import(AddonGroup? group = null)
     {
         this.ThrowIfInvalid();
 
@@ -530,7 +654,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
 
         var fileFinder = group == null ? new AddonNodeFileFinder(this) : new AddonNodeFileFinder(group);
-        var imports = new List<ImportItem>();
+        var importItems = new List<ImportItem>();
         bool skipDir = false;
         while (fileFinder.MoveNext(skipDir))
         {
@@ -562,7 +686,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                     if (metaInfo != null)
                     {
                         skipDir = true;
-                        imports.Add(new WorkshopVpkImportItem(Path.GetFileNameWithoutExtension(filePath), fileFinder.GetOrCreateCurrentGroup(), metaInfo.PublishedFileId));
+                        importItems.Add(new WorkshopVpkImportItem(filePath, fileFinder.GetOrCreateCurrentGroup(), metaInfo.PublishedFileId));
                     }
                 }
             }
@@ -570,14 +694,31 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             {
                 if (fileExtension == ".vpk")
                 {
-                    imports.Add(new LocalVpkImportItem(Path.GetFileNameWithoutExtension(filePath), fileFinder.GetOrCreateCurrentGroup()));
+                    importItems.Add(new LocalVpkImportItem(filePath, fileFinder.GetOrCreateCurrentGroup()));
                 }
             }
         }
-        foreach (var import in imports)
+
+        var resultItems = new ImportResultItem[importItems.Count];
+        for (int i = 0, len = importItems.Count; i < len; i++)
         {
-            import.Create(this);
+            var importItem = importItems[i];
+            string? newFilePath = null;
+            AddonNode addon;
+            try
+            {
+                addon = importItem.Create(this, out newFilePath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to import the addon file: {FilePath}", importItem.FilePath);
+                resultItems[i] = new FailedImportResultItem(this, importItem.FilePath, newFilePath, ex);
+                continue;
+            }
+            resultItems[i] = new SuccessfulImportResultItem(this, importItem.FilePath, newFilePath, addon);
         }
+
+        return new ImportResult(resultItems);
     }
 
     public void Push()
@@ -1132,14 +1273,14 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         _containerService.Remove(node);
     }
 
-    void IAddonNodeContainerInternal.ThrowIfNodeNameInvalid(string name, AddonNode node)
+    void IAddonNodeContainerInternal.ThrowIfChildNewNameDisallowed(string name, AddonNode child)
     {
-        _containerService.ThrowIfNameInvalid(name, node);
+        _containerService.ThrowIfChildNewNameDisallowed(name, child);
     }
 
-    void IAddonNodeContainerInternal.ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
+    void IAddonNodeContainerInternal.ChangeChildNameUnchecked(string? oldName, string newName, AddonNode child)
     {
-        _containerService.ChangeNameUnchecked(oldName, newName, node);
+        _containerService.ChangeChildNameUnchecked(oldName, newName, child);
     }
 
     void IAddonNodeContainerInternal.NotifyDescendantNodeMoved(AddonNode node)

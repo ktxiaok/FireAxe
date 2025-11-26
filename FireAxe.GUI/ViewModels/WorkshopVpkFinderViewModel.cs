@@ -202,17 +202,11 @@ public class WorkshopVpkFinderViewModel : ViewModelBase, IActivatableViewModel, 
             var addon = AddonNode.Create<WorkshopVpkAddon>(addonRoot, addonGroup);
             if (stagedItem.Title is { } title)
             {
-                var name = FileSystemUtils.SanitizeFileName(title);
-                if (name.Length == 0)
-                {
-                    name = "UNNAMED";
-                }
-                name = addon.Parent.GetUniqueNodeName(name);
-                addon.Name = name;
+                addon.Name = addon.Parent.GetUniqueChildName(title);
             }
             else
             {
-                addon.Name = addon.Parent.GetUniqueNodeName(Texts.UnnamedWorkshopAddon);
+                addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
                 addon.RequestAutoSetName = true;
             }
             addon.PublishedFileId = stagedItem.PublishedFileId;

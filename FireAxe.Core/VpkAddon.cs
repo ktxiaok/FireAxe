@@ -130,14 +130,10 @@ public abstract class VpkAddon : AddonNode
 
         if (RetrieveInfo()?.Title is { } title)
         {
-            title = title.Trim();
-            if (title.Length > 0)
+            title = SanitizeName(title, out bool empty);
+            if (!empty)
             {
-                title = FileSystemUtils.SanitizeFileName(title);
-                if (title.Length > 0)
-                {
-                    return Task.FromResult<string?>(title);
-                }
+                return Task.FromResult<string?>(title);
             }
         }
 
