@@ -251,15 +251,14 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         return path;
     }
 
-    public bool AddCustomTag(string tag)
+    public bool AddCustomTag(string? tag)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-        if (tag.Length == 0)
-        {
-            throw new ArgumentException("empty tag string");
-        }
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(tag))
+        {
+            return false;
+        }
 
         if (AddonTags.BuiltInTags.Contains(tag))
         {
@@ -1167,10 +1166,6 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
         foreach (var tag in save.CustomTags)
         {
-            if (string.IsNullOrEmpty(tag))
-            {
-                continue;
-            }
             AddCustomTag(tag);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe;
 
@@ -12,5 +13,6 @@ public class VpkAddonSave : AddonNodeSave
         set => Priority = value;
     }
 
-    public string[] ConflictIgnoringFiles { get; set; } = [];
+    [AllowNull]
+    public string[] ConflictIgnoringFiles { get; set => field = value.EliminateNull(); } = [];
 }

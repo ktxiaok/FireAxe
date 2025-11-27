@@ -622,7 +622,7 @@ public class WorkshopVpkAddon : VpkAddon
                         {
                             foreach (var tagObj in tags)
                             {
-                                self.AddTag(tagObj.Tag);
+                                self.AddTag(tagObj?.Tag);
                             }
                             self.RequestApplyTagsFromWorkshop = false;
                         }

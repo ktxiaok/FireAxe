@@ -581,15 +581,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public bool AddTag(string tag)
+    public bool AddTag(string? tag)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-        if (tag.Length == 0)
-        {
-            throw new ArgumentException("empty tag string");
-        }
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(tag))
+        {
+            return false;
+        }
 
         if (!_tagSet.Add(tag))
         {
@@ -1339,10 +1338,6 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         foreach (var tag in save.Tags)
         {
-            if (string.IsNullOrEmpty(tag))
-            {
-                continue;
-            }
             AddTag(tag);
         }
 

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe;
 
 public class AddonRootSave
 {
-    public AddonNodeSave[] Nodes { get; set; } = Array.Empty<AddonNodeSave>();
+    [AllowNull]
+    public AddonNodeSave[] Nodes { get; set => field = value.EliminateNull(); } = [];
 
-    public string[] CustomTags { get; set; } = [];
+    [AllowNull]
+    public string[] CustomTags { get; set => field = value.EliminateNull(); } = [];
 }

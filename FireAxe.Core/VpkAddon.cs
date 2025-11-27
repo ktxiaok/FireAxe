@@ -65,11 +65,14 @@ public abstract class VpkAddon : AddonNode
         return addonInfo;
     }
 
-    public bool AddConflictIgnoringFile(string file)
+    public bool AddConflictIgnoringFile(string? file)
     {
-        ArgumentNullException.ThrowIfNull(file);
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(file))
+        {
+            return false;
+        }
 
         if (!_conflictIgnoringFileSet.Add(file))
         {
@@ -191,11 +194,12 @@ public abstract class VpkAddon : AddonNode
         _addonInfo.SetTarget(null);
     }
 
-    protected override void OnCreateSave(AddonNodeSave save)
+    protected override void OnCreateSave(AddonNodeSave save0)
     {
-        base.OnCreateSave(save);
-        var save1 = (VpkAddonSave)save;
-        save1.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
+        base.OnCreateSave(save0);
+
+        var save = (VpkAddonSave)save0;
+        save.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
     }
 
     protected override void OnLoadSave(AddonNodeSave save0)
@@ -206,10 +210,6 @@ public abstract class VpkAddon : AddonNode
         ClearConflictIgnoringFiles();
         foreach (var file in save.ConflictIgnoringFiles)
         {
-            if (string.IsNullOrEmpty(file))
-            {
-                continue;
-            }
             AddConflictIgnoringFile(file);
         }
     }

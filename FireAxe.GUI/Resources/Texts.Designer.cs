@@ -2772,7 +2772,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Version:.
+        ///   Looks up a localized string similar to Version: .
         /// </summary>
         public static string VersionColon {
             get {

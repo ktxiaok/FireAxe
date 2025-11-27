@@ -679,7 +679,7 @@
     <value>Use Regex</value>
   </data>
   <data name="VersionColon" xml:space="preserve">
-    <value>Version:</value>
+    <value>Version: </value>
   </data>
   <data name="ViewsColon" xml:space="preserve">
     <value>Views: </value>
