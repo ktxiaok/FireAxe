@@ -1067,4 +1067,10 @@
   <data name="OpeningDirectory" xml:space="preserve">
     <value>打开目录中...</value>
   </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeDirectory" xml:space="preserve">
+    <value>路径“{0}”应该是文件夹而不是文件。</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
+    <value>路径“{0}”应该是文件而不是文件夹。</value>
+  </data>
 </root>

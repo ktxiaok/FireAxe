@@ -194,6 +194,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public virtual bool RequireFile => false;
 
+    public virtual bool IsDirectory => false;
+
     public bool IsAutoCheckEnabled => Root.IsAutoCheckEnabled;
 
     bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
@@ -1230,6 +1232,20 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 if (!FileSystemUtils.Exists(fullFilePath))
                 {
                     new AddonFileNotExistProblem(_fileNotExistProblemSource).Submit();
+                }
+                else if (IsDirectory && !Directory.Exists(fullFilePath))
+                {
+                    new AddonFileNotExistProblem(_fileNotExistProblemSource)
+                    {
+                        FormatProblemType = AddonFileFormatProblemType.ShouldBeDirectory
+                    }.Submit();
+                }
+                else if (!IsDirectory && !File.Exists(fullFilePath))
+                {
+                    new AddonFileNotExistProblem(_fileNotExistProblemSource)
+                    {
+                        FormatProblemType = AddonFileFormatProblemType.ShouldBeFile
+                    }.Submit();
                 }
             }
             catch (Exception ex)

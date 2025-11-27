@@ -1067,4 +1067,10 @@
   <data name="OpeningDirectory" xml:space="preserve">
     <value>Opening Directory...</value>
   </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeDirectory" xml:space="preserve">
+    <value>The path "{0}" should be a folder rather than a file.</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
+    <value>The path "{0}" should be a file rather than a folder.</value>
+  </data>
 </root>

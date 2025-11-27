@@ -19,7 +19,7 @@ namespace FireAxe.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Texts {
@@ -147,6 +147,24 @@ namespace FireAxe.Resources {
         public static string AddonFileNotExistProblemExplain {
             get {
                 return ResourceManager.GetString("AddonFileNotExistProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path &quot;{0}&quot; should be a folder rather than a file..
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain_ShouldBeDirectory {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain_ShouldBeDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path &quot;{0}&quot; should be a file rather than a folder..
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain_ShouldBeFile {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain_ShouldBeFile", resourceCulture);
             }
         }
         

@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace FireAxe;
 
+public enum AddonFileFormatProblemType
+{
+    None,
+    ShouldBeDirectory,
+    ShouldBeFile,
+}
+
 public class AddonFileNotExistProblem : AddonProblem
 {
     public AddonFileNotExistProblem(AddonProblemSource problemSource) : base(problemSource)
@@ -14,4 +21,6 @@ public class AddonFileNotExistProblem : AddonProblem
     }
 
     public string FilePath { get; }
+
+    public AddonFileFormatProblemType FormatProblemType { get; init; } = AddonFileFormatProblemType.None;
 }

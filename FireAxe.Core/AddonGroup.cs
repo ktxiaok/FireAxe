@@ -131,6 +131,8 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
 
     public override bool RequireFile => true;
 
+    public override bool IsDirectory => true;
+
     public AddonGroupEnableStrategy EnableStrategy
     {
         get => _enableStrategy;

@@ -7,7 +7,17 @@ internal static class AddonProblemExplanations
 {
     public static void Register(ObjectExplanationManager manager)
     {
-        manager.Register<AddonFileNotExistProblem>((problem, arg) => Texts.AddonFileNotExistProblemExplain.FormatNoThrow(problem.FilePath));
+        manager.Register<AddonFileNotExistProblem>((problem, arg) =>
+        {
+            switch (problem.FormatProblemType)
+            {
+                case AddonFileFormatProblemType.ShouldBeDirectory:
+                    return Texts.AddonFileNotExistProblemExplain_ShouldBeDirectory.FormatNoThrow(problem.FilePath);
+                case AddonFileFormatProblemType.ShouldBeFile:
+                    return Texts.AddonFileNotExistProblemExplain_ShouldBeFile.FormatNoThrow(problem.FilePath);
+            }
+            return Texts.AddonFileNotExistProblemExplain.FormatNoThrow(problem.FilePath);
+        });
         manager.Register<AddonChildrenProblem>((problem, arg) => Texts.AddonChildProblemExplain);
         manager.Register<InvalidPublishedFileIdProblem>((problem, arg) => Texts.InvalidPublishedFileIdMessage);
         manager.Register<WorkshopVpkNotLoadProblem>((problem, arg) => Texts.WorkshopVpkFileNotLoadProblemExplain);

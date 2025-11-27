@@ -50,6 +50,8 @@ public class WorkshopVpkAddon : VpkAddon
 
     public override Type SaveType => typeof(WorkshopVpkAddonSave);
 
+    public override bool IsDirectory => true;
+
     public override string FileExtension => ".workshop";
 
     public override string? FullVpkFilePath
