@@ -52,6 +52,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }));
         }).DisposeWith(disposables);
 
+        viewModel.ShowAddonRootDeserializationExceptionInteraction.RegisterHandler(async context =>
+        {
+            await CommonMessageBoxes.ShowException(this, context.Input, Texts.AddonRootDeserializationExceptionMessage);
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
         viewModel.ShowImportSuccessInteraction.RegisterHandler(async (context) =>
         {
             await CommonMessageBoxes.ShowInfo(this, Texts.ImportSuccessMessage, Texts.Success);

@@ -1073,4 +1073,7 @@
   <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
     <value>The path "{0}" should be a file rather than a folder.</value>
   </data>
+  <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
+    <value>Failed to load the .addonroot file. This file may be broken. You can use the backup files in ".addonrootdir/backups" to replace the current file.</value>
+  </data>
 </root>

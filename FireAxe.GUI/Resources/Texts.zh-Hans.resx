@@ -1073,4 +1073,7 @@
   <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
     <value>路径“{0}”应该是文件而不是文件夹。</value>
   </data>
+  <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
+    <value>无法加载.addonroot文件。该文件可能损坏。你可以使用位于“.addonrootdir/backups”的备份文件来替换当前的文件。</value>
+  </data>
 </root>

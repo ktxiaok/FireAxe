@@ -205,6 +205,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to load the .addonroot file. This file may be broken. You can use the backup files in &quot;.addonrootdir/backups&quot; to replace the current file..
+        /// </summary>
+        public static string AddonRootDeserializationExceptionMessage {
+            get {
+                return ResourceManager.GetString("AddonRootDeserializationExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Sources of Searching.
         /// </summary>
         public static string AddSearchSource {

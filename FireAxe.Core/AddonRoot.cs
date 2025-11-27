@@ -1113,7 +1113,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
         catch (Exception ex)
         {
-            throw new AddonRootSerializationException("Exception occurred during parsing the JSON text.", ex);
+            throw new AddonRootDeserializationException("Exception occurred during parsing the JSON text.", ex);
         }
 
         // handle old version content
@@ -1135,11 +1135,11 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
         catch (Exception ex)
         {
-            throw new AddonRootSerializationException($"Exception occurred during converting {nameof(JObject)} to {nameof(AddonRootSave)}.", ex);
+            throw new AddonRootDeserializationException($"Exception occurred during converting {nameof(JObject)} to {nameof(AddonRootSave)}.", ex);
         }
         if (save is null)
         {
-            throw new AddonRootSerializationException($"The result {nameof(AddonRootSave)} is null.");
+            throw new AddonRootDeserializationException($"The result {nameof(AddonRootSave)} is null.");
         }
         return save;
     }

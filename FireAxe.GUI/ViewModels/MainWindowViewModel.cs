@@ -366,19 +366,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 _addonRoot.Save();
 
-                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
-                _addonRoot.Pushed -= OnAddonRootPushed;
-                _addonRoot.DisposeAsync().AsTask(); // TODO
-                _addonRoot = null;
+                DisposeAddonRoot();
             }
 
             _addonRoot = value;
 
-            if (_addonRoot == null)
-            {
-                AddonNodeExplorerViewModel = null;
-            }
-            else
+            AddonNodeExplorerViewModel = null;
+            
+            if (_addonRoot is not null)
             {
                 using var blockAutoCheck = _addonRoot.BlockAutoCheck();
 
@@ -388,8 +383,17 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
                 _addonRoot.HttpClient = _httpClient;
-                
-                _addonRoot.LoadFile();
+
+                try
+                {
+                    _addonRoot.LoadFile();
+                }
+                catch (AddonRootDeserializationException)
+                {
+                    DisposeAddonRoot();
+                    this.RaisePropertyChanged();
+                    throw;
+                }
 
                 _addonRoot.CheckAsync();
 
@@ -397,6 +401,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
 
             this.RaisePropertyChanged();
+
+            void DisposeAddonRoot()
+            {
+                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
+                _addonRoot.Pushed -= OnAddonRootPushed;
+                _addonRoot.DisposeAsync().AsTask(); // TODO
+                _addonRoot = null;
+            }
         }
     }
 
@@ -475,6 +487,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public Interaction<Unit, string?> ChooseAddonRootFileToImportInteraction { get; } = new();
 
     public Interaction<Unit, string?> SaveAddonRootFileInteraction { get; } = new();
+
+    public Interaction<AddonRootDeserializationException, Unit> ShowAddonRootDeserializationExceptionInteraction { get; } = new();
 
     public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
 
@@ -569,6 +583,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
                 _settings.LastOpenDirectory = dirPath;
             }, DispatcherPriority.Default);
+        }
+        catch (AddonRootDeserializationException ex)
+        {
+            Log.Error(ex, "Exception occurred during the deserialization of the AddonRoot. Directory Path: {DirectoryPath}", dirPath);
+            await ShowAddonRootDeserializationExceptionInteraction.Handle(ex);
         }
         finally
         {
