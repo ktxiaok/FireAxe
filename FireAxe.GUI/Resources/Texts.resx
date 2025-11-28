@@ -1076,4 +1076,22 @@
   <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
     <value>Failed to load the .addonroot file. This file may be broken. You can use the backup files in ".addonrootdir/backups" to replace the current file.</value>
   </data>
+  <data name="ImportCompletedSuccessfullyWithCount" xml:space="preserve">
+    <value>Import completed. {0} items imported successfully.</value>
+  </data>
+  <data name="ImportCompletedUnsuccessfullyWithCount" xml:space="preserve">
+    <value>Import completed. {0} items imported successfully and {1} items failed to import.</value>
+  </data>
+  <data name="RenamedItemTo" xml:space="preserve">
+    <value>Renamed "{0}" to "{1}".</value>
+  </data>
+  <data name="ItemImportedSuccessfully" xml:space="preserve">
+    <value>"{0}" imported successfully.</value>
+  </data>
+  <data name="ItemFailedToImportWithError" xml:space="preserve">
+    <value>"{0}" failed to import: {1}</value>
+  </data>
+  <data name="NoItemsToImport" xml:space="preserve">
+    <value>There are no items to import.</value>
+  </data>
 </root>

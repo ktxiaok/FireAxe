@@ -606,6 +606,21 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
         public IReadOnlyList<ImportResultItem> Items { get; }
 
+        public bool HasFailure
+        {
+            get
+            {
+                foreach (var item in Items)
+                {
+                    if (!item.Success)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         public int SuccessCount
         {
             get

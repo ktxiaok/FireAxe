@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
+        x:Class="FireAxe.Views.AddonImportResultWindow"
+        x:DataType="vm:AddonImportResultViewModel"
+        Title="{x:Static r:Texts.Import}"
+        Width="500" Height="200"
+        WindowStartupLocation="CenterOwner">
+  <DockPanel
+    Margin="10">
+    <StackPanel
+      DockPanel.Dock="Top"
+      Orientation="Horizontal"
+      Margin="10"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center">
+      <PathIcon
+        IsVisible="{Binding ImportResult.HasFailure, FallbackValue=False}"
+        Data="{StaticResource icon_warning}"
+        Foreground="{DynamicResource brush_warning}"
+        Margin="0, 0, 5, 0"/>
+      <TextBlock
+        Text="{Binding Message, FallbackValue=message}"
+        VerticalAlignment="Center"/>
+    </StackPanel>
+    <Border
+      BorderBrush="Gray"
+      BorderThickness="2"
+      CornerRadius="3"
+      Padding="10">
+      <ScrollViewer
+        HorizontalScrollBarVisibility="Auto">
+        <SelectableTextBlock
+          Text="{Binding Details, FallbackValue=details}"
+          TextAlignment="Left"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Top"/>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

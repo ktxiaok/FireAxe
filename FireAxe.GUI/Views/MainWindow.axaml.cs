@@ -58,9 +58,14 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
 
-        viewModel.ShowImportSuccessInteraction.RegisterHandler(async (context) =>
+        viewModel.ShowImportResultInteraction.RegisterHandler(async context =>
         {
-            await CommonMessageBoxes.ShowInfo(this, Texts.ImportSuccessMessage, Texts.Success);
+            var importResult = context.Input;
+            var window = new AddonImportResultWindow
+            {
+                DataContext = new AddonImportResultViewModel(importResult)
+            };
+            await window.ShowDialog(this);
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
         viewModel.ShowImportErrorInteraction.RegisterHandler(async (context) =>

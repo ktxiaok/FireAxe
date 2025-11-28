@@ -1557,6 +1557,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Import completed. {0} items imported successfully..
+        /// </summary>
+        public static string ImportCompletedSuccessfullyWithCount {
+            get {
+                return ResourceManager.GetString("ImportCompletedSuccessfullyWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import completed. {0} items imported successfully and {1} items failed to import..
+        /// </summary>
+        public static string ImportCompletedUnsuccessfullyWithCount {
+            get {
+                return ResourceManager.GetString("ImportCompletedUnsuccessfullyWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Imported Group.
         /// </summary>
         public static string ImportedGroup {
@@ -1737,11 +1755,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; failed to import: {1}.
+        /// </summary>
+        public static string ItemFailedToImportWithError {
+            get {
+                return ResourceManager.GetString("ItemFailedToImportWithError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item ID.
         /// </summary>
         public static string ItemId {
             get {
                 return ResourceManager.GetString("ItemId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; imported successfully..
+        /// </summary>
+        public static string ItemImportedSuccessfully {
+            get {
+                return ResourceManager.GetString("ItemImportedSuccessfully", resourceCulture);
             }
         }
         
@@ -1949,6 +1985,15 @@ namespace FireAxe.Resources {
         public static string NoItemRandomSelected {
             get {
                 return ResourceManager.GetString("NoItemRandomSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no items to import..
+        /// </summary>
+        public static string NoItemsToImport {
+            get {
+                return ResourceManager.GetString("NoItemsToImport", resourceCulture);
             }
         }
         
@@ -2336,6 +2381,15 @@ namespace FireAxe.Resources {
         public static string Rename {
             get {
                 return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Renamed &quot;{0}&quot; to &quot;{1}&quot;..
+        /// </summary>
+        public static string RenamedItemTo {
+            get {
+                return ResourceManager.GetString("RenamedItemTo", resourceCulture);
             }
         }
         

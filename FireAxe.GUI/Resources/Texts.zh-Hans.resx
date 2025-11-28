@@ -1076,4 +1076,22 @@
   <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
     <value>无法加载.addonroot文件。该文件可能损坏。你可以使用位于“.addonrootdir/backups”的备份文件来替换当前的文件。</value>
   </data>
+  <data name="ImportCompletedSuccessfullyWithCount" xml:space="preserve">
+    <value>导入完成。已成功导入{0}项。</value>
+  </data>
+  <data name="ImportCompletedUnsuccessfullyWithCount" xml:space="preserve">
+    <value>导入完成。{0}项导入成功，{1}项导入失败。</value>
+  </data>
+  <data name="RenamedItemTo" xml:space="preserve">
+    <value>已重命名“{0}”为“{1}”。</value>
+  </data>
+  <data name="ItemImportedSuccessfully" xml:space="preserve">
+    <value>”{0}“导入成功。</value>
+  </data>
+  <data name="ItemFailedToImportWithError" xml:space="preserve">
+    <value>”{0}“导入失败：{1}</value>
+  </data>
+  <data name="NoItemsToImport" xml:space="preserve">
+    <value>没有可导入的项。</value>
+  </data>
 </root>

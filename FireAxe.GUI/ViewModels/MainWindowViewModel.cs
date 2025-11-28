@@ -490,7 +490,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public Interaction<AddonRootDeserializationException, Unit> ShowAddonRootDeserializationExceptionInteraction { get; } = new();
 
-    public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
+    public Interaction<AddonRoot.ImportResult, Unit> ShowImportResultInteraction { get; } = new();
 
     public Interaction<Exception, Unit> ShowImportErrorInteraction { get; } = new();
 
@@ -610,23 +610,30 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
-    public async Task Import()
+    private async Task Import()
     {
-        if (_addonRoot != null)
+        if (_addonRoot is null)
         {
-            try
-            {
-                _addonRoot.Import();
-                await ShowImportSuccessInteraction.Handle(Unit.Default);
-            }
-            catch (Exception ex)
-            {
-                await ShowImportErrorInteraction.Handle(ex);
-            }
+            return;
         }
+
+        using var blockAutoCheck = _addonRoot.BlockAutoCheck();
+        AddonRoot.ImportResult result;
+        try
+        {
+            result = _addonRoot.Import();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Exception occurred during the import of the AddonRoot.");
+            await ShowImportErrorInteraction.Handle(ex);
+            return;
+        }
+        _ = _addonRoot.CheckAsync();
+        await ShowImportResultInteraction.Handle(result);
     }
 
-    public async Task Push()
+    private async Task Push()
     {
         if (_addonRoot == null)
         {
@@ -645,6 +652,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Exception occurred during the push of the AddonRoot.");
             await ShowPushErrorInteraction.Handle(ex);
             return;
         }
