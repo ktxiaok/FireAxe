@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FireAxe.ViewModels"
+        xmlns:r="using:FireAxe.Resources"
+        xmlns:conv="using:FireAxe.ValueConverters"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+        x:Class="FireAxe.Views.FileNameFixerWindow"
+        x:DataType="vm:FileNameFixerViewModel"
+        Title="{x:Static r:Texts.FileNameFixer}"
+        Width="600" Height="600"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel
+    Margin="10">
+    <TextBlock
+      DockPanel.Dock="Top"
+      Text="{x:Static r:Texts.FileNameFixerTip}"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Margin="5"/>
+    <Button
+      DockPanel.Dock="Bottom"
+      Command="{Binding FixAllCommand}"
+      Content="{x:Static r:Texts.Fix}"
+      HorizontalAlignment="Stretch"
+      HorizontalContentAlignment="Center"
+      Margin="5"/>
+    <Border
+      BorderBrush="Gray"
+      BorderThickness="2"
+      CornerRadius="3">
+      <ScrollViewer>
+        <Panel>
+          <ItemsControl
+            ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel
+                  Margin="5">
+                  <StackPanel
+                    DockPanel.Dock="Right"
+                    Orientation="Horizontal">
+                    <TextBlock
+                      Text="{x:Static r:Texts.Fixed}"
+                      IsVisible="{Binding IsFixed}"
+                      VerticalAlignment="Center"/>
+                    <TextBlock
+                      Text="{x:Static r:Texts.FailedToFix}"
+                      IsVisible="{Binding FixException, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      Foreground="{DynamicResource brush_warning}"
+                      VerticalAlignment="Center"/>
+                  </StackPanel>
+
+                  <SelectableTextBlock
+                    TextWrapping="Wrap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                    <SelectableTextBlock.Text>
+                      <MultiBinding StringFormat="{}{0} -> {1}">
+                        <Binding Path="RelativeFilePath"/>
+                        <Binding Path="RelativeNewFilePath"/>
+                      </MultiBinding>
+                    </SelectableTextBlock.Text>
+                  </SelectableTextBlock>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+
+          <TextBlock
+            Text="{x:Static r:Texts.NoItemsToFix}"
+            IsVisible="{Binding Items.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            Margin="10"/>
+        </Panel>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</Window>

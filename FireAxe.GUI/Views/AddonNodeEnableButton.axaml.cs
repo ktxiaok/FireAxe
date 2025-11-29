@@ -33,7 +33,7 @@ public partial class AddonNodeEnableButton : ReactiveUserControl<AddonNodeSimple
                     if (enableState == AddonNodeEnableState.Enabled)
                     {
                         iconData = iconEnabled;
-                        color = Colors.Green;
+                        color = Colors.Lime;
                     }
                     else if (enableState == AddonNodeEnableState.EnabledSuppressed)
                     {
@@ -49,7 +49,7 @@ public partial class AddonNodeEnableButton : ReactiveUserControl<AddonNodeSimple
                     {
                         icon.Data = iconData;
                     }
-                    icon.Foreground = new SolidColorBrush(color);
+                    icon.Fill = new SolidColorBrush(color);
                 })
                 .DisposeWith(disposables);
         });

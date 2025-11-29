@@ -1094,4 +1094,22 @@
   <data name="NoItemsToImport" xml:space="preserve">
     <value>没有可导入的项。</value>
   </data>
+  <data name="FileNameFixer" xml:space="preserve">
+    <value>文件名修复器</value>
+  </data>
+  <data name="FileNameFixerTip" xml:space="preserve">
+    <value>此工具也许可以帮助你解决模组文件不存在的问题。</value>
+  </data>
+  <data name="Fix" xml:space="preserve">
+    <value>修复</value>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>已修复</value>
+  </data>
+  <data name="FailedToFix" xml:space="preserve">
+    <value>修复失败</value>
+  </data>
+  <data name="NoItemsToFix" xml:space="preserve">
+    <value>没有可修复的项。</value>
+  </data>
 </root>

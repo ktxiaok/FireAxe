@@ -1094,4 +1094,22 @@
   <data name="NoItemsToImport" xml:space="preserve">
     <value>There are no items to import.</value>
   </data>
+  <data name="FileNameFixer" xml:space="preserve">
+    <value>File Name Fixer</value>
+  </data>
+  <data name="FileNameFixerTip" xml:space="preserve">
+    <value>This tool might help you solve the problem of missing addon files.</value>
+  </data>
+  <data name="Fix" xml:space="preserve">
+    <value>Fix</value>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>Fixed</value>
+  </data>
+  <data name="FailedToFix" xml:space="preserve">
+    <value>Failed to fix</value>
+  </data>
+  <data name="NoItemsToFix" xml:space="preserve">
+    <value>There are no items to fix.</value>
+  </data>
 </root>

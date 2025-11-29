@@ -1188,6 +1188,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to fix.
+        /// </summary>
+        public static string FailedToFix {
+            get {
+                return ResourceManager.GetString("FailedToFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the latest version..
         /// </summary>
         public static string FailedToGetLatestVersion {
@@ -1278,6 +1287,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Name Fixer.
+        /// </summary>
+        public static string FileNameFixer {
+            get {
+                return ResourceManager.GetString("FileNameFixer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This tool might help you solve the problem of missing addon files..
+        /// </summary>
+        public static string FileNameFixerTip {
+            get {
+                return ResourceManager.GetString("FileNameFixerTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Size: .
         /// </summary>
         public static string FileSizeColon {
@@ -1355,6 +1382,24 @@ namespace FireAxe.Resources {
         public static string FindRedundantVpkFiles {
             get {
                 return ResourceManager.GetString("FindRedundantVpkFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fix.
+        /// </summary>
+        public static string Fix {
+            get {
+                return ResourceManager.GetString("Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fixed.
+        /// </summary>
+        public static string Fixed {
+            get {
+                return ResourceManager.GetString("Fixed", resourceCulture);
             }
         }
         
@@ -1985,6 +2030,15 @@ namespace FireAxe.Resources {
         public static string NoItemRandomSelected {
             get {
                 return ResourceManager.GetString("NoItemRandomSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no items to fix..
+        /// </summary>
+        public static string NoItemsToFix {
+            get {
+                return ResourceManager.GetString("NoItemsToFix", resourceCulture);
             }
         }
         

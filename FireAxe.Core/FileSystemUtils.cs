@@ -138,6 +138,21 @@ public static class FileSystemUtils
         }
     }
 
+    public static string GetUniquePath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        path = Path.GetFullPath(path);
+        var dirPath = Path.GetDirectoryName(path) ?? throw new IOException("Failed to get the directory path.");
+        var name = Path.GetFileName(path);
+        var newName = GetUniqueFileName(name, dirPath);
+        if (newName != name)
+        {
+            path = Path.Join(dirPath, newName);
+        }
+        return path;
+    }
+
     private static readonly FrozenSet<char> s_reservedFileNameChars = FrozenSet.ToFrozenSet(['/', '?', '<', '>', '\\', ':', '*', '|', '"']);
     private static readonly FrozenSet<string> s_reservedUppercaseFileNames = FrozenSet.ToFrozenSet(["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"]);
 

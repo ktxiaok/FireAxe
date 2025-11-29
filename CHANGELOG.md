@@ -1,4 +1,6 @@
 - improve: import of addons
+- add: new tool: File Name Fixer (this tool might help you solve the problem of missing addon files)
+- improve: GUI appearance
 - bugfixes
 # v0.7.0
 - add: VPK conflict checking system

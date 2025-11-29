@@ -16,8 +16,11 @@
     HorizontalAlignment="Center"
     VerticalAlignment="Center"
     Background="Transparent">
-    <PathIcon
+    <Path
       Name="icon"
+      Stretch="Uniform"
+      Stroke="{DynamicResource brush_enable_button_stroke}"
+      StrokeThickness="0.5"
       Width="25"
       Height="25"
       HorizontalAlignment="Stretch"

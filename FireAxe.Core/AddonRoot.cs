@@ -1063,6 +1063,56 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         return false;
     }
 
+    public IEnumerable<string> EnumerateUserFileSystemEntries()
+    {
+        if (!IsDirectoryPathSet)
+        {
+            yield break;
+        }
+        var dirPath = DirectoryPath;
+
+        foreach (var path in Directory.EnumerateFileSystemEntries(dirPath))
+        {
+            var name = Path.GetFileName(path);
+            if (name != SaveFileName && name != VersionFileName && name != AddonRootDirectoryName)
+            {
+                yield return path;
+            }
+        }
+
+        bool ShouldEnterDirectory(string path)
+            => TryGetNodeByPath(ConvertFilePathToNodePath(path)) is null or AddonGroup;
+
+        var dirQueue = new Queue<string>();
+        foreach (var topDirPath in Directory.EnumerateDirectories(dirPath))
+        {
+            var topDirName = Path.GetFileName(topDirPath);
+            if (topDirName != AddonRootDirectoryName && ShouldEnterDirectory(topDirPath))
+            {
+                dirQueue.Enqueue(topDirPath);
+            }
+        }
+
+        while (dirQueue.Count > 0)
+        {
+            var subDirPath = dirQueue.Dequeue();
+
+            foreach (var subDirPath2 in Directory.EnumerateDirectories(subDirPath))
+            {
+                yield return subDirPath2;
+                if (ShouldEnterDirectory(subDirPath2))
+                {
+                    dirQueue.Enqueue(subDirPath2);
+                }
+            }
+
+            foreach (var filePath in Directory.EnumerateFiles(subDirPath))
+            {
+                yield return filePath;
+            }
+        }
+    }
+
     public void LoadFile()
     {
         this.ThrowIfInvalid();
