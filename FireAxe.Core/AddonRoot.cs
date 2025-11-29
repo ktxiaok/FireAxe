@@ -985,7 +985,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
             }
         }
 
-        // Sort existing items by date time and check the backup interval.
+        // Sort existing items by date time, check the backup interval, and compare self to the latest backup file.
+        string? content = null;
         if (existingItems.Count > 0)
         {
             existingItems.Sort((a, b) => a.DateTime.Ticks.CompareTo(b.DateTime.Ticks));
@@ -996,11 +997,20 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 existingItems.RemoveAt(existingItems.Count - 1);
             }
 
-            // Check the backup interval.
             if (existingItems.Count > 0)
             {
+                // Check the backup interval.
                 var latestDateTime = existingItems[existingItems.Count - 1].DateTime;
                 if (currentDateTime - latestDateTime < TimeSpan.FromMinutes(backupIntervalMinutes))
+                {
+                    return false;
+                }
+
+                // The backup file won't be created if it's the same as the latest one.
+                content = Serialize(CreateSave());
+                var latestFilePath = existingItems[existingItems.Count - 1].Path;
+                var latestContent = File.ReadAllText(latestFilePath);
+                if (content == latestContent)
                 {
                     return false;
                 }
@@ -1022,8 +1032,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
 
         // Finally create the backup.
+        content ??= Serialize(CreateSave());
         var backupPath = Path.Join(dir, BuildBackupFileName(currentDateTime));
-        File.WriteAllText(backupPath, Serialize(CreateSave()));
+        File.WriteAllText(backupPath, content);
         return true;
     }
 

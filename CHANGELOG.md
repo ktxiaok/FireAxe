@@ -1,4 +1,5 @@
 - improve: import of addons
+- improve: the backup file won't be created if it's the same as the latest one
 - add: new tool: File Name Fixer (this tool might help you solve the problem of missing addon files)
 - improve: GUI appearance
 - bugfixes
