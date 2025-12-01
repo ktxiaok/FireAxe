@@ -19,15 +19,11 @@ public abstract class VpkAddon : AddonNode
 
     private readonly WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
-    internal readonly AddonProblemSource<VpkAddon> _vpkAddonConflictProblemSource;
-
     protected VpkAddon()
     {
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
         _conflictingFilesWithAddonIdsReadOnly = new(_conflictingFilesWithAddonIds);
         _conflictingAddonIdsWithFilesReadOnly = new(_conflictingAddonIdsWithFiles);
-
-        _vpkAddonConflictProblemSource = new(this);
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
@@ -65,11 +61,14 @@ public abstract class VpkAddon : AddonNode
         return addonInfo;
     }
 
-    public bool AddConflictIgnoringFile(string file)
+    public bool AddConflictIgnoringFile(string? file)
     {
-        ArgumentNullException.ThrowIfNull(file);
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(file))
+        {
+            return false;
+        }
 
         if (!_conflictIgnoringFileSet.Add(file))
         {
@@ -130,14 +129,10 @@ public abstract class VpkAddon : AddonNode
 
         if (RetrieveInfo()?.Title is { } title)
         {
-            title = title.Trim();
-            if (title.Length > 0)
+            title = SanitizeName(title, out bool empty);
+            if (!empty)
             {
-                title = FileSystemUtils.SanitizeFileName(title);
-                if (title.Length > 0)
-                {
-                    return Task.FromResult<string?>(title);
-                }
+                return Task.FromResult<string?>(title);
             }
         }
 
@@ -195,11 +190,12 @@ public abstract class VpkAddon : AddonNode
         _addonInfo.SetTarget(null);
     }
 
-    protected override void OnCreateSave(AddonNodeSave save)
+    protected override void OnCreateSave(AddonNodeSave save0)
     {
-        base.OnCreateSave(save);
-        var save1 = (VpkAddonSave)save;
-        save1.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
+        base.OnCreateSave(save0);
+
+        var save = (VpkAddonSave)save0;
+        save.ConflictIgnoringFiles = [.. ConflictIgnoringFiles];
     }
 
     protected override void OnLoadSave(AddonNodeSave save0)
@@ -210,10 +206,6 @@ public abstract class VpkAddon : AddonNode
         ClearConflictIgnoringFiles();
         foreach (var file in save.ConflictIgnoringFiles)
         {
-            if (string.IsNullOrEmpty(file))
-            {
-                continue;
-            }
             AddConflictIgnoringFile(file);
         }
     }

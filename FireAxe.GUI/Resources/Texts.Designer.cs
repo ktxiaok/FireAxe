@@ -19,7 +19,7 @@ namespace FireAxe.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Texts {
@@ -151,11 +151,38 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The path &quot;{0}&quot; should be a folder rather than a file..
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain_ShouldBeDirectory {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain_ShouldBeDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path &quot;{0}&quot; should be a file rather than a folder..
+        /// </summary>
+        public static string AddonFileNotExistProblemExplain_ShouldBeFile {
+            get {
+                return ResourceManager.GetString("AddonFileNotExistProblemExplain_ShouldBeFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The strategy of enablement of the group is not applied correctly..
         /// </summary>
         public static string AddonGroupEnableStrategyProblemExplain {
             get {
                 return ResourceManager.GetString("AddonGroupEnableStrategyProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The reference source is invalid..
+        /// </summary>
+        public static string AddonInvalidRefSourceProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonInvalidRefSourceProblemExplain", resourceCulture);
             }
         }
         
@@ -183,6 +210,15 @@ namespace FireAxe.Resources {
         public static string AddonRootBackupDirectoryLocationNote {
             get {
                 return ResourceManager.GetString("AddonRootBackupDirectoryLocationNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load the .addonroot file. This file may be broken. You can use the backup files in &quot;.addonrootdir/backups&quot; to replace the current file..
+        /// </summary>
+        public static string AddonRootDeserializationExceptionMessage {
+            get {
+                return ResourceManager.GetString("AddonRootDeserializationExceptionMessage", resourceCulture);
             }
         }
         
@@ -431,6 +467,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checking....
+        /// </summary>
+        public static string Checking {
+            get {
+                return ResourceManager.GetString("Checking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Checking for updates....
         /// </summary>
         public static string CheckingForUpdatesMessage {
@@ -625,6 +670,15 @@ namespace FireAxe.Resources {
         public static string CreateCollectionFailedMessage {
             get {
                 return ResourceManager.GetString("CreateCollectionFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Reference Addons Based on Selected Addons.
+        /// </summary>
+        public static string CreateRefAddonsBasedOnSelectedAddons {
+            get {
+                return ResourceManager.GetString("CreateRefAddonsBasedOnSelectedAddons", resourceCulture);
             }
         }
         
@@ -1161,6 +1215,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to fix.
+        /// </summary>
+        public static string FailedToFix {
+            get {
+                return ResourceManager.GetString("FailedToFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve the latest version..
         /// </summary>
         public static string FailedToGetLatestVersion {
@@ -1251,6 +1314,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Name Fixer.
+        /// </summary>
+        public static string FileNameFixer {
+            get {
+                return ResourceManager.GetString("FileNameFixer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This tool might help you solve the problem of missing addon files..
+        /// </summary>
+        public static string FileNameFixerTip {
+            get {
+                return ResourceManager.GetString("FileNameFixerTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Size: .
         /// </summary>
         public static string FileSizeColon {
@@ -1332,6 +1413,24 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fix.
+        /// </summary>
+        public static string Fix {
+            get {
+                return ResourceManager.GetString("Fix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fixed.
+        /// </summary>
+        public static string Fixed {
+            get {
+                return ResourceManager.GetString("Fixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Flatten.
         /// </summary>
         public static string Flatten {
@@ -1355,6 +1454,15 @@ namespace FireAxe.Resources {
         public static string ForceUseWorkshopTitle {
             get {
                 return ResourceManager.GetString("ForceUseWorkshopTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Game Information.
+        /// </summary>
+        public static string GameInformation {
+            get {
+                return ResourceManager.GetString("GameInformation", resourceCulture);
             }
         }
         
@@ -1436,6 +1544,15 @@ namespace FireAxe.Resources {
         public static string Help {
             get {
                 return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Hidden].
+        /// </summary>
+        public static string Hidden {
+            get {
+                return ResourceManager.GetString("Hidden", resourceCulture);
             }
         }
         
@@ -1526,6 +1643,24 @@ namespace FireAxe.Resources {
         public static string ImportAddonRootFile {
             get {
                 return ResourceManager.GetString("ImportAddonRootFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import completed. {0} items imported successfully..
+        /// </summary>
+        public static string ImportCompletedSuccessfullyWithCount {
+            get {
+                return ResourceManager.GetString("ImportCompletedSuccessfullyWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import completed. {0} items imported successfully and {1} items failed to import..
+        /// </summary>
+        public static string ImportCompletedUnsuccessfullyWithCount {
+            get {
+                return ResourceManager.GetString("ImportCompletedUnsuccessfullyWithCount", resourceCulture);
             }
         }
         
@@ -1701,6 +1836,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Published File ID: {0}.
+        /// </summary>
+        public static string InvalidPublishedFileIdProblemExplain {
+            get {
+                return ResourceManager.GetString("InvalidPublishedFileIdProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid URI.
         /// </summary>
         public static string InvalidUri {
@@ -1710,11 +1854,29 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; failed to import: {1}.
+        /// </summary>
+        public static string ItemFailedToImportWithError {
+            get {
+                return ResourceManager.GetString("ItemFailedToImportWithError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item ID.
         /// </summary>
         public static string ItemId {
             get {
                 return ResourceManager.GetString("ItemId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; imported successfully..
+        /// </summary>
+        public static string ItemImportedSuccessfully {
+            get {
+                return ResourceManager.GetString("ItemImportedSuccessfully", resourceCulture);
             }
         }
         
@@ -1922,6 +2084,24 @@ namespace FireAxe.Resources {
         public static string NoItemRandomSelected {
             get {
                 return ResourceManager.GetString("NoItemRandomSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no items to fix..
+        /// </summary>
+        public static string NoItemsToFix {
+            get {
+                return ResourceManager.GetString("NoItemsToFix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no items to import..
+        /// </summary>
+        public static string NoItemsToImport {
+            get {
+                return ResourceManager.GetString("NoItemsToImport", resourceCulture);
             }
         }
         
@@ -2309,6 +2489,15 @@ namespace FireAxe.Resources {
         public static string Rename {
             get {
                 return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Renamed &quot;{0}&quot; to &quot;{1}&quot;..
+        /// </summary>
+        public static string RenamedItemTo {
+            get {
+                return ResourceManager.GetString("RenamedItemTo", resourceCulture);
             }
         }
         
@@ -2736,6 +2925,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User Interface.
+        /// </summary>
+        public static string UserInterface {
+            get {
+                return ResourceManager.GetString("UserInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value must be an integer..
         /// </summary>
         public static string ValueMustBeInteger {
@@ -2754,7 +2952,7 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Version:.
+        ///   Looks up a localized string similar to Version: .
         /// </summary>
         public static string VersionColon {
             get {
@@ -2768,6 +2966,15 @@ namespace FireAxe.Resources {
         public static string ViewsColon {
             get {
                 return ResourceManager.GetString("ViewsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VPK Addon Conflict.
+        /// </summary>
+        public static string VpkAddonConflict {
+            get {
+                return ResourceManager.GetString("VpkAddonConflict", resourceCulture);
             }
         }
         
@@ -2808,11 +3015,38 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Web Proxy.
+        /// </summary>
+        public static string WebProxy {
+            get {
+                return ResourceManager.GetString("WebProxy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Web Proxy Address.
         /// </summary>
         public static string WebProxyAddress {
             get {
                 return ResourceManager.GetString("WebProxyAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web Proxy Credential Password.
+        /// </summary>
+        public static string WebProxyCredentialPassword {
+            get {
+                return ResourceManager.GetString("WebProxyCredentialPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web Proxy Credential User Name.
+        /// </summary>
+        public static string WebProxyCredentialUserName {
+            get {
+                return ResourceManager.GetString("WebProxyCredentialUserName", resourceCulture);
             }
         }
         

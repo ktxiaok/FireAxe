@@ -92,7 +92,7 @@
 
     <Style Selector="Border.Level1">
       <Setter Property="BorderBrush" Value="Gray"/>
-      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="BorderThickness" Value="2"/>
       <Setter Property="CornerRadius" Value="5"/>
     </Style>
   </Application.Styles>

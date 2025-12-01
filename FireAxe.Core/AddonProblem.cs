@@ -4,12 +4,11 @@ namespace FireAxe;
 
 public abstract class AddonProblem : Problem
 {
-    private readonly AddonProblemSource _problemSource;
-
-    public AddonProblem(AddonProblemSource problemSource) : base(problemSource)
+    public AddonProblem(AddonNode addon)
     {
-        _problemSource = problemSource;
+        ArgumentNullException.ThrowIfNull(addon);
+        Addon = addon;
     }
 
-    public AddonNode Addon => _problemSource.Addon;
+    public AddonNode Addon { get; }
 }

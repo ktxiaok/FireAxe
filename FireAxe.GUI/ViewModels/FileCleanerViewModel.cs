@@ -471,7 +471,7 @@ internal class FileCleanerViewModelDesign : FileCleanerViewModel
         for (int i = 0; i < 10; i++)
         {
             var addonNode = AddonNode.Create<AddonNode>(addonRoot);
-            addonNode.Name = addonNode.Parent.GetUniqueNodeName($"test_{DesignHelper.GenerateRandomString(1, 15)}");
+            addonNode.Name = addonNode.Parent.GetUniqueChildName($"test_{DesignHelper.GenerateRandomString(1, 15)}");
             AddSourceAddon(addonNode.Id);
         }
 

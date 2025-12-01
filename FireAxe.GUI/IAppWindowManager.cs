@@ -8,7 +8,7 @@ public interface IAppWindowManager
 {
     MainWindow? MainWindow { get; }
 
-    MainWindowViewModel MainWindowViewModel { get; }
+    MainWindowViewModel? MainWindowViewModel { get; }
 
     MainWindow CreateMainWindow(MainWindowViewModel viewModel);
 
@@ -29,4 +29,6 @@ public interface IAppWindowManager
     void OpenFileCleanerWindow();
 
     void OpenAddonNameAutoSetterWindow();
+
+    void OpenFileNameFixerWindow();
 }

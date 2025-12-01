@@ -1,3 +1,13 @@
+# v0.7.1
+- add: new context menu item: create reference addons based on selected addons
+- add: new tool: File Name Fixer (this tool might help you solve the problem of missing addon files)
+- add: web proxy credential settings (issue #19)
+- improve: import of addons
+- improve: addon problem check system
+- improve: the backup file won't be created if it's the same as the latest one
+- improve: GUI appearance
+- bugfixes
+# v0.7.0
 - add: VPK conflict checking system
 - add: new addon type: reference addon (you can use this type to operate the same addon in different groups)
 - add: addon dependency management

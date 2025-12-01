@@ -42,16 +42,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     private string? _customImagePath = null;
 
     private int _lastProblemCountGiveToRoot = 0;
-    private readonly ObservableCollection<AddonProblem> _problems = new();
+    // NOTE: _problems is only allowed to add.
+    private readonly ObservableValidRefCollection<AddonProblem> _problems = new();
     private readonly ReadOnlyObservableCollection<AddonProblem> _problemsReadOnly;
     private bool _isBusyChecking = false;
 
     private readonly ObservableCollection<Guid> _dependentAddonIds = new();
     private readonly ReadOnlyObservableCollection<Guid> _dependentAddonIdsReadOnly;
     private readonly HashSet<Guid> _dependentAddonIdSet = new();
-
-    private readonly AddonProblemSource _fileNotExistProblemSource;
-    private readonly AddonProblemSource _dependenciesProblemSource;
 
     private readonly WeakReference<byte[]?> _imageCache = new(null);
     private Task<byte[]?>? _getImageTask = null;
@@ -61,16 +59,13 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     protected AddonNode()
     {
         _tagsReadOnly = new(_tags);
-        _problemsReadOnly = new(_problems);
+        _problemsReadOnly = _problems.AsReadOnlyObservableCollection();
         _dependentAddonIdsReadOnly = new(_dependentAddonIds);
-
-        _fileNotExistProblemSource = new(this);
-        _dependenciesProblemSource = new(this);
 
         PropertyChanged += OnPropertyChanged;
 
         ((INotifyCollectionChanged)_tags).CollectionChanged += OnTagCollectionChanged;
-        ((INotifyCollectionChanged)_problems).CollectionChanged += OnProblemCollectionChanged;
+        _problems.CollectionChanged += OnProblemCollectionChanged;
         ((INotifyCollectionChanged)_dependentAddonIds).CollectionChanged += OnDependentAddonIdsCollectionChanged;
     }
 
@@ -194,6 +189,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public virtual bool RequireFile => false;
 
+    public virtual bool IsDirectory => false;
+
+    public Task? CheckTask { get; private set => NotifyAndSetIfChanged(ref field, value); } = null;
+
     public bool IsAutoCheckEnabled => Root.IsAutoCheckEnabled;
 
     bool IHierarchyNode<AddonNode>.IsNonterminal => HasChildren;
@@ -287,18 +286,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            value = value.Trim(' ', '.');
-            if (value.Length == 0)
-            {
-                throw new ArgumentException("Cannot set the name to a empty string.");
-            }
-            if (value == NullName)
-            {
-                throw new ArgumentException($"Cannot set the name to \"{NullName}\" because it's a reserved name.");
-            }
 
             this.ThrowIfInvalid();
 
+            value = SanitizeName(value);
             if (value == _name)
             {
                 return;
@@ -311,7 +302,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 var parent = Parent;
                 var parentInternal = (IAddonNodeContainerInternal)parent;
 
-                parentInternal.ThrowIfNodeNameInvalid(value, this);
+                parentInternal.ThrowIfChildNewNameDisallowed(value, this);
 
                 // Move the linked files.
                 if (Root.IsDirectoryPathSet && Name != NullName && parent.FileSystemPath is { } parentFilePath)
@@ -336,7 +327,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                     }
                 }
 
-                parentInternal.ChangeNameUnchecked(_name, value, this);
+                parentInternal.ChangeChildNameUnchecked(_name, value, this);
             });
 
             _name = value;
@@ -458,7 +449,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public string? ActualImageFilePath
+    public virtual string? ActualImageFilePath
     {
         get
         {
@@ -532,6 +523,39 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return (T)Create(typeof(T), root, group);
     }
 
+    public static string SanitizeName(string name, out bool empty)
+    {
+        const string Unnamed = "UNNAMED";
+
+        ArgumentNullException.ThrowIfNull(name);
+
+        empty = false;
+
+        if (name.Length == 0 || name == NullName)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        name = name.Trim(' ', '.');
+        if (name.Length == 0)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        name = FileSystemUtils.SanitizeFileName(name);
+        if (name.Length == 0)
+        {
+            empty = true;
+            return Unnamed;
+        }
+
+        return name;
+    }
+
+    public static string SanitizeName(string name) => SanitizeName(name, out _);
+
     public virtual Task<string?> TryGetSuggestedNameAsync(object? arg = null, CancellationToken cancellationToken = default)
     {
         this.ThrowIfInvalid();
@@ -554,15 +578,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public bool AddTag(string tag)
+    public bool AddTag(string? tag)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-        if (tag.Length == 0)
-        {
-            throw new ArgumentException("empty tag string");
-        }
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(tag))
+        {
+            return false;
+        }
 
         if (!_tagSet.Add(tag))
         {
@@ -572,11 +595,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return true;
     }
 
-    public bool RemoveTag(string tag)
-    {
-        ArgumentNullException.ThrowIfNull(tag);
-
+    public bool RemoveTag(string? tag)
+    { 
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(tag))
+        {
+            return false;
+        }
 
         bool result = _tagSet.Remove(tag);
         if (result)
@@ -584,6 +610,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             _tags.Remove(tag);
         }
         return result;
+    }
+
+    public void ClearTags()
+    {
+        this.ThrowIfInvalid();
+
+        _tagSet.Clear();
+        _tags.Clear();
     }
 
     public void RenameTag(string oldTag, string newTag)
@@ -657,6 +691,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return true;
     }
 
+    public void ClearDependentAddons()
+    {
+        this.ThrowIfInvalid();
+
+        _dependentAddonIdSet.Clear();
+        _dependentAddonIds.Clear();
+    }
+
     public bool ContainsDependentAddon(Guid id)
     {
         return _dependentAddonIdSet.Contains(id);
@@ -672,14 +714,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     public void CheckDependencies()
     {
-        _dependenciesProblemSource.Clear();
+        InvalidateProblem<AddonDependencyProblem>();
         if (!IsEnabledInHierarchy)
         {
             return;
         }
         if (!IsDependenciesAllEnabled)
         {
-            new AddonDependenciesProblem(_dependenciesProblemSource).Submit();
+            SetProblem(new AddonDependencyProblem(this));
         }
     }
 
@@ -833,7 +875,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             var targetContainer = targetGroup == null ? (IAddonNodeContainer)Root : (IAddonNodeContainer)targetGroup;
             var targetContainerInternal = (IAddonNodeContainerInternal)targetContainer;
 
-            targetContainerInternal.ThrowIfNodeNameInvalid(Name, this);
+            targetContainerInternal.ThrowIfChildNewNameDisallowed(Name, this);
 
             // Move the linked files.
             if (Root.IsDirectoryPathSet && Name != NullName && targetContainer.FileSystemPath is { } targetContainerFilePath)
@@ -1135,7 +1177,13 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         var root = Root;
 
+        _problems.Dispose();
+        foreach (var problem in _problems)
+        {
+            problem.Invalidate();
+        }
         root.ProblemCount -= _lastProblemCountGiveToRoot;
+
         root.UnregisterNodeId(_id);
 
         var tasks = new List<Task>();
@@ -1162,8 +1210,30 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         _isBusyChecking = true;
         try
         {
-            OnCheck();
-            OnPostCheck();
+            var tasks = new List<Task>();
+            void SubmitTask(Task task)
+            {
+                ArgumentNullException.ThrowIfNull(task);
+                tasks.Add(task);
+            }
+
+            OnCheck(SubmitTask);
+            OnPostCheck(SubmitTask);
+
+            var checkTask = Task.WhenAll(tasks);
+            CheckTask = checkTask;
+            checkTask.ContinueWith(_ =>
+            {
+                if (CheckTask == checkTask)
+                {
+                    CheckTask = null;
+                }
+
+                if (checkTask.Exception is { } ex)
+                {
+                    Log.Error(ex, "Exception occurred during the check task of the {ObjectName}.", GetType().Name);
+                }
+            });
         }
         finally
         {
@@ -1179,12 +1249,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    protected virtual void OnCheck()
+    protected virtual void OnCheck(Action<Task> taskSubmitter)
     {
         CheckDependencies();
     }
 
-    protected virtual void OnPostCheck()
+    protected virtual void OnPostCheck(Action<Task> taskSubmitter)
     {
         CheckFiles();
     }
@@ -1195,7 +1265,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         FileSize = GetFileSize();
 
-        _fileNotExistProblemSource.Clear();
+        AddonFileMissingProblem? fileMissingProblem = null;
         if (RequireFile)
         {
             var fullFilePath = FullFilePath;
@@ -1204,7 +1274,21 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             {
                 if (!FileSystemUtils.Exists(fullFilePath))
                 {
-                    new AddonFileNotExistProblem(_fileNotExistProblemSource).Submit();
+                    fileMissingProblem = new AddonFileMissingProblem(this, fullFilePath);
+                }
+                else if (IsDirectory && !Directory.Exists(fullFilePath))
+                {
+                    fileMissingProblem = new AddonFileMissingProblem(this, fullFilePath)
+                    {
+                        FileTypeMismatch = AddonFileTypeMismatch.ShouldBeDirectory
+                    };
+                }
+                else if (!IsDirectory && !File.Exists(fullFilePath))
+                {
+                    fileMissingProblem = new AddonFileMissingProblem(this, fullFilePath)
+                    {
+                        FileTypeMismatch = AddonFileTypeMismatch.ShouldBeFile
+                    };
                 }
             }
             catch (Exception ex)
@@ -1212,20 +1296,60 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 Log.Error(ex, "Exception occurred during AddonNode.CheckFiles.");
             }
         }
+        SetProblem(fileMissingProblem);
     }
 
-    internal void AddProblem(AddonProblem problem)
+    public void AddProblem(AddonProblem problem)
     {
+        ArgumentNullException.ThrowIfNull(problem);
         this.ThrowIfInvalid();
+
+        if (problem.Addon != this)
+        {
+            throw new InvalidOperationException("The AddonProblem's owner is not this addon.");
+        }
+
+        if (problem.ShouldFixAutomatically)
+        {
+            if (problem.TryAutomaticallyFix())
+            {
+                return;
+            }
+        }
 
         _problems.Add(problem);
     }
 
-    internal void RemoveProblem(AddonProblem problem)
+    public void InvalidateProblem(Type problemType)
+    {
+        ArgumentNullException.ThrowIfNull(problemType);
+        this.ThrowIfInvalid();
+
+        for (int i = 0, len = _problems.Count; i < len; i++)
+        {
+            var problem = _problems[i];
+            if (problem.GetType() == problemType)
+            {
+                problem.Invalidate();
+                break;
+            }
+        }
+    }
+
+    public void InvalidateProblem<T>() where T : AddonProblem
+    {
+        InvalidateProblem(typeof(T));
+    }
+
+    public void SetProblem<T>(T? problem) where T : AddonProblem
     {
         this.ThrowIfInvalid();
 
-        _problems.Remove(problem);
+        InvalidateProblem<T>();
+        if (problem is not null)
+        {
+            AddProblem(problem);
+        }
     }
 
     protected virtual long? GetFileSize()
@@ -1275,13 +1399,18 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
         IsEnabled = save.IsEnabled;
 
+        var name = Parent.GetUniqueChildName(save.Name, true);
+        if (name != save.Name)
+        {
+            Log.Warning($"Addon name corrected at {nameof(AddonNode)}.{nameof(OnLoadSave)}: from \"{{OldName}}\" to \"{{NewName}}\"", save.Name, name);
+        }
         try
         {
-            Name = save.Name;
+            Name = name;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Exception occurred during setting AddonNode.Name at AddonNode.OnLoadSave.");
+            LogValueException(ex, nameof(Name), name);
         }
 
         Priority = save.Priority;
@@ -1291,15 +1420,13 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             CreationTime = save.CreationTime;
         }
 
+        ClearTags();
         foreach (var tag in save.Tags)
         {
-            if (string.IsNullOrEmpty(tag))
-            {
-                continue;
-            }
             AddTag(tag);
         }
 
+        ClearDependentAddons();
         foreach (var id in save.DependentAddonIds)
         {
             AddDependentAddon(id);
@@ -1311,7 +1438,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Exception occurred during setting {nameof(CustomImagePath)} at {nameof(AddonNode)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", save.CustomImagePath);
+            LogValueException(ex, nameof(CustomImagePath), save.CustomImagePath);
+        }
+
+        void LogValueException(Exception ex, string propertyName, object? value)
+        {
+            Log.Error(ex, $"Exception occurred during setting {propertyName} at {nameof(AddonNode)}.{nameof(OnLoadSave)}. Invalid value: {{InvalidValue}}", value);
         }
     }
 
@@ -1388,6 +1520,20 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     private void OnProblemCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        var root = Root;
+
+        if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            if (e.NewItems is { } newItems)
+            {
+                foreach (var item in newItems)
+                {
+                    var problem = (AddonProblem)item;
+                    root.NotifyProblemProduced(problem);
+                }
+            }
+        }
+
         int problemCount;
         if (this is AddonGroup)
         {
@@ -1405,7 +1551,6 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             problemCount = _problems.Count;
         }
-        var root = Root;
         root.ProblemCount = root.ProblemCount - _lastProblemCountGiveToRoot + problemCount;
         _lastProblemCountGiveToRoot = problemCount;
 

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe;
 
@@ -8,42 +9,47 @@ public class PublishedFileDetails
     public class TagObject
     {
         [JsonProperty("tag")]
-        public required string Tag { get; init; }
+        [AllowNull]
+        public string Tag { get; init => field = value ?? ""; } = "";
     }
 
     [JsonProperty("file_url")]
-    public required string FileUrl { get; init; }
+    [AllowNull]
+    public string FileUrl { get; init => field = value ?? ""; } = "";
 
     [JsonProperty("preview_url")]
-    public required string PreviewUrl { get; init; }
+    [AllowNull]
+    public string PreviewUrl { get; init => field = value ?? ""; } = "";
 
     [JsonProperty("title")]
-    public required string Title { get; init; }
+    [AllowNull]
+    public string Title { get; init => field = value ?? ""; } = "";
 
     [JsonProperty("description")]
-    public required string Description { get; init; }
+    [AllowNull]
+    public string Description { get; init => field = value ?? ""; } = "";
 
     [JsonProperty("time_created")]
-    public required ulong TimeCreated { get; init; }
+    public ulong TimeCreated { get; init; } = 0;
 
     [JsonProperty("time_updated")]
-    public required ulong TimeUpdated { get; init; }
+    public ulong TimeUpdated { get; init; } = 0;
 
     [JsonProperty("subscriptions")]
-    public required uint Subscriptions { get; init; }
+    public uint Subscriptions { get; init; } = 0;
 
     [JsonProperty("favorited")]
-    public required uint Favorited { get; init; }
+    public uint Favorited { get; init; } = 0;
 
     [JsonProperty("lifetime_subscriptions")]
-    public required uint LifetimeSubscriptions { get; init; }
+    public uint LifetimeSubscriptions { get; init; } = 0;
 
     [JsonProperty("lifetime_favorited")]
-    public required uint LifetimeFavorited { get; init; }
+    public uint LifetimeFavorited { get; init; } = 0;
 
     [JsonProperty("views")]
-    public required uint Views { get; init; }
+    public uint Views { get; init; } = 0;
 
     [JsonProperty("tags")]
-    public IReadOnlyList<TagObject>? Tags { get; init; }
+    public IReadOnlyList<TagObject?>? Tags { get; init; } = null;
 }

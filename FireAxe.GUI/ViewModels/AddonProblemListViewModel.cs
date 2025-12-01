@@ -1,57 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
+using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
-using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewModel, IDisposable, IValidity
+public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
-    public class ProblemViewModel : ViewModelBase
+    public class ProblemViewModel : ViewModelBase, IValidity
     {
-        private readonly AddonNodeSimpleViewModel[] _addonViewModels;
+        private readonly ObservableValidRefCollection<AddonProblem> _problems = new();
 
-        internal ProblemViewModel(Type problemType, IEnumerable<AddonNode> addons)
+        private readonly ReadOnlyObservableCollection<AddonNodeSimpleViewModel> _addonViewModels;
+
+        internal ProblemViewModel(AddonProblem problem)
         {
-            ProblemType = problemType;
-            _addonViewModels = [.. addons.Select(addon => new AddonNodeSimpleViewModel(addon))];
+            ProblemType = problem.GetType();
+            _problems.Add(problem);
+
+            _problems.ToObservableChangeSet<ObservableValidRefCollection<AddonProblem>, AddonProblem>()
+                .DistinctValues(problem => problem.Addon)
+                .Transform(addon => new AddonNodeSimpleViewModel(addon))
+                .Bind(out _addonViewModels)
+                .Subscribe();
+
+            _problems.WhenAnyValue(x => x.Count)
+                .Subscribe(count =>
+                {
+                    if (count == 0)
+                    {
+                        IsValid = false;
+                    }
+                });
         }
+
+        public bool IsValid { get; private set => this.RaiseAndSetIfChanged(ref field, value); } = true;
 
         public Type ProblemType { get; }
 
         public string Description => AddonProblemTypeExplanations.Get(ProblemType);
 
-        public IReadOnlyCollection<AddonNodeSimpleViewModel> AddonViewModels => _addonViewModels;
+        public ReadOnlyObservableCollection<AddonNodeSimpleViewModel> AddonViewModels => _addonViewModels;
+
+        internal void AddProblem(AddonProblem problem)
+        {
+            if (problem.GetType() != ProblemType)
+            {
+                return;
+            }
+            if (_problems.Contains(problem))
+            {
+                return;
+            }
+            _problems.Add(problem);
+        }
+
+        internal void DisposeSubscriptions()
+        {
+            _problems.Dispose();
+            IsValid = false;
+        }
     }
 
-    private bool _disposed = false;
-    private bool _valid = true;
-    private bool _active = false;
-    private bool _refreshing = false;
+    public class ProblematicAddonViewModel : AddonNodeSimpleViewModel, IValidity
+    {
+        private readonly IDisposable _addonSubscription;
 
-    private readonly CancellationTokenSource _cts = new();
+        public ProblematicAddonViewModel(AddonNode addon) : base(addon)
+        {
+            _addonSubscription = addon.Problems.WhenAnyValue(x => x.Count)
+                .Subscribe(count =>
+                {
+                    if (count == 0)
+                    {
+                        IsValid = false;
+                    }
+                });
 
-    private IEnumerable<AddonNodeSimpleViewModel> _problematicAddonViewModels = [];
+            this.WhenAnyValue(x => x.Addon)
+                .Subscribe(addon =>
+                {
+                    if (addon is null)
+                    {
+                        IsValid = false;
+                    }
+                });
 
-    private IEnumerable<ProblemViewModel> _problemViewModels = [];
+            this.RegisterInvalidHandler(() => _addonSubscription.Dispose());
+        }
+
+        public bool IsValid { get; private set => this.RaiseAndSetIfChanged(ref field, value); } = true;
+
+        internal void DisposeSubscriptions()
+        {
+            IsValid = false;
+        }
+    }
+
+    private ObservableValidRefCollection<ProblemViewModel>? _problemViewModels = null;
+
+    private ObservableValidRefCollection<ProblematicAddonViewModel>? _problematicAddonViewModels = null;
 
     public AddonProblemListViewModel(AddonRoot addonRoot)
     {
         ArgumentNullException.ThrowIfNull(addonRoot);
-        AddonRoot = addonRoot;
 
-        RefreshCommand = ReactiveCommand.CreateFromTask(RefreshAsync);
+        AddonRoot = addonRoot;
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
             var addonRoot = AddonRoot;
-            
+
             addonRoot.RegisterInvalidHandler(() => IsValid = false)
                 .DisposeWith(disposables);
             if (!IsValid)
@@ -59,134 +122,109 @@ public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewM
                 return;
             }
 
-            _active = true;
-
+            _problemViewModels = new();
+            ProblemViewModels = _problemViewModels.AsReadOnlyObservableCollection();
             Disposable.Create(() =>
             {
-                _active = false;
+                _problemViewModels.Dispose();
+                foreach (var problemViewModel in _problemViewModels)
+                {
+                    problemViewModel.DisposeSubscriptions();
+                }
+                _problemViewModels = null;
+                ProblemViewModels = ReadOnlyObservableCollection<ProblemViewModel>.Empty;
             }).DisposeWith(disposables);
 
-            RefreshCommand.Execute().Subscribe();
+            _problematicAddonViewModels = new();
+            ProblematicAddonViewModels = _problematicAddonViewModels.AsReadOnlyObservableCollection();
+            Disposable.Create(() =>
+            {
+                _problematicAddonViewModels.Dispose();
+                foreach (var problematicAddonViewModel in _problematicAddonViewModels)
+                {
+                    problematicAddonViewModel.DisposeSubscriptions();
+                }
+                _problematicAddonViewModels = null;
+                ProblematicAddonViewModels = ReadOnlyObservableCollection<ProblematicAddonViewModel>.Empty;
+            }).DisposeWith(disposables);
+
+            addonRoot.ProblemProduced += NotifyProblemProduced;
+            Disposable.Create(() => addonRoot.ProblemProduced -= NotifyProblemProduced);
+
+            foreach (var addon in addonRoot.GetDescendants())
+            {
+                foreach (var problem in addon.Problems)
+                {
+                    NotifyProblemProduced(problem);
+                }
+            }
         });
     }
 
     public ViewModelActivator Activator { get; } = new();
 
-    public bool IsValid
-    {
-        get => _valid;
-        private set => this.RaiseAndSetIfChanged(ref _valid, value);
-    }
+    public bool IsValid { get; private set => this.RaiseAndSetIfChanged(ref field, value); } = true;
 
     public AddonRoot AddonRoot { get; }
 
-    public bool IsRefreshing
+    public ReadOnlyObservableCollection<ProblemViewModel> ProblemViewModels
     {
-        get => _refreshing;
-        private set => this.RaiseAndSetIfChanged(ref _refreshing, value);
+        get;
+        private set => this.RaiseAndSetIfChanged(ref field, value);
+    } = ReadOnlyObservableCollection<ProblemViewModel>.Empty;
+
+    public ReadOnlyObservableCollection<ProblematicAddonViewModel> ProblematicAddonViewModels
+    {
+        get;
+        private set => this.RaiseAndSetIfChanged(ref field, value);
+    } = ReadOnlyObservableCollection<ProblematicAddonViewModel>.Empty;
+
+    public void Check()
+    {
+        AddonRoot.Check();
     }
 
-    public IEnumerable<AddonNodeSimpleViewModel> ProblematicAddonViewModels
+    private void NotifyProblemProduced(AddonProblem problem)
     {
-        get => _problematicAddonViewModels;
-        private set => this.RaiseAndSetIfChanged(ref _problematicAddonViewModels, value);
-    }
-
-    public IEnumerable<ProblemViewModel> ProblemViewModels
-    {
-        get => _problemViewModels;
-        private set => this.RaiseAndSetIfChanged(ref _problemViewModels, value);
-    }
-
-    public ReactiveCommand<Unit, Unit> RefreshCommand { get; }
-
-    public Interaction<Exception, Unit> ShowExceptionInteraction { get; } = new();
-
-    private async Task RefreshAsync()
-    {
-        this.ThrowIfInvalid();
-
-        if (IsRefreshing)
+        if (problem is AddonChildrenProblem)
         {
             return;
         }
 
-        IsRefreshing = true;
-        try
+        if (_problemViewModels is not null)
         {
-            ProblematicAddonViewModels = [];
-            ProblemViewModels = [];
-            var cancellationToken = _cts.Token;
-            var addonRoot = AddonRoot;
-
-            try
+            var problemType = problem.GetType();
+            bool problemTypePresent = false;
+            foreach (var problemViewModel in _problemViewModels)
             {
-                await addonRoot.CheckAsync().WaitAsync(cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                if (_active)
+                if (problemViewModel.ProblemType == problemType)
                 {
-                    await ShowExceptionInteraction.Handle(ex);
+                    problemTypePresent = true;
+                    problemViewModel.AddProblem(problem);
+                    break;
                 }
             }
-
-            var problematicAddonViewModels = new List<AddonNodeSimpleViewModel>();
-            var problemToAddons = new Dictionary<Type, List<AddonNode>>();
-            foreach (var addon in addonRoot.GetDescendants())
+            if (!problemTypePresent)
             {
-                var problems = addon.Problems;
-
-                if (problems.Count == 0)
-                {
-                    continue;
-                }
-                if (addon is AddonGroup && problems is [AddonChildrenProblem _])
-                {
-                    continue;
-                }
-
-                problematicAddonViewModels.Add(new AddonNodeSimpleViewModel(addon));
-
-                foreach (var problem in problems)
-                {
-                    if (problem is AddonChildrenProblem)
-                    {
-                        continue;
-                    }
-
-                    var problemType = problem.GetType();
-                    if (!problemToAddons.TryGetValue(problemType, out var correspondingAddons))
-                    {
-                        correspondingAddons = new List<AddonNode>();
-                        problemToAddons[problemType] = correspondingAddons;
-                    }
-                    correspondingAddons.Add(addon);
-                }
+                _problemViewModels.Add(new ProblemViewModel(problem));
             }
-            ProblematicAddonViewModels = problematicAddonViewModels.ToArray();
-            ProblemViewModels = problemToAddons.Select(pair => new ProblemViewModel(pair.Key, pair.Value)).ToArray();
         }
-        finally
+
+        if (_problematicAddonViewModels is not null)
         {
-            IsRefreshing = false;
-        }
-    }
-
-    public void Dispose()
-    {
-        if (!_disposed)
-        {
-            IsValid = false;
-
-            _cts.Cancel();
-            _cts.Dispose();
-
-            _disposed = true;
+            bool addonPresent = false;
+            foreach (var problematicAddonViewModel in _problematicAddonViewModels)
+            {
+                if (problematicAddonViewModel.Addon == problem.Addon)
+                {
+                    addonPresent = true;
+                    break;
+                }
+            }
+            if (!addonPresent)
+            {
+                _problematicAddonViewModels.Add(new ProblematicAddonViewModel(problem.Addon));
+            }
         }
     }
 }

@@ -33,9 +33,7 @@ public class AppWindowManager : IAppWindowManager
 
     public MainWindow? MainWindow => _mainWindow;
 
-    public MainWindowViewModel MainWindowViewModel => _mainWindowViewModel ?? throw new InvalidOperationException($"{nameof(MainWindowViewModel)} is not set.");
-
-    public AddonRoot ActiveAddonRoot => MainWindowViewModel.AddonRoot ?? throw new InvalidOperationException($"No available {nameof(ActiveAddonRoot)}.");
+    public MainWindowViewModel? MainWindowViewModel => _mainWindowViewModel;
 
     public MainWindow CreateMainWindow(MainWindowViewModel viewModel)
     {
@@ -57,6 +55,10 @@ public class AppWindowManager : IAppWindowManager
     public void OpenSettingsWindow()
     {
         var mainWindowViewModel = MainWindowViewModel;
+        if (mainWindowViewModel is null)
+        {
+            return;
+        }
         OpenWindow(ref _settingsWindowRef, () => new AppSettingsWindow
         {
             DataContext = new AppSettingsViewModel(_settings, mainWindowViewModel)
@@ -78,7 +80,11 @@ public class AppWindowManager : IAppWindowManager
 
     public void OpenProblemListWindow()
     {
-        var addonRoot = ActiveAddonRoot;
+        var addonRoot = MainWindowViewModel?.AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
         OpenWindow(ref _problemListWindowRef, () => new AddonProblemListWindow
         {
             DataContext = new AddonProblemListViewModel(addonRoot)
@@ -88,6 +94,10 @@ public class AppWindowManager : IAppWindowManager
     public void OpenTagManagerWindow()
     {
         var mainWindowViewModel = MainWindowViewModel;
+        if (mainWindowViewModel is null)
+        {
+            return;
+        }
         OpenWindow(ref _tagManagerWindowRef, () => new AddonTagManagerWindow()
         {
             DataContext = new AddonTagManagerViewModel(mainWindowViewModel)
@@ -96,7 +106,11 @@ public class AppWindowManager : IAppWindowManager
 
     public void OpenVpkConflictListWindow()
     {
-        var addonRoot = ActiveAddonRoot;
+        var addonRoot = MainWindowViewModel?.AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
         OpenWindow(ref _vpkConflictListWindowRef, () => new VpkAddonConflictListWindow
         {
             DataContext = new VpkAddonConflictListViewModel(addonRoot)
@@ -106,6 +120,10 @@ public class AppWindowManager : IAppWindowManager
     public void OpenWorkshopVpkFinderWindow()
     {
         var mainWindowViewModel = MainWindowViewModel;
+        if (mainWindowViewModel is null)
+        {
+            return;
+        }
         var window = new WorkshopVpkFinderWindow
         {
             DataContext = new WorkshopVpkFinderViewModel(mainWindowViewModel, _httpClient)
@@ -115,7 +133,11 @@ public class AppWindowManager : IAppWindowManager
 
     public void OpenFileCleanerWindow()
     {
-        var addonRoot = ActiveAddonRoot;
+        var addonRoot = MainWindowViewModel?.AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
         var window = new FileCleanerWindow
         {
             DataContext = new FileCleanerViewModel(addonRoot)
@@ -125,10 +147,28 @@ public class AppWindowManager : IAppWindowManager
 
     public void OpenAddonNameAutoSetterWindow()
     {
-        var addonRoot = ActiveAddonRoot;
+        var addonRoot = MainWindowViewModel?.AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
         var window = new AddonNameAutoSetterWindow
         {
             DataContext = new AddonNameAutoSetterViewModel(addonRoot)
+        };
+        window.Show();
+    }
+
+    public void OpenFileNameFixerWindow()
+    {
+        var addonRoot = MainWindowViewModel?.AddonRoot;
+        if (addonRoot is null)
+        {
+            return;
+        }
+        var window = new FileNameFixerWindow
+        {
+            DataContext = new FileNameFixerViewModel(addonRoot)
         };
         window.Show();
     }

@@ -28,7 +28,7 @@ internal class AddonNodeContainerService
     {
         ArgumentNullException.ThrowIfNull(node);
 
-        ChangeNameUnchecked(null, node.Name, node);
+        ChangeChildNameUnchecked(null, node.Name, node);
         foreach (var nodeOrDescendant in node.GetSelfAndDescendantsByDfsPreorder())
         {
             nodeOrDescendant.NotifyAncestorsChanged();
@@ -56,25 +56,30 @@ internal class AddonNodeContainerService
         }
     }
 
-    public string GetUniqueName(string name)
+    public string GetUniqueChildName(string name, bool ignoreFileSystem)
     {
         ArgumentNullException.ThrowIfNull(name);
+        name = AddonNode.SanitizeName(name);
 
         var fileSystemEntries = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
-        var fileSystemPath = _container.FileSystemPath;
-        if (fileSystemPath is not null)
+        if (!ignoreFileSystem)
         {
-            try
+            var fileSystemPath = _container.FileSystemPath;
+            if (fileSystemPath is not null)
             {
-                foreach (var path in Directory.EnumerateFileSystemEntries(fileSystemPath))
+                try
                 {
-                    fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
+                    foreach (var path in Directory.EnumerateFileSystemEntries(fileSystemPath))
+                    {
+                        fileSystemEntries.Add(Path.GetFileName(path));
+                        fileSystemEntries.Add(Path.GetFileNameWithoutExtension(path));
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", fileSystemPath);
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during enumerating file system entires of the directory: {Path}", fileSystemPath);
+                }
             }
         }
 
@@ -138,12 +143,12 @@ internal class AddonNodeContainerService
         }
     }
 
-    public void ThrowIfNameInvalid(string name, AddonNode node)
+    public void ThrowIfChildNewNameDisallowed(string name, AddonNode child)
     {
         ArgumentNullException.ThrowIfNull(name);
-        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(child);
 
-        if (_nameToNode.TryGetValue(name, out var existingNode) && existingNode != node)
+        if (_nameToNode.TryGetValue(name, out var existingNode) && existingNode != child)
         {
             throw new AddonNameExistsException(name);
         }
@@ -156,10 +161,10 @@ internal class AddonNodeContainerService
         return _nameToNode.ContainsKey(name);
     }
 
-    public void ChangeNameUnchecked(string? oldName, string newName, AddonNode node)
+    public void ChangeChildNameUnchecked(string? oldName, string newName, AddonNode child)
     {
         ArgumentNullException.ThrowIfNull(newName);
-        ArgumentNullException.ThrowIfNull(node);
+        ArgumentNullException.ThrowIfNull(child);
 
         if (oldName != null && oldName != AddonNode.NullName)
         {
@@ -167,7 +172,7 @@ internal class AddonNodeContainerService
         }
         if (newName != AddonNode.NullName)
         {
-            _nameToNode[newName] = node;
+            _nameToNode[newName] = child;
         }
     }
 }

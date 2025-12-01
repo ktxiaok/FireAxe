@@ -679,7 +679,7 @@
     <value>Use Regex</value>
   </data>
   <data name="VersionColon" xml:space="preserve">
-    <value>Version:</value>
+    <value>Version: </value>
   </data>
   <data name="ViewsColon" xml:space="preserve">
     <value>Views: </value>
@@ -1066,5 +1066,83 @@
   </data>
   <data name="OpeningDirectory" xml:space="preserve">
     <value>Opening Directory...</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeDirectory" xml:space="preserve">
+    <value>The path "{0}" should be a folder rather than a file.</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
+    <value>The path "{0}" should be a file rather than a folder.</value>
+  </data>
+  <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
+    <value>Failed to load the .addonroot file. This file may be broken. You can use the backup files in ".addonrootdir/backups" to replace the current file.</value>
+  </data>
+  <data name="ImportCompletedSuccessfullyWithCount" xml:space="preserve">
+    <value>Import completed. {0} items imported successfully.</value>
+  </data>
+  <data name="ImportCompletedUnsuccessfullyWithCount" xml:space="preserve">
+    <value>Import completed. {0} items imported successfully and {1} items failed to import.</value>
+  </data>
+  <data name="RenamedItemTo" xml:space="preserve">
+    <value>Renamed "{0}" to "{1}".</value>
+  </data>
+  <data name="ItemImportedSuccessfully" xml:space="preserve">
+    <value>"{0}" imported successfully.</value>
+  </data>
+  <data name="ItemFailedToImportWithError" xml:space="preserve">
+    <value>"{0}" failed to import: {1}</value>
+  </data>
+  <data name="NoItemsToImport" xml:space="preserve">
+    <value>There are no items to import.</value>
+  </data>
+  <data name="FileNameFixer" xml:space="preserve">
+    <value>File Name Fixer</value>
+  </data>
+  <data name="FileNameFixerTip" xml:space="preserve">
+    <value>This tool might help you solve the problem of missing addon files.</value>
+  </data>
+  <data name="Fix" xml:space="preserve">
+    <value>Fix</value>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>Fixed</value>
+  </data>
+  <data name="FailedToFix" xml:space="preserve">
+    <value>Failed to fix</value>
+  </data>
+  <data name="NoItemsToFix" xml:space="preserve">
+    <value>There are no items to fix.</value>
+  </data>
+  <data name="Checking" xml:space="preserve">
+    <value>Checking...</value>
+  </data>
+  <data name="InvalidPublishedFileIdProblemExplain" xml:space="preserve">
+    <value>Invalid Published File ID: {0}</value>
+  </data>
+  <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
+    <value>The reference source is invalid.</value>
+  </data>
+  <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
+    <value>Create Reference Addons Based on Selected Addons</value>
+  </data>
+  <data name="UserInterface" xml:space="preserve">
+    <value>User Interface</value>
+  </data>
+  <data name="GameInformation" xml:space="preserve">
+    <value>Game Information</value>
+  </data>
+  <data name="VpkAddonConflict" xml:space="preserve">
+    <value>VPK Addon Conflict</value>
+  </data>
+  <data name="WebProxy" xml:space="preserve">
+    <value>Web Proxy</value>
+  </data>
+  <data name="WebProxyCredentialUserName" xml:space="preserve">
+    <value>Web Proxy Credential User Name</value>
+  </data>
+  <data name="WebProxyCredentialPassword" xml:space="preserve">
+    <value>Web Proxy Credential Password</value>
+  </data>
+  <data name="Hidden" xml:space="preserve">
+    <value>[Hidden]</value>
   </data>
 </root>

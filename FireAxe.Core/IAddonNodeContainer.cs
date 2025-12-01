@@ -21,7 +21,7 @@ public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
 
     event Action<AddonNode>? DescendantNodeMoved;
 
-    string GetUniqueNodeName(string name);
+    string GetUniqueChildName(string name, bool ignoreFileSystem = false);
 
     AddonNode? TryGetNodeByName(string name);
 
@@ -30,9 +30,9 @@ public interface IAddonNodeContainer : IHierarchyNode<AddonNode>
 
 internal interface IAddonNodeContainerInternal
 {
-    void ThrowIfNodeNameInvalid(string name, AddonNode node);
+    void ThrowIfChildNewNameDisallowed(string name, AddonNode child);
 
-    void ChangeNameUnchecked(string? oldName, string newName, AddonNode node);
+    void ChangeChildNameUnchecked(string? oldName, string newName, AddonNode child);
 
     void NotifyDescendantNodeMoved(AddonNode node);
 }

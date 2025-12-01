@@ -1,19 +1,17 @@
-using System;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FireAxe.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace FireAxe.Views;
 
-public partial class AddonProblemListWindow : ReactiveWindow<AddonProblemListViewModel>
+public partial class FileNameFixerWindow : ReactiveWindow<FileNameFixerViewModel>
 {
-    public AddonProblemListWindow()
+    public FileNameFixerWindow()
     {
         InitializeComponent();
 

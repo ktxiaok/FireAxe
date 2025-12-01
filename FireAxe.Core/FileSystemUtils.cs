@@ -71,6 +71,11 @@ public static class FileSystemUtils
     {
         ArgumentNullException.ThrowIfNull(sourcePath);
         ArgumentNullException.ThrowIfNull(targetPath);
+
+        if (IsSamePath(sourcePath, targetPath))
+        {
+            return;
+        }
         
         Directory.Move(sourcePath, targetPath);
     }
@@ -131,6 +136,21 @@ public static class FileSystemUtils
                 i++;
             }
         }
+    }
+
+    public static string GetUniquePath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        path = Path.GetFullPath(path);
+        var dirPath = Path.GetDirectoryName(path) ?? throw new IOException("Failed to get the directory path.");
+        var name = Path.GetFileName(path);
+        var newName = GetUniqueFileName(name, dirPath);
+        if (newName != name)
+        {
+            path = Path.Join(dirPath, newName);
+        }
+        return path;
     }
 
     private static readonly FrozenSet<char> s_reservedFileNameChars = FrozenSet.ToFrozenSet(['/', '?', '<', '>', '\\', ':', '*', '|', '"']);
@@ -207,6 +227,14 @@ public static class FileSystemUtils
         ArgumentNullException.ThrowIfNull(path);
 
         return path.Replace('\\', '/');
+    }
+
+    public static bool IsSamePath(string path1, string path2)
+    {
+        ArgumentNullException.ThrowIfNull(path1);
+        ArgumentNullException.ThrowIfNull(path2);
+
+        return NormalizePath(path1) == NormalizePath(path2);
     }
 
     public static string GetFullAndNormalizedPath(string path) => NormalizePath(Path.GetFullPath(path));

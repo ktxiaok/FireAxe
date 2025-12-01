@@ -36,16 +36,12 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
         _workshopTagsString = this.WhenAnyValue(x => x.PublishedFileDetails)
             .Select(details =>
             {
-                if (details == null)
+                var tags = details?.Tags?.Where(tagObj => tagObj is not null).Select(tagObj => tagObj!.Tag);
+                if (tags is null)
                 {
                     return "";
                 }
-                var tags = details.Tags;
-                if (tags == null)
-                {
-                    return "";
-                }
-                return string.Join(", ", tags.Select(tagObj => tagObj.Tag));
+                return string.Join(", ", tags);
             })
             .ToProperty(this, nameof(WorkshopTagsString));
 

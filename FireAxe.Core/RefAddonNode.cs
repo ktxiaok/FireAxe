@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 
 namespace FireAxe;
 
@@ -9,11 +10,9 @@ public class RefAddonNode : AddonNode
     private bool _isTagsSyncEnabled = true;
     private bool _isDependenciesSyncEnabled = true;
 
-    private readonly AddonProblemSource<RefAddonNode> _circularRefProblemSource;
-
     protected RefAddonNode()
     {
-        _circularRefProblemSource = new(this);
+        
     }
 
     public override Type SaveType => typeof(RefAddonNodeSave);
@@ -43,49 +42,13 @@ public class RefAddonNode : AddonNode
         }
     }
 
-    public AddonNode? ActualSourceAddon
+    public AddonNode? ActualSourceAddon 
     {
         get
         {
             this.ThrowIfInvalid();
 
-            _circularRefProblemSource.Clear();
-
-            var root = Root;
-            if (root.TryGetNodeById(SourceAddonId, out var addon))
-            {
-                var refAddon = addon as RefAddonNode;
-                if (refAddon is null)
-                {
-                    return addon;
-                }
-
-                var accessed = new HashSet<RefAddonNode>();
-                var accessedList = new List<RefAddonNode>();
-                while (true)
-                {
-                    if (!accessed.Add(refAddon))
-                    {
-                        for (int i = accessedList.IndexOf(refAddon), len = accessedList.Count; i < len; i++)
-                        {
-                            new AddonCircularRefProblem(accessedList[i]._circularRefProblemSource).Submit();
-                        }
-                        return null;
-                    }
-                    accessedList.Add(refAddon);
-                    if (!root.TryGetNodeById(refAddon.SourceAddonId, out var nextAddon))
-                    {
-                        return null;
-                    }
-                    if (nextAddon is RefAddonNode nextRefAddon)
-                    {
-                        refAddon = nextRefAddon;
-                        continue;
-                    }
-                    return nextAddon;
-                }
-            }
-            return null;
+            return GetActualSourceAddon();
         }
     }
 
@@ -117,9 +80,144 @@ public class RefAddonNode : AddonNode
         }
     }
 
-    public void CheckCircularRef()
+    public override string? ActualImageFilePath
     {
-        _ = ActualSourceAddon;
+        get
+        {
+            this.ThrowIfInvalid();
+
+            if (base.ActualImageFilePath is { } result)
+            {
+                return result;
+            }
+            if (ActualSourceAddon is { } source)
+            {
+                return source.ActualImageFilePath;
+            }
+            return null;
+        }
+    }
+
+    public static IReadOnlyList<AddonNode> CreateBasedOn(IEnumerable<AddonNode> sources, AddonGroup? parentGroup)
+    {
+        AddonRoot? root = null;
+        if (parentGroup is not null)
+        {
+            parentGroup.ThrowIfInvalid();
+            root = parentGroup.Root;
+        }
+        ArgumentNullException.ThrowIfNull(sources);
+        var sourceArray = sources.ToArray();
+        foreach (var source in sourceArray)
+        {
+            source.ThrowIfInvalid();
+            if (root is null)
+            {
+                root = source.Root;
+            }
+            else if (source.Root != root)
+            {
+                throw new InvalidOperationException("different AddonRoot");
+            }
+        }
+        if (root is null)
+        {
+            return [];
+        }
+
+        var targets = new List<AddonNode>(sourceArray.Length);
+        var sourceToTarget = new Dictionary<AddonNode, AddonNode>();
+        var dependenciesSettingTodos = new List<(AddonNode Addon, IEnumerable<AddonNode> Dependencies)>();
+        foreach (var source in sourceArray.SelectMany(addon => addon.GetSelfAndDescendantsByDfsPreorder()))
+        {
+            var sourceParentGroup = source.Group;
+            AddonGroup? targetParentGroup;
+            if (sourceParentGroup is not null && sourceToTarget.TryGetValue(sourceParentGroup, out var sourceParentGroupMapping))
+            {
+                targetParentGroup = (AddonGroup)sourceParentGroupMapping;
+            }
+            else
+            {
+                targetParentGroup = parentGroup;
+            }
+
+            AddonNode target;
+            if (source is AddonGroup)
+            {
+                target = Create<AddonGroup>(root, targetParentGroup);
+            }
+            else
+            {
+                var refAddon = Create<RefAddonNode>(root, targetParentGroup);
+                refAddon.SourceAddonId = source.Id;
+                target = refAddon;
+            }
+
+            try
+            {
+                target.Name = target.Parent.GetUniqueChildName(source.Name);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during setting the name of the target addon whose source is {SourcePath}.", source.NodePath);
+            }
+
+            if (source.DependentAddonIds.Count > 0)
+            {
+                var dependencies = new List<AddonNode>(source.DependentAddonIds.Count);
+                foreach (var dependency in source.DependentAddons)
+                {
+                    dependencies.Add(dependency);
+                }
+                dependenciesSettingTodos.Add((target, dependencies));
+            }
+
+            sourceToTarget[source] = target;
+
+            if (sourceArray.Contains(source))
+            {
+                targets.Add(target);
+            }
+        }
+
+        foreach (var dependenciesSettingTodo in dependenciesSettingTodos)
+        {
+            var addon = dependenciesSettingTodo.Addon;
+            if (addon is RefAddonNode refAddon)
+            {
+                refAddon.IsDependenciesSyncEnabled = false;
+            }
+            foreach (var dependency in dependenciesSettingTodo.Dependencies)
+            {
+                if (sourceToTarget.TryGetValue(dependency, out var dependencyMapping))
+                {
+                    addon.AddDependentAddon(dependencyMapping.Id);
+                }
+                else
+                {
+                    addon.AddDependentAddon(dependency.Id);
+                }
+            }
+        }
+
+        return targets;
+    }
+
+    public void CheckRef()
+    {
+        this.ThrowIfInvalid();
+
+        InvalidateProblem<AddonCircularRefProblem>();
+        AddonInvalidRefSourceProblem? invalidRefSourceProblem = null;
+        if (GetActualSourceAddon(out var circularRefChain) is null)
+        {
+            invalidRefSourceProblem = new(this);
+        }
+        SetProblem(invalidRefSourceProblem);
+        foreach (var refAddon in circularRefChain)
+        {
+            refAddon.SetProblem(new AddonCircularRefProblem(refAddon));
+        }
     }
 
     public void CheckTagsSync()
@@ -130,6 +228,7 @@ public class RefAddonNode : AddonNode
         {
             if (ActualSourceAddon is { } source)
             {
+                ClearTags();
                 foreach (var tag in source.Tags)
                 {
                     AddTag(tag);
@@ -146,6 +245,7 @@ public class RefAddonNode : AddonNode
         {
             if (ActualSourceAddon is { } source)
             {
+                ClearDependentAddons();
                 foreach (var id in source.DependentAddonIds)
                 {
                     AddDependentAddon(id);
@@ -154,11 +254,11 @@ public class RefAddonNode : AddonNode
         }
     }
 
-    protected override void OnCheck()
+    protected override void OnCheck(Action<Task> taskSubmitter)
     {
-        base.OnCheck();
+        base.OnCheck(taskSubmitter);
 
-        CheckCircularRef();
+        CheckRef();
         CheckTagsSync();
         CheckDependenciesSync();
     }
@@ -191,4 +291,44 @@ public class RefAddonNode : AddonNode
         IsTagsSyncEnabled = save.IsTagsSyncEnabled;
         IsDependenciesSyncEnabled = save.IsDependenciesSyncEnabled;
     }
+
+    private AddonNode? GetActualSourceAddon(out IEnumerable<RefAddonNode> circularRefChain)
+    {
+        circularRefChain = [];
+        var root = Root;
+        if (root.TryGetNodeById(SourceAddonId, out var addon))
+        {
+            var refAddon = addon as RefAddonNode;
+            if (refAddon is null)
+            {
+                return addon;
+            }
+
+            var accessed = new HashSet<RefAddonNode>();
+            var accessedList = new List<RefAddonNode>();
+            while (true)
+            {
+                if (!accessed.Add(refAddon))
+                {
+                    int chainStart = accessedList.IndexOf(refAddon);
+                    circularRefChain = accessedList[chainStart..];
+                    return null;
+                }
+                accessedList.Add(refAddon);
+                if (!root.TryGetNodeById(refAddon.SourceAddonId, out var nextAddon))
+                {
+                    return null;
+                }
+                if (nextAddon is RefAddonNode nextRefAddon)
+                {
+                    refAddon = nextRefAddon;
+                    continue;
+                }
+                return nextAddon;
+            }
+        }
+        return null;
+    }
+
+    private AddonNode? GetActualSourceAddon() => GetActualSourceAddon(out _);
 }

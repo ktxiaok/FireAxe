@@ -152,17 +152,8 @@ public class EditableTextBlock : TemplatedControl
         var displayView = nameScope.Get<Control>(TemplatePartName_DisplayView);
         var editView = nameScope.Get<Control>(TemplatePartName_EditView);
 
-        textBlock.Bind(TextBlock.TextProperty,
-            this.WhenAnyValue(x => x.Value, x => x.Display)
-            .Select(_ =>
-            {
-                var display = Display;
-                if (display != null)
-                {
-                    return display;
-                }
-                return Value;
-            }))
+        this.WhenAnyValue(x => x.Value, x => x.Display, (value, display) => display ?? value)
+            .Subscribe(text => textBlock.Text = text)
             .DisposeWith(_partDisposables);
         textBox.Bind(TextBox.WatermarkProperty, this.WhenAnyValue(x => x.Watermark))
             .DisposeWith(_partDisposables);

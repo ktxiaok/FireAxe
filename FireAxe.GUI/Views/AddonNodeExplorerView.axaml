@@ -255,11 +255,14 @@
     
             <Style Selector="ListBoxItem">
               <Style Selector="^:selected">
-                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
-                  <Setter Property="Background" Value="Gray"/>
+                <Style Selector="^ /template/ ContentPresenter">
+                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected}"/>
+                </Style>
+                <Style Selector="^:pointerover /template/ ContentPresenter">
+                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected_pointerover}"/>
                 </Style>
                 <Style Selector="^ Border">
-                  <Setter Property="BorderBrush" Value="SteelBlue"/>
+                  <Setter Property="BorderBrush" Value="{DynamicResource brush_border_addon_list_item_selected}"/>
                 </Style>
               </Style>
               <Setter Property="Padding" Value="3"/>
@@ -321,6 +324,8 @@
           </Panel>
         </ScrollViewer>
       </DockPanel>
+
+      <!--context menu-->
       <Border.ContextMenu>
         <ContextMenu>
           <MenuItem Header="{x:Static r:Texts.Refresh}" Command="{Binding Refresh}"/>
@@ -333,6 +338,7 @@
             <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopCollection}" Command="{Binding NewWorkshopCollectionCommand}"/>
           </MenuItem>
+          <MenuItem Header="{x:Static r:Texts.CreateRefAddonsBasedOnSelectedAddons}" Command="{Binding CreateRefAddonsBasedOnSelectedCommand}"/>
 
           <Separator/>
 

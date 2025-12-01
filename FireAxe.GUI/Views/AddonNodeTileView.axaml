@@ -43,12 +43,15 @@
       HorizontalAlignment="Right"
       VerticalAlignment="Top">
     </v:AddonNodeEnableButton>
-    <PathIcon
+    <Path
       Data="{StaticResource icon_warning}"
       IsVisible="{Binding Addon.Problems.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
-      Foreground="{DynamicResource brush_warning}"
+      Stretch="Uniform"
+      Fill="{DynamicResource brush_warning}"
+      Stroke="{DynamicResource brush_foreground}"
+      StrokeThickness="0.5"
       Margin="5"
-      Width="20" Height="20"
+      Width="22" Height="22"
       HorizontalAlignment="Left"
       VerticalAlignment="Top"/>
   </Panel>

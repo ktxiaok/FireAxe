@@ -1067,4 +1067,82 @@
   <data name="OpeningDirectory" xml:space="preserve">
     <value>打开目录中...</value>
   </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeDirectory" xml:space="preserve">
+    <value>路径“{0}”应该是文件夹而不是文件。</value>
+  </data>
+  <data name="AddonFileNotExistProblemExplain_ShouldBeFile" xml:space="preserve">
+    <value>路径“{0}”应该是文件而不是文件夹。</value>
+  </data>
+  <data name="AddonRootDeserializationExceptionMessage" xml:space="preserve">
+    <value>无法加载.addonroot文件。该文件可能损坏。你可以使用位于“.addonrootdir/backups”的备份文件来替换当前的文件。</value>
+  </data>
+  <data name="ImportCompletedSuccessfullyWithCount" xml:space="preserve">
+    <value>导入完成。已成功导入{0}项。</value>
+  </data>
+  <data name="ImportCompletedUnsuccessfullyWithCount" xml:space="preserve">
+    <value>导入完成。{0}项导入成功，{1}项导入失败。</value>
+  </data>
+  <data name="RenamedItemTo" xml:space="preserve">
+    <value>已重命名“{0}”为“{1}”。</value>
+  </data>
+  <data name="ItemImportedSuccessfully" xml:space="preserve">
+    <value>”{0}“导入成功。</value>
+  </data>
+  <data name="ItemFailedToImportWithError" xml:space="preserve">
+    <value>”{0}“导入失败：{1}</value>
+  </data>
+  <data name="NoItemsToImport" xml:space="preserve">
+    <value>没有可导入的项。</value>
+  </data>
+  <data name="FileNameFixer" xml:space="preserve">
+    <value>文件名修复器</value>
+  </data>
+  <data name="FileNameFixerTip" xml:space="preserve">
+    <value>此工具也许可以帮助你解决模组文件不存在的问题。</value>
+  </data>
+  <data name="Fix" xml:space="preserve">
+    <value>修复</value>
+  </data>
+  <data name="Fixed" xml:space="preserve">
+    <value>已修复</value>
+  </data>
+  <data name="FailedToFix" xml:space="preserve">
+    <value>修复失败</value>
+  </data>
+  <data name="NoItemsToFix" xml:space="preserve">
+    <value>没有可修复的项。</value>
+  </data>
+  <data name="Checking" xml:space="preserve">
+    <value>检查中...</value>
+  </data>
+  <data name="InvalidPublishedFileIdProblemExplain" xml:space="preserve">
+    <value>无效的发布文件ID：{0}</value>
+  </data>
+  <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
+    <value>无效的引用源。</value>
+  </data>
+  <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
+    <value>根据选中的模组来创建引用模组</value>
+  </data>
+  <data name="UserInterface" xml:space="preserve">
+    <value>用户界面</value>
+  </data>
+  <data name="GameInformation" xml:space="preserve">
+    <value>游戏信息</value>
+  </data>
+  <data name="VpkAddonConflict" xml:space="preserve">
+    <value>VPK模组冲突</value>
+  </data>
+  <data name="WebProxy" xml:space="preserve">
+    <value>Web代理</value>
+  </data>
+  <data name="WebProxyCredentialUserName" xml:space="preserve">
+    <value>Web代理认证用户名</value>
+  </data>
+  <data name="WebProxyCredentialPassword" xml:space="preserve">
+    <value>Web代理认证密码</value>
+  </data>
+  <data name="Hidden" xml:space="preserve">
+    <value>[已隐藏]</value>
+  </data>
 </root>

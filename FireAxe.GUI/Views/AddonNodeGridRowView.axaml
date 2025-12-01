@@ -12,7 +12,7 @@
     <vm:AddonNodeListItemViewModelDesign/>
   </Design.DataContext>
   <Grid
-    RowDefinitions="Auto" ColumnDefinitions="50, *, *, 75, 60">
+    RowDefinitions="Auto" ColumnDefinitions="50, *, *, 75, Auto">
     <Panel
       Grid.Column="0"
       Margin="5, 0, 5, 0">

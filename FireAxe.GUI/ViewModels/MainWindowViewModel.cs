@@ -160,13 +160,13 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
 
             var importedGroup = AddonNode.Create<AddonGroup>(addonRoot, explorerViewModel.CurrentGroup);
-            importedGroup.Name = importedGroup.Parent.GetUniqueNodeName(Texts.ImportedGroup);
+            importedGroup.Name = importedGroup.Parent.GetUniqueChildName(Texts.ImportedGroup);
             explorerViewModel.SelectNode(importedGroup);
             foreach (var nodeSave in nodeSaves)
             {
                 AddonNode.LoadSave(nodeSave, addonRoot, importedGroup);
             }
-            _ = addonRoot.CheckAsync();
+            addonRoot.Check();
         }, _addonRootNotNullObservable);
 
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
@@ -177,6 +177,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         OpenWorkshopVpkFinderWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenWorkshopVpkFinderWindow());
         OpenFileCleanerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFileCleanerWindow(), _addonRootNotNullObservable);
         OpenAddonNameAutoSetterWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAddonNameAutoSetterWindow(), _addonRootNotNullObservable);
+        OpenFileNameFixerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFileNameFixerWindow(), _addonRootNotNullObservable);
 
         PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
@@ -366,19 +367,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 _addonRoot.Save();
 
-                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
-                _addonRoot.Pushed -= OnAddonRootPushed;
-                _addonRoot.DisposeAsync().AsTask(); // TODO
-                _addonRoot = null;
+                DisposeAddonRoot();
             }
 
             _addonRoot = value;
 
-            if (_addonRoot == null)
-            {
-                AddonNodeExplorerViewModel = null;
-            }
-            else
+            AddonNodeExplorerViewModel = null;
+            
+            if (_addonRoot is not null)
             {
                 using var blockAutoCheck = _addonRoot.BlockAutoCheck();
 
@@ -388,15 +384,32 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
                 _addonRoot.HttpClient = _httpClient;
-                
-                _addonRoot.LoadFile();
 
-                _addonRoot.CheckAsync();
+                try
+                {
+                    _addonRoot.LoadFile();
+                }
+                catch (AddonRootDeserializationException)
+                {
+                    DisposeAddonRoot();
+                    this.RaisePropertyChanged();
+                    throw;
+                }
+
+                _addonRoot.Check();
 
                 AddonNodeExplorerViewModel = new(_addonRoot);
             }
 
             this.RaisePropertyChanged();
+
+            void DisposeAddonRoot()
+            {
+                _addonRoot.NewDownloadItem -= OnAddonRootNewDownloadItem;
+                _addonRoot.Pushed -= OnAddonRootPushed;
+                _addonRoot.DisposeAsync().AsTask(); // TODO
+                _addonRoot = null;
+            }
         }
     }
 
@@ -448,6 +461,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> OpenAddonNameAutoSetterWindowCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> OpenFileNameFixerWindowCommand { get; }
+
     public ReactiveCommand<Unit, Unit> PushCommand { get; } 
 
     public ReactiveCommand<Unit, Unit> CheckCommand { get; }
@@ -476,7 +491,9 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public Interaction<Unit, string?> SaveAddonRootFileInteraction { get; } = new();
 
-    public Interaction<Unit, Unit> ShowImportSuccessInteraction { get; } = new();
+    public Interaction<AddonRootDeserializationException, Unit> ShowAddonRootDeserializationExceptionInteraction { get; } = new();
+
+    public Interaction<AddonRoot.ImportResult, Unit> ShowImportResultInteraction { get; } = new();
 
     public Interaction<Exception, Unit> ShowImportErrorInteraction { get; } = new();
 
@@ -570,6 +587,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _settings.LastOpenDirectory = dirPath;
             }, DispatcherPriority.Default);
         }
+        catch (AddonRootDeserializationException ex)
+        {
+            Log.Error(ex, "Exception occurred during the deserialization of the AddonRoot. Directory Path: {DirectoryPath}", dirPath);
+            await ShowAddonRootDeserializationExceptionInteraction.Handle(ex);
+        }
         finally
         {
             IsOpeningDirectory = false;
@@ -591,30 +613,37 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
-    public async Task Import()
+    private async Task Import()
     {
-        if (_addonRoot != null)
+        if (_addonRoot is null)
         {
-            try
-            {
-                _addonRoot.Import();
-                await ShowImportSuccessInteraction.Handle(Unit.Default);
-            }
-            catch (Exception ex)
-            {
-                await ShowImportErrorInteraction.Handle(ex);
-            }
+            return;
         }
+
+        using var blockAutoCheck = _addonRoot.BlockAutoCheck();
+        AddonRoot.ImportResult result;
+        try
+        {
+            result = _addonRoot.Import();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Exception occurred during the import of the AddonRoot.");
+            await ShowImportErrorInteraction.Handle(ex);
+            return;
+        }
+        _addonRoot.Check();
+        await ShowImportResultInteraction.Handle(result);
     }
 
-    public async Task Push()
+    private async Task Push()
     {
         if (_addonRoot == null)
         {
             return;
         }
         
-        _ = _addonRoot.CheckAsync();
+        _addonRoot.Check();
         try
         {
             _addonRoot.Push();
@@ -626,6 +655,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Exception occurred during the push of the AddonRoot.");
             await ShowPushErrorInteraction.Handle(ex);
             return;
         }
@@ -634,12 +664,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public void Check()
     {
-        if (_addonRoot == null)
-        {
-            return;
-        }
-
-        _addonRoot.CheckAsync();
+        AddonRoot?.Check();
     }
 
     public void ClearCaches()

@@ -18,12 +18,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ExportedAssets\**" CopyToOutputDirectory="PreserveNewest"/>
+    <None Include="ExportedAssets\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <AvaloniaResource Remove="Assets\CommonResources.axaml" />
     <AvaloniaResource Remove="Assets\Texts.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Remove="Assets\Icons.axaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -100,5 +104,11 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\AddonTagView.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Update="Assets\Icons.axaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
   </ItemGroup>
 </Project>

@@ -27,12 +27,6 @@ public class WorkshopVpkAddon : VpkAddon
 
     private string? _currentVpkFileName = null;
 
-    private readonly AddonProblemSource<WorkshopVpkAddon> _vpkNotLoadProblemSource;
-    private readonly AddonProblemSource<WorkshopVpkAddon> _invalidPublishedFileIdProblemSource;
-    private readonly AddonProblemSource _downloadFailedProblemSource;
-
-    private Task? _downloadCheckTask = null;
-
     private IDownloadItem? _download = null;
 
     private bool _requestAutoSetName = false;
@@ -41,14 +35,12 @@ public class WorkshopVpkAddon : VpkAddon
 
     protected WorkshopVpkAddon()
     {
-        _vpkNotLoadProblemSource = new(this);
-        _invalidPublishedFileIdProblemSource = new(this);
-        _downloadFailedProblemSource = new(this);
-
         PropertyChanged += OnPropertyChanged;
     }
 
     public override Type SaveType => typeof(WorkshopVpkAddonSave);
+
+    public override bool IsDirectory => true;
 
     public override string FileExtension => ".workshop";
 
@@ -141,6 +133,8 @@ public class WorkshopVpkAddon : VpkAddon
             NotifyChanged();
         }
     }
+
+    public Task? DownloadCheckTask { get; private set => NotifyAndSetIfChanged(ref field, value); } = null;
 
     public IDownloadItem? DownloadItem
     {
@@ -405,20 +399,12 @@ public class WorkshopVpkAddon : VpkAddon
 
         var addonTaskCreator = this.GetValidTaskCreator();
 
-        if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false)) is { } pfd)
+        if ((await GetPublishedFileDetailsAllowCacheAsync(cancellationToken).ConfigureAwait(false))?.Title is { } title)
         {
-            var title = pfd.Title;
-            if (title.Length > 0)
+            title = SanitizeName(title, out bool empty);
+            if (!empty)
             {
-                title = title.Trim();
-                if (title.Length > 0)
-                {
-                    title = FileSystemUtils.SanitizeFileName(title);
-                    if (title.Length > 0)
-                    {
-                        return title;
-                    }
-                }
+                return title;
             }
         }
 
@@ -439,39 +425,42 @@ public class WorkshopVpkAddon : VpkAddon
         return await baseTask.ConfigureAwait(false);
     }
 
-    public void CheckDownload()
+    public Task CheckDownloadAsync()
     {
         this.ThrowIfInvalid();
 
-        _vpkNotLoadProblemSource.Clear();
-
         if (_publishedFileId.HasValue)
         {
-            if (_downloadCheckTask == null)
+            if (DownloadCheckTask is null)
             {
                 var addonTaskCreator = this.GetValidTaskCreator();
-                _downloadCheckTask = RunDownloadCheckTask(_publishedFileId.Value, addonTaskCreator);
-                _downloadCheckTask.ContinueWith(task => addonTaskCreator.StartNew(self =>
+                var checkTask = RunDownloadCheckTask(_publishedFileId.Value, addonTaskCreator);
+                DownloadCheckTask = checkTask;
+                checkTask.ContinueWith(_ =>
                 {
-                    if (self._downloadCheckTask == task)
+                    if (DownloadCheckTask == checkTask)
                     {
-                        self._downloadCheckTask = null;
+                        DownloadCheckTask = null;
                     }
-                }));
+                }, Root.TaskScheduler);
             }
         }
 
-        if (FullVpkFilePath == null)
+        WorkshopVpkNotLoadedProblem? vpkNotLoadedProblem = null;
+        if (FullVpkFilePath is null)
         {
-            new WorkshopVpkNotLoadProblem(_vpkNotLoadProblemSource).Submit();
+            vpkNotLoadedProblem = new(this);
         }
+        SetProblem(vpkNotLoadedProblem);
+
+        return DownloadCheckTask ?? Task.CompletedTask;
     }
 
-    protected override void OnCheck()
+    protected override void OnCheck(Action<Task> taskSubmitter)
     {
-        base.OnCheck();
+        base.OnCheck(taskSubmitter);
 
-        CheckDownload();
+        taskSubmitter(CheckDownloadAsync());
     }
 
     private async Task RunDownloadCheckTask(ulong publishedFileId, ValidTaskCreator<WorkshopVpkAddon> addonTaskCreator)
@@ -489,17 +478,14 @@ public class WorkshopVpkAddon : VpkAddon
         string imageCacheFilePath = GetImageCacheFilePath();
         var httpClient = Root.HttpClient;
         var cancellationToken = DestructionCancellationToken;
-        var details = PublishedFileDetailsCache;
-        Task<GetPublishedFileDetailsResult>? getDetailsTask = null;
-        if (details is null)
+        var pfd = PublishedFileDetailsCache;
+        Task<GetPublishedFileDetailsResult>? getPfdTask = null;
+        if (pfd is null)
         {
-            getDetailsTask = GetPublishedFileDetailsAsync(cancellationToken);
+            getPfdTask = GetPublishedFileDetailsAsync(cancellationToken);
         }
         var downloadService = Root.DownloadService;
         bool invalid = false;
-
-        _invalidPublishedFileIdProblemSource.Clear();
-        _downloadFailedProblemSource.Clear();
 
         try
         {
@@ -521,14 +507,14 @@ public class WorkshopVpkAddon : VpkAddon
 
             CurrentVpkFileName = metaInfo?.CurrentFile;
 
-            if (getDetailsTask is not null)
+            if (getPfdTask is not null)
             {
                 invalid = await addonTaskCreator.StartNew(self => blockMove.Dispose()).ConfigureAwait(false);
                 if (invalid)
                 {
                     return;
                 }
-                var result = await getDetailsTask.ConfigureAwait(false);
+                var result = await getPfdTask.ConfigureAwait(false);
                 invalid = await addonTaskCreator.StartNew(self =>
                 {
                     blockMove = self.BlockMove();
@@ -541,18 +527,29 @@ public class WorkshopVpkAddon : VpkAddon
 
                 if (result.IsSucceeded)
                 {
-                    details = result.Content;
+                    pfd = result.Content;
                 }
                 else
                 {
                     if (result.Status == GetPublishedFileDetailsResultStatus.InvalidPublishedFileId)
                     {
-                        invalid = await addonTaskCreator.StartNew(self => new InvalidPublishedFileIdProblem(self._invalidPublishedFileIdProblemSource).Submit()).ConfigureAwait(false);
+                        invalid = await addonTaskCreator.StartNew(self => self.SetProblem(new InvalidPublishedFileIdProblem(self, publishedFileId)))
+                            .ConfigureAwait(false);
                         if (invalid)
                         {
                             return;
                         }
                     }
+                }
+            }
+
+            if (pfd is not null)
+            {
+                invalid = await addonTaskCreator.StartNew(self => self.InvalidateProblem<InvalidPublishedFileIdProblem>())
+                    .ConfigureAwait(false);
+                if (invalid)
+                {
+                    return;
                 }
             }
 
@@ -599,7 +596,7 @@ public class WorkshopVpkAddon : VpkAddon
                 }
             }
 
-            if (details is not null)
+            if (pfd is not null)
             {
                 invalid = await addonTaskCreator.StartNew(self =>
                 {
@@ -607,12 +604,7 @@ public class WorkshopVpkAddon : VpkAddon
                     {
                         blockMove.Dispose();
 
-                        var name = FileSystemUtils.SanitizeFileName(details.Title);
-                        if (name.Length == 0)
-                        {
-                            name = "UNNAMED";
-                        }
-                        name = self.Parent.GetUniqueNodeName(name);
+                        var name = self.Parent.GetUniqueChildName(pfd.Title);
                         try
                         {
                             self.Name = name;
@@ -628,12 +620,12 @@ public class WorkshopVpkAddon : VpkAddon
 
                     if (self.RequestApplyTagsFromWorkshop)
                     {
-                        var tags = details.Tags;
+                        var tags = pfd.Tags;
                         if (tags is not null)
                         {
                             foreach (var tagObj in tags)
                             {
-                                self.AddTag(tagObj.Tag);
+                                self.AddTag(tagObj?.Tag);
                             }
                             self.RequestApplyTagsFromWorkshop = false;
                         }
@@ -645,7 +637,7 @@ public class WorkshopVpkAddon : VpkAddon
                 }
 
                 byte[]? image = null;
-                string imageUrl = details.PreviewUrl;
+                string imageUrl = pfd.PreviewUrl;
                 try
                 {
                     invalid = await addonTaskCreator.StartNew(self => blockMove.Dispose()).ConfigureAwait(false);
@@ -702,7 +694,7 @@ public class WorkshopVpkAddon : VpkAddon
                     {
                         needDownload = true;
                     }
-                    if (metaInfo.TimeUpdated != details.TimeUpdated)
+                    if (metaInfo.TimeUpdated != pfd.TimeUpdated)
                     {
                         bool isAutoUpdate = false;
                         invalid = await addonTaskCreator.StartNew(self => isAutoUpdate = self.IsAutoUpdateActually).ConfigureAwait(false);
@@ -723,7 +715,7 @@ public class WorkshopVpkAddon : VpkAddon
 
                 if (needDownload)
                 {
-                    string downloadFileName = $"{details.Title}-time_updated-{details.TimeUpdated}.vpk";
+                    string downloadFileName = $"{pfd.Title}-time_updated-{pfd.TimeUpdated}.vpk";
                     downloadFileName = FileSystemUtils.SanitizeFileName(downloadFileName);
                     if (downloadFileName == "")
                     {
@@ -731,7 +723,7 @@ public class WorkshopVpkAddon : VpkAddon
                     }
                     downloadFileName = FileSystemUtils.GetUniqueFileName(downloadFileName, dirPath);
                     string downloadFilePath = Path.Join(dirPath, downloadFileName);
-                    string url = details.FileUrl;
+                    string url = pfd.FileUrl;
 
                     using (var download = downloadService.Download(url, downloadFilePath))
                     {
@@ -752,21 +744,28 @@ public class WorkshopVpkAddon : VpkAddon
                             metaInfo = new WorkshopVpkMetaInfo()
                             {
                                 PublishedFileId = publishedFileId,
-                                TimeUpdated = details.TimeUpdated,
+                                TimeUpdated = pfd.TimeUpdated,
                                 CurrentFile = downloadFileName
                             };
                             File.WriteAllText(metaInfoPath, JsonConvert.SerializeObject(metaInfo, s_metaInfoJsonSettings));
                             DeleteDownloadTempFiles(true);
+
+                            invalid = await addonTaskCreator.StartNew(self => self.InvalidateProblem<AddonDownloadFailedProblem>())
+                                .ConfigureAwait(false);
+                            if (invalid)
+                            {
+                                return;
+                            }
                         }
                         else if (status == DownloadStatus.Failed)
                         {
                             invalid = await addonTaskCreator.StartNew(
-                                self => new AddonDownloadFailedProblem(self._downloadFailedProblemSource)
+                                self => self.SetProblem(new AddonDownloadFailedProblem(self)
                                 {
                                     Url = url,
                                     FilePath = downloadFilePath,
                                     Exception = download.Exception
-                                }.Submit()).ConfigureAwait(false);
+                                })).ConfigureAwait(false);
                             if (invalid)
                             {
                                 return;
@@ -777,6 +776,13 @@ public class WorkshopVpkAddon : VpkAddon
                 else
                 {
                     DeleteDownloadTempFiles(true);
+
+                    invalid = await addonTaskCreator.StartNew(self => self.InvalidateProblem<AddonDownloadFailedProblem>())
+                        .ConfigureAwait(false);
+                    if (invalid)
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -785,7 +791,7 @@ public class WorkshopVpkAddon : VpkAddon
                 invalid = await addonTaskCreator.StartNew(self =>
                 {
                     self.CurrentVpkFileName = metaInfo.CurrentFile;
-                    self._vpkNotLoadProblemSource.Clear();
+                    self.InvalidateProblem<WorkshopVpkNotLoadedProblem>();
                 }).ConfigureAwait(false);
                 if (invalid)
                 {
@@ -888,9 +894,9 @@ public class WorkshopVpkAddon : VpkAddon
         var tasks = new List<Task>();
 
         _download?.Cancel();
-        if (_downloadCheckTask != null)
+        if (DownloadCheckTask is { } downloadCheckTask)
         {
-            tasks.Add(_downloadCheckTask);
+            tasks.Add(downloadCheckTask);
         }
 
         if (_getPublishedFileDetailsTask != null)
