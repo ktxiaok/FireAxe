@@ -17,8 +17,6 @@ public partial class AddonProblemListWindow : ReactiveWindow<AddonProblemListVie
     {
         InitializeComponent();
 
-        Closed += AddonProblemListWindow_Closed;
-
         this.WhenActivated((CompositeDisposable disposables) =>
         {
 
@@ -32,21 +30,6 @@ public partial class AddonProblemListWindow : ReactiveWindow<AddonProblemListVie
             {
                 return;
             }
-
-            viewModel.ShowExceptionInteraction.RegisterHandler(async context =>
-            {
-                await CommonMessageBoxes.ShowException(this, context.Input);
-                context.SetOutput(Unit.Default);
-            }).DisposeWith(disposables);
         });
-    }
-
-    private void AddonProblemListWindow_Closed(object? sender, EventArgs e)
-    {
-        if (ViewModel is { } viewModel)
-        {
-            ViewModel = null;
-            viewModel.Dispose();
-        }
     }
 }

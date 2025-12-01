@@ -1112,4 +1112,13 @@
   <data name="NoItemsToFix" xml:space="preserve">
     <value>There are no items to fix.</value>
   </data>
+  <data name="Checking" xml:space="preserve">
+    <value>Checking...</value>
+  </data>
+  <data name="InvalidPublishedFileIdProblemExplain" xml:space="preserve">
+    <value>Invalid Published File ID: {0}</value>
+  </data>
+  <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
+    <value>The reference source is invalid.</value>
+  </data>
 </root>

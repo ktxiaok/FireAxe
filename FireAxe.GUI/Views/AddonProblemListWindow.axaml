@@ -66,13 +66,13 @@
         <Control Width="10"/>
 
         <TextBlock
-          Text="{x:Static r:Texts.RefreshingHint}"
-          IsVisible="{Binding IsRefreshing, FallbackValue=False}"
+          Text="{x:Static r:Texts.Checking}"
+          IsVisible="{Binding AddonRoot.CheckTask, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"
           VerticalAlignment="Center"
           Margin="0, 0, 5, 0"/>
         <Button
-          Command="{Binding RefreshCommand}"
-          Content="{x:Static r:Texts.Refresh}"/>
+          Command="{Binding Check}"
+          Content="{x:Static r:Texts.Check}"/>
       </StackPanel>
     </DockPanel>
 
@@ -130,7 +130,7 @@
             </ItemsControl>
             <TextBlock
               Classes="EmptyHint"
-              IsVisible="{Binding ProblemViewModels, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"/>
+              IsVisible="{Binding ProblemViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"/>
           </Panel>
 
           <Panel IsVisible="{Binding #problematicAddonsTab.IsSelected}">
@@ -150,7 +150,7 @@
             </ItemsControl>
             <TextBlock
               Classes="EmptyHint"
-              IsVisible="{Binding ProblematicAddonViewModels, Converter={x:Static conv:CollectionConverters.IsEnumerableEmpty}, FallbackValue=True}"/>
+              IsVisible="{Binding ProblematicAddonViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=True}"/>
           </Panel>
         </Panel>
       </ScrollViewer>

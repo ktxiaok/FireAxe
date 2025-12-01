@@ -166,7 +166,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 AddonNode.LoadSave(nodeSave, addonRoot, importedGroup);
             }
-            _ = addonRoot.CheckAsync();
+            addonRoot.Check();
         }, _addonRootNotNullObservable);
 
         OpenSettingsWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenSettingsWindow());
@@ -396,7 +396,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                     throw;
                 }
 
-                _addonRoot.CheckAsync();
+                _addonRoot.Check();
 
                 AddonNodeExplorerViewModel = new(_addonRoot);
             }
@@ -632,7 +632,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             await ShowImportErrorInteraction.Handle(ex);
             return;
         }
-        _ = _addonRoot.CheckAsync();
+        _addonRoot.Check();
         await ShowImportResultInteraction.Handle(result);
     }
 
@@ -643,7 +643,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             return;
         }
         
-        _ = _addonRoot.CheckAsync();
+        _addonRoot.Check();
         try
         {
             _addonRoot.Push();
@@ -664,12 +664,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public void Check()
     {
-        if (_addonRoot == null)
-        {
-            return;
-        }
-
-        _addonRoot.CheckAsync();
+        AddonRoot?.Check();
     }
 
     public void ClearCaches()

@@ -4,7 +4,7 @@ namespace FireAxe;
 
 public class AddonDownloadFailedProblem : AddonProblem
 {
-    public AddonDownloadFailedProblem(AddonProblemSource problemSource) : base(problemSource)
+    public AddonDownloadFailedProblem(AddonNode addon) : base(addon)
     {
 
     }

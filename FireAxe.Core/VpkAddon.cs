@@ -19,15 +19,11 @@ public abstract class VpkAddon : AddonNode
 
     private readonly WeakReference<VpkAddonInfo?> _addonInfo = new(null);
 
-    internal readonly AddonProblemSource<VpkAddon> _vpkAddonConflictProblemSource;
-
     protected VpkAddon()
     {
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
         _conflictingFilesWithAddonIdsReadOnly = new(_conflictingFilesWithAddonIds);
         _conflictingAddonIdsWithFilesReadOnly = new(_conflictingAddonIdsWithFiles);
-
-        _vpkAddonConflictProblemSource = new(this);
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;

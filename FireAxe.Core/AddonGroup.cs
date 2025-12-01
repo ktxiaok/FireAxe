@@ -10,117 +10,15 @@ namespace FireAxe;
 
 public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInternal
 {
-    public class EnableStrategyProblem : AddonProblem
-    {
-        public EnableStrategyProblem(AddonProblemSource<AddonGroup> problemSource) : base(problemSource)
-        {
-
-        }
-
-        public new AddonGroup Addon => (AddonGroup)base.Addon;
-
-        protected override bool OnAutomaticallyFix()
-        {
-            var group = Addon;
-            switch (group.EnableStrategy)
-            {
-                case AddonGroupEnableStrategy.Single:
-                case AddonGroupEnableStrategy.SingleRandom:
-                    {
-                        foreach (var child in group.Children)
-                        {
-                            child.IsEnabled = false;
-                        }
-                        break;
-                    }
-                case AddonGroupEnableStrategy.All:
-                    {
-                        bool enabled = group.IsEnabled;
-                        foreach (var child in group.Children)
-                        {
-                            child.IsEnabled = enabled;
-                        }
-                        break;
-                    }
-            }
-            return !HasProblem(group);
-        }
-
-        public static EnableStrategyProblem? TryCreate(AddonProblemSource<AddonGroup> problemSource)
-        {
-            ArgumentNullException.ThrowIfNull(problemSource);
-
-            if (HasProblem(problemSource.Addon))
-            {
-                return new EnableStrategyProblem(problemSource);
-            }
-
-            return null;
-        }
-
-        public static bool HasProblem(AddonGroup group)
-        {
-            ArgumentNullException.ThrowIfNull(group);
-
-            switch (group.EnableStrategy)
-            {
-                case AddonGroupEnableStrategy.Single:
-                case AddonGroupEnableStrategy.SingleRandom:
-                    {
-                        int enabledCount = 0;
-                        foreach (var child in group.Children)
-                        {
-                            if (child.IsEnabled)
-                            {
-                                enabledCount++;
-                            }
-                            if (enabledCount > 1)
-                            {
-                                return true;
-                            }
-                        }
-                        break;
-                    }
-                case AddonGroupEnableStrategy.All:
-                    {
-                        int enabledCount = 0;
-                        foreach (var child in group.Children)
-                        {
-                            if (child.IsEnabled)
-                            {
-                                ++enabledCount;
-                            }
-                        }
-                        if (group.IsEnabled)
-                        {
-                            ++enabledCount;
-                        }
-                        if (enabledCount != 0 && enabledCount != group.Children.Count + 1)
-                        {
-                            return true;
-                        }
-                        break;
-                    }
-            }
-            return false;
-        }
-    }
-
     private readonly AddonNodeContainerService _containerService;
 
     private AddonGroupEnableStrategy _enableStrategy = AddonGroupEnableStrategy.None;
 
     private bool _isBusyHandlingChildEnableOrDisable = false;
 
-    private readonly AddonProblemSource<AddonGroup> _childrenProblemSource;
-    private readonly AddonProblemSource<AddonGroup> _enableStrategyProblemSource;
-
     protected AddonGroup()
     {
         _containerService = new(this);
-
-        _childrenProblemSource = new(this);
-        _enableStrategyProblemSource = new(this);
 
         ((INotifyCollectionChanged)Children).CollectionChanged += OnCollectionChanged;
         PropertyChanged += OnPropertyChanged;
@@ -218,12 +116,12 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
     {
         this.ThrowIfInvalid();
 
-        _childrenProblemSource.Clear();
+        InvalidateProblem<AddonChildrenProblem>();
         foreach (var child in Children)
         {
             if (child.Problems.Count > 0)
             {
-                new AddonChildrenProblem(_childrenProblemSource).Submit();
+                SetProblem(new AddonChildrenProblem(this));
                 break;
             }
         }
@@ -233,13 +131,12 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
     {
         this.ThrowIfInvalid();
 
-        _enableStrategyProblemSource.Clear();
-        EnableStrategyProblem.TryCreate(_enableStrategyProblemSource)?.Submit();
+        SetProblem(AddonGroupEnableStrategyProblem.TryCreate(this));
     }
 
-    protected override void OnCheck()
+    protected override void OnCheck(Action<Task> taskSubmitter)
     {
-        base.OnCheck();
+        base.OnCheck(taskSubmitter);
 
         if (Root.IsDirectoryPathSet)
         {
@@ -255,9 +152,9 @@ public class AddonGroup : AddonNode, IAddonNodeContainer, IAddonNodeContainerInt
         }
     }
 
-    protected override void OnPostCheck()
+    protected override void OnPostCheck(Action<Task> taskSubmitter)
     {
-        base.OnPostCheck();
+        base.OnPostCheck(taskSubmitter);
 
         CheckChildrenProblems();
 

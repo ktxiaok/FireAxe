@@ -178,6 +178,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The reference source is invalid..
+        /// </summary>
+        public static string AddonInvalidRefSourceProblemExplain {
+            get {
+                return ResourceManager.GetString("AddonInvalidRefSourceProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The addon {0} denied the move or renaming. There may be ongoing tasks(like download tasks). Please try again later..
         /// </summary>
         public static string AddonMoveDeniedMessage {
@@ -454,6 +463,15 @@ namespace FireAxe.Resources {
         public static string CheckForUpdates {
             get {
                 return ResourceManager.GetString("CheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking....
+        /// </summary>
+        public static string Checking {
+            get {
+                return ResourceManager.GetString("Checking", resourceCulture);
             }
         }
         
@@ -1787,6 +1805,15 @@ namespace FireAxe.Resources {
         public static string InvalidPublishedFileIdMessage {
             get {
                 return ResourceManager.GetString("InvalidPublishedFileIdMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Published File ID: {0}.
+        /// </summary>
+        public static string InvalidPublishedFileIdProblemExplain {
+            get {
+                return ResourceManager.GetString("InvalidPublishedFileIdProblemExplain", resourceCulture);
             }
         }
         

@@ -6,6 +6,10 @@ using System.ComponentModel;
 
 namespace FireAxe;
 
+/// <summary>
+/// Once an element becomes invalid, it will be removed automatically.
+/// After disposal, this collection will dispose all the subscriptions of elements and become read-only.
+/// </summary>
 public sealed class ObservableValidRefCollection<T>
     : IList<T>, IReadOnlyList<T>, INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     where T : class, IValidity, INotifyPropertyChanged
@@ -51,6 +55,11 @@ public sealed class ObservableValidRefCollection<T>
             ThrowIfCannotModify();
 
             var oldItem = _collection[index];
+            if (EqualityComparer<T>.Default.Equals(value, oldItem))
+            {
+                return;
+            }
+
             if (value.IsValid)
             {
                 SubscribeIfNot(value);
@@ -122,6 +131,11 @@ public sealed class ObservableValidRefCollection<T>
     public bool Contains(T item)
     {
         ArgumentNullException.ThrowIfNull(item);
+
+        if (_disposed)
+        {
+            return _collection.Contains(item);
+        }
 
         return _subscriptions.ContainsKey(item);
     }

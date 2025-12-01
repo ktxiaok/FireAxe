@@ -2,7 +2,7 @@
 
 namespace FireAxe;
 
-public class VpkAddonConflictProblem(AddonProblemSource<VpkAddon> problemSource) : AddonProblem(problemSource)
+public class VpkAddonConflictProblem(VpkAddon addon) : AddonProblem(addon)
 {
     public new VpkAddon Addon => (VpkAddon)base.Addon;
 }

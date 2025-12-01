@@ -1112,4 +1112,13 @@
   <data name="NoItemsToFix" xml:space="preserve">
     <value>没有可修复的项。</value>
   </data>
+  <data name="Checking" xml:space="preserve">
+    <value>检查中...</value>
+  </data>
+  <data name="InvalidPublishedFileIdProblemExplain" xml:space="preserve">
+    <value>无效的发布文件ID：{0}</value>
+  </data>
+  <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
+    <value>无效的引用源。</value>
+  </data>
 </root>

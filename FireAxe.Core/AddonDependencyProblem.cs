@@ -2,9 +2,9 @@
 
 namespace FireAxe;
 
-public class AddonDependenciesProblem : AddonProblem
+public class AddonDependencyProblem : AddonProblem
 {
-    public AddonDependenciesProblem(AddonProblemSource problemSource) : base(problemSource)
+    public AddonDependencyProblem(AddonNode addon) : base(addon)
     {
 
     }

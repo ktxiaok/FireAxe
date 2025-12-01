@@ -209,6 +209,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public event Action<AddonNode>? NewNodeIdRegistered = null;
 
+    public event Action<AddonProblem>? ProblemProduced = null;
+
     public event Action? Pushed = null;
 
     public bool TryGetNodeById(Guid id, [NotNullWhen(true)] out AddonNode? node)
@@ -273,11 +275,14 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         return true;
     }
 
-    public bool RemoveCustomTag(string tag)
+    public bool RemoveCustomTag(string? tag)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-
         this.ThrowIfInvalid();
+
+        if (string.IsNullOrEmpty(tag))
+        {
+            return false;
+        }
 
         bool result = _customTagSet.Remove(tag);
         if (result)
@@ -367,14 +372,24 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         return _containerService.GetUniqueChildName(name, ignoreFileSystem);
     }
 
-    public Task CheckAsync()
+    public void Check()
     {
         this.ThrowIfInvalid();
 
-        this.CheckDescendants();
-        var vpkConflictsCheckTask = CheckVpkAddonConflictsAsync();
+        var tasks = new List<Task>();
 
-        var checkTask = Task.WhenAll(vpkConflictsCheckTask);
+        this.CheckDescendants();
+        foreach (var node in this.GetDescendants())
+        {
+            if (node.CheckTask is { } task)
+            {
+                tasks.Add(task);
+            }
+        }
+
+        tasks.Add(CheckVpkAddonConflictsAsync());
+
+        var checkTask = Task.WhenAll(tasks);
         CheckTask = checkTask;
         checkTask.ContinueWith(_ =>
         {
@@ -388,7 +403,6 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 Log.Error(ex, "Exception occurred during checking the AddonRoot.");
             }
         }, TaskScheduler);
-        return checkTask;
     }
 
     public Task<VpkAddonConflictResult> CheckVpkAddonConflictsAsync()
@@ -409,7 +423,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         {
             if (addon is VpkAddon vpkAddon)
             {
-                vpkAddon._vpkAddonConflictProblemSource.Clear();
+                vpkAddon.InvalidateProblem<VpkAddonConflictProblem>();
                 vpkAddon._conflictingAddonIdsWithFiles.Clear();
                 vpkAddon._conflictingFilesWithAddonIds.Clear();
             }
@@ -426,7 +440,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 {
                     foreach (var vpkAddon in conflictResult.ConflictingAddons)
                     {
-                        new VpkAddonConflictProblem(vpkAddon._vpkAddonConflictProblemSource).Submit();
+                        vpkAddon.SetProblem(new VpkAddonConflictProblem(vpkAddon));
 
                         vpkAddon._conflictingFilesWithAddonIds.Clear();
                         foreach (var (file, addons) in conflictResult.GetConflictingFilesWithAddons(vpkAddon))
@@ -1403,6 +1417,11 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     internal void NotifyNewNodeIdRegistered(AddonNode node)
     {
         NewNodeIdRegistered?.Invoke(node);
+    }
+
+    internal void NotifyProblemProduced(AddonProblem problem)
+    {
+        ProblemProduced?.Invoke(problem);
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

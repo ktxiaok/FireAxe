@@ -4,8 +4,10 @@ namespace FireAxe;
 
 public class AddonCircularRefProblem : AddonProblem
 {
-    public AddonCircularRefProblem(AddonProblemSource<RefAddonNode> problemSource) : base(problemSource)
+    public AddonCircularRefProblem(RefAddonNode addon) : base(addon)
     {
 
     }
+
+    public new RefAddonNode Addon => (RefAddonNode)base.Addon;
 }

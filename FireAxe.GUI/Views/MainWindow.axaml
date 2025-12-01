@@ -96,6 +96,11 @@
             Text="{x:Static r:Texts.NoProblemFound}"
             VerticalAlignment="Center"/>
         </StackPanel>
+        <TextBlock
+          Text="{x:Static r:Texts.Checking}"
+          IsVisible="{Binding AddonRoot.CheckTask, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"
+          Margin="5, 0, 5, 0"
+          VerticalAlignment="Center"/>
         <Button
           Command="{Binding OpenProblemListWindowCommand}"
           IsVisible="{Binding AddonRoot.ProblemCount, Converter={x:Static conv:CollectionConverters.IsNotEmpty}, FallbackValue=False}"
