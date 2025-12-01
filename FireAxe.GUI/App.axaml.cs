@@ -64,7 +64,7 @@ public partial class App : Application
                     {
                         var appSettings = services.GetRequiredService<AppSettings>();
                         var socketsHttpHandler = new SocketsHttpHandler();
-                        if (appSettings.WebProxy is { } webProxy)
+                        if (appSettings.GetWebProxy() is { } webProxy)
                         {
                             socketsHttpHandler.UseProxy = true;
                             socketsHttpHandler.Proxy = webProxy;

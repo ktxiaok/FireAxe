@@ -1458,6 +1458,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Game Information.
+        /// </summary>
+        public static string GameInformation {
+            get {
+                return ResourceManager.GetString("GameInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Game Path.
         /// </summary>
         public static string GamePath {
@@ -2907,6 +2916,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User Interface.
+        /// </summary>
+        public static string UserInterface {
+            get {
+                return ResourceManager.GetString("UserInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value must be an integer..
         /// </summary>
         public static string ValueMustBeInteger {
@@ -2939,6 +2957,15 @@ namespace FireAxe.Resources {
         public static string ViewsColon {
             get {
                 return ResourceManager.GetString("ViewsColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VPK Addon Conflict.
+        /// </summary>
+        public static string VpkAddonConflict {
+            get {
+                return ResourceManager.GetString("VpkAddonConflict", resourceCulture);
             }
         }
         
@@ -2979,11 +3006,38 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Web Proxy.
+        /// </summary>
+        public static string WebProxy {
+            get {
+                return ResourceManager.GetString("WebProxy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Web Proxy Address.
         /// </summary>
         public static string WebProxyAddress {
             get {
                 return ResourceManager.GetString("WebProxyAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web Proxy Credential Password.
+        /// </summary>
+        public static string WebProxyCredentialPassword {
+            get {
+                return ResourceManager.GetString("WebProxyCredentialPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Web Proxy Credential User Name.
+        /// </summary>
+        public static string WebProxyCredentialUserName {
+            get {
+                return ResourceManager.GetString("WebProxyCredentialUserName", resourceCulture);
             }
         }
         

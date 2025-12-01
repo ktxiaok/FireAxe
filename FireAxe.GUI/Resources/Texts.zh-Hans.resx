@@ -1124,4 +1124,22 @@
   <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
     <value>根据选中的模组来创建引用模组</value>
   </data>
+  <data name="UserInterface" xml:space="preserve">
+    <value>用户界面</value>
+  </data>
+  <data name="GameInformation" xml:space="preserve">
+    <value>游戏信息</value>
+  </data>
+  <data name="VpkAddonConflict" xml:space="preserve">
+    <value>VPK模组冲突</value>
+  </data>
+  <data name="WebProxy" xml:space="preserve">
+    <value>Web代理</value>
+  </data>
+  <data name="WebProxyCredentialUserName" xml:space="preserve">
+    <value>Web代理认证用户名</value>
+  </data>
+  <data name="WebProxyCredentialPassword" xml:space="preserve">
+    <value>Web代理认证密码</value>
+  </data>
 </root>

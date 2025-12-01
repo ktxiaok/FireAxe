@@ -15,6 +15,7 @@ using System.Reactive;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe;
 
@@ -53,7 +54,6 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
     private bool _isAutoRedownload = false;
     private Uri? _webProxyUri = null;
-    private IWebProxy? _webProxy = null;
     private bool _isFileBackupEnabled = true;
     private int _maxRetainedBackupFileCount = 25;
     private int _fileBackupIntervalMinutes = 30;
@@ -313,21 +313,20 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
         }
     }
 
+    [AllowNull]
     [JsonProperty]
     public string WebProxyAddress
     {
         get => _webProxyUri?.OriginalString ?? "";
         set
         {
-            ArgumentNullException.ThrowIfNull(value);
-
+            value ??= "";
             if (value == WebProxyAddress)
             {
                 return;
             }
 
             Uri? uri = null;
-            IWebProxy? proxy = null;
             if (value.Length > 0)
             {
                 try
@@ -338,18 +337,44 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
                 {
                     throw new ArgumentException(Texts.InvalidUri);
                 }
-                proxy = new WebProxy(uri);
             }
 
             _webProxyUri = uri;
-            _webProxy = proxy;
-
             NotifyChanged();
-            NotifyChanged(nameof(WebProxy));
+
+            RequestSave = true;
         }
     }
 
-    public IWebProxy? WebProxy => _webProxy;
+    [AllowNull]
+    [JsonProperty]
+    public string WebProxyCredentialUserName
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                RequestSave = true;
+            }
+        }
+    } = "";
+
+    [AllowNull]
+    [JsonProperty]
+    public string WebProxyCredentialPassword
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                RequestSave = true;
+            }
+        }
+    } = "";
 
     [JsonProperty]
     public bool IsFileBackupEnabled

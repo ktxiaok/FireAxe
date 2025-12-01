@@ -1124,4 +1124,22 @@
   <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
     <value>Create Reference Addons Based on Selected Addons</value>
   </data>
+  <data name="UserInterface" xml:space="preserve">
+    <value>User Interface</value>
+  </data>
+  <data name="GameInformation" xml:space="preserve">
+    <value>Game Information</value>
+  </data>
+  <data name="VpkAddonConflict" xml:space="preserve">
+    <value>VPK Addon Conflict</value>
+  </data>
+  <data name="WebProxy" xml:space="preserve">
+    <value>Web Proxy</value>
+  </data>
+  <data name="WebProxyCredentialUserName" xml:space="preserve">
+    <value>Web Proxy Credential User Name</value>
+  </data>
+  <data name="WebProxyCredentialPassword" xml:space="preserve">
+    <value>Web Proxy Credential Password</value>
+  </data>
 </root>
