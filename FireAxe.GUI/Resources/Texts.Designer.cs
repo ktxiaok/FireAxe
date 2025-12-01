@@ -674,6 +674,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create Reference Addons Based on Selected Addons.
+        /// </summary>
+        public static string CreateRefAddonsBasedOnSelectedAddons {
+            get {
+                return ResourceManager.GetString("CreateRefAddonsBasedOnSelectedAddons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Creating....
         /// </summary>
         public static string Creating {

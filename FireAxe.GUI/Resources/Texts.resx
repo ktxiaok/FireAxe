@@ -1121,4 +1121,7 @@
   <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
     <value>The reference source is invalid.</value>
   </data>
+  <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
+    <value>Create Reference Addons Based on Selected Addons</value>
+  </data>
 </root>

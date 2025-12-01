@@ -188,6 +188,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
         NewWorkshopCollectionCommand = ReactiveCommand.CreateFromTask(async () => await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup)));
 
+        CreateRefAddonsBasedOnSelectedCommand = ReactiveCommand.Create(() => { CreateRefAddonsBasedOnSelected(); }, this.WhenAnyValue(x => x.HasSelection));
+
         DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, this.WhenAnyValue(x => x.HasSelection));
 
         SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null));
@@ -464,6 +466,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
     public ReactiveCommand<Unit, Unit> NewWorkshopCollectionCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> CreateRefAddonsBasedOnSelectedCommand { get; }
+
     public ReactiveCommand<bool, Unit> DeleteCommand { get; }
 
     public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToDefaultRecursivelyCommand { get; }
@@ -557,6 +561,19 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         addon.RequestAutoSetName = true;
         SelectNode(addon);
         return addon;
+    }
+
+    public IReadOnlyList<AddonNode> CreateRefAddonsBasedOnSelected()
+    {
+        var selected = SelectedNodes.ToArray();
+        using var blockAutoCheck = AddonRoot.BlockAutoCheck();
+        var addons = RefAddonNode.CreateBasedOn(selected, CurrentGroup);
+        foreach (var addon in addons)
+        {
+            addon.CheckSelfAndDescendants();
+        }
+        SelectNodes(addons);
+        return addons;
     }
 
     public async Task Delete(bool retainFile)

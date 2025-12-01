@@ -23,6 +23,17 @@ public static class AddonNodeExtensions
         }
     }
 
+    public static void CheckSelfAndDescendants(this AddonNode addon)
+    {
+        ArgumentNullException.ThrowIfNull(addon);
+
+        if (addon is IAddonNodeContainer container)
+        {
+            container.CheckDescendants();
+        }
+        addon.Check();
+    }
+
     public static ValidTaskCreator<T> GetValidTaskCreator<T>(this T addon) where T : AddonNode
     {
         ArgumentNullException.ThrowIfNull(addon);

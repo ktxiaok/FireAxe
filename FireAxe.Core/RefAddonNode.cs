@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 
 namespace FireAxe;
 
@@ -95,6 +96,111 @@ public class RefAddonNode : AddonNode
             }
             return null;
         }
+    }
+
+    public static IReadOnlyList<AddonNode> CreateBasedOn(IEnumerable<AddonNode> sources, AddonGroup? parentGroup)
+    {
+        AddonRoot? root = null;
+        if (parentGroup is not null)
+        {
+            parentGroup.ThrowIfInvalid();
+            root = parentGroup.Root;
+        }
+        ArgumentNullException.ThrowIfNull(sources);
+        var sourceArray = sources.ToArray();
+        foreach (var source in sourceArray)
+        {
+            source.ThrowIfInvalid();
+            if (root is null)
+            {
+                root = source.Root;
+            }
+            else if (source.Root != root)
+            {
+                throw new InvalidOperationException("different AddonRoot");
+            }
+        }
+        if (root is null)
+        {
+            return [];
+        }
+
+        var targets = new List<AddonNode>(sourceArray.Length);
+        var sourceToTarget = new Dictionary<AddonNode, AddonNode>();
+        var dependenciesSettingTodos = new List<(AddonNode Addon, IEnumerable<AddonNode> Dependencies)>();
+        foreach (var source in sourceArray.SelectMany(addon => addon.GetSelfAndDescendantsByDfsPreorder()))
+        {
+            var sourceParentGroup = source.Group;
+            AddonGroup? targetParentGroup;
+            if (sourceParentGroup is not null && sourceToTarget.TryGetValue(sourceParentGroup, out var sourceParentGroupMapping))
+            {
+                targetParentGroup = (AddonGroup)sourceParentGroupMapping;
+            }
+            else
+            {
+                targetParentGroup = parentGroup;
+            }
+
+            AddonNode target;
+            if (source is AddonGroup)
+            {
+                target = Create<AddonGroup>(root, targetParentGroup);
+            }
+            else
+            {
+                var refAddon = Create<RefAddonNode>(root, targetParentGroup);
+                refAddon.SourceAddonId = source.Id;
+                target = refAddon;
+            }
+
+            try
+            {
+                target.Name = target.Parent.GetUniqueChildName(source.Name);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred during setting the name of the target addon whose source is {SourcePath}.", source.NodePath);
+            }
+
+            if (source.DependentAddonIds.Count > 0)
+            {
+                var dependencies = new List<AddonNode>(source.DependentAddonIds.Count);
+                foreach (var dependency in source.DependentAddons)
+                {
+                    dependencies.Add(dependency);
+                }
+                dependenciesSettingTodos.Add((target, dependencies));
+            }
+
+            sourceToTarget[source] = target;
+
+            if (sourceArray.Contains(source))
+            {
+                targets.Add(target);
+            }
+        }
+
+        foreach (var dependenciesSettingTodo in dependenciesSettingTodos)
+        {
+            var addon = dependenciesSettingTodo.Addon;
+            if (addon is RefAddonNode refAddon)
+            {
+                refAddon.IsDependenciesSyncEnabled = false;
+            }
+            foreach (var dependency in dependenciesSettingTodo.Dependencies)
+            {
+                if (sourceToTarget.TryGetValue(dependency, out var dependencyMapping))
+                {
+                    addon.AddDependentAddon(dependencyMapping.Id);
+                }
+                else
+                {
+                    addon.AddDependentAddon(dependency.Id);
+                }
+            }
+        }
+
+        return targets;
     }
 
     public void CheckRef()

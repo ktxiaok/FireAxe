@@ -1,3 +1,4 @@
+- add: new context menu item: create reference addons based on selected addons
 - improve: import of addons
 - improve: addon problem check system
 - improve: the backup file won't be created if it's the same as the latest one

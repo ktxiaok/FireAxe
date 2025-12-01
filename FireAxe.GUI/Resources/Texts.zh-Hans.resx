@@ -1121,4 +1121,7 @@
   <data name="AddonInvalidRefSourceProblemExplain" xml:space="preserve">
     <value>无效的引用源。</value>
   </data>
+  <data name="CreateRefAddonsBasedOnSelectedAddons" xml:space="preserve">
+    <value>根据选中的模组来创建引用模组</value>
+  </data>
 </root>
