@@ -119,9 +119,11 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 }
             }).DisposeWith(disposables);
 
+
+            bool IsAddonDefaultIconFolder(AddonNode addon) => addon is AddonGroup || (addon is RefAddonNode refAddon && refAddon.ActualSourceAddon is AddonGroup);
             var hasImageObservable = this.WhenAnyValue(x => x.Image).Select(img => img != null);
             _shouldShowUnknownIcon = addonObservable.CombineLatest(hasImageObservable)
-                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is not AddonGroup)
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && !IsAddonDefaultIconFolder(args.Addon))
                 .ToProperty(this, nameof(ShouldShowUnknownIcon));
             this.RaisePropertyChanged(nameof(ShouldShowUnknownIcon));
             _shouldShowImage = addonObservable.CombineLatest(hasImageObservable)
@@ -129,7 +131,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 .ToProperty(this, nameof(ShouldShowImage));
             this.RaisePropertyChanged(nameof(ShouldShowImage));
             _shouldShowFolderIcon = addonObservable.CombineLatest(hasImageObservable)
-                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && args.Addon is AddonGroup)
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && IsAddonDefaultIconFolder(args.Addon))
                 .ToProperty(this, nameof(ShouldShowFolderIcon));
             this.RaisePropertyChanged(nameof(ShouldShowFolderIcon));
 

@@ -286,10 +286,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         set
         {
             ArgumentNullException.ThrowIfNull(value);
-            value = SanitizeName(value);
 
             this.ThrowIfInvalid();
 
+            value = SanitizeName(value);
             if (value == _name)
             {
                 return;

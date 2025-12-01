@@ -181,9 +181,15 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             {
                 if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
                 {
-                    if (listItemViewModel.Addon is AddonGroup addonGroup)
+                    var addon = listItemViewModel.Addon;
+                    if (addon is AddonGroup addonGroup)
                     {
                         viewModel.GotoGroup(addonGroup);
+                        e.Handled = true;
+                    }
+                    else if (addon is RefAddonNode refAddon && refAddon.ActualSourceAddon is AddonGroup sourceAddonGroup)
+                    {
+                        viewModel.GotoGroup(sourceAddonGroup);
                         e.Handled = true;
                     }
                 }
