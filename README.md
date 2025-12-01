@@ -18,6 +18,7 @@ FireAxe (formerly L4D2AddonAssistant) is an open-source GUI tool for managing Le
 - VPK information display
 - Workshop item information display
 - Support search and filters of addons
+- Support reference addons to quickly switch between different play schemes
 - ...
 
 This project is currently in early development. More features will be added in the future.
