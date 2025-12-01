@@ -1142,4 +1142,7 @@
   <data name="WebProxyCredentialPassword" xml:space="preserve">
     <value>Web Proxy Credential Password</value>
   </data>
+  <data name="Hidden" xml:space="preserve">
+    <value>[Hidden]</value>
+  </data>
 </root>

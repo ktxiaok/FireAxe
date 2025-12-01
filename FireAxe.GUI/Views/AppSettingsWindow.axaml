@@ -267,7 +267,7 @@
             Margin="0, 5, 0, 2.5"/>
           <v:EditableTextBlock
             Value="{Binding Settings.WebProxyCredentialPassword}"
-            Display="{Binding Settings.WebProxyCredentialPassword, Converter={x:Static conv:StringConverters.ShowEmpty}}"
+            Display="{x:Static r:Texts.Hidden}"
             Margin="0, 2.5, 0, 5"
             HorizontalAlignment="Left"/>
         </StackPanel>

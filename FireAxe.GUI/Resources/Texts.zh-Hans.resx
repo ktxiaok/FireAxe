@@ -1142,4 +1142,7 @@
   <data name="WebProxyCredentialPassword" xml:space="preserve">
     <value>Web代理认证密码</value>
   </data>
+  <data name="Hidden" xml:space="preserve">
+    <value>[已隐藏]</value>
+  </data>
 </root>

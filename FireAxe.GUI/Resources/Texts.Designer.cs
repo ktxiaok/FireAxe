@@ -1548,6 +1548,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [Hidden].
+        /// </summary>
+        public static string Hidden {
+            get {
+                return ResourceManager.GetString("Hidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (Failed to get the title).
         /// </summary>
         public static string HintFailedGetTitle {
