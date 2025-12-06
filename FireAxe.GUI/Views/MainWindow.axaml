@@ -83,6 +83,7 @@
         <Button
           Command="{Binding CheckCommand}"
           Content="{x:Static r:Texts.Check}"
+          ToolTip.Tip="{x:Static r:Texts.CheckAllTip}"
           Margin="5, 0, 5, 0"/>
         <StackPanel
           Orientation="Horizontal"
@@ -129,6 +130,7 @@
           VerticalAlignment="Center"/>
         <Button
           Command="{Binding PushCommand}"
+          ToolTip.Tip="{x:Static r:Texts.PushTip}"
           Margin="5, 0, 5, 0">
           <StackPanel Orientation="Horizontal">
             <PathIcon Data="{StaticResource icon_arrow_up_circle}"/>
