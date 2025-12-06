@@ -28,9 +28,16 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
 
     private SelectionMode _expectedSelectionMode = SelectionMode.Multiple;
 
+    static AddonNodeExplorerView()
+    {
+        DoubleTappedEvent.AddClassHandler<AddonNodeExplorerView>((x, e) => x.AddonNodeExplorerView_DoubleTapped(e));
+    }
+
     public AddonNodeExplorerView()
     {
         InitializeComponent();
+
+        Focusable = true;
 
         this.WhenAnyValue(x => x.IsSingleSelectionEnabled)
             .Select(singleSelection => singleSelection ? SelectionMode.Single : SelectionMode.Multiple)
@@ -38,19 +45,10 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
-            var topLevel = TopLevel.GetTopLevel(this)!;
-            topLevel.KeyDown += HandleKeyDown;
-
-            Disposable.Create(() =>
-            {
-                topLevel.KeyDown -= HandleKeyDown;
-            }).DisposeWith(disposables);
+            
         });
 
-        this.RegisterViewModelConnection(ConnectViewModel);
-
-        DoubleTapped += AddonNodeExplorerView_DoubleTapped;
-        PointerReleased += AddonNodeExplorerView_PointerReleased;
+        this.RegisterViewModelConnection(ConnectViewModel); 
 
         searchOptionsButton.Click += (sender, e) =>
         {
@@ -72,6 +70,10 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
 
     private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
     {
+        viewModel.WhenAnyValue(x => x.CurrentGroup)
+            .Subscribe(_ => Focus())
+            .DisposeWith(disposables);
+
         viewModel.WhenAnyValue(x => x.IsAddonNodeViewEnabled)
             .Subscribe(isAddonNodeViewEnabled =>
             {
@@ -171,8 +173,8 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
     }
-
-    private void AddonNodeExplorerView_DoubleTapped(object? sender, TappedEventArgs e)
+    
+    private void AddonNodeExplorerView_DoubleTapped(TappedEventArgs e)
     {
         var viewModel = ViewModel;
         if (viewModel != null)
@@ -197,8 +199,10 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         }
     }
 
-    private void AddonNodeExplorerView_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
+        base.OnPointerReleased(e);
+
         if (e.InitialPressMouseButton == MouseButton.XButton1)
         {
             var viewModel = ViewModel;
@@ -209,8 +213,10 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         }
     }
 
-    private async void HandleKeyDown(object? sender, KeyEventArgs e)
+    protected override async void OnKeyDown(KeyEventArgs e)
     {
+        base.OnKeyDown(e);
+
         var viewModel = ViewModel;
         if (viewModel == null)
         {
