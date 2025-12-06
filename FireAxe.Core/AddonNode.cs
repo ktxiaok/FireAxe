@@ -734,12 +734,17 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
             return null;
         }
 
-        var path = FullFilePath;
+        var parentPath = Parent.FileSystemPath;
+        if (parentPath is null)
+        {
+            return null;
+        }
+        var pathNoExt = Path.Join(parentPath, Name);
         try
         {
             foreach (var extension in s_linkedImageFileSupportedExtensions)
             {
-                var imagePath = path + extension;
+                var imagePath = pathNoExt + extension;
                 if (File.Exists(imagePath))
                 {
                     return imagePath;

@@ -1,3 +1,4 @@
+- fix: addon preview image customization doesn't work in some cases
 # v0.7.1
 - add: new context menu item: create reference addons based on selected addons
 - add: new tool: File Name Fixer (this tool might help you solve the problem of missing addon files)
