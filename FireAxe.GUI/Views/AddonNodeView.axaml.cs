@@ -63,6 +63,8 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
         customizeImageButton.Click += CustomizeImageButton_Click;
     }
 
+    public EditableTextBlock NameEditingControl => nameEditingControl;
+
     private void EditTagButton_Click(object? sender, RoutedEventArgs e)
     {
         var viewModel = ViewModel;

@@ -1,4 +1,5 @@
 - fix: addon preview image customization doesn't work in some cases
+- add: new shortcut keys: F2 to rename addon, Enter to submit editing and Esc to cancel editing (issue #29)
 - bugfixes
 # v0.7.1
 - add: new context menu item: create reference addons based on selected addons

@@ -248,6 +248,13 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
                 e.Handled = true;
                 await viewModel.Delete(false);
             }
+            else if (e.Key == Key.F2)
+            {
+                if (viewModel.IsAddonNodeViewEnabled && viewModel.IsSingleSelection)
+                {
+                    addonNodeView.NameEditingControl.StartEditing();
+                }
+            }
         }
     }
 }
