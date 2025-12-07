@@ -134,13 +134,10 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
 
     public void OpenWorkshopPage()
     {
-        var addon = Addon;
-        if (addon == null)
+        if (Addon?.PublishedFileId is { } id)
         {
-            return;
+            Utils.OpenSteamWorkshopPage(id);
         }
-
-        Utils.OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={addon.PublishedFileId}");
     }
 
     protected override void OnNewAddon(AddonNode addon0, CompositeDisposable disposables)

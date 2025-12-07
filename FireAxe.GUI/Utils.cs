@@ -50,6 +50,11 @@ internal static class Utils
         }
     }
 
+    public static void OpenSteamWorkshopPage(ulong publishedFileId)
+    {
+        OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishedFileId}");
+    }
+
     public static void ShowInFileExplorer(string path, bool openDir = false)
     {
         ArgumentNullException.ThrowIfNull(path);

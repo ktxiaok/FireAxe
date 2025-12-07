@@ -192,9 +192,13 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
         DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, this.WhenAnyValue(x => x.HasSelection));
 
-        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null));
-        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true));
-        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false));
+        var hasSelectedWorkshopVpkAddon = Selection.ObserveCollectionChanges()
+            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>().Any());
+        var hasSelectedUpdateableAddon = hasSelectedWorkshopVpkAddon;
+        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
+        OpenWorkshopPageCommand = ReactiveCommand.Create(OpenWorkshopPage, hasSelectedWorkshopVpkAddon);
 
         Selection.ObserveCollectionChanges()
             .Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedNodes)));
@@ -475,6 +479,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToEnabledRecursivelyCommand { get; }
 
     public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToDisabledRecursivelyCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenWorkshopPageCommand { get; }
 
 
     public Interaction<bool, bool> ConfirmDeleteInteraction { get; } = new();
@@ -761,6 +767,17 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             if (addon is WorkshopVpkAddon workshopVpkAddon)
             {
                 workshopVpkAddon.IsAutoUpdate = strategy;
+            }
+        }
+    }
+
+    public void OpenWorkshopPage()
+    {
+        foreach (var addon in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>())
+        {
+            if (addon.PublishedFileId is { } id)
+            {
+                Utils.OpenSteamWorkshopPage(id);
             }
         }
     }

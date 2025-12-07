@@ -364,6 +364,7 @@
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDefaultRecursively}" Command="{Binding SetAutoUpdateStrategyToDefaultRecursivelyCommand}"/>
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToEnabledRecursively}" Command="{Binding SetAutoUpdateStrategyToEnabledRecursivelyCommand}"/>
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDisabledRecursively}" Command="{Binding SetAutoUpdateStrategyToDisabledRecursivelyCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.OpenWorkshopPage}" Command="{Binding OpenWorkshopPageCommand}"/>
           </MenuItem>
         </ContextMenu>
       </Border.ContextMenu>
