@@ -23,7 +23,7 @@ using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
+public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
     private readonly static TimeSpan SearchThrottleTime = TimeSpan.FromSeconds(0.5);
 
@@ -76,6 +76,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     private readonly ObservableAsPropertyHelper<IEnumerable<AddonNodeNavBarItemViewModel>> _navBarItemViewModels;
 
     private readonly Subject<AddonNode> _nodeMovedSubject = new();
+
+    private bool _isRefreshNodesDeferredRequested = false;
 
     public AddonNodeExplorerViewModel(AddonRoot addonRoot)
     {
@@ -228,6 +230,13 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
+            AddonRoot.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
+
             // Ensure the validity of the current group.
             this.WhenAnyValue(x => x.CurrentGroup!.IsValid)
                 .Subscribe(isValid =>
@@ -255,7 +264,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
                 })
                 .DisposeWith(disposables);
 
-            _nodeMovedSubject.Subscribe(_ => RefreshNodes())
+            _nodeMovedSubject.Subscribe(_ => RefreshNodesDeferred())
                 .DisposeWith(disposables);
 
             UpdateExistingTags();
@@ -279,6 +288,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             Refresh();
         });
     }
+
+    public bool IsValid { get; protected set => this.RaiseAndSetIfChanged(ref field, value); } = true;
 
     public AddonRoot AddonRoot => _addonRoot;
 
@@ -808,6 +819,30 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         NodeViewModels = nodeViewModels;
 
         SelectNodes(selectedNodes);
+    }
+
+    private async void RefreshNodesDeferred()
+    {
+        if (_isRefreshNodesDeferredRequested)
+        {
+            return;
+        }
+
+        _isRefreshNodesDeferredRequested = true;
+        try
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (IsValid)
+                {
+                    RefreshNodes();
+                }
+            }, DispatcherPriority.Default);
+        }
+        finally
+        {
+            _isRefreshNodesDeferredRequested = false;
+        }
     }
 
     private void DisposeNodesSubscription()
