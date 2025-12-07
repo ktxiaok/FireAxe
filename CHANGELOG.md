@@ -1,4 +1,5 @@
 - fix: addon preview image customization doesn't work in some cases
+- fix: VPK conflict check will fail if there're invalid VPKs (issue #30)
 - add: new shortcut keys: F2 to rename addon, Enter to submit editing and Esc to cancel editing (issue #29)
 - add: new context menu item: Open Workshop Page (issue #29)
 - bugfixes

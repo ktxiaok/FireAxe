@@ -1,4 +1,5 @@
-﻿using SteamDatabase.ValvePak;
+﻿using Serilog;
+using SteamDatabase.ValvePak;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Immutable;
@@ -96,7 +97,14 @@ public static class AddonConflictUtils
                     }
 
                     using var pak = new Package();
-                    pak.Read(vpkPath);
+                    try
+                    {
+                        pak.Read(vpkPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception occurred during reading the VPK file: {VpkPath}", vpkPath);
+                    }
                     if (pak.Entries is null)
                     {
                         continue;
