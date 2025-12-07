@@ -1145,4 +1145,7 @@
   <data name="Hidden" xml:space="preserve">
     <value>[Hidden]</value>
   </data>
+  <data name="InvalidVpkFileProblemExplain" xml:space="preserve">
+    <value>The VPK file is invalid.</value>
+  </data>
 </root>

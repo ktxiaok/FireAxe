@@ -1145,4 +1145,7 @@
   <data name="Hidden" xml:space="preserve">
     <value>[已隐藏]</value>
   </data>
+  <data name="InvalidVpkFileProblemExplain" xml:space="preserve">
+    <value>无效的VPK文件。</value>
+  </data>
 </root>

@@ -43,6 +43,8 @@ public abstract class VpkAddon : AddonNode
 
     public override bool CanGetSuggestedName => true;
 
+    public Task? CheckVpkValidityTask { get; private set => NotifyAndSetIfChanged(ref field, value); } = null;
+
     public VpkAddonInfo? RetrieveInfo()
     {
         this.ThrowIfInvalid();
@@ -139,6 +141,73 @@ public abstract class VpkAddon : AddonNode
         return Task.FromResult<string?>(null);
     }
 
+    public Task CheckVpkValidity()
+    {
+        this.ThrowIfInvalid();
+
+        if (CheckVpkValidityTask is { IsCompleted: false })
+        {
+            return CheckVpkValidityTask;
+        }
+
+        Task GetTask()
+        {
+            var vpkPath = FullVpkFilePath;
+            if (vpkPath is null)
+            {
+                InvalidateProblem<InvalidVpkFileProblem>();
+                return Task.CompletedTask;
+            }
+            var addonTaskCreator = this.GetValidTaskCreator();
+            return Task.Run(async () =>
+            {
+                InvalidVpkFileProblem? problem = null;
+                bool exist = false;
+                try
+                {
+                    exist = File.Exists(vpkPath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during checking the existence of the file: {FilePath}", vpkPath);
+                }
+                if (exist)
+                {
+                    try
+                    {
+                        using var pak = new Package();
+                        pak.Read(vpkPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception occurred during reading the VPK file: {VpkPath}", vpkPath);
+                        problem = new(this);
+                    }
+                }
+                await addonTaskCreator.StartNew(self => self.SetProblem(problem)).ConfigureAwait(false);
+            });
+        }
+
+        var checkTask = GetTask();
+        CheckVpkValidityTask = checkTask;
+        checkTask.ContinueWith(_ =>
+        {
+            if (CheckVpkValidityTask == checkTask)
+            {
+                CheckVpkValidityTask = null;
+            }
+        }, Root.TaskScheduler);
+
+        return checkTask;
+    }
+
+    protected override void OnPostCheck(Action<Task> taskSubmitter)
+    {
+        base.OnPostCheck(taskSubmitter);
+
+        taskSubmitter(CheckVpkValidity());
+    }
+
     protected override long? GetFileSize()
     {
         var path = FullVpkFilePath;
@@ -208,6 +277,21 @@ public abstract class VpkAddon : AddonNode
         {
             AddConflictIgnoringFile(file);
         }
+    }
+
+    protected override Task OnDestroyAsync()
+    {
+        var tasks = new List<Task>();
+
+        if (CheckVpkValidityTask is { } task)
+        {
+            tasks.Add(task);
+        }
+
+        var baseTask = base.OnDestroyAsync();
+        tasks.Add(baseTask);
+
+        return TaskUtils.WhenAllIgnoreCanceled(tasks);
     }
 
     private static bool TryCreatePackage(string? path, [NotNullWhen(true)] out Package? pak)

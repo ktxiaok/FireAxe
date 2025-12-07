@@ -1854,6 +1854,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The VPK file is invalid..
+        /// </summary>
+        public static string InvalidVpkFileProblemExplain {
+            get {
+                return ResourceManager.GetString("InvalidVpkFileProblemExplain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;{0}&quot; failed to import: {1}.
         /// </summary>
         public static string ItemFailedToImportWithError {
