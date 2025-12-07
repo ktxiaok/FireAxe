@@ -3,6 +3,7 @@
 - add: VPK file validity check
 - add: new shortcut keys: F2 to rename addon, Enter to submit editing and Esc to cancel editing (issue #29)
 - add: new context menu item: Open Workshop Page (issue #29)
+- improve: shorten the pushed link VPK file name to avoid problems caused by long file name (issue #27)
 - bugfixes
 # v0.7.1
 - add: new context menu item: create reference addons based on selected addons
