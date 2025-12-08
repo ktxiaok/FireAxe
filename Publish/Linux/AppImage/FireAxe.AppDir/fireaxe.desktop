@@ -2,8 +2,8 @@
 [Desktop Entry]
 Name=FireAxe
 Exec=FireAxe
-Icon=fireaxe
+Icon=FireAxe
 Type=Application
-Categories=Utility;Development;
+Categories=Game;Utility;
 Comment=Avalonia-based addon manager for l4d2
 Terminal=false
