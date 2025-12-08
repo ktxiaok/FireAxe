@@ -1,9 +1,15 @@
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd) || exit
+WORKSPACE=$(cd "$SCRIPT_DIR/../../.." && pwd) || exit
+
+cd "$WORKSPACE" || exit 1
+echo "Current Dir :$(pwd)"
+
 
 AppDir="./Publish/Linux/AppImage/FireAxe.AppDir"
 PubDir="./FireAxe.GUI/bin/Release/net10.0/linux-x64/publish"
 Version="0.7.2"
 
-cd ../../../
+
 
 # mkdir -p "$AppDir"/usr/bin/
 
