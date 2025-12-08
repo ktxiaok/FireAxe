@@ -27,5 +27,6 @@ internal static class AddonProblemExplanations
         manager.Register<AddonCircularRefProblem>((problem, arg) => Texts.AddonCircularRefProblemExplain);
         manager.Register<AddonDownloadFailedProblem>((problem, arg) => Texts.AddonDownloadFailedProblemExplain.FormatNoThrow(problem.Exception?.GetType().Name ?? "null", problem.FilePath, problem.Url));
         manager.Register<AddonInvalidRefSourceProblem>((problem, arg) => Texts.AddonInvalidRefSourceProblemExplain);
+        manager.Register<InvalidVpkFileProblem>((problem, arg) => Texts.InvalidVpkFileProblemExplain);
     }
 }

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using ReactiveUI;
 using System;
@@ -192,6 +193,20 @@ public class EditableTextBlock : TemplatedControl
         }
     }
 
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        if (e.Key == Key.Enter && !e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        {
+            Submit();
+        }
+        else if (e.Key == Key.Escape)
+        {
+            EndEditing();
+        }
+    }
+
     private void EditButton_Click(object? sender, RoutedEventArgs e)
     {
         StartEditing();
@@ -245,7 +260,7 @@ public class EditableTextBlock : TemplatedControl
     }
 }
 
-public class EditableTextBlockDesignDataContext : ReactiveObject
+internal class EditableTextBlockDesignDataContext : ReactiveObject
 {
     private string _value = "test";
 

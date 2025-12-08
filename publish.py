@@ -60,5 +60,6 @@ def publish(context: dict[str, str], runtime: Optional[str]):
 if __name__ == '__main__':
     context = get_context()
     publish(context, 'win-x64')
+    publish(context, 'linux-x64')
     publish(context, None)
     print('Done')

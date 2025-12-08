@@ -1,3 +1,13 @@
+# v0.7.2
+- fix: addon preview image customization doesn't work in some cases
+- fix: VPK conflict check will fail if there're invalid VPKs (issue #30)
+- add: VPK file validity check
+- add: new shortcut keys: F2 to rename addon, Enter to submit editing and Esc to cancel editing (issue #29)
+- add: new context menu item: Open Workshop Page (issue #29)
+- add: Linux support (issue #27)
+- add: process file customization settings
+- improve: shorten the pushed link VPK file name to avoid problems caused by long file name (issue #27)
+- bugfixes
 # v0.7.1
 - add: new context menu item: create reference addons based on selected addons
 - add: new tool: File Name Fixer (this tool might help you solve the problem of missing addon files)

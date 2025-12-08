@@ -8,6 +8,8 @@ namespace FireAxe;
 
 public static class CrashReporter
 {
+    private const string Title = "====FireAxe Crash Reporter====";
+
     public static void Run(Exception unhandledException)
     {
         ArgumentNullException.ThrowIfNull(unhandledException);
@@ -29,7 +31,7 @@ public static class CrashReporter
                     chcp 65001
                     @echo off
                     echo.
-                    echo ====FireAxe Crash Reporter====
+                    echo {Title}
                     echo.
                     type "{messagePath}"
                     echo.
@@ -57,6 +59,57 @@ public static class CrashReporter
                 if (batPath is not null && File.Exists(batPath))
                 {
                     File.Delete(batPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+            }
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            string? messagePath = null;
+            string? shPath = null;
+
+            try
+            {
+                messagePath = Path.GetTempFileName();
+                shPath = Path.GetTempFileName();
+                File.WriteAllText(messagePath, message);
+                string sh = $"""
+                    set +x
+                    echo "{Title}"
+                    echo ""
+                    cat "{messagePath}"
+                    echo ""
+                    read -n 1 -s -p "Press any key to continue..."
+                    """;
+                File.WriteAllText(shPath, sh);
+                var shFileMode = File.GetUnixFileMode(shPath);
+                shFileMode |= (UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
+                File.SetUnixFileMode(shPath, shFileMode);
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "/bin/bash",
+                    Arguments = $"\"{shPath}\"",
+                    UseShellExecute = true,
+                }) ?? throw new Exception("Failed to start a bash process");
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+            }
+
+            try
+            {
+                if (messagePath is not null && File.Exists(messagePath))
+                {
+                    File.Delete(messagePath);
+                }
+                if (shPath is not null && File.Exists(shPath))
+                {
+                    File.Delete(shPath);
                 }
             }
             catch (Exception ex)

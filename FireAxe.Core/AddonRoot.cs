@@ -30,6 +30,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
     };
 
+    private static readonly Regex s_pushedLinkVpkFileNameNoExtRegex = new(@"^fireaxe_link_[0-9A-Fa-f]+$");
+
     private static readonly Regex s_backupFileNameRegex = new(@"^backup_(\d+)-(\d+)-(\d+)_(\d+)-(\d+)\.addonroot$");
 
     private bool _disposed = false;
@@ -771,7 +773,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 {
                     string fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
 
-                    if (TryParseLinkVpkFileNameNoExt(fileNameNoExt, out _))
+                    if (TryParseLinkVpkFileNameNoExt(fileNameNoExt))
                     {
                         filePathsToDelete.Add(filePath);
                     }
@@ -832,7 +834,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 {
                     string nameNoExt = name.Substring(0, name.Length - ".vpk".Length);
 
-                    if (TryParseLinkVpkFileNameNoExt(nameNoExt, out _))
+                    if (TryParseLinkVpkFileNameNoExt(nameNoExt))
                     {
                         continue;
                     }
@@ -857,6 +859,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         }
 
         // Add enabled addons to entries.
+        int nextLinkVpkFileId = 1;
         foreach (var addon in Nodes.SelectMany(addon => addon.GetAllNodesEnabledInHierarchy()))
         {
             var actualAddon = addon;
@@ -880,13 +883,9 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                     continue;
                 }
 
-                string linkFileName = BuildLinkVpkFileName(addon.Id);
-                string linkFilePath = Path.Join(addonsPath, linkFileName);
-                if (File.Exists(linkFilePath))
-                {
-                    continue;
-                }
+                var linkFilePath = BuildLinkVpkFilePath(addonsPath, ref nextLinkVpkFileId);
                 File.CreateSymbolicLink(linkFilePath, vpkPath);
+                var linkFileName = Path.GetFileName(linkFilePath);
                 addonEntries[linkFileName] = ("1", addon.PriorityInHierarchy);
             }
         }
@@ -907,24 +906,22 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
         Pushed?.Invoke();
 
         // File name format-related functions
-        const string LinkVpkFilePrefix = "fireaxe_link_";
-
-        string BuildLinkVpkFileName(Guid guid) => $"{LinkVpkFilePrefix}{guid:N}.vpk";
-
-        bool TryParseLinkVpkFileNameNoExt(string nameNoExt, out Guid guid)
+        string BuildLinkVpkFilePath(string addonsPath, ref int nextId)
         {
-            const int GuidLength = 32;
-
-            guid = default;
-            if (nameNoExt.Length == (LinkVpkFilePrefix.Length + GuidLength) && nameNoExt.StartsWith(LinkVpkFilePrefix))
+            while (true)
             {
-                var guidStr = nameNoExt.AsSpan().Slice(LinkVpkFilePrefix.Length);
-                if (Guid.TryParse(guidStr, out guid))
+                var path = Path.Join(addonsPath, $"fireaxe_link_{nextId:x}.vpk");
+                checked { nextId++; }
+                if (!FileSystemUtils.Exists(path))
                 {
-                    return true;
+                    return path;
                 }
             }
-            return false;
+        }
+
+        bool TryParseLinkVpkFileNameNoExt(string nameNoExt)
+        {
+            return s_pushedLinkVpkFileNameNoExtRegex.IsMatch(nameNoExt);
         }
 
         // Legacy Formats

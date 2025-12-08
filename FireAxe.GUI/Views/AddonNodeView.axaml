@@ -39,7 +39,7 @@
 
     <!--name-->
     <v:EditableTextBlock
-      Name="nameControl"
+      Name="nameEditingControl"
       Value="{Binding Addon.Name}"
       HorizontalAlignment="Center">
       <v:EditableTextBlock.Styles>

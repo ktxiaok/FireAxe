@@ -364,6 +364,7 @@
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDefaultRecursively}" Command="{Binding SetAutoUpdateStrategyToDefaultRecursivelyCommand}"/>
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToEnabledRecursively}" Command="{Binding SetAutoUpdateStrategyToEnabledRecursivelyCommand}"/>
             <MenuItem Header="{x:Static r:Texts.SetAutoUpdateStrategyToDisabledRecursively}" Command="{Binding SetAutoUpdateStrategyToDisabledRecursivelyCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.OpenWorkshopPage}" Command="{Binding OpenWorkshopPageCommand}"/>
           </MenuItem>
         </ContextMenu>
       </Border.ContextMenu>
@@ -373,7 +374,7 @@
       Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
       ResizeDirection="Columns"/>
     
-    <!--addon node parent view-->
+    <!--addon node view parent-->
     <Border
       Grid.Row="0"
       Grid.Column="2"
@@ -403,7 +404,9 @@
           <Panel
             IsVisible="{Binding IsSingleSelection, FallbackValue=False}"
             Margin="10">
-            <v:AddonNodeView DataContext="{Binding ActiveAddonNodeViewModel}"/>
+            <v:AddonNodeView
+              Name="addonNodeView"
+              DataContext="{Binding ActiveAddonNodeViewModel}"/>
           </Panel>
         </Panel>
       </ScrollViewer>

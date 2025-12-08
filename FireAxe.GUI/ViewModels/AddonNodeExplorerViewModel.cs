@@ -23,7 +23,7 @@ using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
+public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, IValidity
 {
     private readonly static TimeSpan SearchThrottleTime = TimeSpan.FromSeconds(0.5);
 
@@ -76,6 +76,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     private readonly ObservableAsPropertyHelper<IEnumerable<AddonNodeNavBarItemViewModel>> _navBarItemViewModels;
 
     private readonly Subject<AddonNode> _nodeMovedSubject = new();
+
+    private bool _isRefreshNodesDeferredRequested = false;
 
     public AddonNodeExplorerViewModel(AddonRoot addonRoot)
     {
@@ -192,9 +194,13 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
         DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, this.WhenAnyValue(x => x.HasSelection));
 
-        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null));
-        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true));
-        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false));
+        var hasSelectedWorkshopVpkAddon = Selection.ObserveCollectionChanges()
+            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>().Any());
+        var hasSelectedUpdateableAddon = hasSelectedWorkshopVpkAddon;
+        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
+        OpenWorkshopPageCommand = ReactiveCommand.Create(OpenWorkshopPage, hasSelectedWorkshopVpkAddon);
 
         Selection.ObserveCollectionChanges()
             .Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedNodes)));
@@ -224,6 +230,13 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
+            AddonRoot.RegisterInvalidHandler(() => IsValid = false)
+                .DisposeWith(disposables);
+            if (!IsValid)
+            {
+                return;
+            }
+
             // Ensure the validity of the current group.
             this.WhenAnyValue(x => x.CurrentGroup!.IsValid)
                 .Subscribe(isValid =>
@@ -251,7 +264,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
                 })
                 .DisposeWith(disposables);
 
-            _nodeMovedSubject.Subscribe(_ => RefreshNodes())
+            _nodeMovedSubject.Subscribe(_ => RefreshNodesDeferred())
                 .DisposeWith(disposables);
 
             UpdateExistingTags();
@@ -275,6 +288,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
             Refresh();
         });
     }
+
+    public bool IsValid { get; protected set => this.RaiseAndSetIfChanged(ref field, value); } = true;
 
     public AddonRoot AddonRoot => _addonRoot;
 
@@ -475,6 +490,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
     public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToEnabledRecursivelyCommand { get; }
 
     public ReactiveCommand<Unit, Unit> SetAutoUpdateStrategyToDisabledRecursivelyCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenWorkshopPageCommand { get; }
 
 
     public Interaction<bool, bool> ConfirmDeleteInteraction { get; } = new();
@@ -765,6 +782,17 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         }
     }
 
+    public void OpenWorkshopPage()
+    {
+        foreach (var addon in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>())
+        {
+            if (addon.PublishedFileId is { } id)
+            {
+                Utils.OpenSteamWorkshopPage(id);
+            }
+        }
+    }
+
     private void RefreshNodes()
     {
         var selectedNodes = SelectedNodes.ToArray();
@@ -791,6 +819,30 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel
         NodeViewModels = nodeViewModels;
 
         SelectNodes(selectedNodes);
+    }
+
+    private async void RefreshNodesDeferred()
+    {
+        if (_isRefreshNodesDeferredRequested)
+        {
+            return;
+        }
+
+        _isRefreshNodesDeferredRequested = true;
+        try
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (IsValid)
+                {
+                    RefreshNodes();
+                }
+            }, DispatcherPriority.Default);
+        }
+        finally
+        {
+            _isRefreshNodesDeferredRequested = false;
+        }
     }
 
     private void DisposeNodesSubscription()
