@@ -1,7 +1,7 @@
 # FireAxe.AppDir/usr/share/applications/fireaxe.desktop
 [Desktop Entry]
 Name=FireAxe
-Exec=FireAxe
+Exec=/usr/bin/FireAxe
 Icon=FireAxe
 Type=Application
 Categories=Game;Utility;
