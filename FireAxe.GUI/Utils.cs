@@ -15,6 +15,81 @@ internal static class Utils
 {
     private static readonly string[] s_byteUnits = ["B", "KiB", "MiB", "GiB", "TiB"];
 
+    private static readonly object s_openDirectoryCustomProcessLock = new();
+    private static readonly object s_showFileCustomProcessLock = new();
+
+    public static string? OpenDirectoryCustomProcessFileName
+    {
+        get
+        {
+            lock (s_openDirectoryCustomProcessLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (s_openDirectoryCustomProcessLock)
+            {
+                field = value;
+            }
+        }
+    } = null;
+
+    public static string? OpenDirectoryCustomProcessArguments
+    {
+        get
+        {
+            lock (s_openDirectoryCustomProcessLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (s_openDirectoryCustomProcessLock)
+            {
+                field = value;
+            }
+        }
+    } = null;
+
+    public static string? ShowFileCustomProcessFileName
+    {
+        get
+        {
+            lock (s_showFileCustomProcessLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (s_showFileCustomProcessLock)
+            {
+                field = value;
+            }
+        }
+    } = null;
+
+    public static string? ShowFileCustomProcessArguments
+    {
+        get
+        {
+            lock (s_showFileCustomProcessLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (s_showFileCustomProcessLock)
+            {
+                field = value;
+            }
+        }
+    }
+
     public static void GetReadableBytes(double bytes, out double value, out string unit)
     {
         value = bytes;
@@ -59,21 +134,48 @@ internal static class Utils
     {
         ArgumentNullException.ThrowIfNull(path);
 
+        if (Path.DirectorySeparatorChar != '/')
+        {
+            path = path.Replace('/', Path.DirectorySeparatorChar);
+        }
         try
         {
-            if (OperatingSystem.IsWindows())
+            if (openDir && Directory.Exists(path)
+                && OpenDirectoryCustomProcessFileName is var openDirCustomProcessFileName && !string.IsNullOrEmpty(openDirCustomProcessFileName)
+                && OpenDirectoryCustomProcessArguments is var openDirCustomProcessArgs && !string.IsNullOrEmpty(openDirCustomProcessArgs))
             {
-                path = path.Replace('/', '\\');
+                using var process = Process.Start(openDirCustomProcessFileName, string.Format(openDirCustomProcessArgs, path));
+            }
+            else if (ShowFileCustomProcessFileName is var showFileCustomProcessFileName && !string.IsNullOrEmpty(showFileCustomProcessFileName)
+                && ShowFileCustomProcessArguments is var showFileCustomProcessArgs && !string.IsNullOrEmpty(showFileCustomProcessArgs))
+            {
+                using var process = Process.Start(showFileCustomProcessFileName, string.Format(showFileCustomProcessArgs, path));
+            }
+            else if (OperatingSystem.IsWindows())
+            {
                 string processArgs;
                 if (openDir && Directory.Exists(path))
                 {
-                    processArgs = path;
+                    processArgs = $"\"{path}\"";
                 }
                 else
                 {
-                    processArgs = $"/select, {path}";
+                    processArgs = $"/select, \"{path}\"";
                 }
                 using var process = Process.Start("explorer.exe", processArgs);
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                string processArgs;
+                if (openDir && Directory.Exists(path))
+                {
+                    processArgs = $"\"{path}\"";
+                }
+                else
+                {
+                    processArgs = $"--select \"{path}\"";
+                }
+                using var process = Process.Start("nautilus", processArgs);
             }
         }
         catch (Exception ex)

@@ -1148,4 +1148,22 @@
   <data name="InvalidVpkFileProblemExplain" xml:space="preserve">
     <value>The VPK file is invalid.</value>
   </data>
+  <data name="ProcessFileCustomization" xml:space="preserve">
+    <value>Process File Customization</value>
+  </data>
+  <data name="ProcessFileName" xml:space="preserve">
+    <value>Process File Name</value>
+  </data>
+  <data name="ProcessArguments" xml:space="preserve">
+    <value>Process Arguments</value>
+  </data>
+  <data name="ShowFile" xml:space="preserve">
+    <value>Show File</value>
+  </data>
+  <data name="OpenDirectoryCustomProcessArgumentsWatermark" xml:space="preserve">
+    <value>Use "{0}" to represent the directory path</value>
+  </data>
+  <data name="ShowFileCustomProcessArgumentsWatermark" xml:space="preserve">
+    <value>Use "{0}" to represent the file path</value>
+  </data>
 </root>

@@ -9,7 +9,7 @@
         xmlns:me="using:FireAxe.MarkupExtensions"
         xmlns:dt="using:FireAxe.DataTemplates"
         xmlns:local="using:FireAxe"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="1500"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="2000"
         x:Class="FireAxe.Views.AppSettingsWindow"
         x:DataType="vm:AppSettingsViewModel"
         Title="{x:Static r:Texts.Settings}"
@@ -335,6 +335,74 @@
               Command="{Binding OpenBackupDirectoryCommand}"
               Content="{x:Static r:Texts.Open}"/>
           </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!--process file customization-->
+      <TextBlock
+        Text="{x:Static r:Texts.ProcessFileCustomization}"
+        Classes="Heading1"
+        Margin="0, 5, 0, 2.5"/>
+      <Border
+        Classes="Level1"
+        Margin="0, 2.5, 0, 5"
+        Padding="5">
+        <StackPanel Orientation="Vertical">
+          <!--open directory-->
+          <TextBlock
+            Text="{x:Static r:Texts.OpenDirectory}"
+            Margin="0, 5, 0, 0"
+            VerticalAlignment="Center"/>
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Text="{x:Static r:Texts.ProcessFileName}"
+              Classes="PropertyName"/>
+            <v:EditableTextBlock
+              Classes="PropertyValue"
+              Value="{Binding Settings.OpenDirectoryCustomProcessFileName}"
+              Display="{Binding Settings.OpenDirectoryCustomProcessFileName, Converter={x:Static conv:StringConverters.ShowEmpty}}"/>
+          </DockPanel>
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Text="{x:Static r:Texts.ProcessArguments}"
+              Classes="PropertyName"/>
+            <v:EditableTextBlock
+              Classes="PropertyValue"
+              Value="{Binding Settings.OpenDirectoryCustomProcessArguments}"
+              Display="{Binding Settings.OpenDirectoryCustomProcessArguments, Converter={x:Static conv:StringConverters.ShowEmpty}}"
+              Watermark="{x:Static r:Texts.OpenDirectoryCustomProcessArgumentsWatermark}"/>
+          </DockPanel>
+
+          <Control Height="15"/>
+
+          <!--show file-->
+          <TextBlock
+            Text="{x:Static r:Texts.ShowFile}"
+            Margin="0, 5, 0, 0"
+            VerticalAlignment="Center"/>
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Text="{x:Static r:Texts.ProcessFileName}"
+              Classes="PropertyName"/>
+            <v:EditableTextBlock
+              Classes="PropertyValue"
+              Value="{Binding Settings.ShowFileCustomProcessFileName}"
+              Display="{Binding Settings.ShowFileCustomProcessFileName, Converter={x:Static conv:StringConverters.ShowEmpty}}"/>
+          </DockPanel>
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Text="{x:Static r:Texts.ProcessArguments}"
+              Classes="PropertyName"/>
+            <v:EditableTextBlock
+              Classes="PropertyValue"
+              Value="{Binding Settings.ShowFileCustomProcessArguments}"
+              Display="{Binding Settings.ShowFileCustomProcessArguments, Converter={x:Static conv:StringConverters.ShowEmpty}}"
+              Watermark="{x:Static r:Texts.ShowFileCustomProcessArgumentsWatermark}"/>
+          </DockPanel>
         </StackPanel>
       </Border>
 

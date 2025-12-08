@@ -2178,6 +2178,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use &quot;{0}&quot; to represent the directory path.
+        /// </summary>
+        public static string OpenDirectoryCustomProcessArgumentsWatermark {
+            get {
+                return ResourceManager.GetString("OpenDirectoryCustomProcessArgumentsWatermark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open the directory where addons are stored. Do not open &quot;left4dead2/addons&quot; or &quot;left4dead2/addon/workshop&quot;!.
         /// </summary>
         public static string OpenDirectoryNote {
@@ -2372,6 +2381,33 @@ namespace FireAxe.Resources {
         public static string ProblemsFoundWithCount {
             get {
                 return ResourceManager.GetString("ProblemsFoundWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Process Arguments.
+        /// </summary>
+        public static string ProcessArguments {
+            get {
+                return ResourceManager.GetString("ProcessArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Process File Customization.
+        /// </summary>
+        public static string ProcessFileCustomization {
+            get {
+                return ResourceManager.GetString("ProcessFileCustomization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Process File Name.
+        /// </summary>
+        public static string ProcessFileName {
+            get {
+                return ResourceManager.GetString("ProcessFileName", resourceCulture);
             }
         }
         
@@ -2696,6 +2732,24 @@ namespace FireAxe.Resources {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show File.
+        /// </summary>
+        public static string ShowFile {
+            get {
+                return ResourceManager.GetString("ShowFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use &quot;{0}&quot; to represent the file path.
+        /// </summary>
+        public static string ShowFileCustomProcessArgumentsWatermark {
+            get {
+                return ResourceManager.GetString("ShowFileCustomProcessArgumentsWatermark", resourceCulture);
             }
         }
         

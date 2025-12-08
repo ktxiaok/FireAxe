@@ -151,7 +151,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     public string? LastOpenDirectory
     {
         get => _lastOpenDirectory;
-        set 
+        set
         {
             if (value == _lastOpenDirectory)
             {
@@ -184,7 +184,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             {
                 return;
             }
-            
+
             LanguageManager.Instance.SetCurrentLanguage(value);
             _language = value;
             NotifyChanged();
@@ -434,6 +434,70 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             RequestSave = true;
         }
     }
+
+    [AllowNull]
+    [JsonProperty]
+    public string OpenDirectoryCustomProcessFileName
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                Utils.OpenDirectoryCustomProcessFileName = value;
+                RequestSave = true;
+            }
+        }
+    } = "";
+
+    [AllowNull]
+    [JsonProperty]
+    public string OpenDirectoryCustomProcessArguments
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                Utils.OpenDirectoryCustomProcessArguments = value;
+                RequestSave = true;
+            }
+        }
+    } = "";
+
+    [AllowNull]
+    [JsonProperty]
+    public string ShowFileCustomProcessFileName
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                Utils.ShowFileCustomProcessFileName = value;
+                RequestSave = true;
+            }
+        }
+    } = "";
+
+    [AllowNull]
+    [JsonProperty]
+    public string ShowFileCustomProcessArguments
+    {
+        get;
+        set
+        {
+            value ??= "";
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                Utils.ShowFileCustomProcessArguments = value;
+                RequestSave = true;
+            }
+        }
+    } = "";
 
     public ReactiveCommand<Unit, IReadOnlySet<string>?> LoadCustomVpkAddonConflictIgnoringFilesCommand { get; }
 
