@@ -22,6 +22,6 @@ Version="0.7.2"
 
 
 dotnet publish -c Release -r linux-x64 --self-contained true
-cp "$PubDir"/* "$AppDir"/usr/bin/
+cp -r "$PubDir"/* "$AppDir"/usr/bin/
 appimagetool "$AppDir"
 mv FireAxe-x86_64.AppImage FireAxe-x86_64_"$Version".AppImage
