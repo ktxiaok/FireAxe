@@ -1,0 +1,11 @@
+Package: fireaxe
+Version: 0.7.2
+Section: devel
+Priority: optional
+Architecture: amd64
+Installed-Size: 68279
+Depends: libx11-6, libice6, libsm6, libfontconfig1, ca-certificates, tzdata, libc6, libgcc1 | libgcc-s1, libgssapi-krb5-2, libstdc++6, zlib1g, libssl1.0.0 | libssl1.0.2 | libssl1.1 | libssl3, libicu | libicu74 | libicu72 | libicu71 | libicu70 | libicu69 | libicu68 | libicu67 | libicu66 | libicu65 | libicu63 | libicu60 | libicu57 | libicu55 | libicu52
+Maintainer: ycna07 <ycna07@foxmail.com>
+Homepage: https://github.com/ktxiaok/FireAxe
+Description: A Left 4 Dead 2 addon manager that supports hierarchical organization, workshop items and collections download, addon enablement management, etc. 
+Copyright: 2024-2025 ycna07 <ycna07@foxmail.com>

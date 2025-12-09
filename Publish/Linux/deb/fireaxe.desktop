@@ -1,0 +1,9 @@
+# FireAxe.AppDir/usr/share/applications/fireaxe.desktop
+[Desktop Entry]
+Name=FireAxe
+Exec=/usr/bin/FireAxe
+Icon=FireAxe
+Type=Application
+Categories=Game;Utility;
+Comment=Avalonia-based addon manager for l4d2
+Terminal=false
