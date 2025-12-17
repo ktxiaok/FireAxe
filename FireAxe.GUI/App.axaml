@@ -7,6 +7,8 @@
   xmlns:conv="using:FireAxe.ValueConverters"
   xmlns:dt="using:FireAxe.DataTemplates"
   xmlns:r="using:FireAxe.Resources"
+  xmlns:semi="https://irihi.tech/semi"
+  xmlns:u-semi="https://irihi.tech/ursa/themes/semi"
   xmlns:sys="using:System">
 
   <Application.DataTemplates>
@@ -15,7 +17,9 @@
   
   <Application.Styles>
     <FluentTheme/>
-
+    <semi:SemiTheme Locale="zh-CN" />
+    <u-semi:SemiTheme Locale="zh-CN"/>
+    <semi:SemiPopupAnimations />
     <Style Selector="Window">
       <Setter Property="Icon" Value="/Assets/AppLogo.ico"/>
     </Style>
