@@ -176,7 +176,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
         get => _language;
         set
         {
-            if (value is not null && !LanguageManager.SupportedLanguages.Contains(value))
+            if (value is not null && !CultureManager.SupportedCultureStrings.Contains(value))
             {
                 value = null;
             }
@@ -185,7 +185,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
                 return;
             }
 
-            LanguageManager.Instance.SetCurrentLanguage(value);
+            CultureManager.Instance.SetCurrentCulture(value);
             _language = value;
             NotifyChanged();
             RequestSave = true;

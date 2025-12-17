@@ -9,7 +9,7 @@
         x:Class="FireAxe.Views.AddonNameAutoSetterWindow"
         x:DataType="vm:AddonNameAutoSetterViewModel"
         Title="{x:Static r:Texts.AddonNameAutoSetter}"
-        Width="900" Height="900"
+        Width="700" Height="700"
         WindowStartupLocation="CenterScreen">
   <DockPanel Margin="10">
     <StackPanel

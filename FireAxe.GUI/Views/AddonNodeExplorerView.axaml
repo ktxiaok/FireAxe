@@ -248,31 +248,26 @@
         <ScrollViewer>
           <Panel>
             <Panel.Styles>
-              <Style Selector="ListBox">
-              <Setter Property="SelectionMode" Value="Multiple"/>
-              <Setter Property="Background" Value="{DynamicResource brush_background}"/>
-            </Style>
-    
-            <Style Selector="ListBoxItem">
-              <Style Selector="^:selected">
-                <Style Selector="^ /template/ ContentPresenter">
-                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected}"/>
+              <Style Selector="ListBoxItem">
+                <Style Selector="^:selected">
+                  <Style Selector="^ /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected}"/>
+                  </Style>
+                  <Style Selector="^:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected_pointerover}"/>
+                  </Style>
+                  <Style Selector="^ Border">
+                    <Setter Property="BorderBrush" Value="{DynamicResource brush_border_addon_list_item_selected}"/>
+                  </Style>
                 </Style>
-                <Style Selector="^:pointerover /template/ ContentPresenter">
-                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected_pointerover}"/>
-                </Style>
-                <Style Selector="^ Border">
-                  <Setter Property="BorderBrush" Value="{DynamicResource brush_border_addon_list_item_selected}"/>
-                </Style>
+                <Setter Property="Padding" Value="3"/>
               </Style>
-              <Setter Property="Padding" Value="3"/>
-            </Style>
 
-            <Style Selector="Border.NodeBorder">
-              <Setter Property="Padding" Value="5"/>
-              <Setter Property="BorderThickness" Value="3"/>
-              <Setter Property="BoxShadow" Value="{StaticResource boxshadow_regular}"/>
-            </Style>
+              <Style Selector="Border.NodeBorder">
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="BorderThickness" Value="3"/>
+                <Setter Property="BoxShadow" Value="{StaticResource boxshadow_regular}"/>
+              </Style>
             </Panel.Styles>
             <!--tile view-->
             <ListBox

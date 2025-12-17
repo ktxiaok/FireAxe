@@ -47,19 +47,21 @@
         Name="jumpButton"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Center"
-        HorizontalContentAlignment="Left"
+        HorizontalContentAlignment="Stretch"
         Background="Transparent">
-        <StackPanel Orientation="Horizontal">
+        <DockPanel>
           <v:AddonIconView
+            DockPanel.Dock="Left"
             ImageSize="40"
             SpecialIconSize="{Binding $self.ImageSize}"
             Margin="0, 0, 2.5, 0"/>
           <SelectableTextBlock
             Text="{Binding Addon.Name}"
-            TextTrimming="CharacterEllipsis"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Margin="2.5, 0, 0, 0"/>
-        </StackPanel>
+        </DockPanel>
       </Button>
     </DockPanel>
   </Panel>

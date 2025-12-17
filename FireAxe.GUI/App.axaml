@@ -8,7 +8,6 @@
   xmlns:dt="using:FireAxe.DataTemplates"
   xmlns:r="using:FireAxe.Resources"
   xmlns:semi="https://irihi.tech/semi"
-  xmlns:u-semi="https://irihi.tech/ursa/themes/semi"
   xmlns:sys="using:System">
 
   <Application.DataTemplates>
@@ -16,16 +15,16 @@
   </Application.DataTemplates>
   
   <Application.Styles>
-    <FluentTheme/>
-    <semi:SemiTheme Locale="zh-CN" />
-    <u-semi:SemiTheme Locale="zh-CN"/>
-    <semi:SemiPopupAnimations />
+    <semi:SemiTheme/>
+    <semi:SemiPopupAnimations/>
     <Style Selector="Window">
       <Setter Property="Icon" Value="/Assets/AppLogo.ico"/>
     </Style>
     
     <Style Selector="PathIcon">
       <Setter Property="Foreground" Value="{DynamicResource brush_foreground}"/>
+      <Setter Property="Width" Value="20"/>
+      <Setter Property="Height" Value="20"/>
     </Style>
     
     <Style Selector="Button:disabled > PathIcon">
@@ -50,7 +49,7 @@
     <Style Selector=":is(TextBlock).PropertyName">
       <Setter Property="HorizontalAlignment" Value="Left"/>
       <Setter Property="VerticalAlignment" Value="Center"/>
-      <Setter Property="Margin" Value="0, 5, 0, 5"/>
+      <Setter Property="Margin" Value="0, 5, 30, 5"/>
     </Style>
 
     <Style Selector=":is(TextBlock).PropertyValue">

@@ -9,7 +9,7 @@
         x:Class="FireAxe.Views.WorkshopVpkFinderWindow"
         x:DataType="vm:WorkshopVpkFinderViewModel"
         Title="{x:Static r:Texts.WorkshopVpkFinder}"
-        Width="600" Height="600"
+        Width="700" Height="700"
         WindowStartupLocation="CenterScreen">
   <DockPanel
     Margin="10">

@@ -12,7 +12,7 @@
         Icon="/Assets/AppLogo.ico"
         Title="{Binding TitleExtraInfo, StringFormat=FireAxe{0}}"
         WindowStartupLocation="CenterScreen"
-        Width="1400" Height="900">
+        Width="1145" Height="700">
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">
@@ -76,7 +76,7 @@
     <DockPanel
       DockPanel.Dock="Bottom"
       LastChildFill="False"
-      Margin="10">
+      Margin="10, 0, 10, 10">
       <StackPanel
         DockPanel.Dock="Left"
         Orientation="Horizontal">

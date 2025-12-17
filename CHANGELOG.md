@@ -1,3 +1,4 @@
+- change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
 # v0.7.2
 - fix: addon preview image customization doesn't work in some cases
 - fix: VPK conflict check will fail if there're invalid VPKs (issue #30)
