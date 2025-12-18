@@ -223,6 +223,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Addons with missing files not found..
+        /// </summary>
+        public static string AddonsWithMissingFilesNotFound {
+            get {
+                return ResourceManager.GetString("AddonsWithMissingFilesNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Sources of Searching.
         /// </summary>
         public static string AddSearchSource {
@@ -548,6 +557,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} addons with missing files found. Are you sure you want to delete these addons?.
+        /// </summary>
+        public static string ConfirmDeleteAddonsWithMissingFilesWithCount {
+            get {
+                return ResourceManager.GetString("ConfirmDeleteAddonsWithMissingFilesWithCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to delete all the items?.
         /// </summary>
         public static string ConfirmDeleteAll {
@@ -743,6 +761,15 @@ namespace FireAxe.Resources {
         public static string Delete {
             get {
                 return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Addons with Missing Files.
+        /// </summary>
+        public static string DeleteAddonsWithMissingFiles {
+            get {
+                return ResourceManager.GetString("DeleteAddonsWithMissingFiles", resourceCulture);
             }
         }
         

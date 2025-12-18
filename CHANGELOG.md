@@ -1,4 +1,5 @@
 - change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
+- add: new operation: Delete Addons with Missing Files
 - improve: the width, height and maximized state of the MainWindow will be saved into the AppSettings
 - fix: the game path validity checker doesn't recognize Left 4 Dead 2 Dedicated Server
 # v0.7.2

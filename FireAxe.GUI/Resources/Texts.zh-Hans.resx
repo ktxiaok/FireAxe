@@ -1166,4 +1166,13 @@
   <data name="ShowFileCustomProcessArgumentsWatermark" xml:space="preserve">
     <value>使用“{0}”代表文件路径</value>
   </data>
+  <data name="DeleteAddonsWithMissingFiles" xml:space="preserve">
+    <value>删除文件不存在的模组</value>
+  </data>
+  <data name="ConfirmDeleteAddonsWithMissingFilesWithCount" xml:space="preserve">
+    <value>已发现{0}个文件不存在的模组。你确定要删除这些模组吗？</value>
+  </data>
+  <data name="AddonsWithMissingFilesNotFound" xml:space="preserve">
+    <value>未发现文件不存在的模组。</value>
+  </data>
 </root>

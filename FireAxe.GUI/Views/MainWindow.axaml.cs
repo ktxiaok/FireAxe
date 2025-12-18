@@ -290,5 +290,17 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
+
+        viewModel.ConfirmDeleteAddonsWithMissingFilesInteraction.RegisterHandler(async context =>
+        {
+            int count = context.Input;
+            bool confirm = await CommonMessageBoxes.Confirm(this, Texts.ConfirmDeleteAddonsWithMissingFilesWithCount.FormatNoThrow(count));
+            context.SetOutput(confirm);
+        }).DisposeWith(disposables);
+        viewModel.ShowAddonsWithMissingFilesNotFoundInteraction.RegisterHandler(async context =>
+        {
+            await CommonMessageBoxes.ShowInfo(this, Texts.AddonsWithMissingFilesNotFound);
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
     }
 }

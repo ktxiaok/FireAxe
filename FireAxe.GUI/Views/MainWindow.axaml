@@ -59,6 +59,17 @@
           </MenuItem.Header>
         </MenuItem>
         <MenuItem Header="{x:Static r:Texts.ExportSelectedItemsAsAddonRootFile}" Command="{Binding ExportSelectedItemsAsAddonRootFile}"/>
+        <MenuItem Header="{x:Static r:Texts.DeleteAddonsWithMissingFiles}" Command="{Binding DeleteAddonsWithMissingFilesCommand}"/>
+        <MenuItem Command="{Binding DeleteAddonsWithMissingFilesForSelectedItemsCommand}">
+          <MenuItem.Header>
+            <MultiBinding StringFormat="{}{0} {1}">
+              <Binding Source="{x:Static r:Texts.DeleteAddonsWithMissingFiles}"/>
+              <Binding Source="{x:Static r:Texts.HintSelectedItems}"/>
+            </MultiBinding>
+          </MenuItem.Header>
+        </MenuItem>
+        <Separator/>
+        
         <MenuItem Header="Crash?">
           <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
         </MenuItem>

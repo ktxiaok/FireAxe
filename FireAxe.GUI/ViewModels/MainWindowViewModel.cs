@@ -219,6 +219,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 return;
             }
         }, this.WhenAnyValue(x => x.HasSelection));
+        DeleteAddonsWithMissingFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteAddonsWithMissingFilesAsync(), _addonRootNotNullObservable);
+        DeleteAddonsWithMissingFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteAddonsWithMissingFilesAsync(true), this.WhenAnyValue(x => x.HasSelection));
 
         OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
         CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
@@ -481,6 +483,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> ExportSelectedItemsAsAddonRootFile { get; }
 
+    public ReactiveCommand<Unit, Unit> DeleteAddonsWithMissingFilesCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> DeleteAddonsWithMissingFilesForSelectedItemsCommand { get; }
+
     public ReactiveCommand<Unit, Unit> OpenAboutWindowCommand { get; }
 
     public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
@@ -524,6 +530,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public Interaction<string, Unit> ShowSaveAddonRootFileSuccessInteraction { get; } = new();
 
     public Interaction<int, Unit> ShowItemsRandomSelectedInteraction { get; } = new();
+
+    public Interaction<int, bool> ConfirmDeleteAddonsWithMissingFilesInteraction { get; } = new();
+
+    public Interaction<Unit, Unit> ShowAddonsWithMissingFilesNotFoundInteraction { get; } = new();
 
     public async void InitIfNot()
     {
@@ -928,6 +938,59 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         {
             await ShowExceptionInteraction.Handle(ex);
         }
+    }
+
+    private async Task DeleteAddonsWithMissingFilesAsync(bool selectedItems = false)
+    {
+        var explorerViewModel = AddonNodeExplorerViewModel;
+        if (explorerViewModel is null)
+        {
+            return;
+        }
+
+        IEnumerable<AddonNode> targetAddons = selectedItems ?
+            explorerViewModel.SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()) :
+            explorerViewModel.AddonRoot.GetDescendants();
+        var addonsToDelete = new List<AddonNode>();
+        foreach (var addon in targetAddons)
+        {
+            if (addon.RequireFile)
+            {
+                bool filePresent = true;
+                var filePath = addon.FullFilePath;
+                try
+                {
+                    filePresent = FileSystemUtils.Exists(filePath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception occurred during getting the existence of the file system entry: {Path}", filePath);
+                }
+                if (!filePresent)
+                {
+                    addonsToDelete.Add(addon);
+                }
+            }
+        }
+        int count = addonsToDelete.Count;
+        if (count == 0)
+        {
+            await ShowAddonsWithMissingFilesNotFoundInteraction.Handle(Unit.Default);
+            return;
+        }
+        bool confirm = await ConfirmDeleteAddonsWithMissingFilesInteraction.Handle(count);
+        if (!confirm)
+        {
+            return;
+        }
+        var deletionTasks = new (Task, string)[count];
+        for (int i = 0; i < count; i++)
+        {
+            var addon = addonsToDelete[i];
+            var nodePath = addon.NodePath;
+            deletionTasks[i] = (addon.DestroyAsync(), nodePath);
+        }
+        await explorerViewModel.ShowDeletionProgressInteraction.Handle(deletionTasks);
     }
 
     private void OnAddonRootNewDownloadItem(IDownloadItem downloadItem)

@@ -1166,4 +1166,13 @@
   <data name="ShowFileCustomProcessArgumentsWatermark" xml:space="preserve">
     <value>Use "{0}" to represent the file path</value>
   </data>
+  <data name="DeleteAddonsWithMissingFiles" xml:space="preserve">
+    <value>Delete Addons with Missing Files</value>
+  </data>
+  <data name="ConfirmDeleteAddonsWithMissingFilesWithCount" xml:space="preserve">
+    <value>{0} addons with missing files found. Are you sure you want to delete these addons?</value>
+  </data>
+  <data name="AddonsWithMissingFilesNotFound" xml:space="preserve">
+    <value>Addons with missing files not found.</value>
+  </data>
 </root>
