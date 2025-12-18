@@ -223,6 +223,63 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     }
 
     [JsonProperty]
+    public double? MainWindowWidth
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                value = Math.Max(0, value.Value);
+            }
+            if (value == field)
+            {
+                return;
+            }
+
+            field = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    } = null;
+
+    [JsonProperty]
+    public double? MainWindowHeight
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                value = Math.Max(0, value.Value);
+            }
+            if (value == field)
+            {
+                return;
+            }
+
+            field = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    } = null;
+
+    [JsonProperty]
+    public bool IsMainWindowMaximized
+    {
+        get;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                RequestSave = true;
+            }
+        }
+    } = false;
+
+    [JsonProperty]
     public string GamePath
     {
         get => _gamePath;

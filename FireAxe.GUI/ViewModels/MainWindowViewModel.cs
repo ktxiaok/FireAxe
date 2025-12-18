@@ -29,14 +29,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             _mainWindowViewModel = mainWindowViewModel;
         }
 
-        public bool IsAutoUpdateWorkshopItem => _mainWindowViewModel._settings.IsAutoUpdateWorkshopItem;
+        public bool IsAutoUpdateWorkshopItem => _mainWindowViewModel._appSettings.IsAutoUpdateWorkshopItem;
 
         public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => _mainWindowViewModel._vpkAddonConflictCheckSettings;
     }
 
-    private static TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
-    private static TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(5);
-    private static TimeSpan BackupInterval = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan CheckClipboardInterval = TimeSpan.FromSeconds(0.5);
+    private static readonly TimeSpan AutoRedownloadInterval = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan BackupInterval = TimeSpan.FromMinutes(1);
 
     private bool _disposed = false;
 
@@ -45,7 +45,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     private bool _inited = false;
 
-    private readonly AppSettings _settings;
+    private readonly AppSettings _appSettings;
     private readonly IAppWindowManager _windowManager;
     private readonly IDownloadService _downloadService;
     private readonly HttpClient _httpClient;
@@ -80,14 +80,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     private IDisposable _backupTimer;
 
-    public MainWindowViewModel(AppSettings settings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
+    public MainWindowViewModel(AppSettings appSettings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
     {
-        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(appSettings);
         ArgumentNullException.ThrowIfNull(windowManager);
         ArgumentNullException.ThrowIfNull(downloadService);
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(downloadItemListViewModel);
-        _settings = settings;
+        _appSettings = appSettings;
         _windowManager = windowManager;
         _downloadService = downloadService;
         _httpClient = httpClient;
@@ -223,7 +223,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         OpenAboutWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAboutWindow());
         CheckUpdateCommand = ReactiveCommand.Create(() => CheckUpdate(false));
 
-        _settings.WhenAnyValue(x => x.GamePath)
+        _appSettings.WhenAnyValue(x => x.GamePath)
             .CombineLatest(this.WhenAnyValue(x => x.AddonRoot))
             .Subscribe(args =>
             {
@@ -234,14 +234,14 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 }
             })
             .DisposeWith(_disposables);
-        _settings.WhenAnyValue(x => x.IgnoreHalfLife2FilesForVpkAddonConflicts)
+        _appSettings.WhenAnyValue(x => x.IgnoreHalfLife2FilesForVpkAddonConflicts)
             .Subscribe(_ =>
             {
-                bool ignoreHl2 = _settings.IgnoreHalfLife2FilesForVpkAddonConflicts;
+                bool ignoreHl2 = _appSettings.IgnoreHalfLife2FilesForVpkAddonConflicts;
                 _vpkAddonConflictCheckSettings = new()
                 {
                     IgnoringFileSet = new VpkAddonConflictIgnoringFileSet([], [
-                        () => _settings.WaitCustomVpkAddonConflictIgnoringFiles(),
+                        () => _appSettings.WaitCustomVpkAddonConflictIgnoringFiles(),
                         () => ignoreHl2 ? CommonVpkAddonConflictIgnoringFiles.HalfLife2 : null
                     ])
                 };
@@ -262,25 +262,25 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 }
                 _addonNodeExplorerViewModelDisposables = new();
                 var disposables = _addonNodeExplorerViewModelDisposables;
-                explorerViewModel.SortMethod = _settings.AddonNodeSortMethod;
-                explorerViewModel.IsAscendingOrder = _settings.IsAddonNodeAscendingOrder;
-                explorerViewModel.ListItemViewKind = _settings.AddonNodeListItemViewKind;
+                explorerViewModel.SortMethod = _appSettings.AddonNodeSortMethod;
+                explorerViewModel.IsAscendingOrder = _appSettings.IsAddonNodeAscendingOrder;
+                explorerViewModel.ListItemViewKind = _appSettings.AddonNodeListItemViewKind;
                 explorerViewModel.WhenAnyValue(x => x.SortMethod)
-                    .BindTo(_settings, x => x.AddonNodeSortMethod)
+                    .BindTo(_appSettings, x => x.AddonNodeSortMethod)
                     .DisposeWith(disposables);
                 explorerViewModel.WhenAnyValue(x => x.IsAscendingOrder)
-                    .BindTo(_settings, x => x.IsAddonNodeAscendingOrder)
+                    .BindTo(_appSettings, x => x.IsAddonNodeAscendingOrder)
                     .DisposeWith(disposables);
                 explorerViewModel.WhenAnyValue(x => x.ListItemViewKind)
-                    .BindTo(_settings, x => x.AddonNodeListItemViewKind)
+                    .BindTo(_appSettings, x => x.AddonNodeListItemViewKind)
                     .DisposeWith(disposables);
-                _settings.WhenAnyValue(x => x.AddonNodeSortMethod)
+                _appSettings.WhenAnyValue(x => x.AddonNodeSortMethod)
                     .BindTo(explorerViewModel, x => x.SortMethod)
                     .DisposeWith(disposables);
-                _settings.WhenAnyValue(x => x.IsAddonNodeAscendingOrder)
+                _appSettings.WhenAnyValue(x => x.IsAddonNodeAscendingOrder)
                     .BindTo(explorerViewModel, x => x.IsAscendingOrder)
                     .DisposeWith(disposables);
-                _settings.WhenAnyValue(x => x.AddonNodeListItemViewKind)
+                _appSettings.WhenAnyValue(x => x.AddonNodeListItemViewKind)
                     .BindTo(explorerViewModel, x => x.ListItemViewKind)
                     .DisposeWith(disposables);
             });
@@ -333,6 +333,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     public event Action? CloseCheckingUpdateWindow = null;
 
     public ViewModelActivator Activator { get; } = new();
+
+    public AppSettings AppSettings => _appSettings; 
 
     public bool RequestSave
     {
@@ -534,11 +536,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         CheckUpdate(true);
 
         // Try to open the LastOpenDirectory.
-        var lastOpenDir = _settings.LastOpenDirectory;
+        var lastOpenDir = _appSettings.LastOpenDirectory;
         if (lastOpenDir != null)
         {
-            _settings.LastOpenDirectory = null;
-            _settings.Save();
+            _appSettings.LastOpenDirectory = null;
+            _appSettings.Save();
             if (Directory.Exists(lastOpenDir))
             {
                 await OpenDirectory(lastOpenDir);
@@ -584,7 +586,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 addonRoot.DirectoryPath = dirPath;
                 AddonRoot = addonRoot;
 
-                _settings.LastOpenDirectory = dirPath;
+                _appSettings.LastOpenDirectory = dirPath;
             }, DispatcherPriority.Default);
         }
         catch (AddonRootDeserializationException ex)
@@ -602,7 +604,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     {
         AddonRoot = null;
 
-        _settings.LastOpenDirectory = null;
+        _appSettings.LastOpenDirectory = null;
     }
 
     public void Save()
@@ -734,7 +736,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 return;
             }
-            if (latestVersion == _settings.SuppressedUpdateRequestVersion)
+            if (latestVersion == _appSettings.SuppressedUpdateRequestVersion)
             {
                 return;
             }
@@ -761,7 +763,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
             else if (reply == UpdateRequestReply.Ignore)
             {
-                _settings.SuppressedUpdateRequestVersion = latestVersion;
+                _appSettings.SuppressedUpdateRequestVersion = latestVersion;
             }
         }
     }
@@ -803,7 +805,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
             var explorerViewModel = AddonNodeExplorerViewModel;
 
-            if (explorerViewModel != null && _settings.IsAutoDetectWorkshopItemLinkInClipboard)
+            if (explorerViewModel != null && _appSettings.IsAutoDetectWorkshopItemLinkInClipboard)
             {
                 if (clipboardText != null)
                 {
@@ -847,7 +849,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         {
             return;
         }
-        if (!_settings.IsAutoRedownload)
+        if (!_appSettings.IsAutoRedownload)
         {
             return;
         }
@@ -866,11 +868,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     public void BackUpIfNeed()
     {
-        if (!_settings.IsFileBackupEnabled)
+        if (!_appSettings.IsFileBackupEnabled)
         {
             return;
         }
-        AddonRoot?.BackUpIfNeed(_settings.MaxRetainedBackupFileCount, _settings.FileBackupIntervalMinutes);
+        AddonRoot?.BackUpIfNeed(_appSettings.MaxRetainedBackupFileCount, _appSettings.FileBackupIntervalMinutes);
     }
 
     public void DummyCrash()
