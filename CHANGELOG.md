@@ -1,4 +1,5 @@
 - change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
+- fix: the game path validity checker doesn't recognize Left 4 Dead 2 Dedicated Server
 # v0.7.2
 - fix: addon preview image customization doesn't work in some cases
 - fix: VPK conflict check will fail if there're invalid VPKs (issue #30)

@@ -15,12 +15,11 @@ public static class GamePathUtils
             return false;
         }
 
-        string appidPath = Path.Join(gamePath, "steam_appid.txt");
         try
         {
-            if (File.Exists(appidPath))
+            if (Directory.Exists(Path.Join(gamePath, "left4dead2")))
             {
-                return File.ReadAllText(appidPath).Trim(' ', '\n', '\0') == "550";
+                return true;
             }
         }
         catch (Exception ex)
