@@ -5,10 +5,10 @@
         xmlns:v="using:FireAxe.Views"
         xmlns:vm="using:FireAxe.ViewModels"
         xmlns:r="using:FireAxe.Resources"
-        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="900"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="700"
         x:Class="FireAxe.Views.AddonNodePickerWindow"
         x:DataType="vm:AddonNodePickerViewModel"
-        Width="900" Height="900"
+        Width="750" Height="700"
         WindowStartupLocation="CenterOwner">
   <DockPanel Margin="10">
     <Panel
@@ -27,6 +27,7 @@
 
     <v:AddonNodeExplorerView
       Name="explorerView"
-      DataContext="{Binding ExplorerViewModel}"/>
+      DataContext="{Binding ExplorerViewModel}"
+      IsAddonNodeViewEnabled="False"/>
   </DockPanel>
 </Window>

@@ -125,7 +125,7 @@ internal static class Utils
         }
     }
 
-    public static void OpenSteamWorkshopPage(ulong publishedFileId)
+    public static void OpenWorkshopPage(ulong publishedFileId)
     {
         OpenWebsite($"https://steamcommunity.com/sharedfiles/filedetails/?id={publishedFileId}");
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using Avalonia;
@@ -35,5 +36,16 @@ public partial class AddonNodePickerWindow : ReactiveWindow<AddonNodePickerViewM
 
             explorerView.IsSingleSelectionEnabled = !viewModel.AllowMultiple;
         });
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        if (ViewModel is { } viewModel)
+        {
+            ViewModel = null;
+            viewModel.Dispose();
+        }
     }
 }

@@ -828,7 +828,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
-    public bool CanMoveTo(AddonGroup? group)
+    public bool IsValidMove(AddonGroup? group)
     {
         this.ThrowIfInvalid();
 
@@ -861,9 +861,9 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         {
             ThrowDifferentRootException();
         }
-        if (!CanMoveTo(targetGroup))
+        if (!IsValidMove(targetGroup))
         {
-            ThrowMoveGroupToItselfException();
+            throw new AddonNodeInvalidMoveException();
         }
 
         this.ThrowIfInvalid();
@@ -1604,10 +1604,5 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     private static void ThrowDifferentRootException()
     {
         throw new InvalidOperationException("Different AddonRoot instance");
-    }
-
-    private static void ThrowMoveGroupToItselfException()
-    {
-        throw new InvalidOperationException("Cannot move a AddonGroup instance to itself!");
     }
 }

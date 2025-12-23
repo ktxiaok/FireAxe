@@ -7,22 +7,13 @@ namespace FireAxe.ValueConverters;
 
 public class ObjectExplanationConverter : IValueConverter
 {
-    private static ObjectExplanationConverter s_default = new();
+    public static ObjectExplanationConverter Default { get; } = new();
 
-    public static ObjectExplanationConverter Default => s_default;
+    public ObjectExplanationManager ExplanationManager { get; init; } = ObjectExplanationManager.Default;
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value == null)
-        {
-            return null;
-        }
-        var result = ObjectExplanationManager.Default.TryGet(value);
-        if (result != null)
-        {
-            return result;
-        }
-        return value;
+        return ExplanationManager.Get(value);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

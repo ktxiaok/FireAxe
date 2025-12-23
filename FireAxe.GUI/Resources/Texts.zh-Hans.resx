@@ -177,8 +177,8 @@
   <data name="CancelMove" xml:space="preserve">
     <value>取消移动</value>
   </data>
-  <data name="CantMoveItemWithName" xml:space="preserve">
-    <value>无法移动项目“{0}”！</value>
+  <data name="FailedToMoveItemWithName" xml:space="preserve">
+    <value>未能移动项目“{0}”。</value>
   </data>
   <data name="Check" xml:space="preserve">
     <value>检查</value>
@@ -465,8 +465,8 @@
   <data name="InvalidInputMessage" xml:space="preserve">
     <value>无效输入</value>
   </data>
-  <data name="InvalidMoveMessage" xml:space="preserve">
-    <value>目标组是源组的子组。</value>
+  <data name="AddonNodeInvalidMoveMessage" xml:space="preserve">
+    <value>无效的移动：目标组不能是源组的子组。</value>
   </data>
   <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
     <value>无效的发布文件ID。</value>
@@ -501,8 +501,8 @@
   <data name="MoveUp" xml:space="preserve">
     <value>上移</value>
   </data>
-  <data name="MovingMessage" xml:space="preserve">
-    <value>正在移动：{0}</value>
+  <data name="MovingColon" xml:space="preserve">
+    <value>正在移动：</value>
   </data>
   <data name="MultipleItemsSelected" xml:space="preserve">
     <value>已选中{0}个项目。</value>

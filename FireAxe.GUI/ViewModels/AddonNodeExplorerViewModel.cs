@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -20,20 +17,87 @@ using DynamicData.Alias;
 using DynamicData.Binding;
 using FireAxe.Resources;
 using ReactiveUI;
+using Serilog;
 
 namespace FireAxe.ViewModels;
 
-public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, IValidity
+public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, IValidity, IDisposable
 {
+    public class MovingNodeViewModel : AddonNodeSimpleViewModel
+    {
+        private readonly AddonNodeExplorerViewModel _explorerViewModel;
+
+        internal MovingNodeViewModel(AddonNodeExplorerViewModel explorerViewModel, AddonNode addon) : base(addon)
+        {
+            _explorerViewModel = explorerViewModel;
+
+            MoveHereCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                try
+                {
+                    MoveHere();
+                }
+                catch (Exception ex)
+                {
+                    var nodePath = Addon?.NodePath ?? "null";
+                    Log.Error(ex, "Exception occurred during moving the AddonNode: {NodePath}", nodePath);
+                    await _explorerViewModel.ShowMoveExceptionInteraction.Handle((ex, nodePath));
+                }
+            });
+        }
+
+        public ReactiveCommand<Unit, Unit> MoveHereCommand { get; }
+
+        public void Remove()
+        {
+            if (Addon is { } addon)
+            {
+                _explorerViewModel._movingNodes.Remove(addon);
+            }
+        }
+
+        public void MoveHere()
+        {
+            if (Addon is { } addon)
+            {
+                addon.MoveTo(_explorerViewModel.CurrentGroup);
+            }
+            Remove();
+        }
+    }
+
     private readonly static TimeSpan SearchThrottleTime = TimeSpan.FromSeconds(0.5);
+
+    private bool _disposed = false;
+    private readonly CompositeDisposable _disposables = new();
 
     private readonly AddonRoot _addonRoot;
 
-    private ReadOnlyObservableCollection<AddonNode>? _nodes = null;
-    private ReadOnlyObservableCollection<AddonNodeListItemViewModel> _nodeViewModels = ReadOnlyObservableCollection<AddonNodeListItemViewModel>.Empty;
-    private IDisposable? _nodesSubscription = null;
+    private ReadOnlyObservableCollection<AddonNode> _currentNodes = ReadOnlyObservableCollection<AddonNode>.Empty;
+    private IDisposable? _currentNodesSubscription = null;
+    private bool _isRefreshCurrentNodesDeferredRequested = false;
 
-    private IEnumerable<string>? _existingTags = null;
+    private AddonGroup? _currentGroup = null;
+
+    private readonly ObservableAsPropertyHelper<IEnumerable<AddonNodeNavBarItemViewModel>> _navBarItemViewModels;
+
+    private readonly ObservableValidRefCollection<AddonNode> _selectedNodes = new();
+    private readonly ObservableAsPropertyHelper<AddonNode?> _selectedNode;
+    private readonly ObservableAsPropertyHelper<bool> _hasSelection;
+    private readonly ObservableAsPropertyHelper<bool> _isSingleSelection;
+    private readonly ObservableAsPropertyHelper<bool> _isMultipleSelection;
+    private readonly ObservableAsPropertyHelper<string?> _selectionNames;
+
+    private readonly ObservableValidRefCollection<AddonNode> _movingNodes = new();
+    private readonly ReadOnlyObservableCollection<MovingNodeViewModel> _movingNodeViewModels;
+
+    private AddonNodeSortMethod _sortMethod = AddonNodeSortMethod.None;
+    private bool _isAscendingOrder = true;
+
+    private AddonNodeListItemViewKind _listItemViewKind = AddonNodeListItemViewKind.MediumTile;
+    private readonly ObservableAsPropertyHelper<bool> _isGridView;
+    private readonly ObservableAsPropertyHelper<bool> _isTileView;
+    private readonly ObservableAsPropertyHelper<double> _tileViewSize;
 
     private string _searchText = "";
     private readonly ObservableAsPropertyHelper<bool> _isSearchTextClearable;
@@ -45,39 +109,11 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
     private bool _isSearchFlatten = false;
     private bool _isSearchRegex = false;
     private bool _isFilterEnabled = false;
+    private IEnumerable<string>? _existingTags = null;
     private AddonTagFilterMode _tagFilterMode = AddonTagFilterMode.Or;
     private IEnumerable<string> _selectedTags = [];
     private ISet<string>? _filterTags = null;
     private AddonNodeSearchOptions _searchOptions = new();
-
-    private AddonNodeSortMethod _sortMethod = AddonNodeSortMethod.None;
-    private bool _isAscendingOrder = true;
-
-    private AddonGroup? _currentGroup = null;
-
-    private IEnumerable<AddonNode> _movingNodes = [];
-    private readonly ObservableAsPropertyHelper<string?> _movingNodeNames;
-
-    private readonly ObservableCollection<AddonNodeListItemViewModel> _selection = new();
-    private readonly ObservableAsPropertyHelper<bool> _hasSelection;
-    private readonly ObservableAsPropertyHelper<bool> _isSingleSelection;
-    private readonly ObservableAsPropertyHelper<bool> _isMultipleSelection;
-    private readonly ObservableAsPropertyHelper<string> _selectionNames;
-
-    private readonly ObservableAsPropertyHelper<AddonNodeViewModel?> _activeAddonNodeViewModel;
-    private bool _isAddonNodeViewEnabled = true;
-
-    private AddonNodeListItemViewKind _listItemViewKind = AddonNodeListItemViewKind.MediumTile;
-
-    private readonly ObservableAsPropertyHelper<bool> _isGridView;
-    private readonly ObservableAsPropertyHelper<bool> _isTileView;
-    private readonly ObservableAsPropertyHelper<double> _tileViewSize;
-
-    private readonly ObservableAsPropertyHelper<IEnumerable<AddonNodeNavBarItemViewModel>> _navBarItemViewModels;
-
-    private readonly Subject<AddonNode> _nodeMovedSubject = new();
-
-    private bool _isRefreshNodesDeferredRequested = false;
 
     public AddonNodeExplorerViewModel(AddonRoot addonRoot)
     {
@@ -85,74 +121,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
         _addonRoot = addonRoot;
 
-        _isSearchTextClearable = this.WhenAnyValue(x => x.SearchText)
-            .Select(searchText => searchText.Length > 0)
-            .ToProperty(this, nameof(IsSearchTextClearable));
-
-        _movingNodeNames = this.WhenAnyValue(x => x.MovingNodes)
-            .Select(movingNodes =>
-            {
-                if (movingNodes.Any())
-                {
-                    return string.Join(", ", movingNodes.Select(node => node.Name));
-                }
-                return null;
-            })
-            .ToProperty(this, nameof(MovingNodeNames));
-
-        _hasSelection = this.WhenAnyValue(x => x.Selection.Count)
-            .Select(count => count > 0)
-            .ToProperty(this, nameof(HasSelection));
-        _isSingleSelection = this.WhenAnyValue(x => x.Selection.Count)
-            .Select(count => count == 1)
-            .ToProperty(this, nameof(IsSingleSelection));
-        _isMultipleSelection = this.WhenAnyValue(x => x.Selection.Count)
-            .Select(count => count > 1)
-            .ToProperty(this, nameof(IsMultipleSelection));
-        _selectionNames = this.WhenAnyValue(x => x.SelectedNodes)
-            .Select(nodes =>
-            {
-                return string.Join(", ", nodes.Select(node => node.Name));
-            })
-            .ToProperty(this, nameof(SelectionNames));
-
-        _activeAddonNodeViewModel = Selection.ObserveCollectionChanges()
-            .CombineLatest(this.WhenAnyValue(x => x.IsAddonNodeViewEnabled))
-            .Select(_ =>
-            {
-                if (!IsAddonNodeViewEnabled)
-                {
-                    return null;
-                }
-
-                var selection = Selection;
-                if (selection.Count == 1 && selection[0].Addon is { } addon)
-                {
-                    return AddonNodeViewModel.Create(addon);
-                }
-
-                return null;
-            })
-            .ToProperty(this, nameof(ActiveAddonNodeViewModel), deferSubscription: true);
-
-        _isGridView = this.WhenAnyValue(x => x.ListItemViewKind)
-            .Select((kind) => kind == AddonNodeListItemViewKind.Grid)
-            .ToProperty(this, nameof(IsGridView));
-        _isTileView = this.WhenAnyValue(x => x.ListItemViewKind)
-            .Select((kind) => kind.IsTile())
-            .ToProperty(this, nameof(IsTileView));
-        _tileViewSize = this.WhenAnyValue(x => x.ListItemViewKind)
-            .Select((kind) => (kind switch
-            {
-                AddonNodeListItemViewKind.MediumTile => (double?)Application.Current!.FindResource("size_addon_tile"),
-                AddonNodeListItemViewKind.LargeTile => (double?)Application.Current!.FindResource("size_addon_tile_large"),
-                AddonNodeListItemViewKind.SmallTile => (double?)Application.Current!.FindResource("size_addon_tile_small"),
-                _ => null
-            }).GetValueOrDefault(200))
-            .ToProperty(this, nameof(TileViewSize));
-
         _navBarItemViewModels = this.WhenAnyValue(x => x.CurrentGroup)
-            .Select((currentGroup) =>
+            .Select(currentGroup =>
             {
                 var items = new List<AddonNodeNavBarItemViewModel>();
                 AddonGroup? current = currentGroup;
@@ -165,9 +135,64 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
             })
             .ToProperty(this, nameof(NavBarItemViewModels));
 
-        GotoParentCommand = ReactiveCommand.Create(GotoParent,
-            this.WhenAnyValue(x => x.CurrentGroup)
-            .Select(group => group != null));
+        _selectedNodes.DisposeWith(_disposables);
+        _selectedNode = _selectedNodes.ObserveCollectionChanges()
+            .Select(_ =>
+            {
+                if (_selectedNodes is [AddonNode selectedNode])
+                {
+                    return selectedNode;
+                }
+                return null;
+            })
+            .ToProperty(this, nameof(SelectedNode));
+        _hasSelection = this.WhenAnyValue(x => x.SelectedNodes.Count)
+            .Select(count => count > 0)
+            .ToProperty(this, nameof(HasSelection));
+        _isSingleSelection = this.WhenAnyValue(x => x.SelectedNodes.Count)
+            .Select(count => count == 1)
+            .ToProperty(this, nameof(IsSingleSelection));
+        _isMultipleSelection = this.WhenAnyValue(x => x.SelectedNodes.Count)
+            .Select(count => count > 1)
+            .ToProperty(this, nameof(IsMultipleSelection));
+        _selectionNames = _selectedNodes.ObserveCollectionChanges()
+            .Select(_ =>
+            {
+                if (_selectedNodes.Count == 0)
+                {
+                    return null;
+                }
+                return string.Join(", ", _selectedNodes.Select(node => node.Name));
+            })
+            .ToProperty(this, nameof(SelectionNames));
+
+        _movingNodes.DisposeWith(_disposables);
+        _movingNodes.ToObservableChangeSet<ObservableValidRefCollection<AddonNode>, AddonNode>()
+            .Transform(addon => new MovingNodeViewModel(this, addon))
+            .Bind(out _movingNodeViewModels)
+            .Subscribe();
+
+        _isGridView = this.WhenAnyValue(x => x.ListItemViewKind)
+            .Select(kind => kind == AddonNodeListItemViewKind.Grid)
+            .ToProperty(this, nameof(IsGridView));
+        _isTileView = this.WhenAnyValue(x => x.ListItemViewKind)
+            .Select(kind => kind.IsTile())
+            .ToProperty(this, nameof(IsTileView));
+        _tileViewSize = this.WhenAnyValue(x => x.ListItemViewKind)
+            .Select(kind => (kind switch
+            {
+                AddonNodeListItemViewKind.MediumTile => (double?)Application.Current!.FindResource("size_addon_tile"),
+                AddonNodeListItemViewKind.LargeTile => (double?)Application.Current!.FindResource("size_addon_tile_large"),
+                AddonNodeListItemViewKind.SmallTile => (double?)Application.Current!.FindResource("size_addon_tile_small"),
+                _ => null
+            }).GetValueOrDefault(200))
+            .ToProperty(this, nameof(TileViewSize));
+
+        _isSearchTextClearable = this.WhenAnyValue(x => x.SearchText)
+            .Select(searchText => searchText.Length > 0)
+            .ToProperty(this, nameof(IsSearchTextClearable));
+
+        GotoParentCommand = ReactiveCommand.Create(GotoParent, this.WhenAnyValue(x => x.CurrentGroup).Select(group => group != null));
         GotoRootCommand = ReactiveCommand.Create(() => GotoGroup(null));
 
         EnableCommand = ReactiveCommand.Create(() => SetSelectionEnabled(true), this.WhenAnyValue(x => x.HasSelection));
@@ -175,41 +200,117 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         EnableRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionEnabledRecursively(true), this.WhenAnyValue(x => x.HasSelection));
         DisableRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionEnabledRecursively(false), this.WhenAnyValue(x => x.HasSelection));
 
-        MoveCommand = ReactiveCommand.Create(Move,
-            this.WhenAnyValue(x => x.MovingNodes, x => x.Selection.Count)
-            .Select(_ => !MovingNodes.Any() && Selection.Count > 0));
-        MoveHereCommand = ReactiveCommand.CreateFromTask(MoveHere,
-            this.WhenAnyValue(x => x.MovingNodes)
-            .Select(movingNodes => movingNodes.Any()));
-        CancelMoveCommand = ReactiveCommand.Create(CancelMove,
-            this.WhenAnyValue(x => x.MovingNodes)
-            .Select(movingNodes => movingNodes.Any()));
+        MoveCommand = ReactiveCommand.Create(() =>
+        {
+            this.ThrowIfInvalid();
+
+            var selectedNodes = SelectedNodes.ToArray();
+            foreach (var node in selectedNodes)
+            {
+                AddMovingNode(node);
+            }
+        }, this.WhenAnyValue(x => x.HasSelection));
+        var movingNodesNotEmptyObservable = this.WhenAnyValue(x => x.MovingNodeViewModels.Count).Select(count => count > 0);
+        MoveHereCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            this.ThrowIfInvalid();
+
+            var movingNodeViewModels = MovingNodeViewModels.ToArray();
+            bool skipAll = false;
+            foreach (var movingNodeViewModel in movingNodeViewModels)
+            {
+                try
+                {
+                    movingNodeViewModel.MoveHere();
+                }
+                catch (Exception ex)
+                {
+                    var nodePath = movingNodeViewModel.Addon?.NodePath ?? "null";
+                    Log.Error(ex, "Exception occurred during moving the AddonNode: {NodePath}", nodePath);
+                    if (movingNodeViewModels.Length == 1)
+                    {
+                        await ShowMoveExceptionInteraction.Handle((ex, nodePath));
+                    }
+                    else if (!skipAll)
+                    {
+                        var reply = await ShowBatchMoveExceptionInteraction.Handle((ex, nodePath));
+                        if (reply == OperationInterruptReply.Abort)
+                        {
+                            break;
+                        }
+                        else if (reply == OperationInterruptReply.SkipAll)
+                        {
+                            skipAll = true;
+                        }
+                    }
+                }
+            }
+        }, movingNodesNotEmptyObservable);
+        CancelMoveCommand = ReactiveCommand.Create(ClearMovingNodes, movingNodesNotEmptyObservable);
 
         NewGroupCommand = ReactiveCommand.Create(() => { NewGroup(); });
         NewRefAddonCommand = ReactiveCommand.Create(() => { NewRefAddon(); });
         NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
-        NewWorkshopCollectionCommand = ReactiveCommand.CreateFromTask(async () => await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup)));
+        NewWorkshopCollectionCommand = ReactiveCommand.CreateFromTask(async () => 
+        {
+            this.ThrowIfInvalid();
+
+            await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup));
+        });
 
         CreateRefAddonsBasedOnSelectedCommand = ReactiveCommand.Create(() => { CreateRefAddonsBasedOnSelected(); }, this.WhenAnyValue(x => x.HasSelection));
 
-        DeleteCommand = ReactiveCommand.CreateFromTask<bool>(Delete, this.WhenAnyValue(x => x.HasSelection));
+        DeleteCommand = ReactiveCommand.CreateFromTask<bool>(DeleteSelectionAsync, this.WhenAnyValue(x => x.HasSelection));
 
-        var hasSelectedWorkshopVpkAddon = Selection.ObserveCollectionChanges()
+        var hasSelectedWorkshopVpkAddon = _selectedNodes.ObserveCollectionChanges()
             .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>().Any());
         var hasSelectedUpdateableAddon = hasSelectedWorkshopVpkAddon;
-        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
-        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
-        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
-        OpenWorkshopPageCommand = ReactiveCommand.Create(OpenWorkshopPage, hasSelectedWorkshopVpkAddon);
+        SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
+        SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
+        OpenWorkshopPageCommand = ReactiveCommand.Create(OpenSelectionWorkshopPage, hasSelectedWorkshopVpkAddon);
 
-        Selection.ObserveCollectionChanges()
-            .Subscribe(_ => this.RaisePropertyChanged(nameof(SelectedNodes)));
+        // Ensure the validity of the current group.
+        this.WhenAnyValue(x => x.CurrentGroup!.IsValid)
+            .Subscribe(isValid =>
+            {
+                if (!isValid)
+                {
+                    AddonGroup? current = _currentGroup;
+                    while (true)
+                    {
+                        if (current == null)
+                        {
+                            GotoGroup(null);
+                            break;
+                        }
+
+                        if (current.IsValid)
+                        {
+                            GotoGroup(current);
+                            break;
+                        }
+
+                        current = current.Group;
+                    }
+                }
+            })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.CurrentGroup)
+            .Subscribe(_ => SelectedNodes.Clear());
 
         UpdateFilterTags();
         this.WhenAnyValue(x => x.SelectedTags, x => x.IsFilterEnabled)
             .Skip(1)
             .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
-            .Subscribe(_ => UpdateFilterTags());
+            .Subscribe(_ => 
+            {
+                if (IsValid)
+                {
+                    UpdateFilterTags();
+                }
+            });
         UpdateSearchOptions();
         this.WhenAnyValue(x => x.SearchIgnoreCase,
             x => x.IsSearchFlatten,
@@ -218,15 +319,27 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
             x => x.FilterTags)
             .Skip(1)
             .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
-            .Subscribe(_ => UpdateSearchOptions());
+            .Subscribe(_ => 
+            {
+                if (IsValid)
+                {
+                    UpdateSearchOptions();
+                }
+            });
 
         this.WhenAnyValue(x => x.SearchText)
             .Skip(1)
             .Throttle(SearchThrottleTime, RxApp.MainThreadScheduler)
-            .Subscribe(_ => RefreshNodes());
+            .Subscribe(_ => 
+            {
+                if (IsValid)
+                {
+                    RefreshCurrentNodes();
+                }
+            });
         this.WhenAnyValue(x => x.CurrentGroup, x => x.SortMethod, x => x.IsAscendingOrder, x => x.SearchOptions)
             .Skip(1)
-            .Subscribe(_ => RefreshNodes());
+            .Subscribe(_ => RefreshCurrentNodes());
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -237,34 +350,20 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
                 return;
             }
 
-            // Ensure the validity of the current group.
-            this.WhenAnyValue(x => x.CurrentGroup!.IsValid)
-                .Subscribe(isValid =>
-                {
-                    if (!isValid)
-                    {
-                        AddonGroup? current = _currentGroup;
-                        while (true)
-                        {
-                            if (current == null)
-                            {
-                                GotoGroup(null);
-                                break;
-                            }
-
-                            if (current.IsValid)
-                            {
-                                GotoGroup(current);
-                                break;
-                            }
-
-                            current = current.Group;
-                        }
-                    }
-                })
+            void OnNodeMoved(AddonNode node)
+            {
+                RefreshCurrentNodesDeferred();
+            }
+            AddonRoot.DescendantNodeMoved += OnNodeMoved;
+            Disposable.Create(() => AddonRoot.DescendantNodeMoved -= OnNodeMoved)
                 .DisposeWith(disposables);
 
-            _nodeMovedSubject.Subscribe(_ => RefreshNodesDeferred())
+            void OnNewNodeIdRegistered(AddonNode node)
+            {
+                RefreshCurrentNodesDeferred();
+            }
+            AddonRoot.NewNodeIdRegistered += OnNewNodeIdRegistered;
+            Disposable.Create(() => AddonRoot.NewNodeIdRegistered -= OnNewNodeIdRegistered)
                 .DisposeWith(disposables);
 
             UpdateExistingTags();
@@ -272,21 +371,18 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
                 .Subscribe(_ => UpdateExistingTags())
                 .DisposeWith(disposables);
 
-            var nodeMovedListener = (AddonNode node) =>
-            {
-                _nodeMovedSubject.OnNext(node);
-            };
-            AddonRoot.DescendantNodeMoved += nodeMovedListener;
-
             Disposable.Create(() =>
             {
-                DisposeNodesSubscription();
-
-                AddonRoot.DescendantNodeMoved -= nodeMovedListener;
+                DisposeCurrentNodesSubscription();
             }).DisposeWith(disposables);
 
             Refresh();
         });
+    }
+
+    ~AddonNodeExplorerViewModel()
+    {
+        Dispose(false);
     }
 
     public bool IsValid { get; protected set => this.RaiseAndSetIfChanged(ref field, value); } = true;
@@ -299,17 +395,51 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         private set => this.RaiseAndSetIfChanged(ref _currentGroup, value);
     }
 
-    public ReadOnlyObservableCollection<AddonNode>? Nodes
+    public ReadOnlyObservableCollection<AddonNode> CurrentNodes
     {
-        get => _nodes;
-        private set => this.RaiseAndSetIfChanged(ref _nodes, value);
+        get => _currentNodes;
+        private set => this.RaiseAndSetIfChanged(ref _currentNodes, value);
     }
 
-    public ReadOnlyObservableCollection<AddonNodeListItemViewModel> NodeViewModels
+    public AddonNodeSortMethod SortMethod
     {
-        get => _nodeViewModels;
-        private set => this.RaiseAndSetIfChanged(ref _nodeViewModels, value);
+        get => _sortMethod;
+        set => this.RaiseAndSetIfChanged(ref _sortMethod, value);
     }
+
+    public bool IsAscendingOrder
+    {
+        get => _isAscendingOrder;
+        set => this.RaiseAndSetIfChanged(ref _isAscendingOrder, value);
+    }
+
+    public ReadOnlyObservableCollection<MovingNodeViewModel> MovingNodeViewModels => _movingNodeViewModels;
+
+    public ObservableValidRefCollection<AddonNode> SelectedNodes => _selectedNodes;
+
+    public AddonNode? SelectedNode => _selectedNode.Value;
+
+    public bool HasSelection => _hasSelection.Value;
+
+    public bool IsSingleSelection => _isSingleSelection.Value;
+
+    public bool IsMultipleSelection => _isMultipleSelection.Value;
+
+    public string? SelectionNames => _selectionNames.Value;
+
+    public AddonNodeListItemViewKind ListItemViewKind
+    {
+        get => _listItemViewKind;
+        set => this.RaiseAndSetIfChanged(ref _listItemViewKind, value);
+    }
+
+    public bool IsGridView => _isGridView.Value;
+
+    public bool IsTileView => _isTileView.Value;
+
+    public double TileViewSize => _tileViewSize.Value;
+
+    public IEnumerable<AddonNodeNavBarItemViewModel> NavBarItemViewModels => _navBarItemViewModels.Value;
 
     public IEnumerable<string>? ExistingTags
     {
@@ -387,73 +517,6 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         private set => this.RaiseAndSetIfChanged(ref _searchOptions, value);
     }
 
-    public AddonNodeSortMethod SortMethod
-    {
-        get => _sortMethod;
-        set => this.RaiseAndSetIfChanged(ref _sortMethod, value);
-    }
-
-    public bool IsAscendingOrder
-    {
-        get => _isAscendingOrder;
-        set => this.RaiseAndSetIfChanged(ref _isAscendingOrder, value);
-    }
-
-    public IEnumerable<AddonNode> MovingNodes
-    {
-        get => _movingNodes;
-        private set => this.RaiseAndSetIfChanged(ref _movingNodes, value);
-    }
-
-    public string? MovingNodeNames => _movingNodeNames.Value;
-
-    public ObservableCollection<AddonNodeListItemViewModel> Selection => _selection;
-
-    public IEnumerable<AddonNode> SelectedNodes
-    {
-        get
-        {
-            var selection = Selection;
-            foreach (var viewModel in selection)
-            {
-                if (viewModel.Addon is { } addon)
-                {
-                    yield return addon;
-                }
-            }
-        }
-    }
-
-    public bool HasSelection => _hasSelection.Value;
-
-    public bool IsSingleSelection => _isSingleSelection.Value;
-
-    public bool IsMultipleSelection => _isMultipleSelection.Value;
-
-    public string SelectionNames => _selectionNames.Value;
-
-    public AddonNodeViewModel? ActiveAddonNodeViewModel => _activeAddonNodeViewModel.Value;
-
-    public bool IsAddonNodeViewEnabled
-    {
-        get => _isAddonNodeViewEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isAddonNodeViewEnabled, value);
-    }
-
-    public AddonNodeListItemViewKind ListItemViewKind
-    {
-        get => _listItemViewKind;
-        set => this.RaiseAndSetIfChanged(ref _listItemViewKind, value);
-    }
-
-    public bool IsGridView => _isGridView.Value;
-
-    public bool IsTileView => _isTileView.Value;
-
-    public double TileViewSize => _tileViewSize.Value;
-
-    public IEnumerable<AddonNodeNavBarItemViewModel> NavBarItemViewModels => _navBarItemViewModels.Value;
-
 
     public ReactiveCommand<Unit, Unit> GotoParentCommand { get; }
 
@@ -496,233 +559,40 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
     public Interaction<bool, bool> ConfirmDeleteInteraction { get; } = new();
 
-    public Interaction<Exception, Unit> ReportExceptionInteraction { get; } = new();
-
-    public Interaction<string, ErrorOperationReply> ReportInvalidMoveInteraction { get; } = new();
-
-    public Interaction<string, ErrorOperationReply> ReportNameExistsForMoveInteraction { get; } = new();
-
-    public Interaction<(string, Exception), ErrorOperationReply> ReportExceptionForMoveInteraction { get; } = new();
-
     public Interaction<IEnumerable<(Task, string)>, Unit> ShowDeletionProgressInteraction { get; } = new();
+
+    public Interaction<(Exception, string), Unit> ShowMoveExceptionInteraction { get; } = new();
+
+    public Interaction<(Exception, string), OperationInterruptReply> ShowBatchMoveExceptionInteraction { get; } = new();
 
     public Interaction<(AddonRoot, AddonGroup?), Unit> ShowNewWorkshopCollectionWindowInteraction { get; } = new();
 
 
     public ViewModelActivator Activator { get; } = new();
 
-    public bool SelectNode(AddonNode node)
+    public void SelectNode(AddonNode node)
     {
+        this.ThrowIfInvalid();
         ArgumentNullException.ThrowIfNull(node);
 
-        Selection.Clear();
-        foreach (var nodeViewModel in NodeViewModels)
+        _selectedNodes.Clear();
+        if (node.Root == AddonRoot)
         {
-            if (nodeViewModel.Addon == node)
-            {
-                Selection.Add(nodeViewModel);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int SelectNodes(IEnumerable<AddonNode>? nodes)
-    {
-        Selection.Clear();
-        if (nodes is null)
-        {
-            return 0;
-        }
-        var nodeSet = new HashSet<AddonNode>(nodes);
-        if (nodeSet.Count == 0)
-        {
-            return 0;
-        }
-        int count = 0;
-        foreach (var nodeViewModel in NodeViewModels)
-        {
-            if (nodeViewModel.Addon is { } node)
-            {
-                if (nodeSet.Contains(node))
-                {
-                    Selection.Add(nodeViewModel);
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    public AddonGroup NewGroup()
-    {
-        var group = AddonNode.Create<AddonGroup>(AddonRoot, CurrentGroup);
-        group.Name = group.Parent.GetUniqueChildName(Texts.UnnamedGroup);
-        Directory.CreateDirectory(group.FullFilePath);
-        SelectNode(group);
-        return group;
-    }
-
-    public RefAddonNode NewRefAddon()
-    {
-        var addon = AddonNode.Create<RefAddonNode>(AddonRoot, CurrentGroup);
-        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedReferenceAddon);
-        SelectNode(addon);
-        return addon;
-    }
-
-    public WorkshopVpkAddon NewWorkshopAddon()
-    {
-        var addon = AddonNode.Create<WorkshopVpkAddon>(AddonRoot, CurrentGroup);
-        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
-        addon.RequestAutoSetName = true;
-        SelectNode(addon);
-        return addon;
-    }
-
-    public IReadOnlyList<AddonNode> CreateRefAddonsBasedOnSelected()
-    {
-        var selected = SelectedNodes.ToArray();
-        using var blockAutoCheck = AddonRoot.BlockAutoCheck();
-        var addons = RefAddonNode.CreateBasedOn(selected, CurrentGroup);
-        foreach (var addon in addons)
-        {
-            addon.CheckSelfAndDescendants();
-        }
-        SelectNodes(addons);
-        return addons;
-    }
-
-    public async Task Delete(bool retainFile)
-    {
-        bool confirm = await ConfirmDeleteInteraction.Handle(retainFile);
-        if (!confirm)
-        {
-            return;
-        }
-        var selectedNodes = SelectedNodes.ToArray();
-        int count = selectedNodes.Length;
-        if (count == 0)
-        {
-            return;
-        }
-        var operations = new (Task, string)[count];
-        for (int i = 0; i < count; i++)
-        {
-            var node = selectedNodes[i];
-            var nodeName = node.NodePath;
-            if (retainFile)
-            {
-                operations[i] = (node.DestroyAsync(), nodeName);
-            }
-            else
-            {
-                operations[i] = (node.DestroyWithFileAsync(), nodeName);
-            }
-        }
-        await ShowDeletionProgressInteraction.Handle(operations);
-    }
-
-    public void Move()
-    {
-        MovingNodes = SelectedNodes.ToArray();
-    }
-
-    public async Task MoveHere()
-    {
-        var movingNodes = MovingNodes;
-        bool skipAll = false;
-        var targetGroup = CurrentGroup;
-        foreach (var node in movingNodes)
-        {
-            if (!node.IsValid)
-            {
-                continue;
-            }
-
-            ErrorOperationReply? reply = null;
-            if (!node.CanMoveTo(targetGroup))
-            {
-                if (!skipAll)
-                {
-                    reply = await ReportInvalidMoveInteraction.Handle(node.NodePath);
-                }
-            }
-            else
-            {
-                try
-                {
-                    node.MoveTo(targetGroup);
-                }
-                catch (AddonNameExistsException)
-                {
-                    if (!skipAll)
-                    {
-                        reply = await ReportNameExistsForMoveInteraction.Handle(node.NodePath);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (!skipAll)
-                    {
-                        reply = await ReportExceptionForMoveInteraction.Handle((node.NodePath, ex));
-                    }
-                }
-            }
-
-            if (reply != null)
-            {
-                bool abort = false;
-                switch (reply)
-                {
-                    case ErrorOperationReply.Abort:
-                        abort = true;
-                        break;
-                    case ErrorOperationReply.Skip:
-                        break;
-                    case ErrorOperationReply.SkipAll:
-                        skipAll = true;
-                        break;
-                    default:
-                        throw new Exception("invalid enum value");
-                }
-                if (abort)
-                {
-                    break;
-                }
-            }
-        }
-        MovingNodes = [];
-    }
-
-    public void CancelMove()
-    {
-        MovingNodes = [];
-    }
-
-    public void SetSelectionEnabled(bool enabled)
-    {
-        var selectedNodes = SelectedNodes.ToArray();
-        foreach (var node in selectedNodes)
-        {
-            node.IsEnabled = enabled;
+            _selectedNodes.Add(node);
         }
     }
 
-    public void SetSelectionEnabledRecursively(bool enabled)
+    public void SelectNodes(IEnumerable<AddonNode> nodes)
     {
-        var selectedNodes = SelectedNodes.ToArray();
-        foreach (var node in selectedNodes)
-        {
-            foreach (var node1 in node.GetSelfAndDescendantsByDfsPreorder())
-            {
-                node1.IsEnabled = enabled;
-            }
-        }
+        this.ThrowIfInvalid();
+        ArgumentNullException.ThrowIfNull(nodes);
+
+        _selectedNodes.Reset(nodes.Where(node => node.Root == AddonRoot));
     }
 
     public void GotoGroup(AddonGroup? group)
     {
+        this.ThrowIfInvalid();
         if (group is not null)
         {
             if (!group.IsValid || group.Root != AddonRoot)
@@ -736,15 +606,17 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
     public void GotoParent()
     {
-        if (_currentGroup == null)
+        this.ThrowIfInvalid();
+
+        if (CurrentGroup is { } currentGroup)
         {
-            return;
+            GotoGroup(currentGroup.Group);
         }
-        GotoGroup(_currentGroup.Group);
     }
 
     public void GotoNode(AddonNode node)
     {
+        this.ThrowIfInvalid();
         ArgumentNullException.ThrowIfNull(node);
         if (!node.IsValid || node.Root != AddonRoot)
         {
@@ -755,104 +627,176 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         SelectNode(node);
     }
 
+    public void AddMovingNode(AddonNode node)
+    {
+        this.ThrowIfInvalid();
+        ArgumentNullException.ThrowIfNull(node);
+        if (!node.IsValid || node.Root != AddonRoot)
+        {
+            return;
+        }
+
+        if (_movingNodes.Contains(node))
+        {
+            return;
+        }
+
+        _movingNodes.Add(node);
+    }
+
+    public void ClearMovingNodes()
+    {
+        this.ThrowIfInvalid();
+
+        _movingNodes.Clear();
+    }
+
+    public void Refresh()
+    {
+        this.ThrowIfInvalid();
+
+        RefreshCurrentNodes();
+    }
+
+    public AddonGroup NewGroup()
+    {
+        this.ThrowIfInvalid();
+
+        var group = AddonNode.Create<AddonGroup>(AddonRoot, CurrentGroup);
+        group.Name = group.Parent.GetUniqueChildName(Texts.UnnamedGroup);
+        Directory.CreateDirectory(group.FullFilePath);
+        SelectNode(group);
+        return group;
+    }
+
+    public RefAddonNode NewRefAddon()
+    {
+        this.ThrowIfInvalid();
+
+        var addon = AddonNode.Create<RefAddonNode>(AddonRoot, CurrentGroup);
+        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedReferenceAddon);
+        SelectNode(addon);
+        return addon;
+    }
+
+    public WorkshopVpkAddon NewWorkshopAddon()
+    {
+        this.ThrowIfInvalid();
+
+        var addon = AddonNode.Create<WorkshopVpkAddon>(AddonRoot, CurrentGroup);
+        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
+        addon.RequestAutoSetName = true;
+        SelectNode(addon);
+        return addon;
+    }
+
+    public IReadOnlyList<AddonNode> CreateRefAddonsBasedOnSelected()
+    {
+        this.ThrowIfInvalid();
+
+        var selected = SelectedNodes.ToArray();
+        using var blockAutoCheck = AddonRoot.BlockAutoCheck();
+        var addons = RefAddonNode.CreateBasedOn(selected, CurrentGroup);
+        foreach (var addon in addons)
+        {
+            addon.CheckSelfAndDescendants();
+        }
+        SelectNodes(addons);
+        return addons;
+    }
+
     public void ToggleOrderDirection()
     {
+        this.ThrowIfInvalid();
+
         IsAscendingOrder = !IsAscendingOrder;
     }
 
     public void ClearSearchText()
     {
+        this.ThrowIfInvalid();
+
         SearchText = "";
     }
 
-    public void Refresh()
+    public void Dispose()
     {
-        RefreshNodes();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    public void SetAutoUpdateStrategyRecursively(bool? strategy)
+    protected virtual void Dispose(bool disposing)
     {
-        var selectedNodes = SelectedNodes.ToArray();
-        foreach (var addon in selectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()))
+        if (!_disposed)
         {
-            if (addon is WorkshopVpkAddon workshopVpkAddon)
+            if (disposing)
             {
-                workshopVpkAddon.IsAutoUpdate = strategy;
+                IsValid = false;
+                _disposables.Dispose();
             }
+
+            _disposed = true;
         }
     }
 
-    public void OpenWorkshopPage()
+    private void RefreshCurrentNodes()
     {
-        foreach (var addon in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>())
-        {
-            if (addon.PublishedFileId is { } id)
-            {
-                Utils.OpenSteamWorkshopPage(id);
-            }
-        }
-    }
+        this.ThrowIfInvalid();
 
-    private void RefreshNodes()
-    {
         var selectedNodes = SelectedNodes.ToArray();
 
-        DisposeNodesSubscription();
+        DisposeCurrentNodesSubscription();
         var disposables = new CompositeDisposable();
-        _nodesSubscription = disposables;
+        _currentNodesSubscription = disposables;
 
         var rawNodes = Search(CurrentGroup?.Children ?? AddonRoot.Nodes);
-        var observableChangeSet = rawNodes.ToObservableChangeSet();
-        if (SortMethod is not AddonNodeSortMethod.None)
+        var nodesObservableChangeSet = rawNodes.ToObservableChangeSet();
+        var sortMethod = SortMethod;
+        if (sortMethod is not AddonNodeSortMethod.None)
         {
-            observableChangeSet = observableChangeSet.Sort(new AddonNodeComparer(SortMethod, IsAscendingOrder));
+            nodesObservableChangeSet = nodesObservableChangeSet.Sort(new AddonNodeComparer(sortMethod, IsAscendingOrder));
         }
-        observableChangeSet.Bind(out ReadOnlyObservableCollection<AddonNode> nodes)
+        nodesObservableChangeSet.Bind(out ReadOnlyObservableCollection<AddonNode> nodes)
             .Subscribe()
             .DisposeWith(disposables);
-        Nodes = nodes;
-        nodes.ToObservableChangeSet()
-            .Select(node => new AddonNodeListItemViewModel(node))
-            .Bind(out var nodeViewModels)
-            .Subscribe()
-            .DisposeWith(disposables);
-        NodeViewModels = nodeViewModels;
+        CurrentNodes = nodes;
 
         SelectNodes(selectedNodes);
     }
 
-    private async void RefreshNodesDeferred()
+    private async void RefreshCurrentNodesDeferred()
     {
-        if (_isRefreshNodesDeferredRequested)
+        this.ThrowIfInvalid();
+
+        if (_isRefreshCurrentNodesDeferredRequested)
         {
             return;
         }
 
-        _isRefreshNodesDeferredRequested = true;
+        _isRefreshCurrentNodesDeferredRequested = true;
         try
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 if (IsValid)
                 {
-                    RefreshNodes();
+                    RefreshCurrentNodes();
                 }
             }, DispatcherPriority.Default);
         }
         finally
         {
-            _isRefreshNodesDeferredRequested = false;
+            _isRefreshCurrentNodesDeferredRequested = false;
         }
     }
 
-    private void DisposeNodesSubscription()
+    private void DisposeCurrentNodesSubscription()
     {
-        NodeViewModels = ReadOnlyObservableCollection<AddonNodeListItemViewModel>.Empty;
-        Nodes = null;
-        if (_nodesSubscription is not null)
+        CurrentNodes = ReadOnlyObservableCollection<AddonNode>.Empty;
+        if (_currentNodesSubscription is not null)
         {
-            _nodesSubscription.Dispose();
-            _nodesSubscription = null;
+            _currentNodesSubscription.Dispose();
+            _currentNodesSubscription = null;
         }
     }
 
@@ -936,6 +880,90 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         else
         {
             FilterTags = null;
+        }
+    }
+
+    private async Task DeleteSelectionAsync(bool retainFile)
+    {
+        this.ThrowIfInvalid();
+
+        bool confirm = await ConfirmDeleteInteraction.Handle(retainFile);
+        if (!confirm)
+        {
+            return;
+        }
+        var selectedNodes = SelectedNodes.ToArray();
+        int count = selectedNodes.Length;
+        if (count == 0)
+        {
+            return;
+        }
+        var operations = new (Task, string)[count];
+        for (int i = 0; i < count; i++)
+        {
+            var node = selectedNodes[i];
+            var nodePath = node.NodePath;
+            if (retainFile)
+            {
+                operations[i] = (node.DestroyAsync(), nodePath);
+            }
+            else
+            {
+                operations[i] = (node.DestroyWithFileAsync(), nodePath);
+            }
+        }
+        await ShowDeletionProgressInteraction.Handle(operations);
+    }
+
+    private void SetSelectionEnabled(bool enabled)
+    {
+        this.ThrowIfInvalid();
+
+        var selectedNodes = SelectedNodes.ToArray();
+        foreach (var node in selectedNodes)
+        {
+            node.IsEnabled = enabled;
+        }
+    }
+
+    private void SetSelectionEnabledRecursively(bool enabled)
+    {
+        this.ThrowIfInvalid();
+
+        var selectedNodes = SelectedNodes.ToArray();
+        foreach (var node in selectedNodes)
+        {
+            foreach (var node1 in node.GetSelfAndDescendantsByDfsPreorder())
+            {
+                node1.IsEnabled = enabled;
+            }
+        }
+    }
+
+    private void SetSelectionAutoUpdateStrategyRecursively(bool? strategy)
+    {
+        this.ThrowIfInvalid();
+
+        var selectedNodes = SelectedNodes.ToArray();
+        foreach (var addon in selectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()))
+        {
+            if (addon is WorkshopVpkAddon workshopVpkAddon)
+            {
+                workshopVpkAddon.IsAutoUpdate = strategy;
+            }
+        }
+    }
+
+    private void OpenSelectionWorkshopPage()
+    {
+        this.ThrowIfInvalid();
+
+        foreach (var addon in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>())
+        {
+            if (addon.PublishedFileId is { } id)
+            {
+                Utils.OpenWorkshopPage(id);
+            }
         }
     }
 }

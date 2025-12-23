@@ -12,8 +12,8 @@ public class ExceptionExplainer : IDataTemplate
     public Control? Build(object? data)
     {
         Exception ex = (Exception)data!;
-        string explain = ObjectExplanationManager.Default.TryGet(ex, Scene) ?? Texts.Error;
-        return new TextBlock { Text = explain };
+        string explanation = ObjectExplanationManager.Default.Get(ex, Scene);
+        return new SelectableTextBlock { Text = explanation };
     }
 
     public bool Match(object? data)

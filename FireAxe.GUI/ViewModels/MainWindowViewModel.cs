@@ -127,10 +127,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 await ShowDontOpenGameAddonsDirectoryInteraction.Handle(Unit.Default);
                 return;
             }
-            await OpenDirectory(path);
+            await OpenDirectoryAsync(path);
         });
         CloseDirectoryCommand = ReactiveCommand.Create(CloseDirectory, _addonRootNotNullObservable);
-        ImportCommand = ReactiveCommand.CreateFromTask(Import, _addonRootNotNullObservable);
+        ImportCommand = ReactiveCommand.CreateFromTask(ImportAsync, _addonRootNotNullObservable);
         ImportAddonRootFileCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             var filePath = await ChooseAddonRootFileToImportInteraction.Handle(Unit.Default);
@@ -179,15 +179,15 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         OpenAddonNameAutoSetterWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenAddonNameAutoSetterWindow(), _addonRootNotNullObservable);
         OpenFileNameFixerWindowCommand = ReactiveCommand.Create(() => _windowManager.OpenFileNameFixerWindow(), _addonRootNotNullObservable);
 
-        PushCommand = ReactiveCommand.CreateFromTask(Push, _addonRootNotNullObservable);
+        PushCommand = ReactiveCommand.CreateFromTask(PushAsync, _addonRootNotNullObservable);
         CheckCommand = ReactiveCommand.Create(Check, _addonRootNotNullObservable);
         ClearCachesCommand = ReactiveCommand.Create(ClearCaches, _addonRootNotNullObservable);
         RandomlySelectCommand = 
             ReactiveCommand.CreateFromTask(async () => await ShowItemsRandomSelectedInteraction.Handle(RandomlySelect()), _addonRootNotNullObservable);
         RandomlySelectForSelectedItemsCommand = 
             ReactiveCommand.CreateFromTask(async () => await ShowItemsRandomSelectedInteraction.Handle(RandomlySelect(true)), this.WhenAnyValue(x => x.HasSelection));
-        DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(), _addonRootNotNullObservable);
-        DeleteRedundantVpkFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFiles(true), this.WhenAnyValue(x => x.HasSelection));
+        DeleteRedundantVpkFilesCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFilesAsync(), _addonRootNotNullObservable);
+        DeleteRedundantVpkFilesForSelectedItemsCommand = ReactiveCommand.CreateFromTask(() => DeleteRedundantVpkFilesAsync(true), this.WhenAnyValue(x => x.HasSelection));
         ExportSelectedItemsAsAddonRootFile = ReactiveCommand.CreateFromTask(async () =>
         {
             var filePath = await SaveAddonRootFileInteraction.Handle(Unit.Default);
@@ -264,6 +264,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 }
                 _addonNodeExplorerViewModelDisposables = new();
                 var disposables = _addonNodeExplorerViewModelDisposables;
+                explorerViewModel.DisposeWith(disposables);
                 explorerViewModel.SortMethod = _appSettings.AddonNodeSortMethod;
                 explorerViewModel.IsAscendingOrder = _appSettings.IsAddonNodeAscendingOrder;
                 explorerViewModel.ListItemViewKind = _appSettings.AddonNodeListItemViewKind;
@@ -553,12 +554,12 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             _appSettings.Save();
             if (Directory.Exists(lastOpenDir))
             {
-                await OpenDirectory(lastOpenDir);
+                await OpenDirectoryAsync(lastOpenDir);
             }
         }
     }
 
-    public async Task OpenDirectory(string dirPath)
+    public async Task OpenDirectoryAsync(string dirPath)
     {
         ArgumentNullException.ThrowIfNull(dirPath);
 
@@ -625,7 +626,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         }
     }
 
-    private async Task Import()
+    private async Task ImportAsync()
     {
         if (_addonRoot is null)
         {
@@ -648,7 +649,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         await ShowImportResultInteraction.Handle(result);
     }
 
-    private async Task Push()
+    private async Task PushAsync()
     {
         if (_addonRoot == null)
         {
@@ -906,7 +907,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         _backupTimer.Dispose();
     }
 
-    private async Task DeleteRedundantVpkFiles(bool selectedItems = false)
+    private async Task DeleteRedundantVpkFilesAsync(bool selectedItems = false)
     {
         var addonRoot = AddonRoot;
         if (addonRoot is null)
