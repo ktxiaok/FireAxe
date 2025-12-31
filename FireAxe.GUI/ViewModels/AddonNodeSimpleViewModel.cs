@@ -17,7 +17,8 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
     private readonly AddonRoot _addonRoot;
 
-    private AddonNode? _addon = null;
+    private readonly ValidRef<AddonNode> _addonRef = new();
+    private bool _lastAddonPresent = false;
     private CompositeDisposable? _addonDisposables = null;
 
     private Bitmap? _image = null;
@@ -65,12 +66,10 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
         ToggleEnabledCommand = ReactiveCommand.Create(() =>
         {
-            if (_addon == null)
+            if (Addon is { } addon)
             {
-                return;
+                addon.IsEnabled = !addon.IsEnabled;
             }
-
-            _addon.IsEnabled = !_addon.IsEnabled;
         });
 
         this.WhenActivated((CompositeDisposable disposables) =>
@@ -111,6 +110,7 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 if (addon == null)
                 {
                     _addonDisposables = null;
+                    OnNullAddon();
                 }
                 else
                 {
@@ -163,20 +163,20 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     {
         get 
         {
-            if (_addon != null && !_addon.IsValid)
+            var addon = _addonRef.TryGet();
+            if (addon is null)
             {
-                Addon = null;
+                if (_lastAddonPresent)
+                {
+                    _lastAddonPresent = false;
+                    this.RaisePropertyChanged(nameof(Addon));
+                }
             }
-
-            return _addon;
+            return addon;
         }
         private set
         {
-            if (value == _addon)
-            {
-                return;
-            }
-            if (value != null)
+            if (value is not null)
             {
                 if (value.Root != _addonRoot)
                 {
@@ -187,13 +187,14 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                     value = null;
                 }
             }
-
-            _addon = value;
-            this.RaisePropertyChanged();
-            if (_addon == null)
+            if (value == Addon)
             {
-                OnNullAddon();
+                return;
             }
+
+            _addonRef.Set(value);
+            _lastAddonPresent = value is not null;
+            this.RaisePropertyChanged();
         }
     }
 
