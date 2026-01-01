@@ -2,6 +2,7 @@
 - add: new operation: Delete Addons with Missing Files
 - improve: UI of addon move
 - improve: the width, height and maximized state of the MainWindow will be saved into the AppSettings
+- fix: the VPK conflict check system doesn't take into account reference addons
 - fix: the game path validity checker doesn't recognize Left 4 Dead 2 Dedicated Server
 - fix: clicking the check button in Problem List will cause the application to crash in some cases (issue #37)
 - bugfixes
