@@ -2,6 +2,7 @@
 using SteamDatabase.ValvePak;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FireAxe;
@@ -24,6 +25,8 @@ public abstract class VpkAddon : AddonNode
         _conflictIgnoringFilesReadOnly = new(_conflictIgnoringFiles);
         _conflictingFilesWithAddonIdsReadOnly = new(_conflictingFilesWithAddonIds);
         _conflictingAddonIdsWithFilesReadOnly = new(_conflictingAddonIdsWithFiles);
+
+        PropertyChanged += OnPropertyChanged;
     }
 
     public ReadOnlyObservableCollection<string> ConflictIgnoringFiles => _conflictIgnoringFilesReadOnly;
@@ -32,7 +35,7 @@ public abstract class VpkAddon : AddonNode
 
     public ReadOnlyObservableCollection<(Guid AddonId, IEnumerable<string> Files)> ConflictingAddonIdsWithFiles => _conflictingAddonIdsWithFilesReadOnly;
 
-    public abstract string? FullVpkFilePath
+    public abstract string? VpkFilePath
     {
         get;
     }
@@ -51,7 +54,7 @@ public abstract class VpkAddon : AddonNode
 
         if (!_addonInfo.TryGetTarget(out var addonInfo))
         {
-            if (TryCreatePackage(FullVpkFilePath, out var pak))
+            if (TryCreatePackage(VpkFilePath, out var pak))
             {
                 using (pak)
                 {
@@ -152,7 +155,7 @@ public abstract class VpkAddon : AddonNode
 
         Task GetTask()
         {
-            var vpkPath = FullVpkFilePath;
+            var vpkPath = VpkFilePath;
             if (vpkPath is null)
             {
                 InvalidateProblem<InvalidVpkFileProblem>();
@@ -210,7 +213,7 @@ public abstract class VpkAddon : AddonNode
 
     protected override long? GetFileSize()
     {
-        var path = FullVpkFilePath;
+        var path = VpkFilePath;
         if (path == null)
         {
             return null;
@@ -233,7 +236,7 @@ public abstract class VpkAddon : AddonNode
 
     protected override Task<byte[]?> DoGetImageAsync(CancellationToken cancellationToken)
     {
-        string? vpkPath = FullVpkFilePath;
+        string? vpkPath = VpkFilePath;
         if (vpkPath == null)
         {
             return Task.FromResult<byte[]?>(null);
@@ -316,6 +319,15 @@ public abstract class VpkAddon : AddonNode
                 pak = null;
             }
             return false;
+        }
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var name = e.PropertyName;
+        if (name == nameof(VpkFilePath))
+        {
+            NotifyImageChanged();
         }
     }
 }

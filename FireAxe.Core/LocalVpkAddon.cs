@@ -10,7 +10,7 @@ public class LocalVpkAddon : VpkAddon
         PropertyChanged += OnPropertyChanged;
     }
 
-    public override string? FullVpkFilePath => FullFilePath;
+    public override string? VpkFilePath => FullFilePath;
 
     public override string FileExtension => ".vpk";
 
@@ -35,7 +35,7 @@ public class LocalVpkAddon : VpkAddon
         var name = e.PropertyName;
         if (name == nameof(FullFilePath))
         {
-            NotifyChanged(nameof(FullVpkFilePath));
+            NotifyChanged(nameof(VpkFilePath));
         }
     }
 }

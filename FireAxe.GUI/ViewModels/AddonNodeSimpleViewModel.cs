@@ -329,13 +329,13 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
             .Throttle(TimeSpan.FromSeconds(0.5), RxApp.MainThreadScheduler)
             .Subscribe(_ => Refresh())
             .DisposeWith(disposables);
-        if (addon is VpkAddon vpkAddon)
+        void OnImageChanged()
         {
-            vpkAddon.WhenAnyValue(x => x.FullVpkFilePath)
-                .Skip(1)
-                .Subscribe(_ => Refresh())
-                .DisposeWith(disposables);
+            Refresh();
         }
+        addon.ImageChanged += OnImageChanged;
+        Disposable.Create(() => addon.ImageChanged -= OnImageChanged)
+            .DisposeWith(disposables);
 
         Disposable.Create(() =>
         {

@@ -869,7 +869,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         {
             if (addonNode is WorkshopVpkAddon workshopVpkAddon)
             {
-                if (workshopVpkAddon.FullVpkFilePath == null)
+                if (workshopVpkAddon.VpkFilePath == null)
                 {
                     workshopVpkAddon.Check();
                 }

@@ -74,7 +74,7 @@ public static class AddonConflictUtils
         {
             if (addon is VpkAddon vpkAddon)
             {
-                if (vpkAddon.FullVpkFilePath is { } vpkPath)
+                if (vpkAddon.VpkFilePath is { } vpkPath)
                 {
                     vpkItems.Add(new VpkItem(vpkAddon, vpkPath));
                 }

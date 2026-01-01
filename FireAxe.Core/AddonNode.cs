@@ -474,6 +474,8 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
 
     internal virtual bool HasChildren_Internal => false;
 
+    public event Action? ImageChanged = null;
+
     public static AddonNode Create(Type addonType, AddonRoot root, AddonGroup? group = null)
     {
         ArgumentNullException.ThrowIfNull(addonType);
@@ -804,6 +806,12 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         return Task.FromResult<byte[]?>(null);
     }
 
+    protected void NotifyImageChanged()
+    {
+        ClearImageCache();
+        ImageChanged?.Invoke();
+    }
+
     public IEnumerable<string> EnumerateLinkedFiles()
     {
         this.ThrowIfInvalid();
@@ -1004,6 +1012,11 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         }
     }
 
+    public void ClearImageCache()
+    {
+        ImageCache = null;
+    }
+
     public void ClearCaches()
     {
         this.ThrowIfInvalid();
@@ -1014,7 +1027,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
     protected virtual void OnClearCaches()
     {
         ClearCacheFiles();
-        ImageCache = null;
+        ClearImageCache();
     }
 
     public void ClearCacheFiles()
