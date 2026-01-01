@@ -3,6 +3,7 @@
 - improve: UI of addon move
 - improve: the width, height and maximized state of the MainWindow will be saved into the AppSettings
 - fix: the game path validity checker doesn't recognize Left 4 Dead 2 Dedicated Server
+- fix: clicking the check button in Problem List will cause the application to crash in some cases (issue #37)
 - bugfixes
 # v0.7.2
 - fix: addon preview image customization doesn't work in some cases
