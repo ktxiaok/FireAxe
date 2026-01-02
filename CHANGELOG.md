@@ -1,3 +1,4 @@
+# v0.7.3
 - change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
 - add: new operation: Delete Addons with Missing Files
 - add: AppImage support (thanks @ycna07)
