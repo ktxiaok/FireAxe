@@ -1,5 +1,6 @@
 from typing import Optional
 import os
+import stat
 import subprocess
 from send2trash import send2trash
 import shutil
@@ -75,5 +76,10 @@ def publish(context: dict[str, str], runtime: Optional[str]):
         if os.path.exists(appdir_bin):
             send2trash(appdir_bin)
         copy_all_in_dir(output_dir, appdir_bin)
+
+        os.chmod(os.path.join(appdir, 'AppRun'), 
+                 stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        os.chmod(os.path.join(appdir, 'usr', 'bin', 'FireAxe'), 
+                 stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
         subprocess.run(['appimagetool', appdir, appimage_file])
