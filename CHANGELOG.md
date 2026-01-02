@@ -1,5 +1,6 @@
 - change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
 - add: new operation: Delete Addons with Missing Files
+- add: AppImage support (thanks @ycna07)
 - improve: UI of addon move
 - improve: the width, height and maximized state of the MainWindow will be saved into the AppSettings
 - fix: the VPK conflict check system doesn't take into account reference addons

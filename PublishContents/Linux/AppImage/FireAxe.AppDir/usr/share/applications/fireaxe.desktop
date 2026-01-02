@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=FireAxe
+Exec=/usr/bin/FireAxe
+Icon=fireaxe
+Type=Application
+Categories=Game;Utility;
+Comment=An open-source Avalonia-based addon manager for Left 4 Dead 2
+Terminal=false
