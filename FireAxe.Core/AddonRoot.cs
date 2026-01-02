@@ -876,7 +876,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
             if (actualAddon is VpkAddon vpkAddon)
             {
-                string? vpkPath = vpkAddon.FullVpkFilePath;
+                string? vpkPath = vpkAddon.VpkFilePath;
 
                 if (vpkPath == null || !File.Exists(vpkPath))
                 {

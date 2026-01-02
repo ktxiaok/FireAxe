@@ -205,6 +205,15 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Move: The target group cannot be the subgroup of the source group..
+        /// </summary>
+        public static string AddonNodeInvalidMoveMessage {
+            get {
+                return ResourceManager.GetString("AddonNodeInvalidMoveMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Backup files are in &quot;.addonrootdir/backups&quot;..
         /// </summary>
         public static string AddonRootBackupDirectoryLocationNote {
@@ -219,6 +228,15 @@ namespace FireAxe.Resources {
         public static string AddonRootDeserializationExceptionMessage {
             get {
                 return ResourceManager.GetString("AddonRootDeserializationExceptionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Addons with missing files not found..
+        /// </summary>
+        public static string AddonsWithMissingFilesNotFound {
+            get {
+                return ResourceManager.GetString("AddonsWithMissingFilesNotFound", resourceCulture);
             }
         }
         
@@ -422,15 +440,6 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Couldn&apos;t move the item &quot;{0}&quot;!.
-        /// </summary>
-        public static string CantMoveItemWithName {
-            get {
-                return ResourceManager.GetString("CantMoveItemWithName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to NOTE: Changing the ID might resolve the reference problem but can also lead to reference loss problems. Please ensure you understand its mechanism before making change..
         /// </summary>
         public static string ChangeIdNote {
@@ -544,6 +553,15 @@ namespace FireAxe.Resources {
         public static string ConfirmDelete {
             get {
                 return ResourceManager.GetString("ConfirmDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} addons with missing files found. Are you sure you want to delete these addons?.
+        /// </summary>
+        public static string ConfirmDeleteAddonsWithMissingFilesWithCount {
+            get {
+                return ResourceManager.GetString("ConfirmDeleteAddonsWithMissingFilesWithCount", resourceCulture);
             }
         }
         
@@ -743,6 +761,15 @@ namespace FireAxe.Resources {
         public static string Delete {
             get {
                 return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Addons with Missing Files.
+        /// </summary>
+        public static string DeleteAddonsWithMissingFiles {
+            get {
+                return ResourceManager.GetString("DeleteAddonsWithMissingFiles", resourceCulture);
             }
         }
         
@@ -1238,6 +1265,15 @@ namespace FireAxe.Resources {
         public static string FailedToGetName {
             get {
                 return ResourceManager.GetString("FailedToGetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to move the item &quot;{0}&quot;..
+        /// </summary>
+        public static string FailedToMoveItemWithName {
+            get {
+                return ResourceManager.GetString("FailedToMoveItemWithName", resourceCulture);
             }
         }
         
@@ -1818,15 +1854,6 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The target group is the subgroup of the source group..
-        /// </summary>
-        public static string InvalidMoveMessage {
-            get {
-                return ResourceManager.GetString("InvalidMoveMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The published file ID is invalid..
         /// </summary>
         public static string InvalidPublishedFileIdMessage {
@@ -2016,11 +2043,11 @@ namespace FireAxe.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Moving: {0}.
+        ///   Looks up a localized string similar to Moving: .
         /// </summary>
-        public static string MovingMessage {
+        public static string MovingColon {
             get {
-                return ResourceManager.GetString("MovingMessage", resourceCulture);
+                return ResourceManager.GetString("MovingColon", resourceCulture);
             }
         }
         

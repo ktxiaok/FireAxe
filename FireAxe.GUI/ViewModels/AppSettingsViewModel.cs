@@ -27,7 +27,7 @@ public class AppSettingsViewModel : ViewModelBase, IActivatableViewModel
         _settings = settings;
         _mainWindowViewModel = mainWindowViewModel;
 
-        _languageItemsSource = [null, .. LanguageManager.SupportedLanguages];
+        _languageItemsSource = [null, .. CultureManager.SupportedCultureStrings];
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {

@@ -1,5 +1,5 @@
 #!/bin/sh
-APPDIR="$(dirname "$(readlink -f "$0")")"
 
+APPDIR="$(dirname "$(readlink -f "$0")")"
 
 exec "$APPDIR/usr/bin/FireAxe" "$@"

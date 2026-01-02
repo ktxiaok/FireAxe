@@ -25,12 +25,14 @@
               Name="PART_TextBlock"
               Grid.Column="0"
               HorizontalAlignment="Right"
-              VerticalAlignment="Center"/>
+              VerticalAlignment="Center"
+              TextWrapping="Wrap"/>
             <Button
               Name="PART_EditButton"
               Grid.Column="1"
               Margin="3"
-              Width="{Binding $self.Height}">
+              Width="{Binding $self.Height}"
+              Background="Transparent">
               <PathIcon Data="{StaticResource icon_edit}"/>
             </Button>
           </Grid>

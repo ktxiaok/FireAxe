@@ -18,7 +18,7 @@
   <Grid
     Name="rootGrid"
     RowDefinitions="Auto, Auto, *"
-    ColumnDefinitions="*, 4, 400">
+    ColumnDefinitions="*, Auto, 400">
     <Grid
       RowDefinitions="Auto"
       ColumnDefinitions="Auto, Auto, *"
@@ -69,14 +69,8 @@
           <Setter Property="Height" Value="20"/>
         </Style>
       </DockPanel.Styles>
-      <!--view kind-->
-      <ComboBox
-        DockPanel.Dock="Right"
-        Classes="EnumComboBox"
-        ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeListItemViewKind}}}"
-        SelectedItem="{Binding ListItemViewKind}"
-        Margin="5"/>
-      <!--sort-->
+      
+      <!--sort and view kind-->
       <StackPanel
         DockPanel.Dock="Right"
         Orientation="Horizontal"
@@ -96,6 +90,12 @@
           Classes="EnumComboBox"
           ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeSortMethod}}}"
           SelectedItem="{Binding SortMethod}"
+          Margin="5"/>
+
+        <ComboBox
+          Classes="EnumComboBox"
+          ItemsSource="{Binding Source={me:EnumValues {x:Type vm:AddonNodeListItemViewKind}}}"
+          SelectedItem="{Binding ListItemViewKind}"
           Margin="5"/>
       </StackPanel>
       <!--search-->
@@ -153,20 +153,59 @@
       BorderBrush="Gray">
       <DockPanel>
         <!--moving nodes-->
-        <Panel
+        <DockPanel
           DockPanel.Dock="Top"
-          IsVisible="{Binding MovingNodeNames, Converter={x:Static ObjectConverters.IsNotNull}}">
+          IsVisible="{Binding MovingNodeViewModels.Count, Converter={x:Static conv:CollectionConverters.IsNotEmpty}}">
+          <TextBlock
+            DockPanel.Dock="Left"
+            Text="{x:Static r:Texts.MovingColon}"
+            Margin="10"
+            VerticalAlignment="Center"/>
           <ScrollViewer
-            HorizontalScrollBarVisibility="Auto">
-            <Panel
-              Margin="5, 10, 5, 20">
-              <TextBlock
-                Text="{Binding MovingNodeNames, StringFormat={x:Static r:Texts.MovingMessage}}"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"/>
-            </Panel>
+            MaxHeight="150">
+            <ItemsControl
+              ItemsSource="{Binding MovingNodeViewModels}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border
+                    BorderBrush="{DynamicResource brush_foreground}"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Margin="5"
+                    Padding="5">
+                    <StackPanel
+                      Orientation="Horizontal">
+                      <StackPanel.Styles>
+                        <Style Selector="v|AddonNodeEnableButton">
+                          <Setter Property="IsVisible" Value="False"/>
+                        </Style>
+                      </StackPanel.Styles>
+
+                      <v:AddonRefView/>
+                      <Button
+                        Command="{Binding MoveHereCommand}"
+                        Background="Transparent"
+                        Margin="2.5, 0, 0, 0">
+                        <PathIcon Data="{StaticResource icon_checkmark}"/>
+                      </Button>
+                      <Button
+                        Command="{Binding Remove}"
+                        Background="Transparent">
+                        <PathIcon Data="{StaticResource icon_dismiss}"/>
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
           </ScrollViewer>
-        </Panel>
+        </DockPanel>
         <!--search options-->
         <Panel
           DockPanel.Dock="Left"
@@ -244,45 +283,42 @@
             </StackPanel>
           </ScrollViewer>
         </Panel>
-        <!--nodes-->
+        <!--current nodes-->
         <ScrollViewer>
-          <Panel>
+          <Panel Name="currentNodesContainerControl">
             <Panel.Styles>
-              <Style Selector="ListBox">
-              <Setter Property="SelectionMode" Value="Multiple"/>
-              <Setter Property="Background" Value="{DynamicResource brush_background}"/>
-            </Style>
-    
-            <Style Selector="ListBoxItem">
-              <Style Selector="^:selected">
-                <Style Selector="^ /template/ ContentPresenter">
-                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected}"/>
+              <Style Selector="ListBoxItem">
+                <Style Selector="^:selected">
+                  <Style Selector="^ /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected}"/>
+                  </Style>
+                  <Style Selector="^:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected_pointerover}"/>
+                  </Style>
+                  <Style Selector="^ Border">
+                    <Setter Property="BorderBrush" Value="{DynamicResource brush_border_addon_list_item_selected}"/>
+                  </Style>
                 </Style>
-                <Style Selector="^:pointerover /template/ ContentPresenter">
-                  <Setter Property="Background" Value="{DynamicResource brush_background_addon_list_item_selected_pointerover}"/>
-                </Style>
-                <Style Selector="^ Border">
-                  <Setter Property="BorderBrush" Value="{DynamicResource brush_border_addon_list_item_selected}"/>
-                </Style>
+                <Setter Property="Padding" Value="3"/>
               </Style>
-              <Setter Property="Padding" Value="3"/>
-            </Style>
 
-            <Style Selector="Border.NodeBorder">
-              <Setter Property="Padding" Value="5"/>
-              <Setter Property="BorderThickness" Value="3"/>
-              <Setter Property="BoxShadow" Value="{StaticResource boxshadow_regular}"/>
-            </Style>
+              <Style Selector="Border.NodeBorder">
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="BorderThickness" Value="3"/>
+                <Setter Property="BoxShadow" Value="{StaticResource boxshadow_regular}"/>
+              </Style>
             </Panel.Styles>
             <!--tile view-->
             <ListBox
               IsVisible="{Binding IsTileView, FallbackValue=False}"
-              ItemsSource="{Binding NodeViewModels}"
-              SelectedItems="{Binding Selection}"
+              ItemsSource="{Binding CurrentNodes}"
+              SelectedItems="{Binding SelectedNodes}"
               SelectionMode="{Binding $parent[v:AddonNodeExplorerView].ExpectedSelectionMode}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
-                  <Border Classes="NodeBorder">
+                  <Border
+                    Classes="NodeBorder"
+                    DataContext="{Binding, Converter={x:Static conv:AddonNodeConverters.ToListItemViewModel}}">
                     <v:AddonNodeTileView/>
                   </Border>
                 </DataTemplate>
@@ -297,12 +333,14 @@
             <!--grid view-->
             <ListBox
               IsVisible="{Binding IsGridView, FallbackValue=False}"
-              ItemsSource="{Binding NodeViewModels}"
-              SelectedItems="{Binding Selection}"
+              ItemsSource="{Binding CurrentNodes}"
+              SelectedItems="{Binding SelectedNodes}"
               SelectionMode="{Binding $parent[v:AddonNodeExplorerView].ExpectedSelectionMode}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
-                  <Border Classes="NodeBorder">
+                  <Border
+                    Classes="NodeBorder"
+                    DataContext="{Binding, Converter={x:Static conv:AddonNodeConverters.ToListItemViewModel}}">
                     <v:AddonNodeGridRowView/>
                   </Border>
                 </DataTemplate>
@@ -316,7 +354,7 @@
 
             <!--empty hint-->
             <TextBlock
-              IsVisible="{Binding NodeViewModels.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}"
+              IsVisible="{Binding CurrentNodes.Count, Converter={x:Static conv:CollectionConverters.IsEmpty}, FallbackValue=False}"
               Text="{x:Static r:Texts.Empty}"
               HorizontalAlignment="Center"
               VerticalAlignment="Top"
@@ -372,14 +410,16 @@
 
     <GridSplitter
       Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
-      ResizeDirection="Columns"/>
+      ResizeDirection="Columns"
+      IsVisible="{Binding $parent[v:AddonNodeExplorerView].IsAddonNodeViewEnabled}"
+      Width="4"/>
     
     <!--addon node view parent-->
     <Border
       Grid.Row="0"
       Grid.Column="2"
       Grid.RowSpan="3"
-      IsVisible="{Binding IsAddonNodeViewEnabled}"
+      IsVisible="{Binding $parent[v:AddonNodeExplorerView].IsAddonNodeViewEnabled}"
       BorderThickness="2"
       BorderBrush="Gray"
       HorizontalAlignment="Stretch"
@@ -391,7 +431,7 @@
             Margin="5, 100, 5, 5"
             IsVisible="{Binding IsMultipleSelection, FallbackValue=False}">
             <TextBlock
-              Text="{Binding Selection.Count, StringFormat={x:Static r:Texts.MultipleItemsSelected}}"
+              Text="{Binding SelectedNodes.Count, StringFormat={x:Static r:Texts.MultipleItemsSelected}}"
               Margin="5"
               TextAlignment="Center"/>
             <TextBlock
@@ -406,7 +446,7 @@
             Margin="10">
             <v:AddonNodeView
               Name="addonNodeView"
-              DataContext="{Binding ActiveAddonNodeViewModel}"/>
+              DataContext="{Binding SelectedNode, Converter={x:Static conv:AddonNodeConverters.ToViewModel}}"/>
           </Panel>
         </Panel>
       </ScrollViewer>

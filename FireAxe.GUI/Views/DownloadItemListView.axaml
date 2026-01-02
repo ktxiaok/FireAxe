@@ -12,8 +12,7 @@
   <Panel>
     <ListBox
       ItemsSource="{Binding DownloadItemViewModels}"
-      SelectionMode="Multiple"
-      Background="{DynamicResource brush_background}">
+      SelectionMode="Multiple">
       <ListBox.ItemTemplate>
         <DataTemplate>
           <Panel Margin="5">

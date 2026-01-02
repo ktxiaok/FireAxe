@@ -176,7 +176,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
         get => _language;
         set
         {
-            if (value is not null && !LanguageManager.SupportedLanguages.Contains(value))
+            if (value is not null && !CultureManager.SupportedCultureStrings.Contains(value))
             {
                 value = null;
             }
@@ -185,7 +185,7 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
                 return;
             }
 
-            LanguageManager.Instance.SetCurrentLanguage(value);
+            CultureManager.Instance.SetCurrentCulture(value);
             _language = value;
             NotifyChanged();
             RequestSave = true;
@@ -221,6 +221,63 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
             };
         }
     }
+
+    [JsonProperty]
+    public double? MainWindowWidth
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                value = Math.Max(0, value.Value);
+            }
+            if (value == field)
+            {
+                return;
+            }
+
+            field = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    } = null;
+
+    [JsonProperty]
+    public double? MainWindowHeight
+    {
+        get;
+        set
+        {
+            if (value is not null)
+            {
+                value = Math.Max(0, value.Value);
+            }
+            if (value == field)
+            {
+                return;
+            }
+
+            field = value;
+            NotifyChanged();
+
+            RequestSave = true;
+        }
+    } = null;
+
+    [JsonProperty]
+    public bool IsMainWindowMaximized
+    {
+        get;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref field, value))
+            {
+                RequestSave = true;
+            }
+        }
+    } = false;
 
     [JsonProperty]
     public string GamePath

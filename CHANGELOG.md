@@ -1,3 +1,13 @@
+# v0.7.3
+- change: UI Appearance (use Semi Theme) (thanks @TiO2EvoLve)
+- add: new operation: Delete Addons with Missing Files
+- add: AppImage support (thanks @ycna07)
+- improve: UI of addon move
+- improve: the width, height and maximized state of the MainWindow will be saved into the AppSettings
+- fix: the VPK conflict check system doesn't take into account reference addons
+- fix: the game path validity checker doesn't recognize Left 4 Dead 2 Dedicated Server
+- fix: clicking the check button in Problem List will cause the application to crash in some cases (issue #37)
+- bugfixes
 # v0.7.2
 - fix: addon preview image customization doesn't work in some cases
 - fix: VPK conflict check will fail if there're invalid VPKs (issue #30)

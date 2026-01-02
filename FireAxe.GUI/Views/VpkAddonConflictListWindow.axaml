@@ -11,7 +11,7 @@
   x:Class="FireAxe.Views.VpkAddonConflictListWindow"
   x:DataType="vm:VpkAddonConflictListViewModel"
   Title="{x:Static r:Texts.VpkConflictList}"
-  Width="800" Height="800"
+  Width="700" Height="700"
   WindowStartupLocation="CenterScreen">
   <Window.Styles>
     <Style Selector="TextBlock.EmptyHint">

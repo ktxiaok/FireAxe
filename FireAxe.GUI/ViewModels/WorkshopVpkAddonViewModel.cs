@@ -136,7 +136,7 @@ public class WorkshopVpkAddonViewModel : VpkAddonViewModel
     {
         if (Addon?.PublishedFileId is { } id)
         {
-            Utils.OpenSteamWorkshopPage(id);
+            Utils.OpenWorkshopPage(id);
         }
     }
 

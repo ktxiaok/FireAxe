@@ -45,7 +45,7 @@ public class AddonImportResultViewModel : ViewModelBase
             else
             {
                 detailsBuilder.AppendLine(Texts.ItemFailedToImportWithError.FormatNoThrow(path,
-                    ObjectExplanationManager.Default.TryGet(item.Exception) ?? item.Exception.ToString()));
+                    ObjectExplanationManager.Default.Get(item.Exception)));
             }
         }
         Details = detailsBuilder.ToString();

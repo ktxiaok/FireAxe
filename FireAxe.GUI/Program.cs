@@ -14,7 +14,7 @@ internal sealed class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        _ = LanguageManager.Instance;
+        _ = CultureManager.Instance;
         SetupLogger();
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         Log.Information("FireAxe Start (Version: {Version})", AppGlobal.VersionString);

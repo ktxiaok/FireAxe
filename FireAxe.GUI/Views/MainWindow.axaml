@@ -12,7 +12,7 @@
         Icon="/Assets/AppLogo.ico"
         Title="{Binding TitleExtraInfo, StringFormat=FireAxe{0}}"
         WindowStartupLocation="CenterScreen"
-        Width="1400" Height="900">
+        Width="1145" Height="700">
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="{x:Static r:Texts.File}">
@@ -59,6 +59,17 @@
           </MenuItem.Header>
         </MenuItem>
         <MenuItem Header="{x:Static r:Texts.ExportSelectedItemsAsAddonRootFile}" Command="{Binding ExportSelectedItemsAsAddonRootFile}"/>
+        <MenuItem Header="{x:Static r:Texts.DeleteAddonsWithMissingFiles}" Command="{Binding DeleteAddonsWithMissingFilesCommand}"/>
+        <MenuItem Command="{Binding DeleteAddonsWithMissingFilesForSelectedItemsCommand}">
+          <MenuItem.Header>
+            <MultiBinding StringFormat="{}{0} {1}">
+              <Binding Source="{x:Static r:Texts.DeleteAddonsWithMissingFiles}"/>
+              <Binding Source="{x:Static r:Texts.HintSelectedItems}"/>
+            </MultiBinding>
+          </MenuItem.Header>
+        </MenuItem>
+        <Separator/>
+        
         <MenuItem Header="Crash?">
           <MenuItem Header="Crash!!!" Command="{Binding DummyCrash}"/>
         </MenuItem>
@@ -76,7 +87,7 @@
     <DockPanel
       DockPanel.Dock="Bottom"
       LastChildFill="False"
-      Margin="0, 5, 0, 5">
+      Margin="10, 0, 10, 10">
       <StackPanel
         DockPanel.Dock="Left"
         Orientation="Horizontal">
@@ -143,7 +154,7 @@
       </StackPanel>
     </DockPanel>
     
-    <Panel>
+    <Panel Margin="10">
       <v:AddonNodeExplorerView
         DataContext="{Binding AddonNodeExplorerViewModel}"
         IsVisible="{Binding AddonRoot, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"/>

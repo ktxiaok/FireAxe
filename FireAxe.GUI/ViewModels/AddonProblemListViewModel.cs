@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using DynamicData;
@@ -213,7 +214,8 @@ public sealed class AddonProblemListViewModel : ViewModelBase, IActivatableViewM
         if (_problematicAddonViewModels is not null)
         {
             bool addonPresent = false;
-            foreach (var problematicAddonViewModel in _problematicAddonViewModels)
+            var problematicAddonViewModels = _problematicAddonViewModels.ToArray();
+            foreach (var problematicAddonViewModel in problematicAddonViewModels)
             {
                 if (problematicAddonViewModel.Addon == problem.Addon)
                 {

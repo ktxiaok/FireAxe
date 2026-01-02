@@ -54,7 +54,7 @@ public class TaskOperationsProgressNotifier
                 }
                 else if (task.Exception is { } ex)
                 {
-                    Observer.NotifyOperationFailed(operation, ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString());
+                    Observer.NotifyOperationFailed(operation, ObjectExplanationManager.Default.Get(ex));
                 }
                 else
                 {

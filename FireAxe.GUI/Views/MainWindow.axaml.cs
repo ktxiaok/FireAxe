@@ -20,8 +20,67 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         InitializeComponent();
 
+        this.WhenAnyValue(x => x.ViewModel)
+            .Subscribe(viewModel =>
+            {
+                if (viewModel is null)
+                {
+                    return;
+                }
+
+                var settings = viewModel.AppSettings;
+                if (settings.MainWindowWidth is { } width)
+                {
+                    Width = width;
+                }
+                if (settings.MainWindowHeight is { } height)
+                {
+                    Height = height;
+                }
+            });
+        this.WhenAnyValue(x => x.Width)
+            .Subscribe(width =>
+            {
+                if (ViewModel is { } viewModel)
+                {
+                    if (WindowState == WindowState.Normal)
+                    {
+                        viewModel.AppSettings.MainWindowWidth = width;
+                    }
+                }
+            });
+        this.WhenAnyValue(x => x.Height)
+            .Subscribe(height =>
+            {
+                if (ViewModel is { } viewModel)
+                {
+                    if (WindowState == WindowState.Normal)
+                    {
+                        viewModel.AppSettings.MainWindowHeight = height;
+                    }
+                }
+            });
+        this.WhenAnyValue(x => x.WindowState)
+            .Subscribe(windowState => ViewModel?.AppSettings.IsMainWindowMaximized = windowState == WindowState.Maximized);
+
         this.WhenActivated((CompositeDisposable disposables) =>
         {
+            this.WhenAnyValue(x => x.ViewModel)
+                .Subscribe(viewModel =>
+                {
+                    if (viewModel is null)
+                    {
+                        return;
+                    }
+
+                    var settings = viewModel.AppSettings;
+                    if (settings.IsMainWindowMaximized)
+                    {
+                        WindowState = WindowState.Maximized;
+                    }
+                })
+                .DisposeWith(disposables);
+
             ViewModel?.InitIfNot();
         });
 
@@ -229,6 +288,18 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             {
                 await CommonMessageBoxes.ShowInfo(this, Texts.ItemsRandomSelectedWithCount.FormatNoThrow(count));
             }
+            context.SetOutput(Unit.Default);
+        }).DisposeWith(disposables);
+
+        viewModel.ConfirmDeleteAddonsWithMissingFilesInteraction.RegisterHandler(async context =>
+        {
+            int count = context.Input;
+            bool confirm = await CommonMessageBoxes.Confirm(this, Texts.ConfirmDeleteAddonsWithMissingFilesWithCount.FormatNoThrow(count));
+            context.SetOutput(confirm);
+        }).DisposeWith(disposables);
+        viewModel.ShowAddonsWithMissingFilesNotFoundInteraction.RegisterHandler(async context =>
+        {
+            await CommonMessageBoxes.ShowInfo(this, Texts.AddonsWithMissingFilesNotFound);
             context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
     }

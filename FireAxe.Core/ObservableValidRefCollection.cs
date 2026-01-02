@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace FireAxe;
 
@@ -11,7 +13,7 @@ namespace FireAxe;
 /// After disposal, this collection will dispose all the subscriptions of elements and become read-only.
 /// </summary>
 public sealed class ObservableValidRefCollection<T>
-    : IList<T>, IReadOnlyList<T>, INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
+    : IList<T>, IList, IReadOnlyList<T>, INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     where T : class, IValidity, INotifyPropertyChanged
 {
     private bool _disposed = false;
@@ -73,6 +75,27 @@ public sealed class ObservableValidRefCollection<T>
         }
     }
 
+    object? IList.this[int index]
+    {
+        get => this[index];
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            T typedValue = default!;
+            try
+            {
+                typedValue = (T)value;
+            }
+            catch (InvalidCastException)
+            {
+                ThrowWrongTypeArgumentException(value);
+            }
+
+            this[index] = typedValue;
+        }
+    }
+
     public int Count
     {
         get
@@ -82,6 +105,14 @@ public sealed class ObservableValidRefCollection<T>
     }
 
     bool ICollection<T>.IsReadOnly => false;
+
+    bool IList.IsReadOnly => false;
+
+    bool IList.IsFixedSize => false;
+
+    bool ICollection.IsSynchronized => false;
+
+    object ICollection.SyncRoot => ((ICollection)_collection).SyncRoot;
 
     public event PropertyChangedEventHandler? PropertyChanged = null;
 
@@ -104,6 +135,29 @@ public sealed class ObservableValidRefCollection<T>
         _collection.Add(item);
     }
 
+    int IList.Add(object? value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        T typedValue = default!;
+        try
+        {
+            typedValue = (T)value;
+        }
+        catch (InvalidCastException)
+        {
+            ThrowWrongTypeArgumentException(value);
+        }
+
+        if (!typedValue.IsValid)
+        {
+            return -1;
+        }
+
+        Add(typedValue);
+        return Count - 1;
+    }
+
     public void Clear()
     {
         ThrowIfDisposed();
@@ -112,6 +166,8 @@ public sealed class ObservableValidRefCollection<T>
         UnsubscribeAll();
         _collection.Clear();
     }
+
+    void IList.Clear() => Clear();
 
     public void Reset(IEnumerable<T> elements)
     {
@@ -140,9 +196,23 @@ public sealed class ObservableValidRefCollection<T>
         return _subscriptions.ContainsKey(item);
     }
 
+    bool IList.Contains(object? value)
+    {
+        if (value is T typedValue)
+        {
+            return Contains(typedValue);
+        }
+        return false;
+    }
+
     public void CopyTo(T[] array, int arrayIndex)
     {
         _collection.CopyTo(array, arrayIndex);
+    }
+
+    void ICollection.CopyTo(Array array, int index)
+    {
+        ((ICollection)_collection).CopyTo(array, index);
     }
 
     public IEnumerator<T> GetEnumerator()
@@ -157,6 +227,11 @@ public sealed class ObservableValidRefCollection<T>
         ArgumentNullException.ThrowIfNull(item);
 
         return _collection.IndexOf(item);
+    }
+
+    int IList.IndexOf(object? value)
+    {
+        return ((IList)_collection).IndexOf(value);
     }
 
     public void Insert(int index, T item)
@@ -174,6 +249,23 @@ public sealed class ObservableValidRefCollection<T>
         _collection.Insert(index, item);
     }
 
+    void IList.Insert(int index, object? value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        T typedValue = default!;
+        try
+        {
+            typedValue = (T)value;
+        }
+        catch (InvalidCastException)
+        {
+            ThrowWrongTypeArgumentException(value);
+        }
+
+        Insert(index, typedValue);
+    }
+
     public bool Remove(T item)
     {
         ArgumentNullException.ThrowIfNull(item);
@@ -189,6 +281,14 @@ public sealed class ObservableValidRefCollection<T>
         UnsubscribeIfAbsent(item);
 
         return true;
+    }
+
+    void IList.Remove(object? value)
+    {
+        if (value is T typedValue)
+        {
+            Remove(typedValue);
+        }
     }
 
     public void RemoveAt(int index)
@@ -279,5 +379,11 @@ public sealed class ObservableValidRefCollection<T>
                 throw new InvalidOperationException($"Cannot modify the collection during notifying multiple {nameof(NotifyCollectionChangedEventHandler)}.");
             }
         }
+    }
+
+    [DoesNotReturn]
+    private static void ThrowWrongTypeArgumentException(object? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        throw new ArgumentException($"The value \"{value}\" is not of the type \"{typeof(T)}\".", paramName);
     }
 }

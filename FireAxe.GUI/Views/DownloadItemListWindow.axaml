@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FireAxe.Views.DownloadItemListWindow"
         Title="{x:Static r:Texts.DownloadList}"
-        Width="600" Height="800"
+        Width="700" Height="700"
         WindowStartupLocation="CenterScreen">
   <ScrollViewer>
     <v:DownloadItemListView/>

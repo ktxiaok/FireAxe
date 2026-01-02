@@ -1,5 +1,6 @@
 from typing import Optional
 import os
+import stat
 import subprocess
 from send2trash import send2trash
 import shutil
@@ -10,6 +11,15 @@ class VersionNotFoundException(Exception):
 
 def bool_to_str(value: bool) -> str:
     return 'true' if value else 'false'
+
+def copy_all_in_dir(src_dir: str, dst_dir: str):
+    os.makedirs(dst_dir, exist_ok=True)
+    for filename in os.listdir(src_dir):
+        file = os.path.join(src_dir, filename)
+        if os.path.isdir(file):
+            shutil.copytree(file, os.path.join(dst_dir, filename))
+        else:
+            shutil.copy(file, dst_dir)
 
 def get_project_version(project: ElementTree.Element) -> str:
     for property_group in project.findall('PropertyGroup'):
@@ -57,9 +67,19 @@ def publish(context: dict[str, str], runtime: Optional[str]):
 
     shutil.make_archive(archive_file_noext, archive_type, output_dir)
 
-if __name__ == '__main__':
-    context = get_context()
-    publish(context, 'win-x64')
-    publish(context, 'linux-x64')
-    publish(context, None)
-    print('Done')
+    # AppImage
+    if runtime != None and runtime.startswith('linux'):
+        appdir = os.path.join('PublishContents', 'Linux', 'AppImage', 'FireAxe.AppDir')
+        appdir_bin = os.path.join(appdir, 'usr', 'bin')
+        appimage_file = os.path.join(publish_dir, f'FireAxe-{version}-{runtime_name}.AppImage')
+
+        if os.path.exists(appdir_bin):
+            send2trash(appdir_bin)
+        copy_all_in_dir(output_dir, appdir_bin)
+
+        os.chmod(os.path.join(appdir, 'AppRun'), 
+                 stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        os.chmod(os.path.join(appdir, 'usr', 'bin', 'FireAxe'), 
+                 stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IWUSR | stat.S_IWGRP | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+        subprocess.run(['appimagetool', appdir, appimage_file])

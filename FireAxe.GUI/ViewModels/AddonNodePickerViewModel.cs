@@ -8,11 +8,11 @@ using ReactiveUI;
 
 namespace FireAxe.ViewModels;
 
-public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IValidity
+public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IValidity, IDisposable
 {
     private static readonly ValidRef<AddonGroup> s_lastAccessedGroupRef = new();
 
-    private bool _isValid = true;
+    private bool _disposed = false;
 
     public AddonNodePickerViewModel(AddonRoot addonRoot)
     {
@@ -20,11 +20,7 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
 
         AddonRoot = addonRoot;
 
-        ExplorerViewModel = new(addonRoot)
-        {
-            IsAddonNodeViewEnabled = false
-        };
-
+        ExplorerViewModel = new(addonRoot);
         ExplorerViewModel.GotoGroup(LastAccessedGroup);
         ExplorerViewModel.WhenAnyValue(x => x.CurrentGroup)
             .Subscribe(currentGroup => LastAccessedGroup = currentGroup);
@@ -44,6 +40,11 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
         });
     }
 
+    ~AddonNodePickerViewModel()
+    {
+        Dispose(false);
+    }
+
     public static AddonGroup? LastAccessedGroup
     {
         get => s_lastAccessedGroupRef.TryGet();
@@ -54,9 +55,9 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
 
     public bool IsValid
     {
-        get => _isValid;
-        private set => this.RaiseAndSetIfChanged(ref _isValid, value);
-    }
+        get;
+        protected set => this.RaiseAndSetIfChanged(ref field, value);
+    } = true;
 
     public AddonRoot AddonRoot { get; }
 
@@ -71,5 +72,25 @@ public class AddonNodePickerViewModel : ViewModelBase, IActivatableViewModel, IV
     public IReadOnlyList<AddonNode> GetSelectedAddons()
     {
         return ExplorerViewModel.SelectedNodes.ToArray();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                IsValid = false;
+                ExplorerViewModel.Dispose();
+            }
+
+            _disposed = true;
+        }
     }
 }

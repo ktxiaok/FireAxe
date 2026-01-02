@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using System.ComponentModel;
 
 namespace FireAxe;
 
@@ -12,7 +13,7 @@ public class RefAddonNode : AddonNode
 
     protected RefAddonNode()
     {
-        
+        PropertyChanged += OnPropertyChanged;
     }
 
     public override Type SaveType => typeof(RefAddonNodeSave);
@@ -331,4 +332,13 @@ public class RefAddonNode : AddonNode
     }
 
     private AddonNode? GetActualSourceAddon() => GetActualSourceAddon(out _);
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var name = e.PropertyName;
+        if (name == nameof(SourceAddonId))
+        {
+            NotifyImageChanged();
+        }
+    }
 }

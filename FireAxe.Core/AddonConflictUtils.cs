@@ -72,11 +72,37 @@ public static class AddonConflictUtils
         var vpkItems = new List<VpkItem>();
         foreach (var addon in addons.SelectMany(addon => addon.GetAllNodesEnabledInHierarchy()))
         {
-            if (addon is VpkAddon vpkAddon)
+            AddonNode? actualAddon;
+            if (addon is RefAddonNode refAddon)
             {
-                if (vpkAddon.FullVpkFilePath is { } vpkPath)
+                actualAddon = refAddon.ActualSourceAddon;
+            }
+            else
+            {
+                actualAddon = addon;
+            }
+            if (actualAddon is VpkAddon actualVpkAddon)
+            {
+                if (actualVpkAddon.VpkFilePath is { } vpkPath)
                 {
-                    vpkItems.Add(new VpkItem(vpkAddon, vpkPath));
+                    bool vpkItemPresent = false;
+                    if (actualAddon != addon)
+                    {
+                        foreach (var vpkItem in vpkItems)
+                        {
+                            if (vpkItem.Addon == actualVpkAddon)
+                            {
+                                vpkItemPresent = true;
+                                vpkItem.Priority = Math.Max(vpkItem.Priority, addon.PriorityInHierarchy);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!vpkItemPresent)
+                    {
+                        vpkItems.Add(new VpkItem(addon, actualVpkAddon, vpkPath));
+                    }
                 }
             }
         }
@@ -194,15 +220,15 @@ public static class AddonConflictUtils
     {
         public readonly VpkAddon Addon;
         public readonly string VpkPath;
-        public readonly int Priority;
+        public int Priority;
         public readonly IReadOnlySet<string> IgnoredFiles;
 
-        public VpkItem(VpkAddon addon, string vpkPath)
+        public VpkItem(AddonNode addon, VpkAddon actualAddon, string vpkPath)
         {
-            Addon = addon;
+            Addon = actualAddon;
             VpkPath = vpkPath;
             Priority = addon.PriorityInHierarchy;
-            IgnoredFiles = addon.ConflictIgnoringFiles.ToImmutableHashSet();
+            IgnoredFiles = actualAddon.ConflictIgnoringFiles.ToImmutableHashSet();
         }
     }
 }

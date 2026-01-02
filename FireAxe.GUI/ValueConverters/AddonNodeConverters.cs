@@ -52,4 +52,10 @@ public static class AddonNodeConverters
             return new AddonNodeSimpleViewModel(addonRoot, id.Value);
         }
     }
+
+    public static IValueConverter ToListItemViewModel { get; } =
+        new FuncValueConverter<AddonNode?, AddonNodeListItemViewModel?>(addon => addon is null ? null : new AddonNodeListItemViewModel(addon));
+
+    public static IValueConverter ToViewModel { get; } =
+        new FuncValueConverter<AddonNode?, AddonNodeViewModel?>(addon => addon is null ? null : AddonNodeViewModel.Create(addon));
 }

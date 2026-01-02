@@ -150,16 +150,12 @@ public static class CommonMessageBoxes
         return result == ButtonResult.Yes;
     }
 
-    public static async Task<ErrorOperationReply> GetErrorOperationReply(Window ownerWindow, string message, string? title = null)
+    public static async Task<OperationInterruptReply> GetOperationInterruptReply(Window ownerWindow, string message, string? title = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
         ArgumentNullException.ThrowIfNull(message);
-
-        if (title == null)
-        {
-            title = Texts.Error;
-        }
-
+        title ??= Texts.Error;
+        
         var textSkip = Texts.Skip;
         var textSkipAll = Texts.SkipAll;
         var textAbort = Texts.Abort;
@@ -178,16 +174,24 @@ public static class CommonMessageBoxes
         }).ShowWindowDialogAsync(ownerWindow);
         if (result == textSkipAll)
         {
-            return ErrorOperationReply.SkipAll;
+            return OperationInterruptReply.SkipAll;
         }
         else if (result == textAbort)
         {
-            return ErrorOperationReply.Abort;
+            return OperationInterruptReply.Abort;
         }
         else
         {
-            return ErrorOperationReply.Skip;
+            return OperationInterruptReply.Skip;
         }
+    }
+
+    public static Task<OperationInterruptReply> GetOperationInterruptReply(Window ownerWindow, Exception exception, string? message = null, string? title = null)
+    {
+        ArgumentNullException.ThrowIfNull(ownerWindow);
+        ArgumentNullException.ThrowIfNull(exception);
+
+        return GetOperationInterruptReply(ownerWindow, CombineMessageAndException(message, exception), title);
     }
 
     public static Task ShowError(Window ownerWindow, string message, string? title = null)
@@ -209,31 +213,12 @@ public static class CommonMessageBoxes
         }).ShowWindowDialogAsync(ownerWindow);
     }
 
-    public static Task ShowException(Window ownerWindow, Exception ex, string? message = null)
+    public static Task ShowException(Window ownerWindow, Exception exception, string? message = null, string? title = null)
     {
         ArgumentNullException.ThrowIfNull(ownerWindow);
-        ArgumentNullException.ThrowIfNull(ex);
+        ArgumentNullException.ThrowIfNull(exception);
 
-        string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
-        if (message == null)
-        {
-            message = exceptionMessage;
-        }
-        else
-        {
-            message = message + '\n' + exceptionMessage;
-        }
-        return MessageBoxManager.GetMessageBoxCustom(new MessageBoxCustomParams
-        {
-            ButtonDefinitions =
-            [
-                new ButtonDefinition{ Name = Texts.Ok, IsDefault = true }
-            ],
-            ContentTitle = Texts.Error,
-            ContentMessage = message,
-            Icon = Icon.Error,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-        }).ShowWindowDialogAsync(ownerWindow);
+        return ShowError(ownerWindow, CombineMessageAndException(message, exception), title);
     }
 
     public static Task ShowInfo(Window ownerWindow, string message, string? title = null)
@@ -283,6 +268,12 @@ public static class CommonMessageBoxes
         {
             return null;
         }
+    }
+
+    private static string CombineMessageAndException(string? message, Exception exception)
+    {
+        string exceptionMessage = ObjectExplanationManager.Default.Get(exception);
+        return string.IsNullOrEmpty(message) ? exceptionMessage : message + '\n' + exceptionMessage;
     }
 }
 

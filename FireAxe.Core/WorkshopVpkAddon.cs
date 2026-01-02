@@ -44,7 +44,7 @@ public class WorkshopVpkAddon : VpkAddon
 
     public override string FileExtension => ".workshop";
 
-    public override string? FullVpkFilePath
+    public override string? VpkFilePath
     {
         get
         {
@@ -191,7 +191,7 @@ public class WorkshopVpkAddon : VpkAddon
 
             _currentVpkFileName = value;
             NotifyChanged();
-            NotifyChanged(nameof(FullVpkFilePath));
+            NotifyChanged(nameof(VpkFilePath));
         }
     }
 
@@ -447,7 +447,7 @@ public class WorkshopVpkAddon : VpkAddon
         }
 
         WorkshopVpkNotLoadedProblem? vpkNotLoadedProblem = null;
-        if (FullVpkFilePath is null)
+        if (VpkFilePath is null)
         {
             vpkNotLoadedProblem = new(this);
         }
@@ -953,7 +953,7 @@ public class WorkshopVpkAddon : VpkAddon
         }
         else if (name == nameof(FullFilePath))
         {
-            NotifyChanged(nameof(FullVpkFilePath));
+            NotifyChanged(nameof(VpkFilePath));
         }
     }
 }

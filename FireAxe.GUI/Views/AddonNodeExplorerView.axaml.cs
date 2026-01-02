@@ -24,6 +24,9 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
     public static readonly DirectProperty<AddonNodeExplorerView, SelectionMode> ExpectedSelectionModeProperty =
         AvaloniaProperty.RegisterDirect<AddonNodeExplorerView, SelectionMode>(nameof(ExpectedSelectionMode), t => t.ExpectedSelectionMode);
 
+    public static readonly StyledProperty<bool> IsAddonNodeViewEnabledProperty =
+        AvaloniaProperty.Register<AddonNodeExplorerView, bool>(nameof(IsAddonNodeViewEnabled), defaultValue: true);
+
     private const int AddonNodeViewColumnIndex = 2;
 
     private SelectionMode _expectedSelectionMode = SelectionMode.Multiple;
@@ -42,6 +45,19 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         this.WhenAnyValue(x => x.IsSingleSelectionEnabled)
             .Select(singleSelection => singleSelection ? SelectionMode.Single : SelectionMode.Multiple)
             .Subscribe(selectionMode => ExpectedSelectionMode = selectionMode);
+
+        this.WhenAnyValue(x => x.IsAddonNodeViewEnabled)
+            .Subscribe(isAddonNodeViewEnabled =>
+            {
+                if (isAddonNodeViewEnabled)
+                {
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = double.PositiveInfinity;
+                }
+                else
+                {
+                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = 0;
+                }
+            });
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -68,24 +84,16 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         private set => SetAndRaise(ExpectedSelectionModeProperty, ref _expectedSelectionMode, value);
     }
 
+    public bool IsAddonNodeViewEnabled
+    {
+        get => GetValue(IsAddonNodeViewEnabledProperty);
+        set => SetValue(IsAddonNodeViewEnabledProperty, value);
+    }
+
     private void ConnectViewModel(AddonNodeExplorerViewModel viewModel, CompositeDisposable disposables)
     {
         viewModel.WhenAnyValue(x => x.CurrentGroup)
             .Subscribe(_ => Focus())
-            .DisposeWith(disposables);
-
-        viewModel.WhenAnyValue(x => x.IsAddonNodeViewEnabled)
-            .Subscribe(isAddonNodeViewEnabled =>
-            {
-                if (isAddonNodeViewEnabled)
-                {
-                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = double.PositiveInfinity;
-                }
-                else
-                {
-                    rootGrid.ColumnDefinitions[AddonNodeViewColumnIndex].MaxWidth = 0;
-                }
-            })
             .DisposeWith(disposables);
 
         viewModel.WhenAnyValue(x => x.TileViewSize)
@@ -94,12 +102,6 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
                 Resources["AddonTileSize"] = size;
             })
             .DisposeWith(disposables);
-
-        viewModel.ReportExceptionInteraction.RegisterHandler(async (context) =>
-        {
-            await CommonMessageBoxes.ShowException(this.GetRootWindow(), context.Input);
-            context.SetOutput(Unit.Default);
-        }).DisposeWith(disposables);
 
         viewModel.ConfirmDeleteInteraction.RegisterHandler(async (context) =>
         {
@@ -113,28 +115,16 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
             context.SetOutput(result);
         }).DisposeWith(disposables);
 
-        viewModel.ReportInvalidMoveInteraction.RegisterHandler(async (context) =>
+        viewModel.ShowMoveExceptionInteraction.RegisterHandler(async context =>
         {
-            string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.InvalidMoveMessage;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
-            context.SetOutput(reply);
+            (Exception exception, string name) = context.Input;
+            await CommonMessageBoxes.ShowException(this.GetRootWindow(), exception, Texts.FailedToMoveItemWithName.FormatNoThrow(name));
+            context.SetOutput(Unit.Default);
         }).DisposeWith(disposables);
-
-        viewModel.ReportNameExistsForMoveInteraction.RegisterHandler(async (context) =>
+        viewModel.ShowBatchMoveExceptionInteraction.RegisterHandler(async context =>
         {
-            string message = string.Format(Texts.CantMoveItemWithName, context.Input) + '\n' + Texts.ItemNameExists;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
-            context.SetOutput(reply);
-        }).DisposeWith(disposables);
-
-        viewModel.ReportExceptionForMoveInteraction.RegisterHandler(async (context) =>
-        {
-            var input = context.Input;
-            string name = input.Item1;
-            Exception ex = input.Item2;
-            string exceptionMessage = ObjectExplanationManager.Default.TryGet(ex) ?? ex.ToString();
-            string message = string.Format(Texts.CantMoveItemWithName, name) + '\n' + exceptionMessage;
-            var reply = await CommonMessageBoxes.GetErrorOperationReply(this.GetRootWindow(), message);
+            (Exception exception, string name) = context.Input;
+            var reply = await CommonMessageBoxes.GetOperationInterruptReply(this.GetRootWindow(), exception, Texts.FailedToMoveItemWithName.FormatNoThrow(name));
             context.SetOutput(reply);
         }).DisposeWith(disposables);
 
@@ -181,9 +171,8 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         {
             if (e.Source is Control sourceControl)
             {
-                if (sourceControl.DataContext is AddonNodeListItemViewModel listItemViewModel)
+                if (TryGetNodeInCurrentNodesFromControl(sourceControl) is { } addon)
                 {
-                    var addon = listItemViewModel.Addon;
                     if (addon is AddonGroup addonGroup)
                     {
                         viewModel.GotoGroup(addonGroup);
@@ -199,14 +188,39 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
         }
     }
 
+    private AddonNode? TryGetNodeInCurrentNodesFromControl(Control control)
+    {
+        bool inCurrentNodesContainerControl = false;
+        foreach (var ancestor in control.GetLogicalAncestors())
+        {
+            if (ancestor == currentNodesContainerControl)
+            {
+                inCurrentNodesContainerControl = true;
+                break;
+            }
+        }
+        if (!inCurrentNodesContainerControl)
+        {
+            return null;
+        }
+        
+        foreach (var selfOrAncestor in control.GetSelfAndLogicalAncestors())
+        {
+            if (selfOrAncestor is Control selfOrAncestorControl && selfOrAncestorControl.DataContext is AddonNode node)
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
 
-        if (e.InitialPressMouseButton == MouseButton.XButton1)
+        if (ViewModel is { } viewModel)
         {
-            var viewModel = ViewModel;
-            if (viewModel != null)
+            if (e.InitialPressMouseButton == MouseButton.XButton1)
             {
                 viewModel.GotoParent();
             }
@@ -217,42 +231,39 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
     {
         base.OnKeyDown(e);
 
-        var viewModel = ViewModel;
-        if (viewModel == null)
+        if (ViewModel is { } viewModel)
         {
-            return;
-        }
-
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
-        {
-            if (e.Key == Key.X)
+            if (e.KeyModifiers == KeyModifiers.Control)
             {
-                e.Handled = true;
-                viewModel.Move();
-            }
-            else if (e.Key == Key.V)
-            {
-                e.Handled = true;
-                await viewModel.MoveHere();
-            }
-            else if (e.Key == Key.F)
-            {
-                e.Handled = true;
-                searchTextBox.Focus();
-            }
-        }
-        else
-        {
-            if (e.Key == Key.Delete)
-            {
-                e.Handled = true;
-                await viewModel.Delete(false);
-            }
-            else if (e.Key == Key.F2)
-            {
-                if (viewModel.IsAddonNodeViewEnabled && viewModel.IsSingleSelection)
+                if (e.Key == Key.X)
                 {
-                    addonNodeView.NameEditingControl.StartEditing();
+                    e.Handled = true;
+                    await viewModel.MoveCommand.Execute();
+                }
+                else if (e.Key == Key.V)
+                {
+                    e.Handled = true;
+                    await viewModel.MoveHereCommand.Execute();
+                }
+                else if (e.Key == Key.F)
+                {
+                    e.Handled = true;
+                    searchTextBox.Focus();
+                }
+            }
+            else
+            {
+                if (e.Key == Key.Delete)
+                {
+                    e.Handled = true;
+                    await viewModel.DeleteCommand.Execute(false);
+                }
+                else if (e.Key == Key.F2)
+                {
+                    if (addonNodeView.IsEffectivelyVisible)
+                    {
+                        addonNodeView.NameEditingControl.StartEditing();
+                    }
                 }
             }
         }

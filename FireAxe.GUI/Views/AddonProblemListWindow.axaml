@@ -10,7 +10,7 @@
         x:Class="FireAxe.Views.AddonProblemListWindow"
         x:DataType="vm:AddonProblemListViewModel"
         Title="{x:Static r:Texts.ProblemList}"
-        Width="800" Height="800"
+        Width="700" Height="700"
         WindowStartupLocation="CenterScreen">
   <DockPanel
     Margin="10">

@@ -128,7 +128,7 @@ public sealed class AddonNameAutoSetJobViewModel : AddonNodeSimpleViewModel, IDi
         }
         catch (Exception ex)
         {
-            SetNameErrorMessage = ObjectExplanationManager.Default.TryGet(ex, ExceptionExplanationScene.Input) ?? Texts.Error;
+            SetNameErrorMessage = ObjectExplanationManager.Default.Get(ex, ExceptionExplanationScene.Input);
         }
         if (success)
         {

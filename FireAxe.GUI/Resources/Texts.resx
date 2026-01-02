@@ -177,8 +177,8 @@
   <data name="CancelMove" xml:space="preserve">
     <value>Cancel Move</value>
   </data>
-  <data name="CantMoveItemWithName" xml:space="preserve">
-    <value>Couldn't move the item "{0}"!</value>
+  <data name="FailedToMoveItemWithName" xml:space="preserve">
+    <value>Failed to move the item "{0}".</value>
   </data>
   <data name="Check" xml:space="preserve">
     <value>Check</value>
@@ -465,8 +465,8 @@
   <data name="InvalidInputMessage" xml:space="preserve">
     <value>Invalid Input</value>
   </data>
-  <data name="InvalidMoveMessage" xml:space="preserve">
-    <value>The target group is the subgroup of the source group.</value>
+  <data name="AddonNodeInvalidMoveMessage" xml:space="preserve">
+    <value>Invalid Move: The target group cannot be the subgroup of the source group.</value>
   </data>
   <data name="InvalidPublishedFileIdMessage" xml:space="preserve">
     <value>The published file ID is invalid.</value>
@@ -501,8 +501,8 @@
   <data name="MoveUp" xml:space="preserve">
     <value>Move Up</value>
   </data>
-  <data name="MovingMessage" xml:space="preserve">
-    <value>Moving: {0}</value>
+  <data name="MovingColon" xml:space="preserve">
+    <value>Moving: </value>
   </data>
   <data name="MultipleItemsSelected" xml:space="preserve">
     <value>{0} items are selected.</value>
@@ -1165,5 +1165,14 @@
   </data>
   <data name="ShowFileCustomProcessArgumentsWatermark" xml:space="preserve">
     <value>Use "{0}" to represent the file path</value>
+  </data>
+  <data name="DeleteAddonsWithMissingFiles" xml:space="preserve">
+    <value>Delete Addons with Missing Files</value>
+  </data>
+  <data name="ConfirmDeleteAddonsWithMissingFilesWithCount" xml:space="preserve">
+    <value>{0} addons with missing files found. Are you sure you want to delete these addons?</value>
+  </data>
+  <data name="AddonsWithMissingFilesNotFound" xml:space="preserve">
+    <value>Addons with missing files not found.</value>
   </data>
 </root>

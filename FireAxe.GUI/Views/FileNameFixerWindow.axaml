@@ -9,7 +9,7 @@
         x:Class="FireAxe.Views.FileNameFixerWindow"
         x:DataType="vm:FileNameFixerViewModel"
         Title="{x:Static r:Texts.FileNameFixer}"
-        Width="600" Height="600"
+        Width="700" Height="700"
         WindowStartupLocation="CenterScreen">
   <DockPanel
     Margin="10">
