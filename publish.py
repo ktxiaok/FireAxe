@@ -16,7 +16,7 @@ def copy_all_in_dir(src_dir: str, dst_dir: str):
     for filename in os.listdir(src_dir):
         file = os.path.join(src_dir, filename)
         if os.path.isdir(file):
-            shutil.copytree(file, dst_dir)
+            shutil.copytree(file, os.path.join(dst_dir, filename))
         else:
             shutil.copy(file, dst_dir)
 
@@ -68,7 +68,7 @@ def publish(context: dict[str, str], runtime: Optional[str]):
 
     # AppImage
     if runtime != None and runtime.startswith('linux'):
-        appdir = os.path.join('Publish', 'Linux', 'AppImage', 'FireAxe.AppDir')
+        appdir = os.path.join('PublishContents', 'Linux', 'AppImage', 'FireAxe.AppDir')
         appdir_bin = os.path.join(appdir, 'usr', 'bin')
         appimage_file = os.path.join(publish_dir, f'FireAxe-{version}-{runtime_name}.AppImage')
 
