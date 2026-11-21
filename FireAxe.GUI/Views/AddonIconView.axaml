@@ -20,5 +20,13 @@
       Name="folderIcon"
       Data="{StaticResource icon_folder}"
       IsVisible="{Binding ShouldShowFolderIcon, FallbackValue=False}"/>
+    <PathIcon Name="subscriptionIcon"
+              Data="{StaticResource icon_collection_subscription}"
+              IsVisible="{Binding ShouldShowSubscriptionIcon, FallbackValue=False}"/>
+    <Border Background="{DynamicResource SemiColorPrimary}" CornerRadius="3" Padding="2"
+            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            IsVisible="{Binding IsCollectionSubscription, FallbackValue=False}">
+      <PathIcon Data="{StaticResource icon_collection_sync}" Width="12" Height="12" Foreground="White"/>
+    </Border>
   </Panel>
 </UserControl>

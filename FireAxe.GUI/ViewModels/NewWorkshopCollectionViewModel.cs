@@ -27,10 +27,11 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
     private bool _valid = true;
     private bool _disposed = false;
 
-    public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup)
+    public NewWorkshopCollectionViewModel(AddonRoot addonRoot, AddonGroup? addonGroup, bool subscribe = false)
     {
         ArgumentNullException.ThrowIfNull(addonRoot);
         _addonRoot = addonRoot;
+        IsSubscription = subscribe;
         if (addonGroup is not null)
         {
             _addonGroupRef = new(addonGroup);
@@ -59,6 +60,18 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
     public event Action? CloseRequested = null;
 
     public ViewModelActivator Activator { get; } = new();
+
+    public bool IsSubscription { get; }
+
+    public string WindowTitle => IsSubscription ? Texts.WorkshopCollectionSubscription : Texts.WorkshopCollection;
+
+    public bool? IsAutoUpdate { get; set; }
+
+    public bool? AllowDownloads { get; set; }
+
+    public bool? AllowDeletions { get; set; }
+
+    public bool? EnableNewAddons { get; set; }
 
     public bool IsValid
     {
@@ -129,7 +142,7 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
         try
         {
             ulong collectionId;
-            if (!PublishedFileUtils.TryParsePublishedFileId(CollectionId, out collectionId))
+            if (!PublishedFileUtils.TryParsePublishedFileId(CollectionId.Trim(), out collectionId) || collectionId == 0)
             {
                 await ShowInvalidCollectionIdInteraction.Handle(Unit.Default);
                 return;
@@ -162,10 +175,28 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
                 return;
             }
 
-            CloseRequested?.Invoke();
-
-            if (!_addonRoot.IsValid)
+            if (!IsValid || !_addonRoot.IsValid || (_addonGroupRef is not null && _addonGroupRef.TryGet() is null))
             {
+                return;
+            }
+
+            if (IsSubscription)
+            {
+                WorkshopCollectionSubscription subscription;
+                using (_addonRoot.BlockAutoCheck())
+                {
+                    subscription = AddonNode.Create<WorkshopCollectionSubscription>(_addonRoot, _addonGroupRef?.TryGet());
+                    subscription.Name = subscription.Parent.GetUniqueChildName(collectionDetails.Title);
+                    subscription.IncludeLinkedCollections = IncludeLinkedCollections;
+                    subscription.IsAutoUpdate = IsAutoUpdate;
+                    subscription.AllowDownloads = AllowDownloads;
+                    subscription.AllowDeletions = AllowDeletions;
+                    subscription.EnableNewAddons = EnableNewAddons;
+                    subscription.CollectionId = collectionId;
+                }
+                _created = true;
+                _ = subscription.SynchronizeAsync(forceUpdate: true);
+                CloseRequested?.Invoke();
                 return;
             }
 
@@ -181,6 +212,7 @@ public sealed class NewWorkshopCollectionViewModel : ViewModelBase, IActivatable
             }
 
             _created = true;
+            CloseRequested?.Invoke();
         }
         finally
         {

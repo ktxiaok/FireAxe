@@ -18,6 +18,7 @@ public static class AddonProblemTypeExplanations
         new KeyValuePair<Type, string>(typeof(AddonCircularRefProblem), Texts.AddonCircularRefProblemExplain),
         new KeyValuePair<Type, string>(typeof(AddonDownloadFailedProblem), Texts.DownloadFailed),
         new KeyValuePair<Type, string>(typeof(InvalidVpkFileProblem), Texts.InvalidVpkFileProblemExplain),
+        new KeyValuePair<Type, string>(typeof(WorkshopCollectionSyncProblem), Texts.CollectionSyncFailedTitle),
     ]);
 
     public static string Get(Type type)

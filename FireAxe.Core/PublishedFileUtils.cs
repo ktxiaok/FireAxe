@@ -20,6 +20,7 @@ public static class PublishedFileUtils
         {
             using var postContent = new StringContent($"itemcount=1&publishedfileids[0]={publishedFileId}", Encoding.UTF8, "application/x-www-form-urlencoded");
             using var response = await httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/", postContent, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
             var responseContentStr = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var json = JObject.Parse(responseContentStr);
             if (json.TryGetValue("response", out var responseToken) && responseToken is JObject responseObj)

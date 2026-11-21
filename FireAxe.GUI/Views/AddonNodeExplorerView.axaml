@@ -376,8 +376,10 @@
             <MenuItem Header="{x:Static r:Texts.WorkshopAddon}" Command="{Binding NewWorkshopAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.GameMapsAddon}" Command="{Binding NewGameMapsAddonCommand}"/>
             <MenuItem Header="{x:Static r:Texts.WorkshopCollection}" Command="{Binding NewWorkshopCollectionCommand}"/>
+            <MenuItem Header="{x:Static r:Texts.WorkshopCollectionSubscription}" Command="{Binding NewWorkshopCollectionSubscriptionCommand}"/>
           </MenuItem>
           <MenuItem Header="{x:Static r:Texts.CreateRefAddonsBasedOnSelectedAddons}" Command="{Binding CreateRefAddonsBasedOnSelectedCommand}"/>
+          <MenuItem Header="{x:Static r:Texts.SynchronizeWorkshopCollections}" Command="{Binding SynchronizeWorkshopCollectionsCommand}"/>
 
           <Separator/>
 

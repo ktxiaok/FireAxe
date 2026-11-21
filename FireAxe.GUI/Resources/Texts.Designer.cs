@@ -3242,6 +3242,40 @@ namespace FireAxe.Resources {
 
         public static string UpdateGameMapsItem => ResourceManager.GetString("UpdateGameMapsItem", resourceCulture);
 
+        public static string WorkshopCollectionSubscription => ResourceManager.GetString("WorkshopCollectionSubscription", resourceCulture);
+
+        public static string SynchronizeWorkshopCollections => ResourceManager.GetString("SynchronizeWorkshopCollections", resourceCulture);
+
+        public static string CollectionAutoUpdate => ResourceManager.GetString("CollectionAutoUpdate", resourceCulture);
+
+        public static string CollectionAllowDownloads => ResourceManager.GetString("CollectionAllowDownloads", resourceCulture);
+
+        public static string CollectionAllowDeletions => ResourceManager.GetString("CollectionAllowDeletions", resourceCulture);
+
+        public static string CollectionEnableNewAddons => ResourceManager.GetString("CollectionEnableNewAddons", resourceCulture);
+
+        public static string CollectionUpdateInterval => ResourceManager.GetString("CollectionUpdateInterval", resourceCulture);
+
+        public static string CollectionSettingsInheritanceHint => ResourceManager.GetString("CollectionSettingsInheritanceHint", resourceCulture);
+
+        public static string CollectionSubscriptionDescription => ResourceManager.GetString("CollectionSubscriptionDescription", resourceCulture);
+
+        public static string CollectionSubscriptionSafetyHint => ResourceManager.GetString("CollectionSubscriptionSafetyHint", resourceCulture);
+
+        public static string CollectionSynchronizing => ResourceManager.GetString("CollectionSynchronizing", resourceCulture);
+
+        public static string CollectionLastSynchronized => ResourceManager.GetString("CollectionLastSynchronized", resourceCulture);
+
+        public static string CollectionItemCount => ResourceManager.GetString("CollectionItemCount", resourceCulture);
+
+        public static string NeverSynchronized => ResourceManager.GetString("NeverSynchronized", resourceCulture);
+
+        public static string CollectionSyncFailedTitle => ResourceManager.GetString("CollectionSyncFailedTitle", resourceCulture);
+
+        public static string CollectionSyncFailed => ResourceManager.GetString("CollectionSyncFailed", resourceCulture);
+
+        public static string CollectionSourceChangeHint => ResourceManager.GetString("CollectionSourceChangeHint", resourceCulture);
+
         public static string Yes {
             get {
                 return ResourceManager.GetString("Yes", resourceCulture);

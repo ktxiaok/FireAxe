@@ -68,6 +68,10 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
         {
             return new GameMapsAddonViewModel(gameMapsAddon);
         }
+        else if (addonNode is WorkshopCollectionSubscription subscription)
+        {
+            return new WorkshopCollectionSubscriptionViewModel(subscription);
+        }
         else if (addonNode is AddonGroup group)
         {
             return new AddonGroupViewModel(group);

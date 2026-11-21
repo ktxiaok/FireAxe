@@ -29,6 +29,8 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     private ObservableAsPropertyHelper<bool>? _shouldShowFolderIcon = null;
     private ObservableAsPropertyHelper<bool>? _shouldShowUnknownIcon = null; 
     private ObservableAsPropertyHelper<bool>? _shouldShowImage = null;
+    private ObservableAsPropertyHelper<bool>? _shouldShowSubscriptionIcon = null;
+    private ObservableAsPropertyHelper<bool>? _isCollectionSubscription = null;
 
     private object? _currentRefreshId = null;
     private CancellationTokenSource? _refreshCts = null;
@@ -121,6 +123,8 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
 
 
             bool IsAddonDefaultIconFolder(AddonNode addon) => addon is AddonGroup || (addon is RefAddonNode refAddon && refAddon.ActualSourceAddon is AddonGroup);
+            bool IsSubscription(AddonNode? addon) => addon is WorkshopCollectionSubscription ||
+                (addon is RefAddonNode reference && reference.ActualSourceAddon is WorkshopCollectionSubscription);
             var hasImageObservable = this.WhenAnyValue(x => x.Image).Select(img => img != null);
             _shouldShowUnknownIcon = addonObservable.CombineLatest(hasImageObservable)
                 .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && !IsAddonDefaultIconFolder(args.Addon))
@@ -131,9 +135,16 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 .ToProperty(this, nameof(ShouldShowImage));
             this.RaisePropertyChanged(nameof(ShouldShowImage));
             _shouldShowFolderIcon = addonObservable.CombineLatest(hasImageObservable)
-                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && IsAddonDefaultIconFolder(args.Addon))
+                .Select(((AddonNode? Addon, bool HasImage) args) => args.Addon is not null && !args.HasImage && IsAddonDefaultIconFolder(args.Addon) && !IsSubscription(args.Addon))
                 .ToProperty(this, nameof(ShouldShowFolderIcon));
             this.RaisePropertyChanged(nameof(ShouldShowFolderIcon));
+            _shouldShowSubscriptionIcon = addonObservable.CombineLatest(hasImageObservable)
+                .Select(args => IsSubscription(args.First) && !args.Second)
+                .ToProperty(this, nameof(ShouldShowSubscriptionIcon));
+            this.RaisePropertyChanged(nameof(ShouldShowSubscriptionIcon));
+            _isCollectionSubscription = addonObservable.Select(IsSubscription)
+                .ToProperty(this, nameof(IsCollectionSubscription));
+            this.RaisePropertyChanged(nameof(IsCollectionSubscription));
 
             Refresh();
 
@@ -147,6 +158,8 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
                 Utils.DisposeAndSetNull(ref _shouldShowUnknownIcon);
                 Utils.DisposeAndSetNull(ref _shouldShowImage);
                 Utils.DisposeAndSetNull(ref _shouldShowFolderIcon);
+                Utils.DisposeAndSetNull(ref _shouldShowSubscriptionIcon);
+                Utils.DisposeAndSetNull(ref _isCollectionSubscription);
 
                 Image = null;
 
@@ -229,6 +242,10 @@ public class AddonNodeSimpleViewModel : ViewModelBase, IActivatableViewModel
     public bool ShouldShowUnknownIcon => _shouldShowUnknownIcon?.Value ?? false;
 
     public bool ShouldShowImage => _shouldShowImage?.Value ?? false;
+
+    public bool ShouldShowSubscriptionIcon => _shouldShowSubscriptionIcon?.Value ?? false;
+
+    public bool IsCollectionSubscription => _isCollectionSubscription?.Value ?? false;
 
     public ReactiveCommand<Unit, Unit> ToggleEnabledCommand { get; }
 

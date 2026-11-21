@@ -256,18 +256,33 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         {
             this.ThrowIfInvalid();
 
-            await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup));
+            await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup, false));
         });
+        NewWorkshopCollectionSubscriptionCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            this.ThrowIfInvalid();
+            await ShowNewWorkshopCollectionWindowInteraction.Handle((_addonRoot, CurrentGroup, true));
+        });
+        var hasSelectedSubscription = _selectedNodes.ObserveCollectionChanges()
+            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopCollectionSubscription>().Any());
+        SynchronizeWorkshopCollectionsCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            this.ThrowIfInvalid();
+            var subscriptions = SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants())
+                .OfType<WorkshopCollectionSubscription>().Distinct().ToArray();
+            await Task.WhenAll(subscriptions.Select(subscription => subscription.SynchronizeAsync(forceUpdate: true)));
+        }, hasSelectedSubscription);
 
         CreateRefAddonsBasedOnSelectedCommand = ReactiveCommand.Create(() => { CreateRefAddonsBasedOnSelected(); }, this.WhenAnyValue(x => x.HasSelection));
 
         DeleteCommand = ReactiveCommand.CreateFromTask<bool>(DeleteSelectionAsync, this.WhenAnyValue(x => x.HasSelection));
 
         var hasSelectedWorkshopVpkAddon = _selectedNodes.ObserveCollectionChanges()
-            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>().Any());
+            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants())
+                .Any(addon => addon is WorkshopVpkAddon or WorkshopCollectionSubscription));
         var hasSelectedUpdateableAddon = _selectedNodes.ObserveCollectionChanges()
             .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants())
-                .Any(addon => addon is WorkshopVpkAddon or GameMapsAddon));
+                .Any(addon => addon is WorkshopVpkAddon or GameMapsAddon or WorkshopCollectionSubscription));
         SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
         SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
         SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
@@ -549,6 +564,10 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> NewWorkshopCollectionCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> NewWorkshopCollectionSubscriptionCommand { get; }
+
+    public ReactiveCommand<Unit, Unit> SynchronizeWorkshopCollectionsCommand { get; }
+
     public ReactiveCommand<Unit, Unit> CreateRefAddonsBasedOnSelectedCommand { get; }
 
     public ReactiveCommand<bool, Unit> DeleteCommand { get; }
@@ -570,7 +589,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
     public Interaction<(Exception, string), OperationInterruptReply> ShowBatchMoveExceptionInteraction { get; } = new();
 
-    public Interaction<(AddonRoot, AddonGroup?), Unit> ShowNewWorkshopCollectionWindowInteraction { get; } = new();
+    public Interaction<(AddonRoot, AddonGroup?, bool Subscribe), Unit> ShowNewWorkshopCollectionWindowInteraction { get; } = new();
 
 
     public ViewModelActivator Activator { get; } = new();
@@ -969,6 +988,10 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
             {
                 gameMapsAddon.IsAutoUpdate = strategy;
             }
+            else if (addon is WorkshopCollectionSubscription subscription)
+            {
+                subscription.IsAutoUpdate = strategy;
+            }
         }
     }
 
@@ -976,12 +999,15 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
     {
         this.ThrowIfInvalid();
 
-        foreach (var addon in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>())
-        {
-            if (addon.PublishedFileId is { } id)
+        foreach (var id in SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants())
+            .Select(addon => addon switch
             {
-                Utils.OpenWorkshopPage(id);
-            }
+                WorkshopVpkAddon workshop => workshop.PublishedFileId,
+                WorkshopCollectionSubscription subscription => subscription.CollectionId,
+                _ => null
+            }).OfType<ulong>().Distinct())
+        {
+            Utils.OpenWorkshopPage(id);
         }
     }
 }

@@ -33,6 +33,16 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
         public bool IsAutoUpdateGameMapsItem => _mainWindowViewModel._appSettings.IsAutoUpdateGameMapsItem;
 
+        public bool IsAutoUpdateWorkshopCollection => _mainWindowViewModel._appSettings.IsAutoUpdateWorkshopCollection;
+
+        public bool AllowWorkshopCollectionDownloads => _mainWindowViewModel._appSettings.AllowWorkshopCollectionDownloads;
+
+        public bool AllowWorkshopCollectionDeletions => _mainWindowViewModel._appSettings.AllowWorkshopCollectionDeletions;
+
+        public bool EnableNewWorkshopCollectionAddons => _mainWindowViewModel._appSettings.EnableNewWorkshopCollectionAddons;
+
+        public int WorkshopCollectionUpdateIntervalMinutes => _mainWindowViewModel._appSettings.WorkshopCollectionUpdateIntervalMinutes;
+
         public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => _mainWindowViewModel._vpkAddonConflictCheckSettings;
     }
 
@@ -82,6 +92,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     private IDisposable _autoRedownloadTimer;
 
     private IDisposable _backupTimer;
+
+    private readonly IDisposable _collectionUpdateTimer;
 
     public MainWindowViewModel(AppSettings appSettings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, GameMapsClient gameMapsClient, DownloadItemListViewModel downloadItemListViewModel)
     {
@@ -317,6 +329,17 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             BackUpIfNeed();
             return true;
         }, BackupInterval);
+        _collectionUpdateTimer = DispatcherTimer.Run(() =>
+        {
+            if (_addonRoot is { IsValid: true } root)
+            {
+                foreach (var subscription in root.GetDescendants().OfType<WorkshopCollectionSubscription>().ToArray())
+                {
+                    if (subscription.IsAutomaticSynchronizationDue) _ = subscription.SynchronizeAsync();
+                }
+            }
+            return true;
+        }, TimeSpan.FromMinutes(1));
         this.WhenAnyValue(x => x.AddonRoot)
             .Subscribe(_ => BackUpIfNeed());
 
@@ -819,6 +842,11 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
             }
             _lastClipboardText = clipboardText;
 
+            // A collection URL pasted into its own editor is already being handled there.
+            if (_windowManager.MainWindow?.FocusManager?.GetFocusedElement() is Avalonia.Controls.Control
+                { DataContext: WorkshopCollectionSubscriptionViewModel or NewWorkshopCollectionViewModel })
+                return;
+
             var explorerViewModel = AddonNodeExplorerViewModel;
 
             if (explorerViewModel != null)
@@ -926,6 +954,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         _checkClipboardTimer.Dispose();
         _autoRedownloadTimer.Dispose();
         _backupTimer.Dispose();
+        _collectionUpdateTimer.Dispose();
     }
 
     private async Task DeleteRedundantVpkFilesAsync(bool selectedItems = false)

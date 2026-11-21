@@ -33,6 +33,8 @@ public partial class AddonIconView : ReactiveUserControl<AddonNodeSimpleViewMode
         specialIconSizeObservable.BindTo(unknownIcon, x => x.Height);
         specialIconSizeObservable.BindTo(folderIcon, x => x.Width);
         specialIconSizeObservable.BindTo(folderIcon, x => x.Height);
+        specialIconSizeObservable.BindTo(subscriptionIcon, x => x.Width);
+        specialIconSizeObservable.BindTo(subscriptionIcon, x => x.Height);
     }
 
     public double ImageSize

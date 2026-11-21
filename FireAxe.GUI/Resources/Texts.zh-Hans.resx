@@ -1184,4 +1184,55 @@
   <data name="GameMapsItemAutoUpdate" xml:space="preserve"><value>GameMaps 项目自动更新</value></data>
   <data name="AutoDetectGameMapsItemLinkInClipboard" xml:space="preserve"><value>自动检测剪贴板内的 GameMaps 链接</value></data>
   <data name="UpdateGameMapsItem" xml:space="preserve"><value>更新 GameMaps 项目</value></data>
+  <data name="WorkshopCollectionSubscription" xml:space="preserve">
+    <value>创意工坊合集订阅</value>
+  </data>
+  <data name="SynchronizeWorkshopCollections" xml:space="preserve">
+    <value>更新合集订阅</value>
+  </data>
+  <data name="CollectionAutoUpdate" xml:space="preserve">
+    <value>自动同步合集变化</value>
+  </data>
+  <data name="CollectionAllowDownloads" xml:space="preserve">
+    <value>允许下载新增 Mod</value>
+  </data>
+  <data name="CollectionAllowDeletions" xml:space="preserve">
+    <value>允许移除合集已删除的 Mod</value>
+  </data>
+  <data name="CollectionEnableNewAddons" xml:space="preserve">
+    <value>默认启用新增 Mod</value>
+  </data>
+  <data name="CollectionUpdateInterval" xml:space="preserve">
+    <value>检查间隔（分钟）</value>
+  </data>
+  <data name="CollectionSettingsInheritanceHint" xml:space="preserve">
+    <value>方块表示跟随设置中的全局默认值；勾选表示开启，空白表示关闭。</value>
+  </data>
+  <data name="CollectionSubscriptionDescription" xml:space="preserve">
+    <value>FireAxe 运行时持续跟踪此合集，新增 Mod 沿用现有的创意工坊下载与更新机制。</value>
+  </data>
+  <data name="CollectionSubscriptionSafetyHint" xml:space="preserve">
+    <value>仅移除此订阅创建且仍在本组中的 Mod，文件按现有机制放入回收站（系统支持时）。手动加入、移出或删除的 Mod 会保留您的选择。手动更新也遵循下载和删除开关。</value>
+  </data>
+  <data name="CollectionSynchronizing" xml:space="preserve">
+    <value>正在同步合集并检查 Mod…</value>
+  </data>
+  <data name="CollectionLastSynchronized" xml:space="preserve">
+    <value>上次成功同步合集</value>
+  </data>
+  <data name="CollectionItemCount" xml:space="preserve">
+    <value>合集中 Mod 数量：{0}</value>
+  </data>
+  <data name="NeverSynchronized" xml:space="preserve">
+    <value>尚未同步</value>
+  </data>
+  <data name="CollectionSyncFailedTitle" xml:space="preserve">
+    <value>合集同步失败</value>
+  </data>
+  <data name="CollectionSyncFailed" xml:space="preserve">
+    <value>无法同步创意工坊合集：{0}。请检查合集是否公开以及网络连接，然后重试。</value>
+  </data>
+  <data name="CollectionSourceChangeHint" xml:space="preserve">
+    <value>点击编辑 ID，也可粘贴另一个合集链接来更换来源。成功读取新合集后才按下载、移除开关同步现有 Mod。</value>
+  </data>
 </root>

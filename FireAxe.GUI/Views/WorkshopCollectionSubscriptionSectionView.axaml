@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             x:Class="FireAxe.Views.WorkshopCollectionSubscriptionSectionView"
+             x:DataType="vm:WorkshopCollectionSubscriptionViewModel">
+  <StackPanel Spacing="5">
+    <TextBlock Text="{x:Static r:Texts.WorkshopCollectionSubscription}" Classes="Heading1" TextWrapping="Wrap"/>
+    <Button Content="{x:Static r:Texts.OpenWorkshopPage}" Command="{Binding OpenWorkshopPage}"/>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.CollectionId}" Classes="PropertyName"/>
+      <v:EditableTextBlock Value="{Binding CollectionId}" Display="{Binding CollectionId}" Classes="PropertyValue"/>
+    </DockPanel>
+    <TextBlock Text="{x:Static r:Texts.CollectionSourceChangeHint}" TextWrapping="Wrap"/>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.IncludeLinkedCollections}" Classes="PropertyName"/>
+      <CheckBox IsChecked="{Binding Addon.IncludeLinkedCollections}" Classes="PropertyValue"/>
+    </DockPanel>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.CollectionAutoUpdate}" Classes="PropertyName"/>
+      <CheckBox IsThreeState="True" IsChecked="{Binding Addon.IsAutoUpdate}" Classes="PropertyValue"/>
+    </DockPanel>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.CollectionAllowDownloads}" Classes="PropertyName"/>
+      <CheckBox IsThreeState="True" IsChecked="{Binding Addon.AllowDownloads}" Classes="PropertyValue"/>
+    </DockPanel>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.CollectionAllowDeletions}" Classes="PropertyName"/>
+      <CheckBox IsThreeState="True" IsChecked="{Binding Addon.AllowDeletions}" Classes="PropertyValue"/>
+    </DockPanel>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.CollectionEnableNewAddons}" Classes="PropertyName"/>
+      <CheckBox IsThreeState="True" IsChecked="{Binding Addon.EnableNewAddons}" Classes="PropertyValue"/>
+    </DockPanel>
+    <TextBlock Text="{x:Static r:Texts.CollectionSettingsInheritanceHint}" TextWrapping="Wrap"/>
+    <TextBlock Text="{x:Static r:Texts.CollectionSubscriptionSafetyHint}" TextWrapping="Wrap"/>
+    <Button Content="{x:Static r:Texts.SynchronizeWorkshopCollections}" Command="{Binding SynchronizeCommand}"/>
+    <TextBlock Text="{x:Static r:Texts.CollectionSynchronizing}"
+               IsVisible="{Binding Addon.SynchronizationTask, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"/>
+    <TextBlock Text="{x:Static r:Texts.CollectionLastSynchronized}" Classes="PropertyName"/>
+    <TextBlock Text="{Binding LastSynchronization}"/>
+    <TextBlock Text="{Binding Addon.LastItemCount, StringFormat={x:Static r:Texts.CollectionItemCount}}"/>
+    <TextBlock Text="{Binding Addon.ErrorMessage}" TextWrapping="Wrap"/>
+  </StackPanel>
+</UserControl>

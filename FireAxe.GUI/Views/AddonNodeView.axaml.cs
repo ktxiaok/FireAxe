@@ -38,6 +38,13 @@ public partial class AddonNodeView : ReactiveUserControl<AddonNodeViewModel>
                                     ViewModel = gameMapsAddonViewModel
                                 });
                             }
+                            else if (viewModel is WorkshopCollectionSubscriptionViewModel subscriptionViewModel)
+                            {
+                                AddSectionView(new WorkshopCollectionSubscriptionSectionView
+                                {
+                                    ViewModel = subscriptionViewModel
+                                });
+                            }
                         }
                         else if (viewModel is RefAddonNodeViewModel refAddonViewModel)
                         {

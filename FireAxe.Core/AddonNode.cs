@@ -1127,6 +1127,7 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         var groupSave = save as AddonGroupSave;
         if (groupSave == null)
         {
+            node.OnPostLoadSave(save);
             return node;
         }
 
@@ -1145,9 +1146,14 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
                 {
                     stack.Add(new LoadSaveStackFrame(childGroup, (AddonGroupSave)childSave));
                 }
+                else
+                {
+                    child.OnPostLoadSave(childSave);
+                }
             }
             else
             {
+                current.Group.OnPostLoadSave(current.Save);
                 stack.RemoveAt(stack.Count - 1);
             }
         }
@@ -1399,6 +1405,10 @@ public class AddonNode : ObservableObject, IHierarchyNode<AddonNode>, IValidity
         save.Tags = [.. Tags];
         save.DependentAddonIds = [.. DependentAddonIds];
         save.CustomImagePath = CustomImagePath;
+    }
+
+    protected virtual void OnPostLoadSave(AddonNodeSave save)
+    {
     }
 
     protected virtual void OnLoadSave(AddonNodeSave save)

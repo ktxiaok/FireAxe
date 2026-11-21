@@ -200,7 +200,7 @@ public class WorkshopVpkAddon : VpkAddon
         this.ThrowIfInvalid();
 
         var task = _getPublishedFileDetailsTask;
-        if (task == null)
+        if (task == null || task.IsCompleted)
         {
             var addonTaskCreator = this.GetValidTaskCreator();
             var rawTask = DoGetPublishedFileDetailsAsync(DestructionCancellationToken);
@@ -425,14 +425,15 @@ public class WorkshopVpkAddon : VpkAddon
         return await baseTask.ConfigureAwait(false);
     }
 
-    public Task CheckDownloadAsync()
+    public Task CheckDownloadAsync(bool refreshDetails = false)
     {
         this.ThrowIfInvalid();
 
         if (_publishedFileId.HasValue)
         {
-            if (DownloadCheckTask is null)
+            if (DownloadCheckTask is not { IsCompleted: false })
             {
+                if (refreshDetails) PublishedFileDetailsCache = null;
                 var addonTaskCreator = this.GetValidTaskCreator();
                 var checkTask = RunDownloadCheckTask(_publishedFileId.Value, addonTaskCreator);
                 DownloadCheckTask = checkTask;

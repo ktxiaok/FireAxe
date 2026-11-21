@@ -39,6 +39,18 @@ This project is currently in early development. More features will be added in t
 - Enable the addons you want and then click the menu item "Operations -> Push" to push the enablement state to the game.
 - You can click the check button to keep the status up to date.
 
+# Workshop collection subscriptions
+
+- Choose **New -> Workshop collection subscription** and enter a public Left 4 Dead 2 collection ID or URL. The existing Workshop Collection command remains a one-time import.
+- Subscriptions have a stacked-card icon with a sync badge and support the usual group enablement, tags, priority, dependencies and references.
+- As with Workshop mods, edit the collection ID in its details or paste another collection URL to change the source. This cancels the old request and immediately reads the new collection. Existing mods are reconciled only after a successful read, following download/removal permissions and preserving shared mods and their settings. An invalid or unavailable new collection leaves existing mods intact.
+- Collections are checked when a library opens and, by default, every 30 minutes while FireAxe is running. Settings has separate controls for automatic synchronization, its interval, downloading new mods, removing obsolete mods and enabling new mods. Per-subscription three-state checkboxes override these defaults; an indeterminate box inherits Settings. Group enable strategies still apply.
+- Right-click a subscription and select **Synchronize collection subscriptions**, or use the button in its details. Manual synchronization bypasses automatic scheduling and still respects download/removal permissions.
+- Downloads and removals are enabled by default. Only Workshop mods created by that subscription and still in its group are removed. Manually added content, GameMaps addons and mods moved elsewhere are preserved. Manually deleted or moved mods are not repeatedly recreated while they remain in the remote collection.
+- Removal uses the existing file mechanism: recycle bin on Windows, deletion on other platforms. References to removed mods follow the existing invalid-reference behavior. Existing mods retain their names, enablement, tags and priority; file updates follow each mod's Workshop update policy.
+- Linked collections support cycle detection and deduplication. Failed, private or incomplete responses never count as empty collections. Source IDs and ownership survive saves, restarts and `.addonroot` import/export.
+- These are local FireAxe subscriptions and do not change your Steam account subscriptions. Collection reads use Steam's official [GetCollectionDetails endpoint](https://partner.steamgames.com/doc/webapi/ISteamRemoteStorage#GetCollectionDetails). Enable the desired subscription and mods, then push to the game as usual.
+
 # Questions and Answers
 ## Why can't I see my addons in the game?
 Please ensure that your addon itself is enabled and all groups containing the addon are enabled. Ensure you have clicked the push button.

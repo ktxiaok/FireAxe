@@ -335,6 +335,45 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     }
 
     [JsonProperty]
+    public bool IsAutoUpdateWorkshopCollection
+    {
+        get;
+        set { if (NotifyAndSetIfChanged(ref field, value)) RequestSave = true; }
+    } = true;
+
+    [JsonProperty]
+    public bool AllowWorkshopCollectionDownloads
+    {
+        get;
+        set { if (NotifyAndSetIfChanged(ref field, value)) RequestSave = true; }
+    } = true;
+
+    [JsonProperty]
+    public bool AllowWorkshopCollectionDeletions
+    {
+        get;
+        set { if (NotifyAndSetIfChanged(ref field, value)) RequestSave = true; }
+    } = true;
+
+    [JsonProperty]
+    public bool EnableNewWorkshopCollectionAddons
+    {
+        get;
+        set { if (NotifyAndSetIfChanged(ref field, value)) RequestSave = true; }
+    } = true;
+
+    [JsonProperty]
+    public int WorkshopCollectionUpdateIntervalMinutes
+    {
+        get;
+        set
+        {
+            value = Math.Clamp(value, 1, 10080);
+            if (NotifyAndSetIfChanged(ref field, value)) RequestSave = true;
+        }
+    } = 30;
+
+    [JsonProperty]
     public string? SuppressedUpdateRequestVersion
     {
         get => _suppressedUpdateRequestVersion;

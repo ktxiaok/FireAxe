@@ -152,10 +152,10 @@ public partial class AddonNodeExplorerView : ReactiveUserControl<AddonNodeExplor
 
         viewModel.ShowNewWorkshopCollectionWindowInteraction.RegisterHandler(context =>
         {
-            var (addonRoot, addonGroup) = context.Input;
+            var (addonRoot, addonGroup, subscribe) = context.Input;
             var window = new NewWorkshopCollectionWindow
             {
-                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup)
+                DataContext = new NewWorkshopCollectionViewModel(addonRoot, addonGroup, subscribe)
             };
             window.Show();
             window.Activate();

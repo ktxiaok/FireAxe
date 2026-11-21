@@ -1184,4 +1184,55 @@
   <data name="GameMapsItemAutoUpdate" xml:space="preserve"><value>GameMaps Item Auto Update</value></data>
   <data name="AutoDetectGameMapsItemLinkInClipboard" xml:space="preserve"><value>Auto detect GameMaps item link in Clipboard</value></data>
   <data name="UpdateGameMapsItem" xml:space="preserve"><value>Update GameMaps Item</value></data>
+  <data name="WorkshopCollectionSubscription" xml:space="preserve">
+    <value>Workshop collection subscription</value>
+  </data>
+  <data name="SynchronizeWorkshopCollections" xml:space="preserve">
+    <value>Synchronize collection subscriptions</value>
+  </data>
+  <data name="CollectionAutoUpdate" xml:space="preserve">
+    <value>Automatically synchronize collections</value>
+  </data>
+  <data name="CollectionAllowDownloads" xml:space="preserve">
+    <value>Download newly added mods</value>
+  </data>
+  <data name="CollectionAllowDeletions" xml:space="preserve">
+    <value>Remove mods removed from the collection</value>
+  </data>
+  <data name="CollectionEnableNewAddons" xml:space="preserve">
+    <value>Enable newly added mods</value>
+  </data>
+  <data name="CollectionUpdateInterval" xml:space="preserve">
+    <value>Check interval (minutes)</value>
+  </data>
+  <data name="CollectionSettingsInheritanceHint" xml:space="preserve">
+    <value>A filled square uses the global default in Settings. A check enables the option; an empty box disables it.</value>
+  </data>
+  <data name="CollectionSubscriptionDescription" xml:space="preserve">
+    <value>Track this collection while FireAxe is running. Newly added mods use the existing Workshop download and update settings.</value>
+  </data>
+  <data name="CollectionSubscriptionSafetyHint" xml:space="preserve">
+    <value>Only mods created by this subscription and still in this group can be removed. Files go to the recycle bin where supported. Manually added, moved, or deleted mods are respected. Manual synchronization also follows these permissions.</value>
+  </data>
+  <data name="CollectionSynchronizing" xml:space="preserve">
+    <value>Synchronizing collection and checking mods…</value>
+  </data>
+  <data name="CollectionLastSynchronized" xml:space="preserve">
+    <value>Last successful collection synchronization</value>
+  </data>
+  <data name="CollectionItemCount" xml:space="preserve">
+    <value>Mods in the collection: {0}</value>
+  </data>
+  <data name="NeverSynchronized" xml:space="preserve">
+    <value>Not synchronized yet</value>
+  </data>
+  <data name="CollectionSyncFailedTitle" xml:space="preserve">
+    <value>Collection synchronization failed</value>
+  </data>
+  <data name="CollectionSyncFailed" xml:space="preserve">
+    <value>Could not synchronize the Workshop collection: {0}. Check the collection's visibility and network connection, then try again.</value>
+  </data>
+  <data name="CollectionSourceChangeHint" xml:space="preserve">
+    <value>Edit the ID or paste another collection URL to change the source. Existing mods are reconciled only after the new collection is read successfully, following the download and removal permissions.</value>
+  </data>
 </root>

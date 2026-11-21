@@ -16,7 +16,7 @@ public static class WorkshopCollectionUtils
             {
                 return null;
             }
-            return results.Select(obj => obj.Id).ToArray();
+            return results.Select(obj => obj.Id).Distinct().ToArray();
         }
 
         var resultIds = new List<ulong>();
@@ -47,12 +47,13 @@ public static class WorkshopCollectionUtils
             }
         }
 
-        return resultIds.ToArray();
+        return resultIds.Distinct().ToArray();
 
         async Task<List<(ulong Id, bool IsCollection)>?> GetRaw(ulong collectionId)
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 using var postContent = new StringContent($"collectioncount=1&publishedfileids[0]={collectionId}", Encoding.UTF8, "application/x-www-form-urlencoded");
                 using var response = await httpClient.PostAsync("https://api.steampowered.com/ISteamRemoteStorage/GetCollectionDetails/v1/", postContent, cancellationToken).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
@@ -64,7 +65,11 @@ public static class WorkshopCollectionUtils
                     var collectiondetailsToken = responseToken["collectiondetails"]![0]!;
                     if ((int)collectiondetailsToken["result"]! == 1)
                     {
-                        var childrenToken = collectiondetailsToken["children"]!;
+                        if ((ulong?)collectiondetailsToken["publishedfileid"] != collectionId) return null;
+                        var childrenToken = collectiondetailsToken["children"] as JArray;
+                        if (childrenToken is null)
+                            return (int?)collectiondetailsToken["childcount"] == 0 ? [] : null;
+                        if (collectiondetailsToken["childcount"] is { } count && (int)count != childrenToken.Count) return null;
                         var results = new List<(ulong Id, bool IsCollection)>();
                         foreach (var childToken in childrenToken)
                         {
@@ -80,6 +85,7 @@ public static class WorkshopCollectionUtils
                                 continue;
                             }
                             ulong id = (ulong)childToken["publishedfileid"]!;
+                            if (id == 0) return null;
                             results.Add((id, isCollection));
                         }
                         

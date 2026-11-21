@@ -208,6 +208,16 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     public bool IsAutoUpdateGameMapsItem => ParentSettings?.IsAutoUpdateGameMapsItem ?? false;
 
+    public bool IsAutoUpdateWorkshopCollection => ParentSettings?.IsAutoUpdateWorkshopCollection ?? true;
+
+    public bool AllowWorkshopCollectionDownloads => ParentSettings?.AllowWorkshopCollectionDownloads ?? true;
+
+    public bool AllowWorkshopCollectionDeletions => ParentSettings?.AllowWorkshopCollectionDeletions ?? true;
+
+    public bool EnableNewWorkshopCollectionAddons => ParentSettings?.EnableNewWorkshopCollectionAddons ?? true;
+
+    public int WorkshopCollectionUpdateIntervalMinutes => Math.Clamp(ParentSettings?.WorkshopCollectionUpdateIntervalMinutes ?? 30, 1, 10080);
+
     public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => ParentSettings?.VpkAddonConflictCheckSettings ?? VpkAddonConflictCheckSettings.Default;
 
     IAddonNodeContainer? IAddonNodeContainer.Parent => null;
