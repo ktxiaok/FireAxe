@@ -64,7 +64,11 @@ public class AddonNodeViewModel : AddonNodeSimpleViewModel
     {
         ArgumentNullException.ThrowIfNull(addonNode);
 
-        if (addonNode is AddonGroup group)
+        if (addonNode is GameMapsAddon gameMapsAddon)
+        {
+            return new GameMapsAddonViewModel(gameMapsAddon);
+        }
+        else if (addonNode is AddonGroup group)
         {
             return new AddonGroupViewModel(group);
         }

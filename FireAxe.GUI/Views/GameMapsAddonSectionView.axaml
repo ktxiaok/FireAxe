@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FireAxe.ViewModels"
+             xmlns:v="using:FireAxe.Views"
+             xmlns:r="using:FireAxe.Resources"
+             x:Class="FireAxe.Views.GameMapsAddonSectionView"
+             x:DataType="vm:GameMapsAddonViewModel">
+  <StackPanel Spacing="5">
+    <TextBlock Text="GameMaps" Classes="Heading1"/>
+    <Button Content="{x:Static r:Texts.OpenGameMapsPage}" Command="{Binding OpenGameMapsPage}"/>
+    <TextBlock Text="{x:Static r:Texts.ItemId}" Classes="PropertyName"/>
+    <v:EditableTextBlock Value="{Binding ItemId}" Display="{Binding ItemId}"
+                        Watermark="{x:Static r:Texts.InputGameMapsIdHint}"/>
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left" Text="{x:Static r:Texts.AutoUpdateStrategy}" Classes="PropertyName"/>
+      <CheckBox Classes="PropertyValue" IsThreeState="True" IsChecked="{Binding Addon.IsAutoUpdate}"/>
+    </DockPanel>
+    <Button Content="{x:Static r:Texts.Download}" Command="{Binding DownloadCommand}"/>
+    <Button Content="{x:Static r:Texts.UpdateGameMapsItem}" Command="{Binding UpdateCommand}"/>
+    <TextBlock Text="{x:Static r:Texts.DownloadingAndExtracting}" TextWrapping="Wrap"
+               IsVisible="{Binding Addon.DownloadCheckTask, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}"/>
+    <StackPanel IsVisible="{Binding DownloadItemViewModel, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=False}">
+      <v:DownloadItemView DataContext="{Binding DownloadItemViewModel}"/>
+    </StackPanel>
+    <TextBlock Text="{Binding Addon.ErrorMessage}" TextWrapping="Wrap"/>
+  </StackPanel>
+</UserControl>

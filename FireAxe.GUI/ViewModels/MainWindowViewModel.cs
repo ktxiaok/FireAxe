@@ -31,6 +31,8 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
         public bool IsAutoUpdateWorkshopItem => _mainWindowViewModel._appSettings.IsAutoUpdateWorkshopItem;
 
+        public bool IsAutoUpdateGameMapsItem => _mainWindowViewModel._appSettings.IsAutoUpdateGameMapsItem;
+
         public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => _mainWindowViewModel._vpkAddonConflictCheckSettings;
     }
 
@@ -49,6 +51,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
     private readonly IAppWindowManager _windowManager;
     private readonly IDownloadService _downloadService;
     private readonly HttpClient _httpClient;
+    private readonly GameMapsClient _gameMapsClient;
     private readonly DownloadItemListViewModel _downloadItemListViewModel;
 
     private AddonRoot? _addonRoot = null;
@@ -80,7 +83,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
     private IDisposable _backupTimer;
 
-    public MainWindowViewModel(AppSettings appSettings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, DownloadItemListViewModel downloadItemListViewModel)
+    public MainWindowViewModel(AppSettings appSettings, IAppWindowManager windowManager, IDownloadService downloadService, HttpClient httpClient, GameMapsClient gameMapsClient, DownloadItemListViewModel downloadItemListViewModel)
     {
         ArgumentNullException.ThrowIfNull(appSettings);
         ArgumentNullException.ThrowIfNull(windowManager);
@@ -91,6 +94,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
         _windowManager = windowManager;
         _downloadService = downloadService;
         _httpClient = httpClient;
+        _gameMapsClient = gameMapsClient;
         _downloadItemListViewModel = downloadItemListViewModel;
 
         _addonRootNotNullObservable = this.WhenAnyValue(x => x.AddonRoot).Select(root => root != null);
@@ -388,6 +392,7 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 _addonRoot.ParentSettings = _addonRootParentSettings;
                 _addonRoot.TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
                 _addonRoot.DownloadService = _downloadService;
+                _addonRoot.GameMapsClient = _gameMapsClient;
                 _addonRoot.HttpClient = _httpClient;
 
                 try
@@ -816,17 +821,29 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
 
             var explorerViewModel = AddonNodeExplorerViewModel;
 
-            if (explorerViewModel != null && _appSettings.IsAutoDetectWorkshopItemLinkInClipboard)
+            if (explorerViewModel != null)
             {
                 if (clipboardText != null)
                 {
-                    if (PublishedFileUtils.TryParsePublishedFileIdLink(clipboardText, out var id))
+                    if (_appSettings.IsAutoDetectWorkshopItemLinkInClipboard
+                        && PublishedFileUtils.TryParsePublishedFileIdLink(clipboardText, out var id))
                     {
                         bool confirm = await ShowAutoDetectWorkshopItemLinkDialogInteraction.Handle(clipboardText);
                         if (confirm)
                         {
                             var addon = explorerViewModel.NewWorkshopAddon();
                             addon.PublishedFileId = id;
+                        }
+                    }
+                    else if (_appSettings.IsAutoDetectGameMapsItemLinkInClipboard
+                        && Uri.TryCreate(clipboardText.Trim(), UriKind.Absolute, out _)
+                        && GameMapsClient.TryParseDetailsId(clipboardText, out var gameMapsId))
+                    {
+                        bool confirm = await ShowAutoDetectWorkshopItemLinkDialogInteraction.Handle(clipboardText);
+                        if (confirm)
+                        {
+                            var addon = explorerViewModel.NewGameMapsAddon();
+                            addon.DetailsId = gameMapsId;
                         }
                     }
                 }
@@ -873,6 +890,10 @@ public sealed class MainWindowViewModel : ViewModelBase, IActivatableViewModel, 
                 {
                     workshopVpkAddon.Check();
                 }
+            }
+            else if (addonNode is GameMapsAddon gameMapsAddon && gameMapsAddon.NeedsDownload)
+            {
+                gameMapsAddon.Check();
             }
         }
     }

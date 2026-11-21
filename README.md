@@ -7,6 +7,7 @@
 FireAxe (formerly L4D2AddonAssistant) is an open-source GUI tool for managing Left 4 Dead 2 addons. It has the following features:
 - Organize addons hierarchically through the concept of groups
 - Support downloading workshop items and collections
+- Download GameMaps addons by URL, with automatic ZIP, RAR and 7z extraction and VPK import
 - Addon enablement state management
 - Addon tag management
 - VPK conflict check system
@@ -32,6 +33,8 @@ This project is currently in early development. More features will be added in t
 - Click the menu item "File -> Settings" and set the game path.
 - If you have local VPK files, put them into the directory. Then click the menu item "File -> Import" to import them.
 - If you want workshop items, right click to open the context menu and click the menu item "New -> Workshop Addon". Then write the item id. FireAxe will download files you need automatically.
+- For GameMaps, choose "New -> GameMaps Addon" and enter a details URL (for example, `https://www.gamemaps.com/details/24878`) or item ID. Downloads appear in the download list, and all VPKs are extracted into the addon group automatically. Clipboard link detection also supports GameMaps. Use Download or Check to retry a failure. If Cloudflare blocks the request, try the proxy in Settings or download in a browser and import the local VPK.
+- The GameMaps section below Workshop in Settings has separate auto-update and clipboard detection switches. Check detects file revisions and applies the global or per-addon auto-update policy. The recursive policy commands also support GameMaps. Use Update GameMaps Item in the addon details for a manual update. Updates retain the group and matching VPKs' names, enablement, tags and other settings, and synchronize added or removed VPKs.
 - You can create some groups to organize addons.
 - Enable the addons you want and then click the menu item "Operations -> Push" to push the enablement state to the game.
 - You can click the check button to keep the status up to date.

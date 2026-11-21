@@ -3224,6 +3224,24 @@ namespace FireAxe.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
+        public static string GameMapsAddon => ResourceManager.GetString("GameMapsAddon", resourceCulture);
+
+        public static string UnnamedGameMapsAddon => ResourceManager.GetString("UnnamedGameMapsAddon", resourceCulture);
+
+        public static string OpenGameMapsPage => ResourceManager.GetString("OpenGameMapsPage", resourceCulture);
+
+        public static string InputGameMapsIdHint => ResourceManager.GetString("InputGameMapsIdHint", resourceCulture);
+
+        public static string InvalidGameMapsId => ResourceManager.GetString("InvalidGameMapsId", resourceCulture);
+
+        public static string DownloadingAndExtracting => ResourceManager.GetString("DownloadingAndExtracting", resourceCulture);
+
+        public static string GameMapsItemAutoUpdate => ResourceManager.GetString("GameMapsItemAutoUpdate", resourceCulture);
+
+        public static string AutoDetectGameMapsItemLinkInClipboard => ResourceManager.GetString("AutoDetectGameMapsItemLinkInClipboard", resourceCulture);
+
+        public static string UpdateGameMapsItem => ResourceManager.GetString("UpdateGameMapsItem", resourceCulture);
+
         public static string Yes {
             get {
                 return ResourceManager.GetString("Yes", resourceCulture);

@@ -208,6 +208,37 @@
         </StackPanel>
       </Border>
 
+      <!--gamemaps-->
+      <TextBlock
+        Text="GameMaps"
+        Classes="Heading1"
+        Margin="0, 5, 0, 2.5"/>
+      <Border
+        Classes="Level1"
+        Margin="0, 2.5, 0, 5"
+        Padding="5">
+        <StackPanel Orientation="Vertical">
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Classes="PropertyName"
+              Text="{x:Static r:Texts.GameMapsItemAutoUpdate}"/>
+            <CheckBox
+              Classes="PropertyValue"
+              IsChecked="{Binding Settings.IsAutoUpdateGameMapsItem}"/>
+          </DockPanel>
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Left"
+              Classes="PropertyName"
+              Text="{x:Static r:Texts.AutoDetectGameMapsItemLinkInClipboard}"/>
+            <CheckBox
+              Classes="PropertyValue"
+              IsChecked="{Binding Settings.IsAutoDetectGameMapsItemLinkInClipboard}"/>
+          </DockPanel>
+        </StackPanel>
+      </Border>
+
       <!--download-->
       <TextBlock
         Text="{x:Static r:Texts.Download}"

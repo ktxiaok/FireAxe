@@ -251,6 +251,7 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         NewGroupCommand = ReactiveCommand.Create(() => { NewGroup(); });
         NewRefAddonCommand = ReactiveCommand.Create(() => { NewRefAddon(); });
         NewWorkshopAddonCommand = ReactiveCommand.Create(() => { NewWorkshopAddon(); });
+        NewGameMapsAddonCommand = ReactiveCommand.Create(() => { NewGameMapsAddon(); });
         NewWorkshopCollectionCommand = ReactiveCommand.CreateFromTask(async () => 
         {
             this.ThrowIfInvalid();
@@ -264,7 +265,9 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
         var hasSelectedWorkshopVpkAddon = _selectedNodes.ObserveCollectionChanges()
             .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants()).OfType<WorkshopVpkAddon>().Any());
-        var hasSelectedUpdateableAddon = hasSelectedWorkshopVpkAddon;
+        var hasSelectedUpdateableAddon = _selectedNodes.ObserveCollectionChanges()
+            .Select(_ => SelectedNodes.SelectMany(addon => addon.GetSelfAndDescendants())
+                .Any(addon => addon is WorkshopVpkAddon or GameMapsAddon));
         SetAutoUpdateStrategyToDefaultRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(null), hasSelectedUpdateableAddon);
         SetAutoUpdateStrategyToEnabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(true), hasSelectedUpdateableAddon);
         SetAutoUpdateStrategyToDisabledRecursivelyCommand = ReactiveCommand.Create(() => SetSelectionAutoUpdateStrategyRecursively(false), hasSelectedUpdateableAddon);
@@ -542,6 +545,8 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
 
     public ReactiveCommand<Unit, Unit> NewWorkshopAddonCommand { get; }
 
+    public ReactiveCommand<Unit, Unit> NewGameMapsAddonCommand { get; }
+
     public ReactiveCommand<Unit, Unit> NewWorkshopCollectionCommand { get; }
 
     public ReactiveCommand<Unit, Unit> CreateRefAddonsBasedOnSelectedCommand { get; }
@@ -686,6 +691,15 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
         var addon = AddonNode.Create<WorkshopVpkAddon>(AddonRoot, CurrentGroup);
         addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedWorkshopAddon);
         addon.RequestAutoSetName = true;
+        SelectNode(addon);
+        return addon;
+    }
+
+    public GameMapsAddon NewGameMapsAddon()
+    {
+        this.ThrowIfInvalid();
+        var addon = AddonNode.Create<GameMapsAddon>(AddonRoot, CurrentGroup);
+        addon.Name = addon.Parent.GetUniqueChildName(Texts.UnnamedGameMapsAddon);
         SelectNode(addon);
         return addon;
     }
@@ -950,6 +964,10 @@ public class AddonNodeExplorerViewModel : ViewModelBase, IActivatableViewModel, 
             if (addon is WorkshopVpkAddon workshopVpkAddon)
             {
                 workshopVpkAddon.IsAutoUpdate = strategy;
+            }
+            else if (addon is GameMapsAddon gameMapsAddon)
+            {
+                gameMapsAddon.IsAutoUpdate = strategy;
             }
         }
     }

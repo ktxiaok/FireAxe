@@ -3,6 +3,7 @@ using FireAxe.ViewModels;
 using FireAxe.Resources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using Serilog;
 using System;
@@ -50,8 +51,10 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     private string _gamePath = "";
     private bool _ignoreHalfLife2FilesForVpkAddonConflicts = true;
     private bool _isAutoUpdateWorkshopItem = true;
+    private bool _isAutoUpdateGameMapsItem = true;
     private string? _suppressedUpdateRequestVersion = null;
     private bool _isAutoDetectWorkshopItemLinkInClipboard = true;
+    private bool _isAutoDetectGameMapsItemLinkInClipboard = true;
     private bool _isAutoRedownload = false;
     private Uri? _webProxyUri = null;
     private bool _isFileBackupEnabled = true;
@@ -358,6 +361,32 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
     }
 
     [JsonProperty]
+    public bool IsAutoUpdateGameMapsItem
+    {
+        get => _isAutoUpdateGameMapsItem;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref _isAutoUpdateGameMapsItem, value))
+            {
+                RequestSave = true;
+            }
+        }
+    }
+
+    [JsonProperty]
+    public bool IsAutoDetectGameMapsItemLinkInClipboard
+    {
+        get => _isAutoDetectGameMapsItemLinkInClipboard;
+        set
+        {
+            if (NotifyAndSetIfChanged(ref _isAutoDetectGameMapsItemLinkInClipboard, value))
+            {
+                RequestSave = true;
+            }
+        }
+    }
+
+    [JsonProperty]
     public bool IsAutoRedownload
     {
         get => _isAutoRedownload;
@@ -643,7 +672,13 @@ public sealed class AppSettings : ObservableObject, ISaveable, IDisposable
         {
             if (File.Exists(_settingsFilePath))
             {
-                JsonConvert.PopulateObject(File.ReadAllText(_settingsFilePath), this, s_jsonSettings);
+                string json = File.ReadAllText(_settingsFilePath);
+                var savedSettings = JObject.Parse(json);
+                JsonConvert.PopulateObject(json, this, s_jsonSettings);
+                if (savedSettings[nameof(IsAutoUpdateGameMapsItem)] is null)
+                    IsAutoUpdateGameMapsItem = IsAutoUpdateWorkshopItem;
+                if (savedSettings[nameof(IsAutoDetectGameMapsItemLinkInClipboard)] is null)
+                    IsAutoDetectGameMapsItemLinkInClipboard = IsAutoDetectWorkshopItemLinkInClipboard;
             }
         }
         catch (Exception ex)

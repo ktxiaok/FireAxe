@@ -157,7 +157,7 @@
     <value>Author:</value>
   </data>
   <data name="AutoDetectWorkshopItemLinkDialogMessage" xml:space="preserve">
-    <value>It is detected that you copied a workshop item link ({0}). Would you like to create a workshop addon?</value>
+    <value>A Steam Workshop or GameMaps link was copied ({0}). Would you like to create an addon?</value>
   </data>
   <data name="AutoDetectWorkshopItemLinkInClipboard" xml:space="preserve">
     <value>Auto detect workshop item link in Clipboard</value>
@@ -1175,4 +1175,13 @@
   <data name="AddonsWithMissingFilesNotFound" xml:space="preserve">
     <value>Addons with missing files not found.</value>
   </data>
+  <data name="GameMapsAddon" xml:space="preserve"><value>GameMaps Addon</value></data>
+  <data name="UnnamedGameMapsAddon" xml:space="preserve"><value>Unnamed GameMaps Addon</value></data>
+  <data name="OpenGameMapsPage" xml:space="preserve"><value>Open GameMaps Page</value></data>
+  <data name="InputGameMapsIdHint" xml:space="preserve"><value>GameMaps details URL or item ID</value></data>
+  <data name="InvalidGameMapsId" xml:space="preserve"><value>Enter a valid GameMaps details URL or a positive item ID.</value></data>
+  <data name="DownloadingAndExtracting" xml:space="preserve"><value>Downloading and importing VPK files…</value></data>
+  <data name="GameMapsItemAutoUpdate" xml:space="preserve"><value>GameMaps Item Auto Update</value></data>
+  <data name="AutoDetectGameMapsItemLinkInClipboard" xml:space="preserve"><value>Auto detect GameMaps item link in Clipboard</value></data>
+  <data name="UpdateGameMapsItem" xml:space="preserve"><value>Update GameMaps Item</value></data>
 </root>

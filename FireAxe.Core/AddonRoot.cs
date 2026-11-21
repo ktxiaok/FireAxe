@@ -58,6 +58,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
 
     private HttpClient? _httpClient = null;
 
+    private GameMapsClient? _gameMapsClient = null;
+
     private readonly AddonNodeContainerService _containerService;
 
     private int _blockAutoCheck = 0;
@@ -72,6 +74,17 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     }
 
     public event Action<IDownloadItem>? NewDownloadItem = null;
+
+    public GameMapsClient GameMapsClient
+    {
+        get => _gameMapsClient ?? throw new InvalidOperationException($"{nameof(GameMapsClient)} is not set.");
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            this.ThrowIfInvalid();
+            _gameMapsClient = value;
+        }
+    }
 
     public bool IsValid => !_disposed;
 
@@ -192,6 +205,8 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
     public IAddonRootParentSettings? ParentSettings { get; set; } = null;
 
     public bool IsAutoUpdateWorkshopItem => ParentSettings?.IsAutoUpdateWorkshopItem ?? false;
+
+    public bool IsAutoUpdateGameMapsItem => ParentSettings?.IsAutoUpdateGameMapsItem ?? false;
 
     public VpkAddonConflictCheckSettings VpkAddonConflictCheckSettings => ParentSettings?.VpkAddonConflictCheckSettings ?? VpkAddonConflictCheckSettings.Default;
 
@@ -1272,7 +1287,7 @@ public sealed class AddonRoot : ObservableObject, IAsyncDisposable, IAddonNodeCo
                 tasks.Add(checkTask);
             }
 
-            foreach (var node in Nodes)
+            foreach (var node in Nodes.ToArray())
             {
                 tasks.Add(node.DestroyAsync());
             }

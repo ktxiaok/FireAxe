@@ -56,6 +56,7 @@ public partial class App : Application
                     .AddSingleton<MainWindowViewModel>()
                     .AddSingleton<AppSettings>()
                     .AddSingleton<DownloadItemListViewModel>()
+                    .AddSingleton<GameMapsClient>(services => new GameMapsClient(services.GetRequiredService<AppSettings>().GetWebProxy()))
                     .AddSingleton<SaveManager>()
                     .AddSingleton<IAppWindowManager, AppWindowManager>()
                     .AddSingleton<IDownloadService, DownloadService>(
